@@ -1,19 +1,8 @@
-import {
-  ArrowBigDown,
-  Calendar,
-  ChevronDown,
-  FileCheck,
-  Keyboard,
-  LucideArrowDownWideNarrow,
-  Plus,
-  Search,
-  Settings,
-} from "lucide-react";
-import React from "react";
-import { TbReportSearch } from "react-icons/tb";
-import { IoSettingsOutline } from "react-icons/io5";
+import { Calendar, ChevronDown, Plus, Search } from "lucide-react";
+
 import { FaFileInvoice } from "react-icons/fa";
 import DashboardNavbar from "../components/DashboardNavbar";
+import { motion } from "framer-motion";
 
 const DashboardExpenses = () => {
   return (
@@ -22,7 +11,21 @@ const DashboardExpenses = () => {
         <div className="h-full rounded-md  bg-white p-5 flex flex-col">
           <DashboardNavbar title={"Expenses"} />
 
-          <div className="flex justify-between  mt-10">
+          <motion.div
+            initial={{
+              opacity: 0,
+              scaleY: 0,
+            }}
+            animate={{
+              opacity: 1,
+              scaleY: 1,
+            }}
+            transition={{
+              ease: "easeInOut",
+              duration: 0.2,
+            }}
+            className="flex justify-between  mt-10"
+          >
             <div className="flex gap-3">
               {/* search box */}
               <div className="">
@@ -88,6 +91,7 @@ const DashboardExpenses = () => {
                 </ul>
               </div>
             </div>
+
             <div>
               <div className="h-full">
                 <button className="btn btn-info">
@@ -95,10 +99,26 @@ const DashboardExpenses = () => {
                 </button>
               </div>
             </div>
-          </div>
+          </motion.div>
 
           {/* table */}
-          <div className="overflow-x-auto border border-zinc-200 rounded-lg  mt-10 h-80 w-full">
+          <motion.div
+          initial={{
+            opacity:0,
+            scale:0,
+            filter:"blur(10px)"
+          }}
+          animate={{
+            opacity:1,
+            scale:1,
+            filter:"blur(0px)"
+          }}
+          transition={{
+            ease:"easeInOut",
+            duration:0.2
+          }}
+          
+          className="overflow-x-auto border border-zinc-200 rounded-lg  mt-10 h-80 w-full">
             <table className="table">
               {/* head */}
               <thead>
@@ -115,7 +135,7 @@ const DashboardExpenses = () => {
               <FaFileInvoice size={40} />
               No transactions matching the current filter
             </div>
-          </div>
+          </motion.div>
         </div>
       </section>
     </main>
