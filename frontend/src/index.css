@@ -1,0 +1,22 @@
+@import url("https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap");
+@import "tailwindcss";
+@plugin "daisyui";
+body {
+  font-family: "Poppins", sans-serif;
+}
+
+:root {
+  --primary-btn-background: rgba(66, 135, 245, 0.3);
+  --primary-btn-dark: rgb(66, 135, 245);
+  --primary-btn-color: #00bafe;
+  --primary-btn-back-hover: rgb(66, 135, 245);
+}
+
+/* hide-scrollbar class */
+.hide-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+.hide-scrollbar {
+  -ms-overflow-style: none; /* IE and Edge */
+  scrollbar-width: none; /* Firefox */
+}
