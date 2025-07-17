@@ -142,16 +142,25 @@ const Sidebar = () => {
             animate="show"
           >
             {dashboardAccountingFields?.map((field) => (
-              <motion.div
-                variants={dashboardLinksItems}
-                key={field?.id}
-                className="group px-4 flex items-center gap-5 text-sm py-2 hover:bg-info/10 cursor-pointer hover:scale-105 transition-all ease-in-out duration-150 hover:text-[var(--primary-btn-color)]"
-              >
-                {field?.icon}
-                <span className="group-hover:translate-x-2 transition-all ease-in-out duration-200">
-                  {field.label}
-                </span>
-              </motion.div>
+              <div key={field.id}>
+                <NavLink
+                  end
+                  to={field.link}
+                  className={({ isActive }) =>
+                    `group px-4 my-1 flex items-center gap-5 text-sm py-2 cursor-pointer transition-all ease-in-out duration-150 
+                  ${
+                    isActive
+                      ? "bg-info/10 text-[var(--primary-btn-color)] scale-105 border-l-2"
+                      : "hover:bg-info/0 hover:text-[var(--primary-btn-color)] hover:scale-105"
+                  }`
+                  }
+                >
+                  {field?.icon}
+                  <span className="group-hover:translate-x-2 transition-all ease-in-out duration-200">
+                    {field.label}
+                  </span>
+                </NavLink>
+              </div>
             ))}
           </motion.div>
         </div>

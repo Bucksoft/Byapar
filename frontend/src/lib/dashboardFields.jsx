@@ -72,25 +72,30 @@ export const dashboardAccountingFields = [
     id: 1,
     icon: <BsBank2 />,
     label: "Cash & Bank",
+    link: "cashandbank",
   },
   {
     id: 2,
     icon: <FaFileInvoice />,
     label: "E-Invoicing",
+    link: "invoicing",
   },
   {
     id: 3,
     icon: <FaMoneyBills />,
     label: "Automated Bills",
+    link: "bills",
   },
   {
     id: 4,
     icon: <FaWallet />,
     label: "Expenses",
+    link: "expenses",
   },
   {
     id: 5,
     icon: <BsFillLaptopFill />,
     label: "POS Billing",
+    link: "pos",
   },
 ];
