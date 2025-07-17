@@ -104,7 +104,7 @@ const Sidebar = () => {
             className="mt-3"
           >
             {dashboardFields?.map((field, index) => (
-              <motion.div key={field.id} variants={dashboardLinksItems}>
+              <motion.div variants={dashboardLinksItems}>
                 <NavLink
                   end
                   to={
@@ -142,7 +142,7 @@ const Sidebar = () => {
             animate="show"
           >
             {dashboardAccountingFields?.map((field) => (
-              <div key={field.id}>
+              <div key={field.id} variants={dashboardLinksItems}>
                 <NavLink
                   end
                   to={field.link}

@@ -9,6 +9,7 @@ import DashboardPurchasesPage from "./pages/DashboardPurchasesPage";
 import DashboardReportPage from "./pages/DashboardReportPage";
 import DashboardSalesPage from "./pages/DashboardSalesPage";
 import DashboardEInvoicing from "./pages/DashboardEInvoicing";
+import DashboardExpenses from "./pages/DashboardExpenses";
 
 function App() {
   return (
@@ -30,6 +31,7 @@ function App() {
             path="/dashboard/invoicing"
             element={<DashboardEInvoicing />}
           />
+          <Route path="/dashboard/expenses" element={<DashboardExpenses />} />
         </Route>
       </Routes>
     </>
