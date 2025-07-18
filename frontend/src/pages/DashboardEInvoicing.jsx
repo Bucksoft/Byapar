@@ -63,19 +63,24 @@ const DashboardEInvoicing = () => {
             variants={container}
             initial="hidden"
             animate="show"
-            className="grid grid-cols-3   gap-5 my-5 mx-20 "
+            className="grid grid-cols-3  gap-5 my-5 mx-20 "
           >
             {/* Card 1 */}
             {dashboardEInvoicingCardDetails?.map((detail) => (
               <motion.div
                 variants={childCards}
-                className="border border-zinc-200 hover:-translate-y-1 transition-all ease-in-out rounded-md hover:shadow-md"
+                className="border border-zinc-200 hover:-translate-y-1 flex flex-col items-center justify-center  transition-all ease-in-out rounded-md hover:shadow-md"
                 key={detail.id}
               >
-                <div className="flex flex-col items-center justify-center  h-[80%] ">
-                  <img src={detail.img} alt="invoDel" width={250} />
+                <div className="flex flex-col items-center justify-center h-[80%] ">
+                  <img
+                    src={detail.img}
+                    alt="invoDel"
+                    width={250}
+                    className=""
+                  />
                 </div>
-                <p className="mt-4 p-3 text-slate-600 border-t text-sm border-t-zinc-200 text-center pt-2">
+                <p className="mt-4 p-3 text-slate-600 border-t w-full text-sm border-t-zinc-200 text-center pt-2">
                   {detail.label}
                 </p>
               </motion.div>
@@ -93,7 +98,7 @@ const DashboardEInvoicing = () => {
                 ease: "easeInOut",
                 duration: 0.2,
               }}
-              className="font-medium text-sm  py-4"
+              className="font-medium text-sm text-zinc-600 py-4"
             >
               Try India's easiest and fastest e-invoicing solution today
             </motion.p>
