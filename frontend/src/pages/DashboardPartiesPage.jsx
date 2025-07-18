@@ -1,10 +1,11 @@
-
 import { FaIndianRupeeSign } from "react-icons/fa6";
-import {  Plus, Search } from "lucide-react";
+import { Plus, Search } from "lucide-react";
 import upload from "../assets/upload.png";
 import { PiMicrosoftExcelLogoFill } from "react-icons/pi";
 import DashboardNavbar from "../components/DashboardNavbar";
 import { dashboardPartiesCardDetails } from "../lib/dashboardPartiesCards";
+import { motion } from "framer-motion";
+import { container, dashboardLinksItems } from "../components/Sidebar";
 
 const DashboardPartiesPage = () => {
   return (
@@ -13,14 +14,20 @@ const DashboardPartiesPage = () => {
         {/* Parties top navigation bar */}
         <DashboardNavbar title={"Parties"} />
 
-        <div className="grid grid-cols-3 gap-2 mt-4 text-sm">
+        <motion.div
+          variants={container}
+          initial="hidden"
+          animate="show"
+          className="grid grid-cols-3 gap-2 mt-4 text-sm"
+        >
           {dashboardPartiesCardDetails?.map((details) => (
-            <div
+            <motion.div
+              variants={dashboardLinksItems}
               key={details.id}
               className={`border rounded-md p-3 shadow-md border-${details.color} bg-${details.color}/10 hover:-translate-y-1 transition-all ease-in-out duration-200 cursor-pointer`}
             >
               <p className={`flex items-center gap-3 text-${details.color}`}>
-                {details.icon} {details.label}  
+                {details.icon} {details.label}
               </p>
               <span className="font-medium text-2xl flex items-center gap-2">
                 {details.label === "To Collect" && (
@@ -29,12 +36,25 @@ const DashboardPartiesPage = () => {
                 {details.label === "To Pay" && <FaIndianRupeeSign size={15} />}
                 {details.value}
               </span>
-            </div>
+            </motion.div>
           ))}
-        </div>
+        </motion.div>
 
-
-        <div className="flex items-center justify-between mt-8">
+        <motion.div
+          initial={{
+            opacity: 0,
+            scaleY: 0,
+          }}
+          animate={{
+            opacity: 1,
+            scaleY: 1,
+          }}
+          transition={{
+            ease: "easeInOut",
+            duration: 0.2,
+          }}
+          className="flex items-center justify-between mt-8"
+        >
           <div className="">
             <label className="input">
               <Search size={16} className="text-zinc-400" />
@@ -47,11 +67,22 @@ const DashboardPartiesPage = () => {
               <Plus size={14} /> Create Party
             </button>
           </div>
-        </div>
-          
+        </motion.div>
 
-
-        <div className="overflow-x-auto rounded-box border border-base-content/5 bg-base-100 mt-8 ">
+        <motion.div
+        initial={{
+          opacity:0,
+          scale:0
+        }}
+        animate={{
+          opacity:1,
+          scale:1
+        }}
+        transition={{
+          ease:"easeInOut",
+          duration:0.2
+        }}
+        className="overflow-x-auto rounded-box border border-base-content/5 bg-base-100 mt-8 ">
           <table className="table">
             {/* head */}
             <thead>
@@ -65,18 +96,47 @@ const DashboardPartiesPage = () => {
             </thead>
             <tbody>
               {/* row 1 */}
-              <tr>
+              <motion.tr
+              initial={{
+                opacity:0,
+                scaleY:0
+              }}
+              animate={{
+                opacity:1,
+                scaleY:1
+              }}
+              transition={{
+                ease:"easeInOut",
+                duration:0.2,
+                delay:0.2
+              }}
+              >
                 <td>Cash Sale</td>
                 <td>-</td>
                 <td>63874682348</td>
                 <td>Customer</td>
                 <td>₹ 0</td>
-              </tr>
+              </motion.tr>
             </tbody>
           </table>
-        </div>
+        </motion.div>
 
-        <div className="w-full mt-7 flex  gap-3 bg-gradient-to-r from-sky-100 to-sky-50 rounded-md p-4">
+        <motion.div
+        initial={{
+          opacity:0,
+          translateY:100
+        }}
+        animate={{
+          opacity:1,
+          translateY:1
+        }}
+        transition={{
+          ease:"easeInOut",
+          duration:0.2,
+          delay:0.3
+        }}
+        
+        className="w-full mt-7 flex  gap-3 bg-gradient-to-r from-sky-100 to-sky-50 rounded-md p-4">
           <img src={upload} alt="upload" width={120} />
           <div>
             <h2 className="mt-2 text-md font-semibold">
@@ -91,7 +151,7 @@ const DashboardPartiesPage = () => {
               Upload Excel
             </button>
           </div>
-        </div>
+        </motion.div>
       </section>
     </main>
   );

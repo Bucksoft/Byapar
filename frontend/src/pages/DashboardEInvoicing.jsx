@@ -77,7 +77,7 @@ const DashboardEInvoicing = () => {
                     src={detail.img}
                     alt="invoDel"
                     width={250}
-                    className=""
+                    loading="lazy"
                   />
                 </div>
                 <p className="mt-4 p-3 text-slate-600 border-t w-full text-sm border-t-zinc-200 text-center pt-2">

@@ -1,70 +1,111 @@
-import React from "react";
-import { BsStars } from "react-icons/bs";
-import { FaFile, FaRegFile } from "react-icons/fa6";
-import { LuBox } from "react-icons/lu";
 import { RiAccountPinCircleFill } from "react-icons/ri";
-import { TbReportAnalytics } from "react-icons/tb";
-import { IoPeopleOutline } from "react-icons/io5";
+import { motion } from "framer-motion";
+import { container, dashboardLinksItems } from "../components/Sidebar";
+
+const badges = [
+  {
+    id: 1,
+    label: "Party",
+  },
+  {
+    id: 2,
+    label: "Invoice",
+  },
+  {
+    id: 3,
+    label: "Category",
+  },
+  {
+    id: 4,
+    label: "Payment Collection",
+  },
+  {
+    id: 5,
+    label: "Item",
+  },
+  {
+    id: 6,
+    label: "Invoice Details",
+  },
+  {
+    id: 7,
+    label: "Summary",
+  },
+];
+
 const DashboardReportPage = () => {
   return (
     <main className="h-full p-2">
       <div className="h-full w-full bg-white rounded-lg p-3">
         {/* header */}
-        <div className="flex items-center justify-between ">
+        <motion.div
+          initial={{
+            opacity: 0,
+            translateY: -100,
+          }}
+          animate={{
+            opacity: 1,
+            translateY: 0,
+          }}
+          transition={{
+            ease: "easeInOut",
+            duration: 0.3,
+          }}
+          className="flex items-center justify-between "
+        >
           <h1 className="font-semibold text-lg mt-1">Reports</h1>
           <button className="btn btn-sm btn-info flex items-center gap-2">
             {" "}
             <RiAccountPinCircleFill size={16} /> CA Report Sharing
           </button>
-        </div>
+        </motion.div>
 
         <div className="mt-7 text-sm flex items-center gap-5">
           <h2>Filter By</h2>
-          <div className="flex gap-3">
-            <div className="badge badge-soft badge-primary cursor-pointer">
-              Party
-            </div>
-            <div className="badge badge-soft badge-primary cursor-pointer">
-              Category
-            </div>
-            <div className="badge badge-soft badge-primary cursor-pointer">
-              Payment Collection
-            </div>
-            <div className="badge badge-soft badge-primary cursor-pointer">
-              Item
-            </div>
-            <div className="badge badge-soft badge-primary cursor-pointer">
-              Invoice Details
-            </div>
-            <div className="badge badge-soft badge-primary cursor-pointer">
-              Summary
-            </div>
-          </div>
+          <motion.div
+            variants={container}
+            initial="hidden"
+            animate="show"
+            className="flex gap-3"
+          >
+            {badges?.map((badge) => (
+              <motion.div
+                variants={dashboardLinksItems}
+                className="badge badge-soft badge-primary cursor-pointer"
+              >
+                {badge.label}
+              </motion.div>
+            ))}
+          </motion.div>
         </div>
 
-        <table className="table mt-8">
+        <motion.table
+          initial={{
+            opacity: 0,
+            translateY: 100,
+          }}
+          animate={{
+            opacity: 1,
+            translateY: 0,
+          }}
+          transition={{
+            ease: "easeInOut",
+            duration: 0.2,
+            delay: 0.4,
+          }}
+          className="table mt-8"
+        >
           {/* head */}
           <thead>
             <tr className="bg-zinc-100">
-              <th className="flex items-center gap-2">
-                <BsStars /> Favourite
-              </th>
-              <th>
-                <TbReportAnalytics /> GST
-              </th>
-              <th>
-                <FaRegFile /> Transaction
-              </th>
-              <th>
-                <LuBox /> Item
-              </th>
-              <th>
-                <IoPeopleOutline />
-                Party
-              </th>
+              <th>Favourite</th>
+              <th>GST</th>
+              <th>Transaction</th>
+              <th>Item</th>
+              <th>Party</th>
             </tr>
           </thead>
-        </table>
+        </motion.table>
       </div>
     </main>
   );
