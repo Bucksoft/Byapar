@@ -12,6 +12,20 @@ import DashboardEInvoicing from "./pages/DashboardEInvoicing";
 import DashboardExpenses from "./pages/DashboardExpenses";
 import DashboardCashAndBank from "./pages/DashboardCashAndBank";
 import DashboardBills from "./pages/DashboardBills";
+import DashboardAccountPage from "./pages/DashboardAccountPage";
+import DashboardManageBusinessPage from "./pages/DashboardManageBusinessPage";
+import DashboardInvoicePage from "./pages/DashboardInvoicePage";
+import DashboardPrintSettingsPage from "./pages/DashboardPrintSettingsPage";
+import DashboardManageUsersPage from "./pages/DashboardManageUsersPage";
+import DashboardRemindersPage from "./pages/DashboardRemindersPage";
+import DashboardCAReportsSharingPage from "./pages/DashboardCAReportsSharingPage";
+import DashboardPricingPage from "./pages/DashboardPricingPage";
+import DashboardReferAndEarnPage from "./pages/DashboardReferAndEarnPage";
+import DashboardHelpAndSupportPage from "./pages/DashboardHelpAndSupportPage";
+import DashboardStaffPage from "./pages/DashboardStaffPage";
+import DashboardOnlineStorePage from "./pages/DashboardOnlineStorePage";
+import DashboardSMSMarketingPage from "./pages/DashboardSMSMarketingPage";
+import DashboardLoanPage from "./pages/DashboardLoanPage";
 
 function App() {
   return (
@@ -39,6 +53,47 @@ function App() {
             element={<DashboardCashAndBank />}
           />
           <Route path="/dashboard/bills" element={<DashboardBills />} />
+          <Route path="/dashboard/account" element={<DashboardAccountPage />} />
+          <Route
+            path="/dashboard/business"
+            element={<DashboardManageBusinessPage />}
+          />
+          <Route path="/dashboard/invoice" element={<DashboardInvoicePage />} />
+          <Route
+            path="/dashboard/print"
+            element={<DashboardPrintSettingsPage />}
+          />
+          <Route
+            path="/dashboard/users"
+            element={<DashboardManageUsersPage />}
+          />
+          <Route
+            path="/dashboard/reminders"
+            element={<DashboardRemindersPage />}
+          />
+          <Route
+            path="/dashboard/ca-reports"
+            element={<DashboardCAReportsSharingPage />}
+          />
+          <Route path="/dashboard/pricing" element={<DashboardPricingPage />} />
+          <Route
+            path="/dashboard/refer-and-earn"
+            element={<DashboardReferAndEarnPage />}
+          />
+          <Route
+            path="/dashboard/help-and-support"
+            element={<DashboardHelpAndSupportPage />}
+          />
+          <Route path="/dashboard/staff" element={<DashboardStaffPage />} />
+          <Route
+            path="/dashboard/online-store"
+            element={<DashboardOnlineStorePage />}
+          />
+          <Route
+            path="/dashboard/sms-marketing"
+            element={<DashboardSMSMarketingPage />}
+          />
+          <Route path="/dashboard/loan" element={<DashboardLoanPage />} />
         </Route>
       </Routes>
     </>

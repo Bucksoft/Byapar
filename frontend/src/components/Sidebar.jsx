@@ -1,12 +1,16 @@
 import { Plus } from "lucide-react";
 import { FaMoneyBillAlt } from "react-icons/fa";
 import {
+  businessTools,
   dashboardAccountingFields,
   dashboardFields,
+  settingLinks,
 } from "../lib/dashboardFields";
 import { IoSettings } from "react-icons/io5";
 import { NavLink } from "react-router-dom";
 import { motion } from "framer-motion";
+import { TbLogout2 } from "react-icons/tb";
+import { BiChevronDown } from "react-icons/bi";
 
 export const container = {
   hidden: { opacity: 0 },
@@ -32,7 +36,7 @@ export const dashboardLinksItems = {
 const Sidebar = () => {
   return (
     <>
-      <section className=" bg-gradient-to-b from-sky-50 to-white  text-black shadow-md max-h-screen overflow-y-auto hide-scrollbar  border border-zinc-200 ">
+      <section className=" bg-gradient-to-b from-sky-50 to-white  text-black shadow-md max-h-screen overflow-y-auto hide-scrollbar border border-zinc-200 ">
         {/* nav */}
         <motion.h1
           initial={{
@@ -105,29 +109,64 @@ const Sidebar = () => {
           >
             {dashboardFields?.map((field, index) => (
               <motion.div variants={dashboardLinksItems}>
-                <NavLink
-                  end
-                  to={
-                    field.label.toLowerCase() === "dashboard"
-                      ? "/dashboard"
-                      : `/dashboard/${field.label
-                          .toLowerCase()
-                          .replace(/\s+/g, "-")}`
-                  }
-                  className={({ isActive }) =>
-                    `group px-4 flex items-center gap-5 text-sm py-2 cursor-pointer transition-all ease-in-out duration-150 
+                {field.label === "Items" ||
+                field.label === "Sales" ||
+                field.label === "Purchases" ? (
+                  <>
+                    <div className="dropdown group px-4 flex items-center gap-5 text-sm py-2 cursor-pointer transition-all ease-in-out duration-150 hover:text-info ">
+                      <div
+                        tabIndex={0}
+                        role="button"
+                        className="flex items-center justify-between  w-full"
+                      >
+                        <div className="flex items-center gap-5 justify-between">
+                          {field?.icon}
+                          <span className="group-hover:translate-x-2 transition-all ease-in-out duration-200">
+                            {field.label}
+                          </span>
+                        </div>
+                        <BiChevronDown />
+                      </div>
+                      <ul
+                        tabIndex={0}
+                        className="dropdown-content  menu bg-white rounded-box z-100 w-52 p-2 shadow-sm"
+                      >
+                        <li>
+                          <a>Item 1</a>
+                        </li>
+                        <li>
+                          <a>Item 2</a>
+                        </li>
+                      </ul>
+                    </div>
+                  </>
+                ) : (
+                  <>
+                    <NavLink
+                      end
+                      to={
+                        field.label.toLowerCase() === "dashboard"
+                          ? "/dashboard"
+                          : `/dashboard/${field.label
+                              .toLowerCase()
+                              .replace(/\s+/g, "-")}`
+                      }
+                      className={({ isActive }) =>
+                        `group px-4 flex items-center gap-5 text-sm py-2 cursor-pointer transition-all ease-in-out duration-150 
                   ${
                     isActive
                       ? "bg-info/10 text-[var(--primary-btn-color)] scale-105 border-l-2"
                       : "hover:bg-info/0 hover:text-[var(--primary-btn-color)] hover:scale-105"
                   }`
-                  }
-                >
-                  {field?.icon}
-                  <span className="group-hover:translate-x-2 transition-all ease-in-out duration-200">
-                    {field.label}
-                  </span>
-                </NavLink>
+                      }
+                    >
+                      {field?.icon}
+                      <span className="group-hover:translate-x-2 transition-all ease-in-out duration-200">
+                        {field.label}
+                      </span>
+                    </NavLink>
+                  </>
+                )}
               </motion.div>
             ))}
           </motion.div>
@@ -165,9 +204,73 @@ const Sidebar = () => {
           </motion.div>
         </div>
 
+        <div className="px-5 py-2 border-b border-zinc-200">
+          <label className="font-semibold text-xs">SETTINGS</label>
+          <motion.div
+            className="mt-3"
+            variants={container}
+            initial="hidden"
+            animate="show"
+          >
+            {settingLinks?.map((field) => (
+              <div key={field.id} variants={dashboardLinksItems}>
+                <NavLink
+                  end
+                  to={field.link}
+                  className={({ isActive }) =>
+                    `group px-4 my-1 flex items-center gap-5 text-sm py-2 cursor-pointer transition-all ease-in-out duration-150 
+                  ${
+                    isActive
+                      ? "bg-info/10 text-[var(--primary-btn-color)] scale-105 border-l-2"
+                      : "hover:bg-info/0 hover:text-[var(--primary-btn-color)] hover:scale-105"
+                  }`
+                  }
+                >
+                  {field?.icon}
+                  <span className="group-hover:translate-x-2 text-nowrap transition-all ease-in-out duration-200">
+                    {field.label}
+                  </span>
+                </NavLink>
+              </div>
+            ))}
+          </motion.div>
+        </div>
+
+        <div className="px-5 py-2 border-b border-zinc-200">
+          <label className="font-semibold text-xs">BUSINESS TOOLS</label>
+          <motion.div
+            className="mt-3"
+            variants={container}
+            initial="hidden"
+            animate="show"
+          >
+            {businessTools?.map((field) => (
+              <div key={field.id} variants={dashboardLinksItems}>
+                <NavLink
+                  end
+                  to={field.link}
+                  className={({ isActive }) =>
+                    `group px-4 my-1 flex items-center gap-5 text-sm py-2 cursor-pointer transition-all ease-in-out duration-150 
+                  ${
+                    isActive
+                      ? "bg-info/10 text-[var(--primary-btn-color)] scale-105 border-l-2"
+                      : "hover:bg-info/0 hover:text-[var(--primary-btn-color)] hover:scale-105"
+                  }`
+                  }
+                >
+                  {field?.icon}
+                  <span className="group-hover:translate-x-2  transition-all ease-in-out duration-200">
+                    {field.label}
+                  </span>
+                </NavLink>
+              </div>
+            ))}
+          </motion.div>
+        </div>
+
         <button className="hover:bg-slate-800 transition-all ease-in-out duration-700 hover:text-white group px-5 py-3 flex items-center gap-3 bg-info text-white w-full cursor-pointer">
-          <IoSettings className="group-hover:rotate-90 transition-all ease-in-out duration-200 group-hover:scale-120" />{" "}
-          Settings
+          <TbLogout2 className="group-hover:rotate-90 transition-all ease-in-out duration-200 group-hover:scale-120" />{" "}
+          Logout
         </button>
       </section>
     </>
