@@ -1,10 +1,24 @@
-import React from "react";
 import { IoSettingsOutline } from "react-icons/io5";
 import { TbReportSearch } from "react-icons/tb";
+import { motion } from "framer-motion";
 
 const DashboardNavbar = ({ title }) => {
   return (
-    <div className="flex items-center justify-between">
+    <motion.div
+      initial={{
+        opacity: 0,
+        translateY: -100,
+      }}
+      animate={{
+        opacity: 1,
+        translateY: 0,
+      }}
+      transition={{
+        ease: "easeInOut",
+        duration: 0.3,
+      }}
+      className="flex items-center justify-between"
+    >
       <h2 className="font-semibold text-lg">{title}</h2>
 
       {/* Reports dropdown */}
@@ -37,7 +51,7 @@ const DashboardNavbar = ({ title }) => {
           />
         </button>
       </div>
-    </div>
+    </motion.div>
   );
 };
 

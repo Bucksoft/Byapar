@@ -11,14 +11,14 @@ export const dashboardPartiesCardDetails = [
   },
   {
     id: 2,
-    icon: <BadgeIndianRupee size={14}/>,
+    icon: <BadgeIndianRupee size={14} />,
     label: "To Collect",
     value: "1",
     color: "error",
   },
   {
     id: 3,
-    icon: <BadgeIndianRupee size={14}/>,
+    icon: <BadgeIndianRupee size={14} />,
     label: "To Pay",
     value: "1",
     color: "primary",

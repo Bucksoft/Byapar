@@ -12,6 +12,7 @@ import DashboardEInvoicing from "./pages/DashboardEInvoicing";
 import DashboardExpenses from "./pages/DashboardExpenses";
 import DashboardCashAndBank from "./pages/DashboardCashAndBank";
 import DashboardBills from "./pages/DashboardBills";
+<<<<<<< HEAD
 import DashboardAccountPage from "./pages/DashboardAccountPage";
 import DashboardManageBusinessPage from "./pages/DashboardManageBusinessPage";
 import DashboardInvoicePage from "./pages/DashboardInvoicePage";
@@ -26,6 +27,9 @@ import DashboardStaffPage from "./pages/DashboardStaffPage";
 import DashboardOnlineStorePage from "./pages/DashboardOnlineStorePage";
 import DashboardSMSMarketingPage from "./pages/DashboardSMSMarketingPage";
 import DashboardLoanPage from "./pages/DashboardLoanPage";
+=======
+import DashboardPOS from "./pages/DashboardPOS";
+>>>>>>> d9236567d22c05460e84054991f455c55cd8e028
 
 function App() {
   return (
@@ -53,6 +57,7 @@ function App() {
             element={<DashboardCashAndBank />}
           />
           <Route path="/dashboard/bills" element={<DashboardBills />} />
+<<<<<<< HEAD
           <Route path="/dashboard/account" element={<DashboardAccountPage />} />
           <Route
             path="/dashboard/business"
@@ -94,6 +99,9 @@ function App() {
             element={<DashboardSMSMarketingPage />}
           />
           <Route path="/dashboard/loan" element={<DashboardLoanPage />} />
+=======
+          <Route path="/dashboard/pos" element={<DashboardPOS />} />
+>>>>>>> d9236567d22c05460e84054991f455c55cd8e028
         </Route>
       </Routes>
     </>

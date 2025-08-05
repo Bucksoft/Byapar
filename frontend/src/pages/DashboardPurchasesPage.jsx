@@ -1,18 +1,24 @@
-import React from "react";
 import DashboardNavbar from "../components/DashboardNavbar";
 import { dashboardPurchaseDetails } from "../lib/dashboardPurhaseCards";
 import { Calendar, Plus, Search } from "lucide-react";
-import { TbReportSearch } from "react-icons/tb";
 import { FaFileInvoice } from "react-icons/fa6";
+import { motion } from "framer-motion";
+import { container, dashboardLinksItems } from "../components/Sidebar";
 
 const DashboardPurchasesPage = () => {
   return (
     <main className="h-full p-2">
       <div className="h-full w-full bg-white rounded-lg p-3">
         <DashboardNavbar title={"Purchase Invoice"} />
-        <div className="grid grid-cols-3 gap-2 mt-4 text-sm">
+        <motion.div
+          variants={container}
+          initial="hidden"
+          animate="show"
+          className="grid grid-cols-3 gap-2 mt-4 text-sm"
+        >
           {dashboardPurchaseDetails?.map((details) => (
-            <div
+            <motion.div
+              variants={dashboardLinksItems}
               key={details.id}
               className={`border rounded-md p-3 shadow-md border-${details.color} bg-${details.color}/10 hover:-translate-y-1 transition-all ease-in-out duration-200 cursor-pointer`}
             >
@@ -26,11 +32,25 @@ const DashboardPurchasesPage = () => {
                 {details.label === "To Pay" && <FaIndianRupeeSign size={15} />}
                 {details.value}
               </span>
-            </div>
+            </motion.div>
           ))}
-        </div>
+        </motion.div>
 
-        <div className="flex items-center justify-between mt-8">
+        <motion.div
+          initial={{
+            opacity: 0,
+            scaleY: 0,
+          }}
+          animate={{
+            opacity: 1,
+            scaleY: 1,
+          }}
+          transition={{
+            ease: "easeInOut",
+            duration: 0.2,
+          }}
+          className="flex items-center justify-between mt-8"
+        >
           <div className="flex items-center gap-3">
             <label className="input">
               <Search size={16} className="text-zinc-400" />
@@ -69,10 +89,25 @@ const DashboardPurchasesPage = () => {
               <Plus size={14} /> Create Purchase Invoice
             </button>
           </div>
-        </div>
+        </motion.div>
 
         <div className="mt-8 overflow-x-auto rounded-box border border-base-content/5 bg-base-100">
-          <table className="table">
+          <motion.table
+            initial={{
+              opacity: 0,
+              translateY: 100,
+            }}
+            animate={{
+              opacity: 1,
+              translateY: 0,
+            }}
+            transition={{
+              ease: "easeInOut",
+              duration: 0.2,
+              delay: 0.3,
+            }}
+            className="table"
+          >
             {/* head */}
             <thead>
               <tr>
@@ -84,11 +119,16 @@ const DashboardPurchasesPage = () => {
                 <th>Status</th>
               </tr>
             </thead>
-          </table>
-          <div className="w-full flex items-center justify-center my-8 flex-col gap-3 text-zinc-400">
+          </motion.table>
+          <motion.div
+            initial={{ opacity: 0, scale: 0 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ ease: "easeInOut", duration: 0.2, delay: 0.4 }}
+            className="w-full flex items-center justify-center my-8 flex-col gap-3 text-zinc-400"
+          >
             <FaFileInvoice size={40} />
             No transactions matching the current filter
-          </div>
+          </motion.div>
         </div>
       </div>
     </main>

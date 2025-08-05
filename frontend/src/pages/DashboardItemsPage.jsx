@@ -1,13 +1,12 @@
 import DashboardNavbar from "../components/DashboardNavbar";
 import { Plus, Search } from "lucide-react";
 import { FaIndianRupeeSign } from "react-icons/fa6";
-import { AiOutlineStock } from "react-icons/ai";
-import { BsFillBoxSeamFill } from "react-icons/bs";
 import { LuPackageSearch } from "react-icons/lu";
 import no_items from "../assets/no_items.jpg";
 import { PiMicrosoftExcelLogoFill } from "react-icons/pi";
-import { dashboardPartiesCardDetails } from "../lib/dashboardPartiesCards";
 import { dashboardItemsCardDetails } from "../lib/dashboardItemCards";
+import { motion } from "framer-motion";
+import { container, dashboardLinksItems } from "../components/Sidebar";
 
 const DashboardItemsPage = () => {
   return (
@@ -15,9 +14,15 @@ const DashboardItemsPage = () => {
       <div className="h-full w-full bg-white rounded-lg p-3">
         <DashboardNavbar title={"Items"} />
 
-        <section className="grid grid-cols-2 gap-2 ">
+        <motion.section
+          variants={container}
+          initial="hidden"
+          animate="show"
+          className="grid grid-cols-2 gap-2 "
+        >
           {dashboardItemsCardDetails?.map((details) => (
-            <div
+            <motion.div
+              variants={dashboardLinksItems}
               key={details.id}
               className={`border rounded-md p-3 mt-5 shadow-md border-${details.color} bg-${details.color}/10 hover:-translate-y-1 transition-all ease-in-out duration-200 cursor-pointer`}
             >
@@ -30,11 +35,25 @@ const DashboardItemsPage = () => {
                 )}
                 1
               </span>
-            </div>
+            </motion.div>
           ))}
-        </section>
+        </motion.section>
 
-        <div className="flex items-center justify-between mt-8 ">
+        <motion.div
+          initial={{
+            opacity: 0,
+            scaleY: 0,
+          }}
+          animate={{
+            opacity: 1,
+            scaleY: 1,
+          }}
+          transition={{
+            ease: "easeInOut",
+            duration: 0.2,
+          }}
+          className="flex items-center justify-between mt-8 "
+        >
           <div className="flex items-center gap-2">
             <label className="input">
               <Search size={16} className="text-zinc-400" />
@@ -50,9 +69,24 @@ const DashboardItemsPage = () => {
               <Plus size={14} /> Create Item
             </button>
           </div>
-        </div>
+        </motion.div>
 
-        <div className="flex items-center justify-center  flex-col">
+        <motion.div
+          initial={{
+            opacity: 0,
+            scale: 0,
+          }}
+          animate={{
+            opacity: 1,
+            scale: 1,
+          }}
+          transition={{
+            ease:'easeInOut',
+            duration:0.2,
+            delay:0.2
+          }}
+          className="flex items-center justify-center  flex-col"
+        >
           <img src={no_items} alt="no_items" width={250} />
           <h3 className="font-semibold">Add all your Items at once!</h3>
           <p className="text-zinc-500 text-xs">
@@ -62,7 +96,7 @@ const DashboardItemsPage = () => {
             {" "}
             <PiMicrosoftExcelLogoFill size={15} /> Add Items with Excel
           </button>
-        </div>
+        </motion.div>
       </div>
     </main>
   );
