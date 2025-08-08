@@ -1,4 +1,4 @@
-import { Keyboard, MessageCircle, Upload } from "lucide-react";
+import { Keyboard, MessageCircle } from "lucide-react";
 import { IoMdAttach } from "react-icons/io";
 import suggestion from "../assets/suggestion.png";
 import personhandshake from "../assets/Personhandshake.png";
@@ -7,14 +7,15 @@ import phonesms from "../assets/phoneSMS.png";
 import desktop from "../assets/Desktop.png";
 import scanner from "../assets/scanner.png";
 import warehouse from "../assets/Warehouse.png";
-import React, { useState } from "react";
+import { useState } from "react";
 import { IoLogoWechat } from "react-icons/io5";
+import { motion } from "framer-motion";
 
 const DashboardAccountPage = () => {
   const [chatOpen, setChatOpen] = useState(false);
-  console.log(chatOpen);
   return (
     <main className="h-screen w-full relative flex">
+      {/* Chatbot */}
       {chatOpen && (
         <div className="flex items-end justify-between flex-col absolute bottom-5 right-5  w-1/4">
           <div className="border-b border-b-zinc-300 rounded-md bg-white border w-full overflow-hidden">
@@ -64,7 +65,21 @@ const DashboardAccountPage = () => {
 
       <section className="w-full p-2 bg-gray-200">
         <div className=" shadow shadow-gray-200 h-full rounded-md bg-white">
-          <div className="flex justify-between border-b border-b-zinc-300 p-3 ">
+          <motion.div
+            initial={{
+              translateY: -100,
+              opacity: 0,
+            }}
+            animate={{
+              translateY: 0,
+              opacity: 1,
+            }}
+            transition={{
+              ease: "easeInOut",
+              duration: 0.3,
+            }}
+            className="flex justify-between border-b border-b-zinc-300 p-3 "
+          >
             {/* navigation left side*/}
             <div className=" flex flex-col">
               <span className="text-md">Account Settings</span>
@@ -85,23 +100,53 @@ const DashboardAccountPage = () => {
               <button className="btn btn-info btn-sm">Cancel</button>
               <button className="btn btn-info btn-sm">Save Changes</button>
             </div>
-          </div>
+          </motion.div>
 
-          <div className="border-b border-b-zinc-300 p-2 flex items-center justify-center bg-indigo-50">
-            <span className="font-semibold pr-4">
+          <motion.div
+            initial={{
+              translateY: -100,
+              opacity: 0,
+            }}
+            animate={{
+              translateY: 0,
+              opacity: 1,
+            }}
+            transition={{
+              ease: "easeInOut",
+              duration: 0.3,
+              delay: 0.3,
+            }}
+            className="border-b  border-b-zinc-300 p-2 flex items-center justify-center bg-indigo-50"
+          >
+            <span className="font-semibold pr-4 ">
               Help us make Byapar better
             </span>
             <button className="btn btn-info btn-sm">
               <img src={suggestion} alt="" className="h-5 font-black" />
               <span className=""> Share Suggestion</span>
             </button>
-          </div>
+          </motion.div>
 
           <div className="border-b border-b-zinc-300 pl-3 py-1 bg-gray-50">
             <span className="text-xs">General Information</span>
           </div>
 
-          <div className="border-b border-b-zinc-300 p-3 flex ">
+          <motion.div
+            initial={{
+              translateY: -100,
+              opacity: 0,
+            }}
+            animate={{
+              translateY: 0,
+              opacity: 1,
+            }}
+            transition={{
+              ease: "easeInOut",
+              duration: 0.3,
+              delay: 0.5,
+            }}
+            className="border-b border-b-zinc-300 p-3 flex "
+          >
             <form action="" className="flex">
               <div>
                 <label htmlFor="name" className="text-xs pr-40">
@@ -126,13 +171,27 @@ const DashboardAccountPage = () => {
                 <input type="email" placeholder="" className="input input-sm" />
               </div>
             </form>
-          </div>
+          </motion.div>
 
-          <div className="border-b border-b-zinc-300 pl-3 py-1 bg-gray-50">
+          <motion.div
+            initial={{
+              opacity: 0,
+              filter: "blur(10px)",
+            }}
+            animate={{
+              opacity: 1,
+              filter: "0px",
+            }}
+            transition={{
+              ease: "easeInOut",
+              duration: 0.3,
+            }}
+            className="border-b border-b-zinc-300 pl-3 py-1 bg-gray-50"
+          >
             <span className="text-xs">
               Referral code for subscription discount
             </span>
-          </div>
+          </motion.div>
 
           <div className="border-b border-b-zinc-300 p-3">
             <input
@@ -143,11 +202,39 @@ const DashboardAccountPage = () => {
             <button className="btn btn-info ml-5 px-15 btn-sm">Apply</button>
           </div>
 
-          <div className="border-b border-b-zinc-300 pl-3 py-1 bg-gray-50">
+          <motion.div
+            initial={{
+              opacity: 0,
+              filter: "blur(10px)",
+            }}
+            animate={{
+              opacity: 1,
+              filter: "0px",
+            }}
+            transition={{
+              ease: "easeInOut",
+              duration: 0.3,
+            }}
+            className="border-b border-b-zinc-300 pl-3 py-1 bg-gray-50"
+          >
             <span className="text-xs">Subscription Plan</span>
-          </div>
+          </motion.div>
 
-          <div className="grid grid-cols-2">
+          <motion.div
+            initial={{
+              opacity: 0,
+              filter: "blur(10px)",
+            }}
+            animate={{
+              opacity: 1,
+              filter: "0px",
+            }}
+            transition={{
+              ease: "easeInOut",
+              duration: 0.3,
+            }}
+            className="grid grid-cols-2"
+          >
             {/* left */}
             <div className="pt-5 pl-3">
               <p className="text-xs">CURRENT PLAN</p>
@@ -233,7 +320,7 @@ const DashboardAccountPage = () => {
                 </div>
               </div>
             </div>
-          </div>
+          </motion.div>
         </div>
       </section>
     </main>

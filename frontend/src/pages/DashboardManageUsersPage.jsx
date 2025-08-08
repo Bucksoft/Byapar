@@ -1,32 +1,42 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { AiOutlineQuestionCircle } from "react-icons/ai";
 import { LuUsers } from "react-icons/lu";
 import { IoIosPulse } from "react-icons/io";
 import manageuser from "../assets/manageuser.png";
 import { FaPlus } from "react-icons/fa6";
 import { IoSearchOutline } from "react-icons/io5";
-import { IoIosArrowDown } from "react-icons/io";
-import { CiCalendar } from "react-icons/ci";
 import { LuChevronsUpDown } from "react-icons/lu";
 import { LuSquareActivity } from "react-icons/lu";
 import manageuser1 from "../assets/manageuser1.png";
+import { motion } from "framer-motion";
 
 const DashboardManageUsersPage = () => {
   const [menu, setMenu] = useState("users");
   return (
-    <main className="flex p-2 bg-white border border-gray-200 shadow-2xs gap-2 ">
-      <div className="w-full h-screen border border-gray-300 rounded ">
+    <main className="flex p-2 bg-zinc-200 max-h-screen overflow-y-scroll border border-gray-200 shadow-2xs gap-2 ">
+      <div className="w-full h-screen border border-gray-300 bg-white rounded ">
         {/* Header Seaction */}
         <div className="flex flex-col w-full h-screen p-4">
           <div className="flex items-center justify-between ">
-            <p className="text-2xl ">Manage Users</p>
+            <p className="text-lg">Manage Users</p>
             <p className="p-2 border border-gray-300">
               <AiOutlineQuestionCircle size={15} />
             </p>
           </div>
 
           <section className="flex py-4 gap-3">
-            <div
+            <motion.div
+              initial={{
+                translateX: -100,
+                opacity: 0,
+              }}
+              animate={{
+                translateX: 0,
+                opacity: 1,
+              }}
+              transition={{
+                ease: "easeInOut",
+              }}
               onClick={() => setMenu("users")}
               className="border flex flex-col gap-2 p-3 border-gray-300 w-1/3 cursor-pointer rounded-lg hover:bg-[#F1F0FC] hover:border-indigo-700 "
             >
@@ -35,9 +45,21 @@ const DashboardManageUsersPage = () => {
                 Number of Users
               </div>
               <div className="text-lg font-semibold">1</div>
-            </div>
+            </motion.div>
 
-            <div
+            <motion.div
+              initial={{
+                translateX: -100,
+                opacity: 0,
+              }}
+              animate={{
+                translateX: 0,
+                opacity: 1,
+              }}
+              transition={{
+                ease: "easeInOut",
+                delay: 0.3,
+              }}
               onClick={() => setMenu("activites")}
               className="border flex flex-col p-3 gap-2 cursor-pointer border-gray-300 w-1/3 rounded-lg hover:bg-[#F1F0FC] hover:border-indigo-700 "
             >
@@ -51,7 +73,7 @@ const DashboardManageUsersPage = () => {
                   Last 30 Days
                 </p>
               </div>
-            </div>
+            </motion.div>
           </section>
 
           {/* Medium Part */}
@@ -59,61 +81,148 @@ const DashboardManageUsersPage = () => {
             <>
               {/* User Section */}
               <section className="flex flex-col items-center gap-3 justify-center">
-                <img
+                <motion.img
+                  initial={{
+                    opacity: 0,
+                    filter: "blur(10px)",
+                  }}
+                  animate={{
+                    opacity: 1,
+                    filter: "blur(0px)",
+                  }}
+                  transition={{
+                    ease: "easeInOut",
+                    duration: 0.3,
+                  }}
                   src={manageuser}
                   alt="/src/assets/manageuser"
                   className="w-3/7"
                 />
-                <p className="font-semibold text-lg">
+                <motion.p
+                  initial={{
+                    translateY: -100,
+                    opacity: 0,
+                  }}
+                  animate={{
+                    translateY: 0,
+                    opacity: 1,
+                  }}
+                  transition={{
+                    ease: "easeInOut",
+                    duration: 0.3,
+                  }}
+                  className="font-semibold text-lg"
+                >
                   Give access to users and monitor their actions
-                </p>
-                <p className="text-sm text-gray-500">
+                </motion.p>
+                <motion.p
+                  initial={{
+                    translateY: -100,
+                    opacity: 0,
+                  }}
+                  animate={{
+                    translateY: 0,
+                    opacity: 1,
+                  }}
+                  transition={{
+                    ease: "easeInOut",
+                    duration: 0.3,
+                    delay: 0.3,
+                  }}
+                  className="text-sm text-gray-500"
+                >
                   Manage your business more efficiently with full control and
                   vision
-                </p>
-                <div className="flex gap-4">
-                  <button className="bg-info text-white p-2 gap-1 cursor-pointer flex items-center rounded font-bold text-sm px-5 ">
+                </motion.p>
+                <motion.div
+                  initial={{
+                    translateY: 100,
+                    opacity: 0,
+                  }}
+                  animate={{
+                    translateY: 0,
+                    opacity: 1,
+                  }}
+                  transition={{
+                    ease: "easeInOut",
+                    duration: 0.3,
+                  }}
+                  className="flex gap-4"
+                >
+                  <button className="btn btn-info btn-sm ">
                     <FaPlus />
                     Add New User
                   </button>
-                  <button className="text-sm text-gray-500 border gap-1 cursor-pointer  hover:text-gray flex items-center border-gray-300 rounded p-2 px-5">
+                  <button className="btn btn-sm">
                     <FaPlus />
                     Add Your CA
                   </button>
-                </div>
+                </motion.div>
               </section>
             </>
           ) : (
             <>
               {/* Activites section */}
               <section className="flex flex-col">
-                <div className="flex items-center gap-3">
-                  <button className="text-gray border border-gray-300 p-2 rounded">
-                    <IoSearchOutline />
+                <motion.div
+                  initial={{
+                    transitionY: -100,
+                    opacity: 0,
+                  }}
+                  animate={{
+                    transitionY: 0,
+                    opacity: 1,
+                  }}
+                  transition={{
+                    ease: "easeInOut",
+                  }}
+                  className="flex items-center gap-3"
+                >
+                  <button className="btn btn-sm">
+                    <IoSearchOutline size={16} />
                   </button>
-                  <button className="flex items-center bg-[#F6F7F7] border border-gray-300 rounded p-2 gap-16 text-sm text-gray-400">
-                    All Transactions
-                    <IoIosArrowDown />
-                  </button>
-                  <button className="flex items-center justify-between bg-[#F6F7F7] border border-gray-300 rounded p-2 gap-16 ">
-                    <p className="text-gray-400 text-sm flex items-center gap-2 ">
-                      <CiCalendar />
-                      Last 30 Days
-                    </p>
-                    <p className="text-gray-400">
-                      <IoIosArrowDown />
-                    </p>
-                  </button>
-                </div>
+                  <select
+                    defaultValue="All transactions"
+                    className="select select-sm"
+                  >
+                    <option disabled={true}>All transactions</option>
+                    <option>Crimson</option>
+                    <option>Amber</option>
+                    <option>Velvet</option>
+                  </select>
+                  <select
+                    defaultValue="Last 30 days"
+                    className="select select-sm"
+                  >
+                    <option disabled={true}>Last 30 days</option>
+                    <option>Crimson</option>
+                    <option>Amber</option>
+                    <option>Velvet</option>
+                  </select>
+                </motion.div>
               </section>
 
-              <section className="py-3 ">
-                <div className="border border-gray-300 rounded">
+              <section className="py-3">
+                <motion.div
+                  initial={{
+                    translateY: -100,
+                    opacity: 0,
+                  }}
+                  animate={{
+                    translateY: 0,
+                    opacity: 1,
+                  }}
+                  transition={{
+                    ease: "easeInOut",
+                    delay: 0.3,
+                  }}
+                  className="border border-gray-300 rounded"
+                >
                   <div className="overflow-x-auto rounded-box border border-base-content/5 bg-base-100">
                     <table className="table">
                       {/* head */}
                       <thead>
-                        <tr>
+                        <tr className="bg-base-300">
                           <th className="flex items-center gap-1">
                             Time of Activity
                             <LuChevronsUpDown />
@@ -133,10 +242,24 @@ const DashboardManageUsersPage = () => {
                       You have performed 0 activities
                     </p>
                   </div>
-                </div>
+                </motion.div>
 
                 <section className="py-3">
-                  <div className="border border-gray-300 flex items-center justify-between rounded px-3 bg-[#E3E9ED]">
+                  <motion.div
+                    initial={{
+                      filter: "blur(10px)",
+                      opacity: 0,
+                    }}
+                    animate={{
+                      filter: "0px",
+                      opacity: 1,
+                    }}
+                    transition={{
+                      ease: "easeInOut",
+                      duration: 0.3,
+                    }}
+                    className="border border-gray-300 flex items-center justify-between rounded px-3 bg-[#E3E9ED]"
+                  >
                     <div className="flex items-center gap-3">
                       <img
                         src={manageuser1}
@@ -154,10 +277,10 @@ const DashboardManageUsersPage = () => {
                         </p>
                       </div>
                     </div>
-                    <button className="text-white text-sm font-bold p-2 px-2 bg-[#7063D8] cursor-pointer rounded hover:bg-indigo-400">
+                    <button className="btn btn-info btn-sm">
                       Track All Activities
                     </button>
-                  </div>
+                  </motion.div>
                 </section>
               </section>
             </>

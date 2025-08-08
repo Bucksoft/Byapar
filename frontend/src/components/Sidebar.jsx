@@ -17,7 +17,7 @@ export const container = {
   show: {
     opacity: 1,
     transition: {
-      staggerChildren: 0.2,
+      staggerChildren: 0.1,
     },
   },
 };
@@ -48,7 +48,7 @@ const Sidebar = () => {
             filter: "blur(0)",
           }}
           onScroll={() => console.log("Sad")}
-          className="sticky top-0 bg-sky-950  z-10 text-md text-white font-semibold flex items-center gap-3 w-full px-5 py-3 border-b border-zinc-200"
+          className="sticky top-0 bg-sky-950 z-10 text-md text-white font-semibold flex items-center gap-3 w-full px-5 py-3 border-b border-zinc-200"
         >
           <FaMoneyBillAlt size={20} />
           ByaPar
@@ -116,7 +116,7 @@ const Sidebar = () => {
                     {/* Nested Links */}
                     <Link
                       to={`/dashboard/${field.label.toLowerCase()}`}
-                      className="dropdown dropdown-start group px-4 flex items-center gap-5 text-sm py-2 cursor-pointer transition-all ease-in-out duration-150 hover:text-info "
+                      className="dropdown dropdown-start group px-4 flex items-center gap-5 text-xs py-2 cursor-pointer transition-all ease-in-out duration-150 hover:text-info "
                     >
                       <div
                         tabIndex={0}
@@ -164,7 +164,7 @@ const Sidebar = () => {
                               .replace(/\s+/g, "-")}`
                       }
                       className={({ isActive }) =>
-                        `group px-4 flex items-center gap-5 text-sm py-2 cursor-pointer transition-all ease-in-out duration-150 
+                        `group px-4 flex items-center gap-5 text-xs py-2 cursor-pointer transition-all ease-in-out duration-150 
                   ${
                     isActive
                       ? "bg-info/10 text-[var(--primary-btn-color)] scale-105 border-l-2"
@@ -198,7 +198,7 @@ const Sidebar = () => {
                   end
                   to={field.link}
                   className={({ isActive }) =>
-                    `group px-4 my-1 flex items-center gap-5 text-sm py-2 cursor-pointer transition-all ease-in-out duration-150 
+                    `group px-4 my-1 flex items-center gap-5 text-xs py-2 cursor-pointer transition-all ease-in-out duration-150 
                   ${
                     isActive
                       ? "bg-info/10 text-[var(--primary-btn-color)] scale-105 border-l-2"
@@ -230,7 +230,7 @@ const Sidebar = () => {
                   end
                   to={field.link}
                   className={({ isActive }) =>
-                    `group px-4 my-1 flex items-center gap-5 text-sm py-2 cursor-pointer transition-all ease-in-out duration-150 
+                    `group px-4 my-1 flex items-center gap-5 text-xs py-2 cursor-pointer transition-all ease-in-out duration-150 
                   ${
                     isActive
                       ? "bg-info/10 text-[var(--primary-btn-color)] scale-105 border-l-2"
@@ -248,7 +248,7 @@ const Sidebar = () => {
           </motion.div>
         </div>
 
-        <div className="px-5 py-2 border-b border-zinc-200">
+        <div className="px-5 pt-2 pb-8 border-b border-zinc-200">
           <label className="font-semibold text-xs">BUSINESS TOOLS</label>
           <motion.div
             className="mt-3"
@@ -262,7 +262,7 @@ const Sidebar = () => {
                   end
                   to={field.link}
                   className={({ isActive }) =>
-                    `group px-4 my-1 flex items-center gap-5 text-sm py-2 cursor-pointer transition-all ease-in-out duration-150 
+                    `group px-4 my-1 flex items-center gap-5 text-xs text-nowrap py-2 cursor-pointer transition-all ease-in-out duration-150 
                   ${
                     isActive
                       ? "bg-info/10 text-[var(--primary-btn-color)] scale-105 border-l-2"
@@ -271,7 +271,7 @@ const Sidebar = () => {
                   }
                 >
                   {field?.icon}
-                  <span className="group-hover:translate-x-2  transition-all ease-in-out duration-200">
+                  <span className="group-hover:translate-x-2 transition-all ease-in-out duration-200">
                     {field.label}
                   </span>
                 </NavLink>
@@ -280,7 +280,7 @@ const Sidebar = () => {
           </motion.div>
         </div>
 
-        <button className="hover:bg-slate-800 transition-all ease-in-out duration-700 hover:text-white group px-5 py-3 flex items-center gap-3 bg-info text-white w-full cursor-pointer">
+        <button className="hover:bg-slate-800  transition-all ease-in-out duration-700 hover:text-white group px-5 py-3 flex items-center gap-3 bg-info text-white w-full cursor-pointer">
           <TbLogout2 className="group-hover:rotate-90 transition-all ease-in-out duration-200 group-hover:scale-120" />{" "}
           Logout
         </button>

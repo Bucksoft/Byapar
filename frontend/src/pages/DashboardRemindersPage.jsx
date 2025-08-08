@@ -1,7 +1,7 @@
 import { Keyboard, MessageCircle } from "lucide-react";
 import { useState } from "react";
 import { FaSortDown, FaSortUp } from "react-icons/fa";
-import { RxCheckbox } from "react-icons/rx";
+import { motion } from "framer-motion";
 
 const DashboardRemindersPage = () => {
   const [open, setOpen] = useState(false);
@@ -22,7 +22,21 @@ const DashboardRemindersPage = () => {
     <main className="h-screen w-full flex">
       <section className="w-full p-3 bg-gray-200">
         <div className=" shadow shadow-gray-200 h-full rounded-md bg-white">
-          <div className="flex justify-between border-b border-b-zinc-300 p-3 ">
+          <motion.div
+            initial={{
+              translateY: -100,
+              opacity: 0,
+            }}
+            animate={{
+              translateY: 0,
+              opacity: 1,
+            }}
+            transition={{
+              ease: "easeInOut",
+              duration: 0.3,
+            }}
+            className="flex justify-between border-b border-b-zinc-300 p-3 "
+          >
             {/* navigation left side*/}
             <div className=" flex flex-col">
               <span className="text-md">Reminder Settings</span>
@@ -39,12 +53,26 @@ const DashboardRemindersPage = () => {
               <button className="btn btn-info btn-sm">Cancel</button>
               <button className="btn btn-info btn-sm">Save Changes</button>
             </div>
-          </div>
+          </motion.div>
           {/* toggle section */}
 
           <div className="border-t border-b border-zinc-300 grid grid-cols-2 py-4 gap-5">
             {/* left */}
-            <div className="border border-zinc-300 rounded-md ml-3 p-3">
+            <motion.div
+              initial={{
+                translateX: -100,
+                opacity: 0,
+              }}
+              animate={{
+                translateX: 0,
+                opacity: 1,
+              }}
+              transition={{
+                ease: "easeInOut",
+                duration: 0.3,
+              }}
+              className="border border-zinc-300 rounded-md ml-3 p-3"
+            >
               <div className="overflow-hidden flex justify-between items-center">
                 <p className="text-[13px] ">Send billing SMS to Party</p>
                 <input
@@ -56,9 +84,24 @@ const DashboardRemindersPage = () => {
               <p className="text-[12px] text-zinc-400">
                 Send SMS to your Party on creating any transaction
               </p>
-            </div>
+            </motion.div>
             {/* right */}
-            <div className="border border-zinc-300 rounded-md mr-3 p-3">
+            <motion.div
+              initial={{
+                translateX: -100,
+                opacity: 0,
+              }}
+              animate={{
+                translateX: 0,
+                opacity: 1,
+              }}
+              transition={{
+                ease: "easeInOut",
+                duration: 0.3,
+                delay: 0.3,
+              }}
+              className="border border-zinc-300 rounded-md mr-3 p-3"
+            >
               <div className="overflow-hidden flex justify-between items-center">
                 <p className="text-[13px] ">Send billing SMS to Party</p>
                 <input
@@ -70,12 +113,24 @@ const DashboardRemindersPage = () => {
               <p className="text-[12px] text-zinc-400">
                 Send SMS to your Party on creating any transaction
               </p>
-            </div>
+            </motion.div>
           </div>
 
           {/*  first accordion */}
           <div className="">
-            <div
+            <motion.div
+              initial={{
+                translateY: -100,
+                opacity: 0,
+              }}
+              animate={{
+                translateY: 0,
+                opacity: 1,
+              }}
+              transition={{
+                ease: "easeInOut",
+                duration: 0.3,
+              }}
               className="border-b border-b-zinc-300 flex cursor-pointer items-center justify-between p-2 bg-gray-100"
               onClick={handleFirstAccordion}
             >
@@ -91,7 +146,7 @@ const DashboardRemindersPage = () => {
                   <FaSortDown />
                 </span>
               )}
-            </div>
+            </motion.div>
             {open && (
               <>
                 <div className="p-3 border border-zinc-300 ">
@@ -160,7 +215,20 @@ const DashboardRemindersPage = () => {
 
           {/* second accordian */}
           <div className="">
-            <div
+            <motion.div
+              initial={{
+                translateY: -100,
+                opacity: 0,
+              }}
+              animate={{
+                translateY: 0,
+                opacity: 1,
+              }}
+              transition={{
+                ease: "easeInOut",
+                duration: 0.3,
+                delay:0.3
+              }}
               className="border-b cursor-pointer border-zinc-300 flex items-center justify-between p-2 bg-gray-100"
               onClick={handleSecondAccordion}
             >
@@ -176,7 +244,7 @@ const DashboardRemindersPage = () => {
                   <FaSortDown />
                 </span>
               )}
-            </div>
+            </motion.div>
             {secondopen && (
               <>
                 {/* top */}

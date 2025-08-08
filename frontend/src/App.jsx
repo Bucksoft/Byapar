@@ -26,6 +26,7 @@ import DashboardStaffPage from "./pages/DashboardStaffPage";
 import DashboardOnlineStorePage from "./pages/DashboardOnlineStorePage";
 import DashboardSMSMarketingPage from "./pages/DashboardSMSMarketingPage";
 import DashboardLoanPage from "./pages/DashboardLoanPage";
+import DashboardPOS from "./pages/DashboardPOS";
 
 function App() {
   return (
@@ -48,6 +49,7 @@ function App() {
             element={<DashboardEInvoicing />}
           />
           <Route path="/dashboard/expenses" element={<DashboardExpenses />} />
+          <Route path="/dashboard/pos" element={<DashboardPOS />} />
           <Route
             path="/dashboard/cashandbank"
             element={<DashboardCashAndBank />}
