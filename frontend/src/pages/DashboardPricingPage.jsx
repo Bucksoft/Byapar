@@ -30,7 +30,20 @@ const DashboardPricingPage = () => {
   return (
     <main className="max-h-screen w-full flex ">
       <div className=" bg-[#F7F7FE] w-full m-5 rounded-md overflow-auto hide-scroll">
-        <div className="border border-gray-200 m-5 p-3 bg-white rounded-xs text-sm flex flex-col items-center justify-center">
+        <motion.div
+          initial={{
+            translateY: -100,
+            opacity: 0,
+          }}
+          animate={{
+            translateY: 0,
+            opacity: 1,
+          }}
+          transition={{
+            ease: "easeInOut",
+          }}
+          className="border rounded-md border-gray-200 m-5 p-3 bg-white  text-sm flex flex-col items-center justify-center"
+        >
           <p className="text-lg">You don't have any active plan</p>
           <p className="text-md">
             Choose the best plan to continue using Byapar without any
@@ -40,14 +53,30 @@ const DashboardPricingPage = () => {
             <img src={guarantee} alt="" className="h-10 w-10 " />
             <p className="text-xs">7 days moneyback guarantee</p>
           </div>
-        </div>
+        </motion.div>
 
         {/* pricing cards */}
         <div className="grid grid-cols-3 m-5 gap-2">
           {pricingPlans?.map((plan) => (
-            <div key={plan.id} className=" border border-zinc-400 rounded-lg">
+            <motion.div
+              initial={{
+                rotateY: -180,
+                opacity: 0,
+              }}
+              animate={{
+                rotateY: 0,
+                opacity: 1,
+              }}
+              transition={{
+                ease: "easeInOut",
+                duration: 0.3,
+                delay: 0.3,
+              }}
+              key={plan.id}
+              className=" border border-zinc-400 rounded-lg"
+            >
               <SettingPricingCard plan={plan} />
-            </div>
+            </motion.div>
           ))}
         </div>
         {/* accordion */}
@@ -230,12 +259,12 @@ const DashboardPricingPage = () => {
 
         {/* review card */}
         <p className="mt-8 mx-8 font-semibold text-2xl mb-2">Reviews</p>
-        <div className="grid grid-cols-3 gap-4  rounded-md p-2  mb-10">
+        <div className="grid grid-cols-3 gap-4 rounded-md p-2 px-5  mb-10">
           {pricing_Review?.map((review) => (
             // card
             <div
               key={review?.id}
-              className="card w-full bg-gradient-to-b from-zinc-200 to-zinc-100  card-xs shadow-sm"
+              className="card w-full  bg-gradient-to-b from-zinc-200 to-zinc-100  card-xs shadow-lg shadow-zinc-400"
             >
               <div className="card-body  ">
                 <div className="flex items-center gap-2 ">
