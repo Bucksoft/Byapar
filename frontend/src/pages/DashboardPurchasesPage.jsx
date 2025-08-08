@@ -9,7 +9,7 @@ const DashboardPurchasesPage = () => {
   return (
     <main className="h-full p-2">
       <div className="h-full w-full bg-white rounded-lg p-3">
-        <DashboardNavbar title={"Purchase Invoice"} />
+        <DashboardNavbar title={"Purchase Invoice"} isReport={"true"} />
         <motion.div
           variants={container}
           initial="hidden"
@@ -56,7 +56,7 @@ const DashboardPurchasesPage = () => {
               <Search size={16} className="text-zinc-400" />
               <input type="search" required placeholder="Search" />
             </label>
-            <div className="dropdown dropdown-center">
+            <div className="dropdown dropdown-center dropdown-sm">
               <div
                 tabIndex={0}
                 role="button"

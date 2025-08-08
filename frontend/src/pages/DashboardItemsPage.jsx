@@ -12,7 +12,7 @@ const DashboardItemsPage = () => {
   return (
     <main className="h-full p-2">
       <div className="h-full w-full bg-white rounded-lg p-3">
-        <DashboardNavbar title={"Items"} />
+        <DashboardNavbar title={"Items"} isReport={"true"} />
 
         <motion.section
           variants={container}
@@ -59,7 +59,7 @@ const DashboardItemsPage = () => {
               <Search size={16} className="text-zinc-400" />
               <input type="search" required placeholder="Search" />
             </label>
-            <button className="btn btn-ghost">
+            <button className="btn btn-ghost ">
               <LuPackageSearch className="flex items-center" /> Show Low Stock
             </button>
           </div>
@@ -81,9 +81,9 @@ const DashboardItemsPage = () => {
             scale: 1,
           }}
           transition={{
-            ease:'easeInOut',
-            duration:0.2,
-            delay:0.2
+            ease: "easeInOut",
+            duration: 0.2,
+            delay: 0.2,
           }}
           className="flex items-center justify-center  flex-col"
         >

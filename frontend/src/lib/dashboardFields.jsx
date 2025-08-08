@@ -49,6 +49,18 @@ export const dashboardFields = [
       </>
     ),
     label: "Items",
+    subLinks: [
+      {
+        id: 1,
+        label: "Inventory",
+        link: "items",
+      },
+      {
+        id: 2,
+        label: "Godown (Warehouse)",
+        link: "godown",
+      },
+    ],
   },
   {
     id: 4,
@@ -58,6 +70,43 @@ export const dashboardFields = [
       </>
     ),
     label: "Sales",
+    subLinks: [
+      {
+        id: 1,
+        label: "Sales Invoices",
+        link: "sales",
+      },
+      {
+        id: 2,
+        label: "Quotation/Estimate",
+        link: "quotations",
+      },
+      {
+        id: 3,
+        label: "Payment In",
+        link: "payment-in",
+      },
+      {
+        id: 4,
+        label: "Sales Return",
+        link: "sales-return",
+      },
+      {
+        id: 5,
+        label: "Credit Note",
+        link: "credit-note",
+      },
+      {
+        id: 6,
+        label: "Delivery Challan",
+        link: "delivery-challan",
+      },
+      {
+        id: 7,
+        label: "Proforma Invoice",
+        link: "proforma",
+      },
+    ],
   },
   {
     id: 5,
@@ -67,6 +116,33 @@ export const dashboardFields = [
       </>
     ),
     label: "Purchases",
+    subLinks: [
+      {
+        id: 1,
+        label: "Purchase Invoices",
+        link: "purchases",
+      },
+      {
+        id: 2,
+        label: "Payment Out",
+        link: "payment-out",
+      },
+      {
+        id: 3,
+        label: "Purchase Return",
+        link: "purchase-return",
+      },
+      {
+        id: 4,
+        label: "Debit Note",
+        link: "debit-note",
+      },
+      {
+        id: 5,
+        label: "Purchase Orders",
+        link: "purchase-order",
+      },
+    ],
   },
   {
     id: 6,

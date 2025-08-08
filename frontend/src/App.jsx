@@ -27,6 +27,18 @@ import DashboardOnlineStorePage from "./pages/DashboardOnlineStorePage";
 import DashboardSMSMarketingPage from "./pages/DashboardSMSMarketingPage";
 import DashboardLoanPage from "./pages/DashboardLoanPage";
 import DashboardPOS from "./pages/DashboardPOS";
+import DashboardGodownPage from "./pages/DashboardGodownPage";
+import DashboardPaymentOutPage from "./pages/DashboardPaymentOutPage";
+import DashboardPurchaseReturnPage from "./pages/DashboardPurchaseReturnPage";
+import DashboardDebitNotePage from "./pages/DashboardDebitNotePage";
+import DashoardPurchaseOrderPage from "./pages/DashoardPurchaseOrderPage";
+import DashboardQuotationPage from "./pages/DashboardQuotationPage";
+import DashboardPaymentInPage from "./pages/DashboardPaymentInPage";
+import DashboardSalesReturnPage from "./pages/DashboardSalesReturnPage";
+import DashboardCreditNotePage from "./pages/DashboardCreditNotePage";
+import DashboardDeliveryChallanPage from "./pages/DashboardDeliveryChallanPage";
+import DashboardProformaPage from "./pages/DashboardProformaPage";
+import DashboardAddPartyPage from "./pages/DashboardAddPartyPage";
 
 function App() {
   return (
@@ -38,12 +50,73 @@ function App() {
           <Route index element={<DashboardPage />} />
           <Route path="/dashboard/parties" element={<DashboardPartiesPage />} />
           <Route path="/dashboard/items" element={<DashboardItemsPage />} />
+          <Route path="/dashboard/godown" element={<DashboardGodownPage />} />
+
           <Route
             path="/dashboard/purchases"
             element={<DashboardPurchasesPage />}
           />
+
+          <Route
+            path="/dashboard/add-party"
+            element={<DashboardAddPartyPage />}
+          />
+
+          <Route
+            path="/dashboard/payment-out"
+            element={<DashboardPaymentOutPage />}
+          />
+
+          <Route
+            path="/dashboard/purhase-return"
+            element={<DashboardPurchaseReturnPage />}
+          />
+
+          <Route
+            path="/dashboard/debit-note"
+            element={<DashboardDebitNotePage />}
+          />
+
+          <Route
+            path="/dashboard/purchase-return"
+            element={<DashboardPurchaseReturnPage />}
+          />
+
+          <Route
+            path="/dashboard/purchase-order"
+            element={<DashoardPurchaseOrderPage />}
+          />
+
           <Route path="/dashboard/reports" element={<DashboardReportPage />} />
           <Route path="/dashboard/sales" element={<DashboardSalesPage />} />
+          <Route
+            path="/dashboard/quotations"
+            element={<DashboardQuotationPage />}
+          />
+          <Route
+            path="/dashboard/payment-in"
+            element={<DashboardPaymentInPage />}
+          />
+          <Route
+            path="/dashboard/sales-return"
+            element={<DashboardSalesReturnPage />}
+          />
+
+          <Route
+            path="/dashboard/credit-note"
+            element={<DashboardCreditNotePage />}
+          />
+
+          <Route
+            path="/dashboard/delivery-challan"
+            element={<DashboardDeliveryChallanPage />}
+          />
+
+          <Route
+            path="/dashboard/proforma"
+            element={<DashboardProformaPage />}
+          />
+
           <Route
             path="/dashboard/invoicing"
             element={<DashboardEInvoicing />}

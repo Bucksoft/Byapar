@@ -2,7 +2,7 @@ import { IoSettingsOutline } from "react-icons/io5";
 import { TbReportSearch } from "react-icons/tb";
 import { motion } from "framer-motion";
 
-const DashboardNavbar = ({ title }) => {
+const DashboardNavbar = ({ title, isReport }) => {
   return (
     <motion.div
       initial={{
@@ -24,13 +24,15 @@ const DashboardNavbar = ({ title }) => {
       {/* Reports dropdown */}
       <div className="flex gap-5 items-center">
         <div className="dropdown dropdown-end">
-          <div
-            tabIndex={0}
-            role="button"
-            className="btn btn-sm m-1 btn-dash btn-wide btn-info"
-          >
-            <TbReportSearch size={14} /> Reports
-          </div>
+          {isReport && (
+            <div
+              tabIndex={0}
+              role="button"
+              className="btn btn-sm m-1 btn-dash btn-wide btn-info"
+            >
+              <TbReportSearch size={14} /> Reports
+            </div>
+          )}
           <ul
             tabIndex={0}
             className="dropdown-content menu bg-base-100 rounded-box z-1 w-52 p-2 shadow-sm"

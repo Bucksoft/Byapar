@@ -7,7 +7,7 @@ import {
   settingLinks,
 } from "../lib/dashboardFields";
 import { IoSettings } from "react-icons/io5";
-import { Link, NavLink } from "react-router-dom";
+import { Link, NavLink, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { TbLogout2 } from "react-icons/tb";
 import { BiChevronDown } from "react-icons/bi";
@@ -34,6 +34,12 @@ export const dashboardLinksItems = {
 };
 
 const Sidebar = () => {
+  const navigate = useNavigate();
+  const handleChange = (e) => {
+    const selectedLink = e.target.value;
+    if (selectedLink) navigate(selectedLink);
+  };
+
   return (
     <>
       <section className=" bg-gradient-to-b from-sky-50 to-white  text-black shadow-md max-h-screen overflow-y-auto hide-scrollbar border border-zinc-200 ">
@@ -112,46 +118,32 @@ const Sidebar = () => {
                 {field.label === "Items" ||
                 field.label === "Sales" ||
                 field.label === "Purchases" ? (
-                  <>
-                    {/* Nested Links */}
-                    <Link
-                      to={`/dashboard/${field.label.toLowerCase()}`}
-                      className="dropdown dropdown-start group px-4 flex items-center gap-5 text-xs py-2 cursor-pointer transition-all ease-in-out duration-150 hover:text-info "
+                  <div className="group flex items-center px-4 hover:text-info transition-all duration-200 ease-in-out">
+                    <span className="group-hover:-translate-x-2 transition-all duration-200 ease-in-out">
+                      {field.icon}
+                    </span>
+                    <select
+                      name={field.label}
+                      onChange={handleChange}
+                      defaultValue="" // ensures first option is shown initially
+                      className="group-hover:translate-x-2 px-4 text-xs py-2 cursor-pointer outline-none w-full transition-all duration-200 ease-in-out"
                     >
-                      <div
-                        tabIndex={0}
-                        role="button"
-                        className="flex items-center justify-between w-full"
-                      >
-                        <div className="flex items-center gap-5 justify-between">
-                          {field?.icon}
-                          <span className="group-hover:translate-x-2 transition-all ease-in-out duration-200">
-                            {field.label}
-                          </span>
-                        </div>
-                        <BiChevronDown />
-                      </div>
-                      <ul
-                        tabIndex={0}
-                        className="dropdown-content menu bg-white rounded-box z-100 w-52 p-2 shadow-sm"
-                      >
-                        <li>
-                          <Link
-                            to={`/dashboard/${field?.label.toLowerCase()}/item1`}
-                          >
-                            Item 1
-                          </Link>
-                        </li>
-                        <li>
-                          <Link
-                            to={`/dashboard/${field?.label.toLowerCase()}/item1`}
-                          >
-                            Item 2
-                          </Link>
-                        </li>
-                      </ul>
-                    </Link>
-                  </>
+                      {/* Disabled visible placeholder */}
+                      <option value="" disabled>
+                        {field.label}
+                      </option>
+
+                      {field.subLinks.map((sublink) => (
+                        <option
+                          value={sublink.link}
+                          key={sublink.id}
+                          className="text-black"
+                        >
+                          {sublink.label}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
                 ) : (
                   <>
                     <NavLink

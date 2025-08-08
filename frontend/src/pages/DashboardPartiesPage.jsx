@@ -6,6 +6,7 @@ import DashboardNavbar from "../components/DashboardNavbar";
 import { dashboardPartiesCardDetails } from "../lib/dashboardPartiesCards";
 import { motion } from "framer-motion";
 import { container, dashboardLinksItems } from "../components/Sidebar";
+import { Link } from "react-router-dom";
 
 const DashboardPartiesPage = () => {
   return (
@@ -63,26 +64,27 @@ const DashboardPartiesPage = () => {
           </div>
 
           <div>
-            <button className="btn btn-sm btn-info">
+            <Link to={"/dashboard/add-party"} className="btn btn-sm btn-info">
               <Plus size={14} /> Create Party
-            </button>
+            </Link>
           </div>
         </motion.div>
 
         <motion.div
-        initial={{
-          opacity:0,
-          scale:0
-        }}
-        animate={{
-          opacity:1,
-          scale:1
-        }}
-        transition={{
-          ease:"easeInOut",
-          duration:0.2
-        }}
-        className="overflow-x-auto rounded-box border border-base-content/5 bg-base-100 mt-8 ">
+          initial={{
+            opacity: 0,
+            scale: 0,
+          }}
+          animate={{
+            opacity: 1,
+            scale: 1,
+          }}
+          transition={{
+            ease: "easeInOut",
+            duration: 0.2,
+          }}
+          className="overflow-x-auto rounded-box border border-base-content/5 bg-base-100 mt-8 "
+        >
           <table className="table">
             {/* head */}
             <thead>
@@ -97,19 +99,19 @@ const DashboardPartiesPage = () => {
             <tbody>
               {/* row 1 */}
               <motion.tr
-              initial={{
-                opacity:0,
-                scaleY:0
-              }}
-              animate={{
-                opacity:1,
-                scaleY:1
-              }}
-              transition={{
-                ease:"easeInOut",
-                duration:0.2,
-                delay:0.2
-              }}
+                initial={{
+                  opacity: 0,
+                  scaleY: 0,
+                }}
+                animate={{
+                  opacity: 1,
+                  scaleY: 1,
+                }}
+                transition={{
+                  ease: "easeInOut",
+                  duration: 0.2,
+                  delay: 0.2,
+                }}
               >
                 <td>Cash Sale</td>
                 <td>-</td>
@@ -122,21 +124,21 @@ const DashboardPartiesPage = () => {
         </motion.div>
 
         <motion.div
-        initial={{
-          opacity:0,
-          translateY:100
-        }}
-        animate={{
-          opacity:1,
-          translateY:1
-        }}
-        transition={{
-          ease:"easeInOut",
-          duration:0.2,
-          delay:0.3
-        }}
-        
-        className="w-full mt-7 flex  gap-3 bg-gradient-to-r from-sky-100 to-sky-50 rounded-md p-4">
+          initial={{
+            opacity: 0,
+            translateY: 100,
+          }}
+          animate={{
+            opacity: 1,
+            translateY: 1,
+          }}
+          transition={{
+            ease: "easeInOut",
+            duration: 0.2,
+            delay: 0.3,
+          }}
+          className="w-full mt-7 flex  gap-3 bg-gradient-to-r from-sky-100 to-sky-50 rounded-md p-4"
+        >
           <img src={upload} alt="upload" width={120} />
           <div>
             <h2 className="mt-2 text-md font-semibold">
