@@ -1,27 +1,55 @@
 import { Calendar, ChevronDown, Keyboard, Search } from "lucide-react";
 import onineShopping from "../assets/OnlineShopping.png";
 import { FaFileInvoice } from "react-icons/fa";
+import { motion } from "framer-motion";
 
 const DashboardOnlineStorePage = () => {
   return (
-    <main className="h-screen w-full flex">
+    <main className="h-screen w-full flex ">
       <section className="h-full w-full bg-gray-100 p-2 ">
         <div className=" border border-zinc-300 h-full rounded-md bg-white">
           {/* navigation */}
-          <div className="flex items-center justify-between p-3 m-2">
+          <motion.div
+            initial={{
+              translateY: -100,
+              opacity: 0,
+            }}
+            animate={{
+              translateY: 0,
+              opacity: 1,
+            }}
+            transition={{
+              ease: "easeInOut",
+              duration: 0.3,
+            }}
+            className="flex items-center justify-between p-3 m-2"
+          >
             <div>
-              <span className="font-medium text-lg text-zinc-500">
-                Online Orders
-              </span>
+              <span className="text-lg ">Online Orders</span>
             </div>
             <div className="border p-1 rounded-sm border-zinc-400">
               <Keyboard size={16} className="text-zinc-400" />
             </div>
-          </div>
+          </motion.div>
           {/* card */}
-          <div className="border border-zinc-200 h-28 m-4 flex justify-between shadow-md rounded-xs">
+          <motion.div
+            initial={{
+              translateY: -100,
+              opacity: 0,
+            }}
+            animate={{
+              translateY: 0,
+              opacity: 1,
+            }}
+            transition={{
+              ease: "easeInOut",
+              duration: 0.3,
+              delay: 0.3,
+            }}
+            className="border border-zinc-200 h-28 m-4 flex justify-between shadow-md rounded-xs"
+          >
             <div className="flex flex-col justify-center ml-5">
-              <span className="text-sm text-zinc-500">
+              <span className="text-sm text-zinc-800">
                 Increase your sales, get Online Orders with a single click
               </span>
               <button className="bg-info text-white rounded-sm text-xs w-40 h-8 mt-2">
@@ -35,12 +63,24 @@ const DashboardOnlineStorePage = () => {
                 className="h-28 w-70  rounded-xs"
               />
             </div>
-          </div>
+          </motion.div>
           {/* Search&Cal */}
-          <div className="flex ml-4 space-x-5">
+          <motion.div
+          initial={{
+            opacity:0
+          }}
+          animate={{
+            opacity:1
+          }}
+          transition={{
+            ease:'easeInOut',
+            duration:0.3,
+            delay:0.3
+          }}
+          className="flex ml-4 space-x-5">
             <div className="">
-              <label className="input border border-zinc-200">
-                <Search size={16} className="text-zinc-400" />
+              <label className="input border border-zinc-400">
+                <Search size={16} className="text-zinc-600" />
                 <input type="search" required placeholder="Search" />
               </label>
             </div>
@@ -48,13 +88,13 @@ const DashboardOnlineStorePage = () => {
               <div
                 tabIndex={0}
                 role="button"
-                className="border border-zinc-200 flex items-center justify-between btn btn-wide w-full text-xs font-medium  bg-white"
+                className="border border-zinc-400 flex items-center justify-between btn btn-wide w-full text-xs font-medium  bg-white"
               >
-                <div className="flex items-center gap-2 text-zinc-400">
-                  <Calendar size={16} className="text-zinc-400" />
+                <div className="flex items-center gap-2 text-zinc-600">
+                  <Calendar size={16} />
                   Last 365 days
                 </div>
-                <ChevronDown size={16} className="text-zinc-400" />
+                <ChevronDown size={16} />
               </div>
               <ul
                 tabIndex={0}
@@ -74,9 +114,22 @@ const DashboardOnlineStorePage = () => {
                 </li>
               </ul>
             </div>
-          </div>
+          </motion.div>
           {/* table */}
-          <div className="border border-zinc-200 mt-5 h-80 rounded-md mx-4 ">
+          <motion.div
+          initial={{
+            scale:0,
+            opacity:0
+          }}
+          animate={{
+            scale:1,
+            opacity:1
+          }}
+          transition={{
+            ease:'easeInOut',
+            duration:0.3
+          }}
+          className="border border-zinc-200 mt-5 h-80 rounded-md mx-4 ">
             <table className="table ">
               {/* head */}
               <thead>
@@ -99,7 +152,7 @@ const DashboardOnlineStorePage = () => {
               <FaFileInvoice size={40} />
               No transactions matching the current filter
             </div>
-          </div>
+          </motion.div>
         </div>
       </section>
     </main>

@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { TbDeviceMobileMessage } from "react-icons/tb";
 import referandearn from "../assets/referandearn.png";
 import { LuIndianRupee } from "react-icons/lu";
@@ -198,7 +198,7 @@ const DashboardReferAndEarnPage = () => {
                   }}
                   transition={{
                     ease: "easeInOut",
-                    delay:0.3
+                    delay: 0.3,
                   }}
                   className="w-full flex flex-col items-center justify-center h-60  "
                 >

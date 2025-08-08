@@ -2,6 +2,7 @@ import mes from "../assets/Message.png";
 import calcal from "../assets/CalenderCal.png";
 import calclo from "../assets/CalenderClock.jpg";
 import { PlusIcon } from "lucide-react";
+import { delay, motion } from "framer-motion";
 
 const DashboardStaffPage = () => {
   return (
@@ -12,14 +13,41 @@ const DashboardStaffPage = () => {
       <section className="w-full p-4">
         <div className="border-2 border-zinc-100 shadow-2xl rounded-md bg-white p-4 h-full">
           {/* Title */}
-          <p className="font-medium text-lg mb-4 border-b border-zinc-300 pb-2">
+          <motion.p
+            initial={{
+              translateY:-100,
+              opacity:0
+            }}
+            animate={{
+              translateY:0,
+              opacity:1
+            }}
+            transition={{
+              ease:'easeInOut',
+              duration:0.3
+            }}
+          className="text-lg mb-4 border-b border-zinc-300 pb-2">
             Staff Attendance & Payroll
-          </p>
+          </motion.p>
 
           {/* Card Grid */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mx-20">
             {/* Card 1 */}
-            <div className="border border-zinc-300 bg-gradient-to-b from-zinc-200 rounded-md">
+            <motion.div
+              initial={{
+                opacity: 0,
+                filter: "blur(10px)",
+              }}
+              animate={{
+                opacity: 1,
+                filter: "blur(0px)",
+              }}
+              transition={{
+                ease: "easeInOut",
+                duration: 0.3,
+              }}
+              className="border border-zinc-300 bg-gradient-to-b from-zinc-200 rounded-md"
+            >
               <div className="flex items-center justify-center p-4">
                 <img
                   src={calclo}
@@ -30,10 +58,25 @@ const DashboardStaffPage = () => {
               <p className="text-center text-sm border-t border-gray-300 p-3">
                 Mark your staff's attendance digitally
               </p>
-            </div>
+            </motion.div>
 
             {/* Card 2 */}
-            <div className="border border-zinc-300 bg-gradient-to-b from-zinc-200 rounded-md">
+            <motion.div
+              initial={{
+                opacity: 0,
+                filter: "blur(10px)",
+              }}
+              animate={{
+                opacity: 1,
+                filter: "blur(0px)",
+              }}
+              transition={{
+                ease: "easeInOut",
+                duration: 0.3,
+                delay: 0.3,
+              }}
+              className="border border-zinc-300 bg-gradient-to-b from-zinc-200 rounded-md"
+            >
               <div className="flex items-center justify-center p-4">
                 <img
                   src={calcal}
@@ -44,10 +87,25 @@ const DashboardStaffPage = () => {
               <p className="text-center text-sm border-t border-gray-300 p-3">
                 Simplify payroll by adding salary, advance & pending payments
               </p>
-            </div>
+            </motion.div>
 
             {/* Card 3 */}
-            <div className="border border-zinc-300 bg-gradient-to-b from-zinc-200 rounded-md">
+            <motion.div
+              initial={{
+                opacity: 0,
+                filter: "blur(10px)",
+              }}
+              animate={{
+                opacity: 1,
+                filter: "blur(0px)",
+              }}
+              transition={{
+                ease: "easeInOut",
+                duration: 0.3,
+                delay: 0.6,
+              }}
+              className="border border-zinc-300 bg-gradient-to-b from-zinc-200 rounded-md"
+            >
               <div className="flex items-center justify-center p-4 mt-5">
                 <img
                   src={mes}
@@ -58,21 +116,63 @@ const DashboardStaffPage = () => {
               <p className="text-center text-sm border-t border-gray-300 p-4">
                 Set custom reminders to mark attendance timely
               </p>
-            </div>
+            </motion.div>
           </div>
 
           {/* CTA Section */}
           <div className="flex items-center justify-center flex-col mt-8 text-center px-4">
-            <span className="font-semibold text-lg">
+            <motion.span
+              initial={{
+                translateY: -100,
+                opacity: 0,
+              }}
+              animate={{
+                translateY: 0,
+                opacity: 1,
+              }}
+              transition={{
+                ease: "easeInOut",
+                duration: 0.3,
+              }}
+              className="font-semibold text-lg"
+            >
               Mark attendance and manage payroll
-            </span>
-            <span className="text-sm mt-3">
+            </motion.span>
+            <motion.span
+              initial={{
+                translateY: -100,
+                opacity: 0,
+              }}
+              animate={{
+                translateY: 0,
+                opacity: 1,
+              }}
+              transition={{
+                ease: "easeInOut",
+                duration: 0.3,
+                delay: 0.3,
+              }}
+              className="text-sm mt-3"
+            >
               Add staff to mark attendance and manage payroll with ease!
-            </span>
-            <button className="btn btn-info btn-sm mt-5">
+            </motion.span>
+            <motion.button
+            initial={{
+              translateY:100,
+              opacity:0
+            }}
+            animate={{
+              translateY:0,
+              opacity:1
+            }}
+            transition={{
+              ease:"easeInOut",
+              duration:0.3
+            }}
+            className="btn btn-info btn-sm mt-5">
               <PlusIcon size={18} />
               Add Staff
-            </button>
+            </motion.button>
           </div>
         </div>
       </section>
