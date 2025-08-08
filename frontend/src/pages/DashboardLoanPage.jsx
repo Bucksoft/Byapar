@@ -1,7 +1,20 @@
+import { motion } from "framer-motion";
+
 const DashboardLoanPage = () => {
   return (
     <main className="h-screen w-full flex">
-      <section className="h-full w-full bg-gray-200 p-2 ">
+      <motion.section
+        initial={{
+          scale: 0,
+        }}
+        animate={{
+          scale: 1,
+        }}
+        transition={{
+          ease: "easeInOut",
+        }}
+        className="h-full w-full bg-gray-200 p-2 "
+      >
         <div className=" border border-zinc-300 h-full rounded-md bg-gray-100 flex items-center justify-center">
           <div className=" border border-zinc-300 h-75 rounded-md bg-white w-110">
             <p className="font-bold text-3xl text-center mt-15">
@@ -19,7 +32,7 @@ const DashboardLoanPage = () => {
             </button>
           </div>
         </div>
-      </section>
+      </motion.section>
     </main>
   );
 };
