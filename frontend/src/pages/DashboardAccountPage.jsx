@@ -76,14 +76,14 @@ const DashboardAccountPage = () => {
             <div className="flex items-center space-x-3 mr-5">
               <Keyboard />
               <button
-                className="btn btn-soft btn-info "
+                className="btn btn-soft btn-info btn-sm"
                 onClick={() => setChatOpen(!chatOpen)}
               >
                 <MessageCircle size={16} />
                 Chat Support
               </button>
-              <button className="btn btn-info">Cancel</button>
-              <button className="btn btn-info">Save Changes</button>
+              <button className="btn btn-info btn-sm">Cancel</button>
+              <button className="btn btn-info btn-sm">Save Changes</button>
             </div>
           </div>
 
@@ -91,7 +91,7 @@ const DashboardAccountPage = () => {
             <span className="font-semibold pr-4">
               Help us make Byapar better
             </span>
-            <button className="btn btn-info">
+            <button className="btn btn-info btn-sm">
               <img src={suggestion} alt="" className="h-5 font-black" />
               <span className=""> Share Suggestion</span>
             </button>
@@ -107,19 +107,23 @@ const DashboardAccountPage = () => {
                 <label htmlFor="name" className="text-xs pr-40">
                   Name
                 </label>
-                <input type="text" placeholder="" className="input" />
+                <input type="text" placeholder="" className="input input-sm" />
               </div>
               <div>
                 <label htmlFor="number" className="text-xs pr-40">
                   Number
                 </label>
-                <input type="number" placeholder="" className="input" />
+                <input
+                  type="number"
+                  placeholder=""
+                  className="input input-sm"
+                />
               </div>
               <div>
                 <label htmlFor="email" className="text-xs pr-40">
                   Email
                 </label>
-                <input type="email" placeholder="" className="input" />
+                <input type="email" placeholder="" className="input input-sm" />
               </div>
             </form>
           </div>
@@ -134,9 +138,9 @@ const DashboardAccountPage = () => {
             <input
               type="text"
               placeholder="Type here referral code"
-              className="input w-fit"
+              className="input w-fit input-sm"
             />
-            <button className="btn btn-info ml-5 px-15">Apply</button>
+            <button className="btn btn-info ml-5 px-15 btn-sm">Apply</button>
           </div>
 
           <div className="border-b border-b-zinc-300 pl-3 py-1 bg-gray-50">
@@ -148,30 +152,30 @@ const DashboardAccountPage = () => {
             <div className="pt-5 pl-3">
               <p className="text-xs">CURRENT PLAN</p>
               <p className="text-xl pt-2 font-medium">Free Trial Expired</p>
-              <button className="btn btn-info mt-15">
+              <button className="btn btn-info mt-15 btn-sm">
                 Buy Subscription Plan
               </button>
               {/* avatar */}
               <div className="flex items-center">
                 <div>
                   <div className="avatar-group -space-x-6 pt-5">
-                    <div className="avatar">
-                      <div className="w-8">
+                    <div className="avatar ">
+                      <div className="w-7">
                         <img src="https://img.daisyui.com/images/profile/demo/batperson@192.webp" />
                       </div>
                     </div>
                     <div className="avatar">
-                      <div className="w-8">
+                      <div className="w-7">
                         <img src="https://img.daisyui.com/images/profile/demo/spiderperson@192.webp" />
                       </div>
                     </div>
                     <div className="avatar">
-                      <div className="w-8">
+                      <div className="w-7">
                         <img src="https://img.daisyui.com/images/profile/demo/averagebulk@192.webp" />
                       </div>
                     </div>
                     <div className="avatar">
-                      <div className="w-8">
+                      <div className="w-7">
                         <img src="https://img.daisyui.com/images/profile/demo/wonderperson@192.webp" />
                       </div>
                     </div>
@@ -179,7 +183,7 @@ const DashboardAccountPage = () => {
                 </div>
                 <div className="pt-5 pl-2 text-xs">
                   <p>10,00,000+ Vyaparis running their </p>
-                  <p>business on myBillBook premium</p>
+                  <p>business on ByaPar premium</p>
                 </div>
               </div>
             </div>

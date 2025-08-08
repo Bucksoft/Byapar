@@ -1,22 +1,21 @@
-import { IndianRupee } from "lucide-react";
 import { RxCross2 } from "react-icons/rx";
 
 const SettingPricingCard = ({ plan }) => {
   return (
-    <div className="border-gray-300 rounded-md">
-      <div className="border border-zinc-400 rounded-md overflow-hidden">
+    <div className="border-gray-300 rounded-md ">
+      <div className=" rounded-md overflow-hidden ">
         <div
           className={`border-3 ${
             plan.id === 1
-              ? "border-[#6e1a81]"
+              ? "border-error"
               : plan.id === 2
-              ? "border-[#7d7a07]"
-              : "border-[#3a523a]"
+              ? "border-accent-content"
+              : "border-warning"
           }`}
         ></div>
         <div className="flex flex-col mt-3 p-2 border-b border-b-zinc-400">
           <span className=" text-lg font-medium py-3">{plan.name}</span>
-          <span className={`text-sm text-[#93a1ff] font-semibold`}>
+          <span className={`text-sm text-success font-semibold`}>
             {plan.tagline}
           </span>
           <div className="flex">
@@ -32,31 +31,31 @@ const SettingPricingCard = ({ plan }) => {
           </div>
           <span className="text-md font-medium ">{plan.yearlyPrice}</span>
           <button
-            className={`p-2  border font-semibold ${
+            className={`p-2 cursor-pointer border font-semibold ${
               plan.id === 1
-                ? "border-[#6e1a81] text-[#6e1a81] hover:bg-[#6e1a81]/10"
+                ? "border-error text-error hover:bg-error/10 "
                 : plan.id === 2
-                ? "border-[#7d7a07] text-[#7d7a07] hover:bg-[#7d7a07]/10"
-                : "border-[#3a523a] text-[#3a523a] hover:bg-[#3a523a]/10"
+                ? "border-accent-content text-accent-content hover:bg-accent-content/10 "
+                : "border-warning text-warning hover:bg-warning/10"
             } my-3 w-full transition-all ease-in-out duration-300`}
           >
             {plan.name}
           </button>
         </div>
-        <div className="mt-3 p-3 border-b border-b-zinc-400">
-          <p className="text-gray-500 text-sm font-medium mb-3">
+        <div className="mt-3 p-3 border-b border-b-zinc-400 text-xs">
+          <p className="text-gray-500  font-medium mb-3">
             Manage
             <span className="text-black ml-2 font-normal">{plan.manage}</span>
           </p>
-          <p className="text-gray-500 text-sm font-medium mb-3">
+          <p className="text-gray-500  font-medium mb-3">
             Access for
             <span className="text-black ml-2 font-normal">{plan.access}</span>
           </p>
-          <p className="text-gray-500 text-sm font-medium mb-3">
+          <p className="text-gray-500  font-medium mb-3">
             Auto Sync
             <span className="text-black ml-2 font-normal">{plan.Auto}</span>
           </p>
-          <p className="text-gray-500 text-sm font-medium mb-2 flex">
+          <p className="text-gray-500  font-medium mb-2 flex">
             Access on
             <span className="text-black ml-2 flex gap-3 font-normal">
               {plan.accessOn?.map((item, index) => (
@@ -72,27 +71,29 @@ const SettingPricingCard = ({ plan }) => {
           <span
             className={`ml-2 font-semibold ${
               plan.id === 1
-                ? " text-[#6e1a81]"
+                ? " text-error"
                 : plan.id === 2
-                ? " text-[#7d7a07]"
-                : " text-[#3a523a]"
+                ? " text-accent-content"
+                : " text-warning"
             }`}
           >
             {plan.name}
           </span>
         </p>
-        <div className="mt-5 pl-3  text-sm ">
-          <p className="p-3">
+        <div className="mt-5 pl-3  text-sm  ">
+          <p className="p-3 ">
             {plan.name === "Diamond Plan" &&
               plan.features.slice(0, 4).map((item, index) => (
                 <>
-                  <div className="bg-yellow-500/10 p-2 rounded-md">{item}</div>
+                  <div className="bg-emerald-900/10 p-2 rounded-md text-xs">
+                    {item}
+                  </div>
                 </>
               ))}
             {plan.name === "Diamond Plan" &&
               plan.features.slice(4).map((item, index) => (
                 <>
-                  <div className="p-2 flex items-center gap-2 line-through text-zinc-500">
+                  <div className="p-2 flex items-center gap-2 line-through text-zinc-500 text-xs">
                     <RxCross2 size={20} className="text-red-600 " />
                     {item}
                   </div>
@@ -102,13 +103,15 @@ const SettingPricingCard = ({ plan }) => {
             {plan.name === "Platinum Plan" &&
               plan.features.slice(0, 10).map((item, index) => (
                 <>
-                  <div className="bg-yellow-500/10 p-2 rounded-md">{item}</div>
+                  <div className="bg-emerald-900/10 p-2 rounded-md text-xs">
+                    {item}
+                  </div>
                 </>
               ))}
             {plan.name === "Platinum Plan" &&
               plan.features.slice(10).map((item, index) => (
                 <>
-                  <div className="p-2 flex items-center gap-2 line-through text-zinc-500">
+                  <div className="p-2 flex items-center gap-2 line-through text-zinc-500 text-xs">
                     <RxCross2 size={20} className="text-red-600 " />
                     {item}
                   </div>
@@ -118,7 +121,9 @@ const SettingPricingCard = ({ plan }) => {
             {plan.name === "Enterprise Plan" &&
               plan.features.map((item, index) => (
                 <>
-                  <div className="bg-yellow-500/10 p-2 rounded-md">{item}</div>
+                  <div className="bg-emerald-900/10 p-2 rounded-md text-xs">
+                    {item}
+                  </div>
                 </>
               ))}
           </p>

@@ -7,7 +7,7 @@ import {
   settingLinks,
 } from "../lib/dashboardFields";
 import { IoSettings } from "react-icons/io5";
-import { NavLink } from "react-router-dom";
+import { Link, NavLink } from "react-router-dom";
 import { motion } from "framer-motion";
 import { TbLogout2 } from "react-icons/tb";
 import { BiChevronDown } from "react-icons/bi";
@@ -113,11 +113,15 @@ const Sidebar = () => {
                 field.label === "Sales" ||
                 field.label === "Purchases" ? (
                   <>
-                    <div className="dropdown group px-4 flex items-center gap-5 text-sm py-2 cursor-pointer transition-all ease-in-out duration-150 hover:text-info ">
+                    {/* Nested Links */}
+                    <Link
+                      to={`/dashboard/${field.label.toLowerCase()}`}
+                      className="dropdown dropdown-start group px-4 flex items-center gap-5 text-sm py-2 cursor-pointer transition-all ease-in-out duration-150 hover:text-info "
+                    >
                       <div
                         tabIndex={0}
                         role="button"
-                        className="flex items-center justify-between  w-full"
+                        className="flex items-center justify-between w-full"
                       >
                         <div className="flex items-center gap-5 justify-between">
                           {field?.icon}
@@ -129,16 +133,24 @@ const Sidebar = () => {
                       </div>
                       <ul
                         tabIndex={0}
-                        className="dropdown-content  menu bg-white rounded-box z-100 w-52 p-2 shadow-sm"
+                        className="dropdown-content menu bg-white rounded-box z-100 w-52 p-2 shadow-sm"
                       >
                         <li>
-                          <a>Item 1</a>
+                          <Link
+                            to={`/dashboard/${field?.label.toLowerCase()}/item1`}
+                          >
+                            Item 1
+                          </Link>
                         </li>
                         <li>
-                          <a>Item 2</a>
+                          <Link
+                            to={`/dashboard/${field?.label.toLowerCase()}/item1`}
+                          >
+                            Item 2
+                          </Link>
                         </li>
                       </ul>
-                    </div>
+                    </Link>
                   </>
                 ) : (
                   <>

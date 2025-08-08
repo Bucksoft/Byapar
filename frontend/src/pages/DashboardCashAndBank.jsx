@@ -6,12 +6,27 @@ import { IoIosArrowDown } from "react-icons/io";
 import { MdOutlineFileDownload } from "react-icons/md";
 import { FaArrowRightArrowLeft } from "react-icons/fa6";
 import { FaPlusMinus } from "react-icons/fa6";
+import { motion } from "framer-motion";
 
 const DashboardCashAndBank = () => {
   return (
-    <>
-      <main className=" h-screen w-full bg-white rounded-2xl  border border-gray-300">
-        <header className="py-4   w-full bg-white  mb-2">
+    <main className="p-2">
+      <div className="max-h-screen overflow-y-scroll w-full bg-white rounded-2xl  border border-gray-300 ">
+        <motion.header
+          initial={{
+            translateY: -100,
+            opacity: 0,
+          }}
+          animate={{
+            translateY: 0,
+            opacity: 1,
+          }}
+          transition={{
+            ease: "easeInOut",
+            duration: 0.3,
+          }}
+          className="py-4   w-full bg-white  mb-2"
+        >
           <div className="w-full  flex  items-center justify-between px-5">
             <h1 className="text-xl font-semibold">Cash and Bank</h1>
             <div className="flex items-center justify-between gap-2">
@@ -29,11 +44,25 @@ const DashboardCashAndBank = () => {
               </button>
             </div>
           </div>
-        </header>
+        </motion.header>
 
         <section className="bg-white h-full flex">
           {/* left body */}
-          <div className="w-1/4 bg-white border border-gray-300 h-full">
+          <motion.div
+            initial={{
+              translateX: -100,
+              opacity: 0,
+            }}
+            animate={{
+              translateX: 0,
+              opacity: 1,
+            }}
+            transition={{
+              ease: "easeInOut",
+              duration: 0.3,
+            }}
+            className="w-1/4 bg-white border border-gray-300 h-full"
+          >
             <div className="h-23 flex bg-white items-center border-b border-zinc-300 justify-between p-4">
               <p className="text-sm">Total Balance:</p>
               <p className="flex items-center font-medium">
@@ -67,17 +96,48 @@ const DashboardCashAndBank = () => {
                 <FaIndianRupeeSign /> 0
               </p>
             </div>
-          </div>
+          </motion.div>
 
           {/* right body */}
           <div className=" w-3/4 bg-white ">
             <div className="flex bg-white py-4 items-center justify-between border border-gray-300 h-16 w-full">
               <div className=" flex bg-purple-100 items-center h-16 p-4 justify-between border-r border-t border-b border-gray-300">
-                <p className="text-bold">Transactions</p>
+                <motion.p
+                  initial={{
+                    translateX: -100,
+                    opacity: 0,
+                  }}
+                  animate={{
+                    translateX: 0,
+                    opacity: 1,
+                  }}
+                  transition={{
+                    ease: "easeInOut",
+                    duration: 0.3,
+                    delay: 0.3,
+                  }}
+                  className="text-bold"
+                >
+                  Transactions
+                </motion.p>
               </div>
             </div>
 
-            <div className="flex boredr border-gray-300 px-4 py-2 ">
+            <motion.div
+              initial={{
+                filter: "blur(10px)",
+                opacity: 0,
+              }}
+              animate={{
+                filter: "blur(0px)",
+                opacity: 1,
+              }}
+              transition={{
+                ease: "easeInOut",
+                duration: 0.3,
+              }}
+              className="flex boredr border-gray-300 px-4 py-2 "
+            >
               <div className="dropdown w-full ">
                 <div
                   tabIndex={0}
@@ -120,11 +180,11 @@ const DashboardCashAndBank = () => {
               <button className="border border-gray-300  p-1  flex justify-center hover:bg-zinc-200 cursor-pointer rounded-lg text-zinc-500 items-center">
                 <MdOutlineFileDownload size={25} />
               </button>
-            </div>
+            </motion.div>
           </div>
         </section>
-      </main>
-    </>
+      </div>
+    </main>
   );
 };
 

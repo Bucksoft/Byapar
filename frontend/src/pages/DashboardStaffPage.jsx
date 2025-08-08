@@ -19,7 +19,7 @@ const DashboardStaffPage = () => {
           {/* Card Grid */}
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 mx-20">
             {/* Card 1 */}
-            <div className="border border-zinc-300 rounded-md">
+            <div className="border border-zinc-300 bg-gradient-to-b from-zinc-200 rounded-md">
               <div className="flex items-center justify-center p-4">
                 <img
                   src={calclo}
@@ -33,7 +33,7 @@ const DashboardStaffPage = () => {
             </div>
 
             {/* Card 2 */}
-            <div className="border border-zinc-300 rounded-md">
+            <div className="border border-zinc-300 bg-gradient-to-b from-zinc-200 rounded-md">
               <div className="flex items-center justify-center p-4">
                 <img
                   src={calcal}
@@ -47,7 +47,7 @@ const DashboardStaffPage = () => {
             </div>
 
             {/* Card 3 */}
-            <div className="border border-zinc-300 rounded-md">
+            <div className="border border-zinc-300 bg-gradient-to-b from-zinc-200 rounded-md">
               <div className="flex items-center justify-center p-4 mt-5">
                 <img
                   src={mes}
@@ -69,7 +69,7 @@ const DashboardStaffPage = () => {
             <span className="text-sm mt-3">
               Add staff to mark attendance and manage payroll with ease!
             </span>
-            <button className="mt-4 px-6 py-2 bg-info text-white flex items-center gap-2 rounded transition-all">
+            <button className="btn btn-info btn-sm mt-5">
               <PlusIcon size={18} />
               Add Staff
             </button>

@@ -21,7 +21,7 @@ const DashboardReferAndEarnPage = () => {
       <div className="w-full ">
         {/* Header */}
         <header className="flex w-30/40  items-center">
-          <p className="text-lg p-5 font-semibold">Refer & Earn</p>
+          <p className="text-lg p-5 ">Refer & Earn</p>
         </header>
 
         {/* Gift Section */}
@@ -44,10 +44,7 @@ const DashboardReferAndEarnPage = () => {
                 </p>
               </div>
               <div className="flex ho gap-5">
-                <button
-                  onClick={() => setShowPopup(true)}
-                  className="text-sm border text-gray-700 hover:bg-gray-300 rounded bg-white px-11 py-2 font-semibold"
-                >
+                <button onClick={() => setShowPopup(true)} className="btn ">
                   Refer Now
                 </button>
                 <p className="text-sm flex gap-2 text-white items-center font-semibold">
@@ -73,11 +70,11 @@ const DashboardReferAndEarnPage = () => {
             <div className="flex justify-between p-4 gap-2">
               <div className="border rounded border-gray-300 shadow bg-white w-1/2">
                 <div className="flex p-3 flex-col">
-                  <p className="text-sm flex items-center text-blue-600">
+                  <p className="text-sm flex items-center gap-2 text-blue-600">
                     <HiOutlineCurrencyRupee size={20} />
                     Total Claimed
                   </p>
-                  <p className=" flex items-center text-2xl">
+                  <p className=" flex items-center text-2xl ml-7">
                     <LuIndianRupee size={16} />
                     0.0
                   </p>
@@ -85,11 +82,11 @@ const DashboardReferAndEarnPage = () => {
               </div>
               <div className="border rounded border-gray-300 shadow bg-white w-1/2">
                 <div className="flex p-3 flex-col">
-                  <p className="text-sm flex items-center text-green-600">
+                  <p className="text-sm flex items-center gap-2 text-green-600">
                     <BsBank />
                     Ready to Withdraw
                   </p>
-                  <p className=" flex items-center text-2xl">
+                  <p className=" flex items-center text-2xl ml-5">
                     <LuIndianRupee size={16} />
                     0.0
                   </p>
@@ -111,8 +108,8 @@ const DashboardReferAndEarnPage = () => {
               <button
                 onClick={() => setMenu("Plan_purchased")}
                 className={` text-base cursor-pointer gap-2 ${
-                  menu === "purchased_user" && "bg-info/10 text-info"
-                } cursor-pointer gap-2 flex items-center font-semibold`}
+                  menu === "Plan_purchased" && "bg-info/10 text-info"
+                } cursor-pointer gap-2 flex items-center px-5 p-2 mr-2 font-semibold`}
               >
                 <HiOutlineUsers />
                 Plan Purchased
@@ -129,7 +126,7 @@ const DashboardReferAndEarnPage = () => {
                   </p>
                   <button
                     onClick={() => setShowPopup(true)}
-                    className="text-base text-white px-5 py-2 hover:bg-blue-400 rounded bg-blue-600 font-bold"
+                    className="btn btn-sm btn-info"
                   >
                     Refer Now
                   </button>
@@ -146,7 +143,7 @@ const DashboardReferAndEarnPage = () => {
                   </p>
                   <button
                     onClick={() => setShowPopup(true)}
-                    className="text-base  text-white px-5 py-2 hover:bg-blue-400 rounded bg-blue-600 font-bold"
+                    className="btn btn-sm btn-info"
                   >
                     Refer Now
                   </button>
@@ -162,8 +159,8 @@ const DashboardReferAndEarnPage = () => {
 
         {/* Footer Section */}
         <section>
-          <div className="flex w-full items-center py-2 justify-between">
-            <div className="flex flex-col ml-6 border border-gray-300 shadow rounded-2xl w-10/40 items-center justify-center py-8">
+          <div className=" grid grid-cols-3 py-8">
+            <div className="flex flex-col ml-6 bg-gradient-to-b from-zinc-200 to-zinc-100 border  border-gray-300 shadow rounded-2xl  items-center justify-center py-8">
               <p className="text-blue-600 mb-4 font-bold">
                 <RiShareLine size={30} />
               </p>
@@ -171,7 +168,7 @@ const DashboardReferAndEarnPage = () => {
               <p className="text-base">friends</p>
             </div>
 
-            <div className="flex flex-col ml-6 border border-gray-300 shadow rounded-2xl w-10/40 items-center justify-center py-8">
+            <div className="flex flex-col ml-6 border bg-gradient-to-b from-zinc-200 to-zinc-100 border-gray-300 shadow rounded-2xl  items-center justify-center py-8">
               <p className="text-green-600 mb-4 font-bold">
                 <FiDownload size={30} />
               </p>
@@ -181,7 +178,7 @@ const DashboardReferAndEarnPage = () => {
               <p className="text-base">subscribe the plan</p>
             </div>
 
-            <div className="flex flex-col ml-6 border border-gray-300 shadow rounded-2xl w-10/40 items-center justify-center mr-6 py-10">
+            <div className="flex flex-col ml-6 border bg-gradient-to-b from-zinc-200 to-zinc-100 border-gray-300 shadow rounded-2xl  items-center justify-center mr-6 py-10">
               <p className="text-yellow-500 mb-4 font-bold">
                 <IoGiftSharp size={30} />
               </p>

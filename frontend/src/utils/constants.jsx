@@ -10,6 +10,7 @@ import {
 import invoDel from "../assets/InvoiceDelivery.jpg";
 import invoP from "../assets/InvoiceP.png";
 import payment from "../assets/Payment.png";
+import { LiaStarSolid } from "react-icons/lia";
 
 export const features = [
   {
@@ -181,7 +182,7 @@ export const pricing_Review = [
     review: `We were searching for an affordable app to manage our business operations, and this one delivers far 
         more than expected for the price. The monthly plan fits our budget, and the features are comparable to much more 
         expensive tools. Highly recommended for startups and small teams.`,
-    stars: `⭐⭐⭐⭐⭐`,
+    stars: <LiaStarSolid />,
   },
   {
     id: 2,
@@ -189,7 +190,7 @@ export const pricing_Review = [
     review: `After using this app for just three months, we've seen an increase in productivity and a noticeable reduction
          in operational costs. The yearly plan offers great savings, and we’re already seeing the return on investment. 
          Definitely one of the smartest purchases we’ve made for the business.`,
-    stars: `⭐⭐⭐⭐⭐`,
+    stars: <LiaStarSolid />,
   },
   {
     id: 3,
@@ -197,15 +198,7 @@ export const pricing_Review = [
     review: `I love how the pricing adapts to different stages of business growth. We started on the entry-level plan and 
         recently upgraded to a premium one without any hassle. It’s great to have an app that grows with you, both in features
         and pricing.`,
-    stars: `⭐⭐⭐⭐⭐`,
-  },
-  {
-    id: 4,
-    name: "Karun",
-    review: `I’ve tried multiple apps for business management, and most cheap ones lack core features. This app is the 
-        exception. It’s budget-friendly but still provides everything we need—task management, invoicing, and even team 
-        collaboration. Incredible value!`,
-    stars: `⭐⭐⭐⭐⭐`,
+    stars: <LiaStarSolid />,
   },
 ];
 
@@ -295,4 +288,46 @@ export const LandingPagePricingPlan = [
       "User Activity Tracker",
     ],
   },
+];
+
+export const states = [
+  "Enter state",
+  "Andaman & Nicobar Islands",
+  "Andhra Pradesh",
+  "Arunachal Pradesh",
+  "Assam",
+  "Bihar",
+  "Chandigarh",
+  "Chhasttisgarh",
+  "Dadra & Nagar Haveli & Daman & Diu",
+  "Delhi",
+  "Goa",
+  "Gujarat",
+  "Haryana",
+  "Himachal Pradesh",
+  "Jammu & Kashmir",
+  "Jharkhand",
+  "Karnataka",
+  "Kerala",
+  "Ladakh",
+  "Lakshadweep",
+  "Madhya Pradesh",
+  "Maharashtra",
+  "Manipur",
+  "Meghalay",
+  "Mizoram",
+  "Nagaland",
+  "Odisha",
+  "Puducherry",
+  "Punjab",
+  "Rajasthan",
+  "Sikkim",
+  "Tamil Nadu",
+  "Telangana",
+  "Tripura",
+  "Uttar Pradesh",
+  "Uttarakhand",
+  "West Bengal",
+  "Foreign Country",
+  "Other Territory",
 ];

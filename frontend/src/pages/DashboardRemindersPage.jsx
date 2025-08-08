@@ -33,11 +33,11 @@ const DashboardRemindersPage = () => {
             {/* navigation right side*/}
             <div className="flex items-center space-x-3 mr-5">
               <Keyboard />
-              <button className="btn btn-soft btn-info ">
+              <button className="btn btn-soft btn-info btn-sm">
                 <MessageCircle size={16} /> Chat Support
               </button>
-              <button className="btn btn-info">Cancel</button>
-              <button className="btn btn-info">Save Changes</button>
+              <button className="btn btn-info btn-sm">Cancel</button>
+              <button className="btn btn-info btn-sm">Save Changes</button>
             </div>
           </div>
           {/* toggle section */}

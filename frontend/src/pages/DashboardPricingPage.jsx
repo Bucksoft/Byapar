@@ -45,7 +45,7 @@ const DashboardPricingPage = () => {
         {/* pricing cards */}
         <div className="grid grid-cols-3 m-5 gap-2">
           {pricingPlans?.map((plan) => (
-            <div key={plan.id}>
+            <div key={plan.id} className=" border border-zinc-400 rounded-lg">
               <SettingPricingCard plan={plan} />
             </div>
           ))}
@@ -230,15 +230,15 @@ const DashboardPricingPage = () => {
 
         {/* review card */}
         <p className="mt-8 mx-8 font-semibold text-2xl mb-2">Reviews</p>
-        <div className="grid grid-cols-4 mx-5 rounded-md p-2 gap-2 mb-10">
+        <div className="grid grid-cols-3 gap-4  rounded-md p-2  mb-10">
           {pricing_Review?.map((review) => (
             // card
             <div
               key={review?.id}
-              className="card w-72 bg-base-100 card-xs shadow-sm"
+              className="card w-full bg-gradient-to-b from-zinc-200 to-zinc-100  card-xs shadow-sm"
             >
-              <div className="card-body">
-                <div className="flex items-center gap-2">
+              <div className="card-body  ">
+                <div className="flex items-center gap-2 ">
                   <div className="avatar avatar-placeholder">
                     <div
                       className={`w-8 rounded-full text-black`}
@@ -250,7 +250,11 @@ const DashboardPricingPage = () => {
                   <h2 className="card-title">{review?.name}</h2>
                 </div>
                 <p>{review?.review}</p>
-                <div className="justify-end card-actions">
+                <div className="justify-end card-actions text-yellow-500 ">
+                  <span className="">{review?.stars}</span>
+                  <span className="">{review?.stars}</span>
+                  <span className="">{review?.stars}</span>
+                  <span className="">{review?.stars}</span>
                   <span className="">{review?.stars}</span>
                 </div>
               </div>
