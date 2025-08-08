@@ -12,29 +12,58 @@ import { FiDownload } from "react-icons/fi";
 import { IoGiftSharp } from "react-icons/io5";
 import { RxCross2 } from "react-icons/rx";
 import { MdCopyAll } from "react-icons/md";
+import { motion } from "framer-motion";
 
 const DashboardReferAndEarnPage = () => {
   const [menu, setMenu] = useState("signed_up");
   const [showPopup, setShowPopup] = useState(false);
   return (
-    <main className="flex p-2 border max-h-screen overflow-y-scroll border-gray-200 shadow-2xs rounded-2xl ">
+    <main className="flex p-1 border max-h-screen overflow-y-scroll border-gray-200 shadow-2xs ">
       <div className="w-full ">
         {/* Header */}
-        <header className="flex w-30/40  items-center">
+        <motion.header
+          initial={{
+            translateY: -100,
+            filter: "blur(10px)",
+          }}
+          animate={{
+            translateY: 0,
+            filter: "blur(0px)",
+          }}
+          transition={{
+            ease: "easeInOut",
+            duration: 0.3,
+          }}
+          className="flex w-30/40  items-center"
+        >
           <p className="text-lg p-5 ">Refer & Earn</p>
-        </header>
+        </motion.header>
 
         {/* Gift Section */}
-        <section className="px-6">
+        <motion.section
+          initial={{
+            opacity: 0,
+            filter: "blur(10px)",
+          }}
+          animate={{
+            opacity: 1,
+            filter: "blur(0px)",
+          }}
+          transition={{
+            ease: "easeInOut",
+            duration: 0.3,
+          }}
+          className="px-6"
+        >
           <div className="flex border bg-gradient-to-r from-[#020211] to-[#6E1A66] shadow rounded-2xl border-gray-300 ">
-            <div className=" w-full p-5 flex-col">
+            <div className=" w-full p-2 px-4 flex-col">
               <div className="flex gap-2">
-                <p className="text-3xl text-yellow-500 font-bold">Earn ₹501</p>
-                <p className="text-3xl text-white font-bold">
+                <p className="text-2xl text-yellow-500 font-bold">Earn ₹501</p>
+                <p className="text-2xl text-white font-bold">
                   for each Referral
                 </p>
               </div>
-              <div className="flex text-lg gap-2 py-3">
+              <div className="flex text-md gap-2 py-3">
                 <p className=" font-semibold text-white">
                   When your friend buys a plan, they'll get
                 </p>
@@ -43,8 +72,11 @@ const DashboardReferAndEarnPage = () => {
                   off on the plan purchase
                 </p>
               </div>
-              <div className="flex ho gap-5">
-                <button onClick={() => setShowPopup(true)} className="btn ">
+              <div className="flex gap-5">
+                <button
+                  onClick={() => setShowPopup(true)}
+                  className="btn btn-sm"
+                >
                   Refer Now
                 </button>
                 <p className="text-sm flex gap-2 text-white items-center font-semibold">
@@ -57,19 +89,45 @@ const DashboardReferAndEarnPage = () => {
               <img
                 src={referandearn}
                 alt="/src/assets/referandearn"
-                className="w-70"
+                className="w-60"
               />
             </div>
           </div>
-        </section>
+        </motion.section>
 
         {/* Reword Earn Seaction */}
         <section className="p-6">
-          <div className="flex flex-col border border-gray-100 shadow  rounded-2xl ">
-            <p className="text-lg p-4 font-bold">Rewards Earned</p>
+          <div className="flex flex-col border bg-white border-gray-100 shadow  rounded-2xl ">
+            <motion.p
+              initial={{
+                opacity: 0,
+              }}
+              animate={{
+                opacity: 1,
+              }}
+              transition={{
+                ease: "easeInOut",
+              }}
+              className="text-lg p-4 font-bold"
+            >
+              Rewards Earned
+            </motion.p>
             <div className="flex justify-between p-4 gap-2">
-              <div className="border rounded border-gray-300 shadow bg-white w-1/2">
-                <div className="flex p-3 flex-col">
+              <motion.div
+                initial={{
+                  translateX: -100,
+                  opacity: 0,
+                }}
+                animate={{
+                  translateX: 0,
+                  opacity: 1,
+                }}
+                transition={{
+                  ease: "easeInOut",
+                }}
+                className="border rounded border-gray-300 shadow bg-white w-1/2"
+              >
+                <div className="flex p-3 flex-col bg-info/10">
                   <p className="text-sm flex items-center gap-2 text-blue-600">
                     <HiOutlineCurrencyRupee size={20} />
                     Total Claimed
@@ -79,9 +137,23 @@ const DashboardReferAndEarnPage = () => {
                     0.0
                   </p>
                 </div>
-              </div>
-              <div className="border rounded border-gray-300 shadow bg-white w-1/2">
-                <div className="flex p-3 flex-col">
+              </motion.div>
+              <motion.div
+                initial={{
+                  translateX: -100,
+                  opacity: 0,
+                }}
+                animate={{
+                  translateX: 0,
+                  opacity: 1,
+                }}
+                transition={{
+                  ease: "easeInOut",
+                  delay: 0.3,
+                }}
+                className="border rounded border-gray-300 shadow bg-white w-1/2"
+              >
+                <div className="flex p-3 flex-col bg-success/20">
                   <p className="text-sm flex items-center gap-2 text-green-600">
                     <BsBank />
                     Ready to Withdraw
@@ -91,11 +163,11 @@ const DashboardReferAndEarnPage = () => {
                     0.0
                   </p>
                 </div>
-              </div>
+              </motion.div>
             </div>
 
-            {/* Refer Now Seaction */}
-            <div className="flex items-center w-full border-b border-gray-300">
+            {/* Refer Now Section */}
+            <div className="flex items-center w-full border-b  border-gray-300">
               <button
                 onClick={() => setMenu("signed_up")}
                 className={`text-base cursor-pointer gap-2 ${
@@ -117,7 +189,19 @@ const DashboardReferAndEarnPage = () => {
             </div>
             {menu === "signed_up" ? (
               <>
-                <div className="w-full flex flex-col items-center justify-center h-60  ">
+                <motion.div
+                  initial={{
+                    opacity: 0,
+                  }}
+                  animate={{
+                    opacity: 1,
+                  }}
+                  transition={{
+                    ease: "easeInOut",
+                    delay:0.3
+                  }}
+                  className="w-full flex flex-col items-center justify-center h-60  "
+                >
                   <p className="text-gray-500 mb-2 text-bold">
                     <FiUserX size={50} />
                   </p>
@@ -130,7 +214,7 @@ const DashboardReferAndEarnPage = () => {
                   >
                     Refer Now
                   </button>
-                </div>
+                </motion.div>
               </>
             ) : (
               <>
