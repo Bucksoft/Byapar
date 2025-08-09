@@ -52,7 +52,7 @@ const DashboardOnlineStorePage = () => {
               <span className="text-sm text-zinc-800">
                 Increase your sales, get Online Orders with a single click
               </span>
-              <button className="bg-info text-white rounded-sm text-xs w-40 h-8 mt-2">
+              <button className="bg-[var(--primary-btn)] text-white rounded-sm text-xs w-40 h-8 mt-2">
                 Create Online Store
               </button>
             </div>
@@ -66,18 +66,19 @@ const DashboardOnlineStorePage = () => {
           </motion.div>
           {/* Search&Cal */}
           <motion.div
-          initial={{
-            opacity:0
-          }}
-          animate={{
-            opacity:1
-          }}
-          transition={{
-            ease:'easeInOut',
-            duration:0.3,
-            delay:0.3
-          }}
-          className="flex ml-4 space-x-5">
+            initial={{
+              opacity: 0,
+            }}
+            animate={{
+              opacity: 1,
+            }}
+            transition={{
+              ease: "easeInOut",
+              duration: 0.3,
+              delay: 0.3,
+            }}
+            className="flex ml-4 space-x-5"
+          >
             <div className="">
               <label className="input border border-zinc-400">
                 <Search size={16} className="text-zinc-600" />
@@ -117,19 +118,20 @@ const DashboardOnlineStorePage = () => {
           </motion.div>
           {/* table */}
           <motion.div
-          initial={{
-            scale:0,
-            opacity:0
-          }}
-          animate={{
-            scale:1,
-            opacity:1
-          }}
-          transition={{
-            ease:'easeInOut',
-            duration:0.3
-          }}
-          className="border border-zinc-200 mt-5 h-80 rounded-md mx-4 ">
+            initial={{
+              scale: 0,
+              opacity: 0,
+            }}
+            animate={{
+              scale: 1,
+              opacity: 1,
+            }}
+            transition={{
+              ease: "easeInOut",
+              duration: 0.3,
+            }}
+            className="border border-zinc-200 mt-5 h-80 rounded-md mx-4 "
+          >
             <table className="table ">
               {/* head */}
               <thead>

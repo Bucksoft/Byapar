@@ -20,7 +20,7 @@ const DashboardAccountPage = () => {
         <div className="flex items-end justify-between flex-col absolute bottom-5 right-5  w-1/4">
           <div className="border-b border-b-zinc-300 rounded-md bg-white border w-full overflow-hidden">
             {/* header */}
-            <div className="border-b border-b-black bg-info p-2 mb-2">
+            <div className="border-b border-b-black bg-[var(--primary-btn)] p-2 mb-2">
               <span className="text-lg font-semibold text-white pl-5">
                 Byapar Chatbot
               </span>
@@ -55,7 +55,7 @@ const DashboardAccountPage = () => {
             </div>
           </div>
 
-          <div className=" w-12 h-12 flex items-center justify-center bg-info rounded-full text-white p-3">
+          <div className=" w-12 h-12 flex items-center justify-center bg-[var(--primary-btn)] rounded-full text-white p-3">
             <button className="p-1" onClick={() => setChatOpen(false)}>
               <IoLogoWechat size={22} />
             </button>

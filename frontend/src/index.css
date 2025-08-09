@@ -6,10 +6,8 @@ body {
 }
 
 :root {
-  --primary-btn-background: rgba(66, 135, 245, 0.3);
-  --primary-btn-dark: rgb(66, 135, 245);
-  --primary-btn-color: #00bafe;
-  --primary-btn-back-hover: rgb(66, 135, 245);
+  --primary-btn: rgb(0, 186, 254);
+  --secondary-btn: rgb(0, 211, 144);
 }
 
 /* hide-scrollbar class */

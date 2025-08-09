@@ -86,7 +86,7 @@ const Sidebar = () => {
             }}
             tabIndex={0}
             role="button"
-            className="btn btn-sm m-1 w-3/4 bg-info text-white rounded-full shadow-md  
+            className="btn btn-sm m-1 w-3/4 bg-[var(--primary-btn)] text-white rounded-full shadow-md  
             transition-all ease-in-out duration-200 hover:h-10
             "
           >
@@ -118,7 +118,7 @@ const Sidebar = () => {
                 {field.label === "Items" ||
                 field.label === "Sales" ||
                 field.label === "Purchases" ? (
-                  <div className="group flex items-center px-4 hover:text-info transition-all duration-200 ease-in-out">
+                  <div className="group flex items-center px-4 hover:text-[var(--primary-btn)] transition-all duration-200 ease-in-out">
                     <span className="group-hover:-translate-x-2 transition-all duration-200 ease-in-out">
                       {field.icon}
                     </span>
@@ -159,8 +159,8 @@ const Sidebar = () => {
                         `group px-4 flex items-center gap-5 text-xs py-2 cursor-pointer transition-all ease-in-out duration-150 
                   ${
                     isActive
-                      ? "bg-info/10 text-[var(--primary-btn-color)] scale-105 border-l-2"
-                      : "hover:bg-info/0 hover:text-[var(--primary-btn-color)] hover:scale-105"
+                      ? "bg-[var(--primary-btn)]/10 text-[var(--primary-btn)] scale-105 border-l-2"
+                      : "hover:bg-[var(--primary-btn)]/0 hover:text-[var(--primary-btn)] hover:scale-105"
                   }`
                       }
                     >
@@ -193,8 +193,8 @@ const Sidebar = () => {
                     `group px-4 my-1 flex items-center gap-5 text-xs py-2 cursor-pointer transition-all ease-in-out duration-150 
                   ${
                     isActive
-                      ? "bg-info/10 text-[var(--primary-btn-color)] scale-105 border-l-2"
-                      : "hover:bg-info/0 hover:text-[var(--primary-btn-color)] hover:scale-105"
+                      ? "bg-[var(--primary-btn)]/10 text-[var(--primary-btn)] scale-105 border-l-2"
+                      : "hover:bg-[var(--primary-btn)]/0 hover:text-[var(--primary-btn)] hover:scale-105"
                   }`
                   }
                 >
@@ -225,8 +225,8 @@ const Sidebar = () => {
                     `group px-4 my-1 flex items-center gap-5 text-xs py-2 cursor-pointer transition-all ease-in-out duration-150 
                   ${
                     isActive
-                      ? "bg-info/10 text-[var(--primary-btn-color)] scale-105 border-l-2"
-                      : "hover:bg-info/0 hover:text-[var(--primary-btn-color)] hover:scale-105"
+                      ? "bg-[var(--primary-btn)]/10 text-[var(--primary-btn)] scale-105 border-l-2"
+                      : "hover:bg-[var(--primary-btn)]/0 hover:text-[var(--primary-btn)] hover:scale-105"
                   }`
                   }
                 >
@@ -257,8 +257,8 @@ const Sidebar = () => {
                     `group px-4 my-1 flex items-center gap-5 text-xs text-nowrap py-2 cursor-pointer transition-all ease-in-out duration-150 
                   ${
                     isActive
-                      ? "bg-info/10 text-[var(--primary-btn-color)] scale-105 border-l-2"
-                      : "hover:bg-info/0 hover:text-[var(--primary-btn-color)] hover:scale-105"
+                      ? "bg-[var(--primary-btn)]/10 text-[var(--primary-btn)] scale-105 border-l-2"
+                      : "hover:bg-[var(--primary-btn)]/0 hover:text-[var(--primary-btn)] hover:scale-105"
                   }`
                   }
                 >
@@ -272,7 +272,7 @@ const Sidebar = () => {
           </motion.div>
         </div>
 
-        <button className="hover:bg-slate-800  transition-all ease-in-out duration-700 hover:text-white group px-5 py-3 flex items-center gap-3 bg-info text-white w-full cursor-pointer">
+        <button className="hover:bg-slate-800  transition-all ease-in-out duration-700 hover:text-white group px-5 py-3 flex items-center gap-3 bg-[var(--primary-btn)] text-white w-full cursor-pointer">
           <TbLogout2 className="group-hover:rotate-90 transition-all ease-in-out duration-200 group-hover:scale-120" />{" "}
           Logout
         </button>

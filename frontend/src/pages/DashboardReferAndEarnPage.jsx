@@ -127,7 +127,7 @@ const DashboardReferAndEarnPage = () => {
                 }}
                 className="border rounded border-gray-300 shadow bg-white w-1/2"
               >
-                <div className="flex p-3 flex-col bg-info/10">
+                <div className="flex p-3 flex-col bg-[var(--primary-btn)]/10">
                   <p className="text-sm flex items-center gap-2 text-blue-600">
                     <HiOutlineCurrencyRupee size={20} />
                     Total Claimed
@@ -171,7 +171,7 @@ const DashboardReferAndEarnPage = () => {
               <button
                 onClick={() => setMenu("signed_up")}
                 className={`text-base cursor-pointer gap-2 ${
-                  menu === "signed_up" && "bg-info/10 text-info"
+                  menu === "signed_up" && "bg-[var(--primary-btn)]/10 text-info"
                 } flex items-center px-5 font-semibold p-2 mr-2`}
               >
                 <HiOutlineUser />
@@ -180,7 +180,8 @@ const DashboardReferAndEarnPage = () => {
               <button
                 onClick={() => setMenu("Plan_purchased")}
                 className={` text-base cursor-pointer gap-2 ${
-                  menu === "Plan_purchased" && "bg-info/10 text-info"
+                  menu === "Plan_purchased" &&
+                  "bg-[var(--primary-btn)]/10 text-info"
                 } cursor-pointer gap-2 flex items-center px-5 p-2 mr-2 font-semibold`}
               >
                 <HiOutlineUsers />
