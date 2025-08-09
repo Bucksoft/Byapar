@@ -8,6 +8,12 @@ body {
 :root {
   --primary-btn: rgb(0, 186, 254);
   --secondary-btn: rgb(0, 211, 144);
+  --badge: rgb(66, 42, 213);
+  --gradient-from: rgb(204, 149, 192);
+  --gradient-via: rgb(219, 212, 180);
+  --gradient-to: rgb(122, 161, 210);
+  --login-background: rgb(235, 247, 243);
+  --loading: rgb(228, 228, 231);
 }
 
 /* hide-scrollbar class */

@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { axiosInstance } from "../config/axios";
 import { useNavigate } from "react-router-dom";
-import { Loader } from "lucide-react";
+import CustomLoader from "./Loader";
 
 const OtpInputForm = ({ email }) => {
   const queryClient = useQueryClient();
@@ -21,8 +21,8 @@ const OtpInputForm = ({ email }) => {
   });
 
   return (
-    <main className="flex">
-      <input
+    <>
+      {/* <input
         type="text"
         value={otp}
         onChange={(e) => setOtp(e.target.value)}
@@ -34,15 +34,30 @@ const OtpInputForm = ({ email }) => {
         onClick={() => mutation.mutate({ otp })}
         className="bg-[var(--primary-btn-dark)] cursor-pointer text-white p-2 rounded-tr-md rounded-br-md shadow-md"
       >
-        {mutation.isPending ? (
-          <>
-            <Loader className="size-4 animate-spin" />
-          </>
-        ) : (
-          <>Verify</>
-        )}
-      </button>
-    </main>
+        
+      </button> */}
+      <div className="bg-white shadow-lg w-1/4 p-5 rounded-lg">
+        <h2 className="mb-3 font-semibold">Verify your OTP</h2>
+        <input
+          type="text"
+          className="input input-sm"
+          placeholder="Enter OTP"
+          value={otp}
+          onChange={(e) => setOtp(e.target.value)}
+        />
+        <div className="flex items-center justify-end mt-5">
+          <button className="btn btn-sm bg-success">
+            {mutation.isPending ? (
+              <>
+                <CustomLoader text={"Loading......"} />
+              </>
+            ) : (
+              <>Verify OTP</>
+            )}
+          </button>
+        </div>
+      </div>
+    </>
   );
 };
 

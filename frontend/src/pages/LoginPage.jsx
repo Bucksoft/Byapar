@@ -1,12 +1,14 @@
-import { Loader, Mail } from "lucide-react";
+import { Mail } from "lucide-react";
 import { FcGoogle } from "react-icons/fc";
-import { FaMoneyBillAlt } from "react-icons/fa";
-import loginVector from "../assets/login.svg";
+import ByaparLogo from "../assets/Byapar.png";
+import LoginImage from "../assets/Login_image.png";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
 import { axiosInstance } from "../config/axios";
 import OtpInputForm from "../components/OtpInputForm";
 import { useNavigate } from "react-router-dom";
+import { motion } from "framer-motion";
+import CustomLoader from "../components/Loader";
 
 const LoginPage = () => {
   const [email, setEmail] = useState("");
@@ -27,100 +29,88 @@ const LoginPage = () => {
   });
   return (
     <>
-      <main className="h-screen flex flex-col sm:flex-row w-full mx-auto">
-        <section className="bg-white h-full w-full sm:w-1/2 flex px-6 sm:px-24 justify-center flex-col">
-          {/* logo */}
-          <div className="flex flex-col items-center justify-center p-3">
-            <h1 className="text-2xl text-blue-950 font-semibold flex items-center gap-3">
-              <FaMoneyBillAlt size={30} />
-              ByaPar
-            </h1>
-            <small className="font-medium text-center">
-              Login into your account
-            </small>
-          </div>
+      <main className="h-screen w-full md:p-16 bg-gradient-to-r from-[var(--gradient-from)] via-[var(--gradient-via)] to-[var(--gradient-to)] grid md:place-items-center relative">
+        <div className="border md:w-3/4  flex items-center justify-center border-white/10 bg-[var(--login-background)] backdrop-blur-3xl h-full md:rounded-xl shadow-lg overflow-hidden">
+          {/* left section */}
+          <section className="md:w-1/2  h-full flex flex-col items-center mt-32 justify-start">
+            <div className="flex flex-col ">
+              <img
+                src={ByaparLogo}
+                alt="Byapar_logo"
+                width={200}
+                className="mb-16 -ml-10"
+              />
 
-          <div className="mt-6">
-            <div className="flex flex-col">
-              <label htmlFor="email" className="font-semibold mb-2">
-                Email address
-              </label>
-              <div className="flex relative">
+              <h1 className="font-semibold text-xl">Login / Register</h1>
+              <span className="text-sm">
+                Please enter your email down below
+              </span>
+              <div className="relative">
                 <input
-                  onChange={(e) => setEmail(e.target.value)}
-                  value={email}
                   type="text"
+                  className="input mt-8"
                   placeholder="Email"
-                  className="input w-full"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
                 />
-                <div className=" text-zinc-500 p-2 rounded-r-md absolute right-1 z-10">
-                  <Mail />
-                </div>
+                <Mail
+                  className="absolute right-3 top-11 text-zinc-500"
+                  size={15}
+                />
               </div>
-            </div>
-
-            {otpInput && (
-              <div className="mt-5">
-                <OtpInputForm email={email} />
-              </div>
-            )}
-
-            <button
-              onClick={() => mutation.mutate(email)}
-              className="btn  btn-info mt-5 w-full"
-            >
-              {mutation.isPending ? (
-                <div className="flex items-center justify-center">
-                  <Loader className="animate-spin size-6" />
-                </div>
-              ) : (
-                <>Get OTP</>
-              )}
-            </button>
-
-            <div className="flex gap-3 text-zinc-400 mt-8 items-center justify-center">
-              <div className="h-[0.9px] w-full bg-zinc-200" />
-              <div>OR</div>
-              <div className="h-[0.9px] w-full bg-zinc-200" />
-            </div>
-
-            <button className="btn bg-white text-black border-[#e5e5e5] w-full mt-7">
-              <svg
-                aria-label="Google logo"
-                width="16"
-                height="16"
-                xmlns="http://www.w3.org/2000/svg"
-                viewBox="0 0 512 512"
+              <button
+                onClick={() => mutation.mutate({ email })}
+                className={`btn mt-5 bg-[var(--primary-btn)] ${
+                  mutation.isPending && "bg-neutral-content"
+                }`}
+                disabled={mutation.isPending}
               >
-                <g>
-                  <path d="m0 0H512V512H0" fill="#fff"></path>
-                  <path
-                    fill="#34a853"
-                    d="M153 292c30 82 118 95 171 60h62v48A192 192 0 0190 341"
-                  ></path>
-                  <path
-                    fill="#4285f4"
-                    d="m386 400a140 175 0 0053-179H260v74h102q-7 37-38 57"
-                  ></path>
-                  <path
-                    fill="#fbbc02"
-                    d="m90 341a208 200 0 010-171l63 49q-12 37 0 73"
-                  ></path>
-                  <path
-                    fill="#ea4335"
-                    d="m153 219c22-69 116-109 179-50l55-54c-78-75-230-72-297 55"
-                  ></path>
-                </g>
-              </svg>
-              Login with Google
-            </button>
-          </div>
-        </section>
+                {mutation.isPending ? (
+                  <CustomLoader text={"Sending email ....."} />
+                ) : (
+                  <>Get OTP</>
+                )}
+              </button>
 
-        {/* Image - hidden on mobile, visible from sm+ */}
-        <section className="hidden sm:flex items-center justify-center h-full w-1/2">
-          <img src={loginVector} alt="loginVector" width={550} loading="lazy" />
-        </section>
+              <div className="flex text-xs text-zinc-500 items-center gap-3 my-5">
+                <span className="h-[1px] bg-zinc-400 w-full" />
+                <p className="text-nowrap">or continue</p>
+                <span className="h-[1px] bg-zinc-400 w-full" />
+              </div>
+
+              <button className="btn btn-neutral ">
+                <FcGoogle size={20} /> Log In with Google
+              </button>
+            </div>
+          </section>
+
+          {/* right section */}
+          <section className=" md:flex hidden w-1/2 h-full p-3  justify-end">
+            <div className="rounded-lg overflow-hidden">
+              <img src={LoginImage} alt="Login_image" width={390} />
+            </div>
+          </section>
+        </div>
+        {/* OTP INPUT FORM IS DISPLAYED HERE */}
+        {otpInput && (
+          <motion.div
+            initial={{
+              translateY: -100,
+              opacity: 0,
+            }}
+            animate={{
+              translateY: 0,
+              opacity: 1,
+            }}
+            transition={{
+              ease: "easeInOut",
+              duration: 0.3,
+            }}
+            className="absolute h-screen w-full bg-black/80 backdrop-blur-md flex items-center justify-center"
+          >
+            <OtpInputForm email={email} />
+          </motion.div>
+        )}
       </main>
     </>
   );

@@ -12,6 +12,37 @@ import invoP from "../assets/InvoiceP.png";
 import payment from "../assets/Payment.png";
 import { LiaStarSolid } from "react-icons/lia";
 
+export const badges = [
+  {
+    id: 1,
+    label: "Party",
+  },
+  {
+    id: 2,
+    label: "Invoice",
+  },
+  {
+    id: 3,
+    label: "Category",
+  },
+  {
+    id: 4,
+    label: "Payment Collection",
+  },
+  {
+    id: 5,
+    label: "Item",
+  },
+  {
+    id: 6,
+    label: "Invoice Details",
+  },
+  {
+    id: 7,
+    label: "Summary",
+  },
+];
+
 export const features = [
   {
     title: "Creating repeated bills?",

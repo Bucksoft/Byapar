@@ -38,7 +38,7 @@ const DashboardCashAndBank = () => {
                 <FaArrowRightArrowLeft />
                 Transfer Money
               </button>
-              <button className="flex bg-[#4C3CCE] border border-gray-300 gap-2 px-4 py-2 items-center justify-center btn btn-sm rounded text-bold text-white">
+              <button className="flex bg-[var(--primary-btn)] btn btn-sm">
                 <FaPlus />
                 Add New Account
               </button>

@@ -1,5 +1,5 @@
 import { Plus } from "lucide-react";
-import { FaMoneyBillAlt } from "react-icons/fa";
+import ByaparLogo from "../assets/Byapar.png";
 import {
   businessTools,
   dashboardAccountingFields,
@@ -54,10 +54,9 @@ const Sidebar = () => {
             filter: "blur(0)",
           }}
           onScroll={() => console.log("Sad")}
-          className="sticky top-0 bg-sky-950 z-10 text-md text-white font-semibold flex items-center gap-3 w-full px-5 py-3 border-b border-zinc-200"
+          className="sticky top-0  z-10 text-md text-white font-semibold flex items-center gap-3 w-full px-5 py-3 border-b border-zinc-200 bg-white"
         >
-          <FaMoneyBillAlt size={20} />
-          ByaPar
+          <img src={ByaparLogo} alt="Byapar_logo" className="-ml-8" width={150}/>
         </motion.h1>
 
         {/* business details */}

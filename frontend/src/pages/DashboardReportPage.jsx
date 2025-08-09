@@ -1,37 +1,7 @@
 import { RiAccountPinCircleFill } from "react-icons/ri";
 import { motion } from "framer-motion";
 import { container, dashboardLinksItems } from "../components/Sidebar";
-
-const badges = [
-  {
-    id: 1,
-    label: "Party",
-  },
-  {
-    id: 2,
-    label: "Invoice",
-  },
-  {
-    id: 3,
-    label: "Category",
-  },
-  {
-    id: 4,
-    label: "Payment Collection",
-  },
-  {
-    id: 5,
-    label: "Item",
-  },
-  {
-    id: 6,
-    label: "Invoice Details",
-  },
-  {
-    id: 7,
-    label: "Summary",
-  },
-];
+import { badges } from "../utils/constants";
 
 const DashboardReportPage = () => {
   return (
@@ -71,7 +41,7 @@ const DashboardReportPage = () => {
             {badges?.map((badge) => (
               <motion.div
                 variants={dashboardLinksItems}
-                className="badge badge-soft badge-primary cursor-pointer"
+                className="badge badge-soft badge-[var(--badge)] cursor-pointer"
               >
                 {badge.label}
               </motion.div>
