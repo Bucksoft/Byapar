@@ -6,12 +6,12 @@ import { delay, motion } from "framer-motion";
 
 const DashboardStaffPage = () => {
   return (
-    <main className="min-h-screen w-full flex flex-col md:flex-row bg-gray-100">
+    <main className="min-h-screen w-full flex flex-col md:flex-row bg-zinc-100">
       {/* Sidebar */}
 
       {/* Main Content */}
       <section className="w-full p-4">
-        <div className="border-2 border-zinc-100 shadow-2xl rounded-md bg-white p-4 h-full">
+        <div className="border border-zinc-200 shadow-2xl rounded-md bg-white p-4 h-full">
           {/* Title */}
           <motion.p
             initial={{
@@ -169,7 +169,7 @@ const DashboardStaffPage = () => {
               ease:"easeInOut",
               duration:0.3
             }}
-            className="btn btn-info btn-sm mt-5">
+            className="btn btn-[var(--primary-btn)] btn-sm mt-5">
               <PlusIcon size={18} />
               Add Staff
             </motion.button>

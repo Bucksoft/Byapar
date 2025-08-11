@@ -29,7 +29,7 @@ const DashboardPage = () => {
               className="w-full bg-white rounded-lg px-5 py-3 flex items-center justify-between"
             >
               <span className="font-semibold text-lg">Dashboard</span>
-              <button className="btn btn-sm btn-soft btn-info">
+              <button className="btn btn-sm btn-soft bg-[var(--primary-btn)]">
                 {" "}
                 <MessageCircle size={15} /> Chat
               </button>

@@ -11,7 +11,7 @@ import { motion } from "framer-motion";
 const DashboardCashAndBank = () => {
   return (
     <main className="p-2">
-      <div className="max-h-screen overflow-y-scroll w-full bg-white rounded-2xl  border border-gray-300 ">
+      <div className="max-h-screen w-full bg-white roundes  ">
         <motion.header
           initial={{
             translateY: -100,
@@ -27,7 +27,7 @@ const DashboardCashAndBank = () => {
           }}
           className="py-4   w-full bg-white  mb-2"
         >
-          <div className="w-full  flex  items-center justify-between px-5">
+          <div className="w-full flex items-center justify-between px-5">
             <h1 className="text-xl font-semibold">Cash and Bank</h1>
             <div className="flex items-center justify-between gap-2">
               <button className="flex border border-gray-300 hover gap-2 px-4 py-2 btn btn-sm  rounded text-sm">
@@ -46,7 +46,7 @@ const DashboardCashAndBank = () => {
           </div>
         </motion.header>
 
-        <section className="bg-white h-full flex">
+        <section className="bg-white h-full flex p-3">
           {/* left body */}
           <motion.div
             initial={{
@@ -61,7 +61,7 @@ const DashboardCashAndBank = () => {
               ease: "easeInOut",
               duration: 0.3,
             }}
-            className="w-1/4 bg-white border border-gray-300 h-full"
+            className="w-1/4 bg-white border border-gray-200 h-full"
           >
             <div className="h-23 flex bg-white items-center border-b border-zinc-300 justify-between p-4">
               <p className="text-sm">Total Balance:</p>

@@ -10,7 +10,7 @@ export async function sendOTPviaMail(to, otp) {
       bounce_address: process.env.ZOHO_BOUNCE_ADDRESS,
       from: {
         address: process.env.ZOHO_MAIL_FROM,
-        name: "Bharat Chatbot",
+        name: "Byapar",
       },
       to: [{ email_address: { address: to } }],
       subject: "Your One-Time Password (OTP) for Account Verification",

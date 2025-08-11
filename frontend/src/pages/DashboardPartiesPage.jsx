@@ -57,14 +57,14 @@ const DashboardPartiesPage = () => {
           className="flex items-center justify-between mt-8"
         >
           <div className="">
-            <label className="input">
+            <label className="input input-sm">
               <Search size={16} className="text-zinc-400" />
               <input type="search" required placeholder="Search" />
             </label>
           </div>
 
           <div>
-            <Link to={"/dashboard/add-party"} className="btn btn-sm btn-info">
+            <Link to={"/dashboard/add-party"} className="btn btn-sm bg-[var(--primary-btn)]">
               <Plus size={14} /> Create Party
             </Link>
           </div>

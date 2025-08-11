@@ -65,7 +65,7 @@ const DashboardItemsPage = () => {
           </div>
 
           <div>
-            <button className="btn btn-sm btn-info">
+            <button className="btn btn-sm btn-[var(--primary-btn)]">
               <Plus size={14} /> Create Item
             </button>
           </div>
@@ -92,7 +92,7 @@ const DashboardItemsPage = () => {
           <p className="text-zinc-500 text-xs">
             For quicker and easier experience of creating sales invoices
           </p>
-          <button className="btn btn-soft btn-sm mt-4 btn-info">
+          <button className="btn btn-soft btn-sm mt-4 bg-[var(--primary-btn)]">
             {" "}
             <PiMicrosoftExcelLogoFill size={15} /> Add Items with Excel
           </button>

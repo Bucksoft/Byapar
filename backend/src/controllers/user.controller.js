@@ -10,7 +10,9 @@ export async function login(req, res) {
   try {
     const { email } = req.body;
     if (!email) {
-      res.status(400).json({ status: "Failed", err: "Email not provided" });
+      return res
+        .status(400)
+        .json({ status: "Failed", err: "Email not provided" });
     }
 
     const result = loginSchema.safeParse({
@@ -19,7 +21,7 @@ export async function login(req, res) {
 
     if (!result.success) {
       const errors = result.error.format();
-      res
+      return res
         .status(400)
         .json({ status: "Failed", err: "Validation failed", errors });
     }
@@ -33,15 +35,24 @@ export async function login(req, res) {
       expiresIn: Date.now() + 5 * 60 * 1000,
     });
     // 2. Send OTP via email to user.
-    const mailResponse = await sendOTPviaMail(email, otp);
+    await sendOTPviaMail(email, otp);
+
+    // 3. save otp record
+    const otpRecord = await OTP.create({
+      email,
+      otp,
+      expiresIn: new Date(Date.now() + 1 * 60 * 1000),
+    });
 
     return res.status(200).json({
       status: "success",
       message: `Login request received for ${email} and OTP sent`,
     });
   } catch (error) {
-    res.status(500).json({ status: "Failed", err: "Internal Server Error" });
     console.error(`Internal Server error : ${error}`);
+    return res
+      .status(500)
+      .json({ status: "Failed", err: "Internal Server Error" });
   }
 }
 
@@ -61,6 +72,7 @@ export async function verifyOTP(req, res) {
     }
 
     const otpRecord = await OTP.findOne({ email, otp });
+    console.log(otpRecord);
     if (!otpRecord) {
       return res
         .status(400)

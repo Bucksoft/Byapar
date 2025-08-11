@@ -17,18 +17,18 @@ const DashboardNavbar = ({ title, isReport }) => {
         ease: "easeInOut",
         duration: 0.3,
       }}
-      className="flex items-center justify-between"
+      className="flex items-start justify-between px-4"
     >
       <h2 className="font-semibold text-lg">{title}</h2>
 
       {/* Reports dropdown */}
-      <div className="flex gap-5 items-center">
+      <div className="flex gap-5 items-center ">
         <div className="dropdown dropdown-end">
           {isReport && (
             <div
               tabIndex={0}
               role="button"
-              className="btn btn-sm m-1 btn-dash btn-wide btn-info"
+              className="btn btn-sm m-1 btn-dash btn-wide bg-[var(--primary-btn)]"
             >
               <TbReportSearch size={14} /> Reports
             </div>

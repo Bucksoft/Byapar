@@ -44,14 +44,14 @@ const DashboardBills = () => {
             className=" border-gray-300  flex items-center justify-between  p-2  "
           >
             <div className="flex justify-between items-center mr-16 space-x-5">
-              <div className="font-semibold text-lg pl-2">E-Invoicing</div>
+              <div className="font-semibold text-lg pl-2">Automated Bills</div>
 
-              <button className="btn btn-outline btn-info btn-sm">
+              <button className="btn btn-outline bg-[var(--primary-btn)] btn-sm">
                 What is e-Invoicing
               </button>
             </div>
             <div className="pr-10">
-              <button className="btn btn-soft btn-info btn-sm">
+              <button className="btn btn-soft bg-[var(--primary-btn)] btn-sm">
                 <MessageCircle size={16} /> Chat Support
               </button>
             </div>
@@ -117,7 +117,7 @@ const DashboardBills = () => {
                 ease: "easeInOut",
                 duration: 0.2,
               }}
-              className="btn btn-info"
+              className="btn bg-[var(--primary-btn)]"
             >
               Create Automated Bill
             </motion.button>

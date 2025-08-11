@@ -6,6 +6,7 @@ import CustomLoader from "./Loader";
 
 const OtpInputForm = ({ email }) => {
   const queryClient = useQueryClient();
+
   const navigate = useNavigate();
   const [otp, setOtp] = useState("");
 
@@ -22,21 +23,7 @@ const OtpInputForm = ({ email }) => {
 
   return (
     <>
-      {/* <input
-        type="text"
-        value={otp}
-        onChange={(e) => setOtp(e.target.value)}
-        placeholder="Enter your OTP"
-        className="outline-0 w-full p-2 bg-zinc-200 rounded-tl-md rounded-bl-md shadow-md"
-      />
-
-      <button
-        onClick={() => mutation.mutate({ otp })}
-        className="bg-[var(--primary-btn-dark)] cursor-pointer text-white p-2 rounded-tr-md rounded-br-md shadow-md"
-      >
-        
-      </button> */}
-      <div className="bg-white shadow-lg w-1/4 p-5 rounded-lg">
+      <div className="bg-white shadow-lg md:w-1/4 w-3/4 p-5 rounded-lg">
         <h2 className="mb-3 font-semibold">Verify your OTP</h2>
         <input
           type="text"
@@ -45,8 +32,16 @@ const OtpInputForm = ({ email }) => {
           value={otp}
           onChange={(e) => setOtp(e.target.value)}
         />
+        {mutation.isError && (
+          <p className="text-xs text-red-500">
+            {mutation.error.response.data.err}
+          </p>
+        )}
         <div className="flex items-center justify-end mt-5">
-          <button className="btn btn-sm bg-success">
+          <button
+            onClick={() => mutation.mutate(otp)}
+            className="btn btn-sm bg-success"
+          >
             {mutation.isPending ? (
               <>
                 <CustomLoader text={"Loading......"} />

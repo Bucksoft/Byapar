@@ -171,7 +171,7 @@ const DashboardReferAndEarnPage = () => {
               <button
                 onClick={() => setMenu("signed_up")}
                 className={`text-base cursor-pointer gap-2 ${
-                  menu === "signed_up" && "bg-[var(--primary-btn)]/10 text-info"
+                  menu === "signed_up" && "bg-[var(--primary-btn)]/10 text-[var(--primary-btn)]"
                 } flex items-center px-5 font-semibold p-2 mr-2`}
               >
                 <HiOutlineUser />
@@ -181,7 +181,7 @@ const DashboardReferAndEarnPage = () => {
                 onClick={() => setMenu("Plan_purchased")}
                 className={` text-base cursor-pointer gap-2 ${
                   menu === "Plan_purchased" &&
-                  "bg-[var(--primary-btn)]/10 text-info"
+                  "bg-[var(--primary-btn)]/10 text-[var(--primary-btn)]"
                 } cursor-pointer gap-2 flex items-center px-5 p-2 mr-2 font-semibold`}
               >
                 <HiOutlineUsers />
@@ -211,7 +211,7 @@ const DashboardReferAndEarnPage = () => {
                   </p>
                   <button
                     onClick={() => setShowPopup(true)}
-                    className="btn btn-sm btn-info"
+                    className="btn btn-sm btn-[var(--primary-btn)]"
                   >
                     Refer Now
                   </button>
@@ -228,7 +228,7 @@ const DashboardReferAndEarnPage = () => {
                   </p>
                   <button
                     onClick={() => setShowPopup(true)}
-                    className="btn btn-sm btn-info"
+                    className="btn btn-sm btn-[var(--primary-btn)]"
                   >
                     Refer Now
                   </button>

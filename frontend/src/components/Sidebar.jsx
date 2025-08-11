@@ -42,7 +42,7 @@ const Sidebar = () => {
 
   return (
     <>
-      <section className=" bg-gradient-to-b from-sky-50 to-white  text-black shadow-md max-h-screen overflow-y-auto hide-scrollbar border border-zinc-200 ">
+      <section className="bg-[rgb(6,7,28)] text-white/70 shadow-md max-h-screen overflow-y-auto hide-scrollbar border border-zinc-200 ">
         {/* nav */}
         <motion.h1
           initial={{
@@ -56,7 +56,12 @@ const Sidebar = () => {
           onScroll={() => console.log("Sad")}
           className="sticky top-0  z-10 text-md text-white font-semibold flex items-center gap-3 w-full px-5 py-3 border-b border-zinc-200 bg-white"
         >
-          <img src={ByaparLogo} alt="Byapar_logo" className="-ml-8" width={150}/>
+          <img
+            src={ByaparLogo}
+            alt="Byapar_logo"
+            className="-ml-8"
+            width={150}
+          />
         </motion.h1>
 
         {/* business details */}
@@ -73,7 +78,7 @@ const Sidebar = () => {
         </div>
 
         {/* dropdown */}
-        <div className="dropdown dropdown-start w-full flex justify-center  border-b pb-3 border-zinc-200">
+        <div className="dropdown dropdown-start w-full flex justify-center  border-b pb-3 border-zinc-800">
           <motion.div
             initial={{
               filter: "blur(10px)",
@@ -85,15 +90,15 @@ const Sidebar = () => {
             }}
             tabIndex={0}
             role="button"
-            className="btn btn-sm m-1 w-3/4 bg-[var(--primary-btn)] text-white rounded-full shadow-md  
-            transition-all ease-in-out duration-200 hover:h-10
+            className="btn btn-sm m-1 w-3/4 bg-[var(--primary-btn)] text-white border-none rounded-full shadow-sm  
+            transition-all ease-in-out duration-200 hover:h-10 shadow-info/60
             "
           >
             <Plus size={16} /> Create
           </motion.div>
           <ul
             tabIndex={0}
-            className="dropdown-content menu bg-base-100 rounded-box z-1 w-52 p-2 shadow-sm"
+            className="dropdown-content menu bg-base-200 text-black rounded-box z-1 w-52 p-2 shadow-sm"
           >
             <li>
               <a>Item 1</a>
@@ -104,8 +109,10 @@ const Sidebar = () => {
           </ul>
         </div>
 
-        <div className="px-5 py-2 border-b border-zinc-200">
-          <label className="font-semibold text-xs">GENERAL</label>
+        <div className="px-5 py-2 border-b border-zinc-800">
+          <label className="font-semibold text-xs text-[var(--primary-btn)]">
+            GENERAL
+          </label>
           <motion.div
             variants={container}
             initial="hidden"
@@ -175,8 +182,10 @@ const Sidebar = () => {
           </motion.div>
         </div>
 
-        <div className="px-5 py-2 border-b border-zinc-200">
-          <label className="font-semibold text-xs">ACCOUNTING SOLUTIONS</label>
+        <div className="px-5 py-2 border-b border-zinc-800">
+          <label className="font-semibold text-xs text-[var(--primary-btn)]">
+            ACCOUNTING SOLUTIONS
+          </label>
           <motion.div
             className="mt-3"
             variants={container}
@@ -207,8 +216,8 @@ const Sidebar = () => {
           </motion.div>
         </div>
 
-        <div className="px-5 py-2 border-b border-zinc-200">
-          <label className="font-semibold text-xs">SETTINGS</label>
+        <div className="px-5 py-2 border-b border-zinc-800">
+          <label className="font-semibold text-xs text-info">SETTINGS</label>
           <motion.div
             className="mt-3"
             variants={container}
@@ -239,8 +248,10 @@ const Sidebar = () => {
           </motion.div>
         </div>
 
-        <div className="px-5 pt-2 pb-8 border-b border-zinc-200">
-          <label className="font-semibold text-xs">BUSINESS TOOLS</label>
+        <div className="px-5 pt-2 pb-8 border-b border-zinc-800">
+          <label className="font-semibold text-xs text-[var(--primary-btn)]">
+            BUSINESS TOOLS
+          </label>
           <motion.div
             className="mt-3"
             variants={container}

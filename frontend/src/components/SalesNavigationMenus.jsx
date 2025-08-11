@@ -1,0 +1,102 @@
+import { Calendar, ChevronDown, Keyboard, Search } from "lucide-react";
+import { IoSettingsOutline } from "react-icons/io5";
+import { TbCoinRupee } from "react-icons/tb";
+
+const SalesNavigationMenus = ({ title, btnText, selectText }) => {
+  return (
+    <main>
+      {title === "Payment In" && (
+        <div className="mx-5 mt-6  border-zinc-200 text-sm flex items-center gap-1 font-medium border-b ">
+          <p className="pb-2 border-w">
+            <TbCoinRupee size={16} className="text-[var(--primary-btn)] " />
+          </p>
+          <span className="text-[var(--primary-btn)] pb-2">
+            Payment Received
+          </span>
+        </div>
+      )}
+
+      <div className="flex justify-between mx-5 mt-5">
+        <div className="flex gap-3">
+          {/* search box */}
+          <div className="">
+            <label className="input input-sm">
+              <Search size={16} className="text-zinc-400" />
+              <input type="search" required placeholder="Search" />
+            </label>
+          </div>
+          {/* calender */}
+          <div className="dropdown dropdown-center w-50">
+            <div
+              tabIndex={0}
+              role="button"
+              className="bg-white flex items-center justify-between btn btn-wide btn-sm w-full text-xs font-medium"
+            >
+              <div className="flex items-center gap-2">
+                <Calendar size={16} className="text-zinc-400" />
+                <span className="text-zinc-400">Last 365 days</span>
+              </div>
+              <ChevronDown size={16} className="text-zinc-400" />
+            </div>
+            <ul
+              tabIndex={0}
+              className="dropdown-content menu bg-base-100 rounded-box z-1 w-52 p-2 shadow-sm  text-zinc-400"
+            >
+              <li>
+                <a>Today</a>
+              </li>
+              <li>
+                <a>Yesterday</a>
+              </li>
+              <li>
+                <a>This week</a>
+              </li>
+              <li>
+                <a>Last week</a>
+              </li>
+            </ul>
+          </div>
+          {/* create quotation optional */}
+          {(title === "Quotation / Estimate" ||
+            title === "Proforma Invoice" ||
+            title === "Delivery Challan" ||
+            title === "Purchase Orders") && (
+            <div className="dropdown dropdown-center w-60 ">
+              <div
+                tabIndex={0}
+                role="button"
+                className=" bg-white btn btn-wide w-full  btn-sm  text-xs font-medium flex items-center justify-between"
+              >
+                <span className="text-zinc-400">Show Open {selectText}</span>
+                <ChevronDown size={16} className="text-zinc-400" />
+              </div>
+              <ul
+                tabIndex={0}
+                className="dropdown-content menu bg-base-100 rounded-box z-1 w-52 p-2 shadow-sm text-zinc-400 "
+              >
+                <li>
+                  <a>Show All {selectText}</a>
+                </li>
+                <li>
+                  <a>Show Open {selectText}</a>
+                </li>
+                <li>
+                  <a>Show Closed {selectText}</a>
+                </li>
+              </ul>
+            </div>
+          )}
+        </div>
+        <div>
+          <div className="h-full">
+            <button className="btn bg-[var(--primary-btn)] btn-sm">
+              <span className="text-zinc-700">Create {btnText}</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </main>
+  );
+};
+
+export default SalesNavigationMenus;

@@ -13,8 +13,8 @@ import { motion } from "framer-motion";
 const DashboardManageUsersPage = () => {
   const [menu, setMenu] = useState("users");
   return (
-    <main className="flex p-2 bg-zinc-200 max-h-screen overflow-y-scroll border border-gray-200 shadow-2xs gap-2 ">
-      <div className="w-full h-screen border border-gray-300 bg-white rounded ">
+    <main className="flex p-2 bg-zinc-100 max-h-screen overflow-y-scroll border border-gray-200 shadow-2xs gap-2 ">
+      <div className="w-full h-screen border border-zinc-200 bg-white rounded ">
         {/* Header Seaction */}
         <div className="flex flex-col w-full h-screen p-4">
           <div className="flex items-center justify-between ">
@@ -149,7 +149,7 @@ const DashboardManageUsersPage = () => {
                   }}
                   className="flex gap-4"
                 >
-                  <button className="btn btn-info btn-sm ">
+                  <button className="btn bg-[var(--primary-btn)] btn-sm ">
                     <FaPlus />
                     Add New User
                   </button>
@@ -277,7 +277,7 @@ const DashboardManageUsersPage = () => {
                         </p>
                       </div>
                     </div>
-                    <button className="btn btn-info btn-sm">
+                    <button className="btn bg-[var(--primary-btn)] btn-sm">
                       Track All Activities
                     </button>
                   </motion.div>

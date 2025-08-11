@@ -24,7 +24,7 @@ const DashboardReportPage = () => {
           className="flex items-center justify-between "
         >
           <h1 className="font-semibold text-lg mt-1">Reports</h1>
-          <button className="btn btn-sm btn-info flex items-center gap-2">
+          <button className="btn btn-sm bg-[var(--primary-btn)] flex items-center gap-2">
             {" "}
             <RiAccountPinCircleFill size={16} /> CA Report Sharing
           </button>

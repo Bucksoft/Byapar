@@ -63,8 +63,8 @@ const DashboardAccountPage = () => {
         </div>
       )}
 
-      <section className="w-full p-2 bg-gray-200">
-        <div className=" shadow shadow-gray-200 h-full rounded-md bg-white">
+      <section className="w-full p-2 bg-zinc-100">
+        <div className=" shadow shadow-gray-200 h-full border border-zinc-200 rounded-md bg-white">
           <motion.div
             initial={{
               translateY: -100,
@@ -91,14 +91,14 @@ const DashboardAccountPage = () => {
             <div className="flex items-center space-x-3 mr-5">
               <Keyboard />
               <button
-                className="btn btn-soft btn-info btn-sm"
+                className="btn btn-soft bg-[var(--primary-btn)] btn-sm"
                 onClick={() => setChatOpen(!chatOpen)}
               >
                 <MessageCircle size={16} />
                 Chat Support
               </button>
-              <button className="btn btn-info btn-sm">Cancel</button>
-              <button className="btn btn-info btn-sm">Save Changes</button>
+              <button className="btn bg-[var(--primary-btn)] btn-sm">Cancel</button>
+              <button className="btn bg-[var(--primary-btn)] btn-sm">Save Changes</button>
             </div>
           </motion.div>
 
@@ -121,7 +121,7 @@ const DashboardAccountPage = () => {
             <span className="font-semibold pr-4 ">
               Help us make Byapar better
             </span>
-            <button className="btn btn-info btn-sm">
+            <button className="btn bg-[var(--primary-btn)] btn-sm">
               <img src={suggestion} alt="" className="h-5 font-black" />
               <span className=""> Share Suggestion</span>
             </button>
@@ -199,7 +199,7 @@ const DashboardAccountPage = () => {
               placeholder="Type here referral code"
               className="input w-fit input-sm"
             />
-            <button className="btn btn-info ml-5 px-15 btn-sm">Apply</button>
+            <button className="btn bg-[var(--primary-btn)] ml-5 px-15 btn-sm">Apply</button>
           </div>
 
           <motion.div
@@ -239,7 +239,7 @@ const DashboardAccountPage = () => {
             <div className="pt-5 pl-3">
               <p className="text-xs">CURRENT PLAN</p>
               <p className="text-xl pt-2 font-medium">Free Trial Expired</p>
-              <button className="btn btn-info mt-15 btn-sm">
+              <button className="btn bg-[var(--primary-btn)] mt-15 btn-sm">
                 Buy Subscription Plan
               </button>
               {/* avatar */}

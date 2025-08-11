@@ -80,7 +80,7 @@ const DashboardOnlineStorePage = () => {
             className="flex ml-4 space-x-5"
           >
             <div className="">
-              <label className="input border border-zinc-400">
+              <label className="input input-sm border border-zinc-400">
                 <Search size={16} className="text-zinc-600" />
                 <input type="search" required placeholder="Search" />
               </label>
@@ -89,7 +89,7 @@ const DashboardOnlineStorePage = () => {
               <div
                 tabIndex={0}
                 role="button"
-                className="border border-zinc-400 flex items-center justify-between btn btn-wide w-full text-xs font-medium  bg-white"
+                className="border border-zinc-400 flex items-center justify-between btn btn-wide btn-sm w-full text-xs font-medium  bg-white"
               >
                 <div className="flex items-center gap-2 text-zinc-600">
                   <Calendar size={16} />

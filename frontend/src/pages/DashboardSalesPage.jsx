@@ -58,7 +58,7 @@ const DashboardSalesPage = () => {
           </div>
 
           <div>
-            <button className="btn btn-sm btn-info">
+            <button className="btn btn-sm bg-[var(--primary-btn)]">
               <Plus size={14} /> Create Sales Invoice
             </button>
           </div>

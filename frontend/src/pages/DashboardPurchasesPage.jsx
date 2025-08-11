@@ -60,7 +60,7 @@ const DashboardPurchasesPage = () => {
               <div
                 tabIndex={0}
                 role="button"
-                className="btn m-1 btn-dash btn-wide btn-info text-nowrap"
+                className="btn m-1 btn-dash btn-wide bg-[var(--primary-btn)] text-nowrap"
               >
                 <Calendar size={14} /> Last 365 days
               </div>
@@ -85,7 +85,7 @@ const DashboardPurchasesPage = () => {
           </div>
 
           <div>
-            <button className="btn btn-sm btn-info">
+            <button className="btn btn-sm bg-[var(--primary-btn)]">
               <Plus size={14} /> Create Purchase Invoice
             </button>
           </div>

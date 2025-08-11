@@ -4,7 +4,7 @@ import { motion } from "framer-motion";
 const DashboardCAReportsSharingPage = () => {
   return (
     <main className="flex h-screen w-full flex-col">
-      <div className=" bg-white m-2 p-2 h-screen rounded-lg">
+      <div className=" bg-white m-2 p-2 h-screen rounded-lg border border-zinc-200">
         <motion.section
           initial={{
             translateY: -100,
@@ -18,7 +18,7 @@ const DashboardCAReportsSharingPage = () => {
             ease: "easeInOut",
             duration: 0.3,
           }}
-          className="flex rounded-lg items-center border border-gray-300 justify-between"
+          className="flex rounded-lg items-center border border-zinc-200 justify-between"
         >
           <div className="flex-flex-col ml-5 mt-4 mb-4">
             <p className="font-lg  text-black text-left">CA Reports Sharing</p>
@@ -28,7 +28,9 @@ const DashboardCAReportsSharingPage = () => {
           </div>
           <div className="flex items-center gap-4 mr-5">
             <button className="btn btn-error btn-sm btn-outline">Cancel</button>
-            <button className="btn btn-info  btn-sm">Save Changes</button>
+            <button className="btn bg-[var(--primary-btn)]  btn-sm">
+              Save Changes
+            </button>
           </div>
         </motion.section>
 
@@ -72,7 +74,7 @@ const DashboardCAReportsSharingPage = () => {
               <input
                 type="checkbox"
                 defaultChecked
-                className="toggle toggle-sm toggle-info"
+                className="toggle toggle-sm toggle-[var(--primary-btn)]"
               />
             </div>
           </div>

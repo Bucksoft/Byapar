@@ -3,7 +3,7 @@ import { FcGoogle } from "react-icons/fc";
 import ByaparLogo from "../assets/Byapar.png";
 import LoginImage from "../assets/Login_image.png";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { axiosInstance } from "../config/axios";
 import OtpInputForm from "../components/OtpInputForm";
 import { useNavigate } from "react-router-dom";
@@ -13,8 +13,8 @@ import CustomLoader from "../components/Loader";
 const LoginPage = () => {
   const [email, setEmail] = useState("");
   const [otpInput, setOtpInput] = useState(false);
+  const inputRef = useRef();
   const queryClient = useQueryClient();
-  const navigate = useNavigate();
 
   const mutation = useMutation({
     mutationFn: async (email) => {
@@ -24,9 +24,12 @@ const LoginPage = () => {
     },
     onSuccess: () => {
       setOtpInput(true);
-      navigate("/dashboard");
+    },
+    onError: () => {
+      inputRef.current.focus();
     },
   });
+
   return (
     <>
       <main className="h-screen w-full md:p-16 bg-gradient-to-r from-[var(--gradient-from)] via-[var(--gradient-via)] to-[var(--gradient-to)] grid md:place-items-center relative">
@@ -48,18 +51,26 @@ const LoginPage = () => {
               <div className="relative">
                 <input
                   type="text"
-                  className="input mt-8"
+                  ref={inputRef}
+                  className={`input mt-8  ${
+                    mutation.isError && "input-error"
+                  } `}
                   placeholder="Email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                 />
+                {mutation.isError && (
+                  <p className="text-xs text-error mt-3">
+                    {mutation.error.response?.data?.err}
+                  </p>
+                )}
                 <Mail
                   className="absolute right-3 top-11 text-zinc-500"
                   size={15}
                 />
               </div>
               <button
-                onClick={() => mutation.mutate({ email })}
+                onClick={() => mutation.mutate(email)}
                 className={`btn mt-5 bg-[var(--primary-btn)] ${
                   mutation.isPending && "bg-neutral-content"
                 }`}

@@ -36,7 +36,7 @@ const DashboardSMSMarketingPage = () => {
           <div className="text-sm ">
             <MdKeyboard size={30} />
           </div>
-          <button className="btn btn-info btn-sm">Creat Campaign</button>
+          <button className="btn bg-[var(--primary-btn)] btn-sm">Creat Campaign</button>
         </div>
       </motion.header>
 

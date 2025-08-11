@@ -20,8 +20,8 @@ const DashboardRemindersPage = () => {
 
   return (
     <main className="h-screen w-full flex">
-      <section className="w-full p-3 bg-gray-200">
-        <div className=" shadow shadow-gray-200 h-full rounded-md bg-white">
+      <section className="w-full p-3 bg-zinc-100">
+        <div className=" shadow shadow-gray-200 h-full rounded-md bg-white border border-zinc-200">
           <motion.div
             initial={{
               translateY: -100,
@@ -47,11 +47,11 @@ const DashboardRemindersPage = () => {
             {/* navigation right side*/}
             <div className="flex items-center space-x-3 mr-5">
               <Keyboard />
-              <button className="btn btn-soft btn-info btn-sm">
+              <button className="btn btn-soft bg-[var(--primary-btn)] btn-sm">
                 <MessageCircle size={16} /> Chat Support
               </button>
-              <button className="btn btn-info btn-sm">Cancel</button>
-              <button className="btn btn-info btn-sm">Save Changes</button>
+              <button className="btn bg-[var(--primary-btn)] btn-sm">Cancel</button>
+              <button className="btn bg-[var(--primary-btn)] btn-sm">Save Changes</button>
             </div>
           </motion.div>
           {/* toggle section */}
@@ -78,7 +78,7 @@ const DashboardRemindersPage = () => {
                 <input
                   type="checkbox"
                   defaultChecked
-                  className="toggle toggle-sm mr-5 text-info "
+                  className="toggle toggle-sm mr-5 text-[var(--primary-btn)] "
                 />
               </div>
               <p className="text-[12px] text-zinc-400">
@@ -107,7 +107,7 @@ const DashboardRemindersPage = () => {
                 <input
                   type="checkbox"
                   defaultChecked
-                  className="toggle toggle-sm mr-5 text-info"
+                  className="toggle toggle-sm mr-5 text-[var(--primary-btn)]"
                 />
               </div>
               <p className="text-[12px] text-zinc-400">
@@ -160,7 +160,7 @@ const DashboardRemindersPage = () => {
                       <input
                         type="checkbox"
                         defaultChecked
-                        className="checkbox size-4 rounded-sm mr-3 text-info"
+                        className="checkbox size-4 rounded-sm mr-3 text-[var(--primary-btn)]"
                       />
                     </p>
                     <p className="text-[13px] pt-3 flex justify-between items-center">
@@ -168,7 +168,7 @@ const DashboardRemindersPage = () => {
                       <input
                         type="checkbox"
                         defaultChecked
-                        className="checkbox size-4 rounded-sm mr-3 text-info"
+                        className="checkbox size-4 rounded-sm mr-3 text-[var(--primary-btn)]"
                       />
                     </p>
 
@@ -260,7 +260,7 @@ const DashboardRemindersPage = () => {
                       <input
                         type="checkbox"
                         defaultChecked
-                        className="checkbox size-4 rounded-sm mr-3 text-info"
+                        className="checkbox size-4 rounded-sm mr-3 text-[var(--primary-btn)]"
                       />
                     </p>
                     <p className="text-[13px] pt-3 flex justify-between items-center">
@@ -268,7 +268,7 @@ const DashboardRemindersPage = () => {
                       <input
                         type="checkbox"
                         defaultChecked
-                        className="checkbox size-4 rounded-sm mr-3 text-info"
+                        className="checkbox size-4 rounded-sm mr-3 text-[var(--primary-btn)]"
                       />
                     </p>
                   </div>
@@ -283,7 +283,7 @@ const DashboardRemindersPage = () => {
                       <input
                         type="checkbox"
                         defaultChecked
-                        className="checkbox size-4 rounded-sm mr-3 text-info"
+                        className="checkbox size-4 rounded-sm mr-3 text-[var(--primary-btn)]"
                       />
                     </p>
                   </div>
@@ -302,7 +302,7 @@ const DashboardRemindersPage = () => {
                       <input
                         type="checkbox"
                         defaultChecked
-                        className="checkbox size-4 rounded-sm mr-3 text-info"
+                        className="checkbox size-4 rounded-sm mr-3 text-[var(--primary-btn)]"
                       />
                     </p>
                     <p className="text-[13px] pt-3 flex justify-between items-center">
@@ -310,7 +310,7 @@ const DashboardRemindersPage = () => {
                       <input
                         type="checkbox"
                         defaultChecked
-                        className="checkbox size-4 rounded-sm mr-3 text-info"
+                        className="checkbox size-4 rounded-sm mr-3 text-[var(--primary-btn)]"
                       />
                     </p>
                   </div>
@@ -325,7 +325,7 @@ const DashboardRemindersPage = () => {
                       <input
                         type="checkbox"
                         defaultChecked
-                        className="checkbox size-4 rounded-sm mr-3 text-info"
+                        className="checkbox size-4 rounded-sm mr-3 text-[var(--primary-btn)]"
                       />
                     </p>
                     <p className="text-[13px] pt-3 flex justify-between items-center">
@@ -333,7 +333,7 @@ const DashboardRemindersPage = () => {
                       <input
                         type="checkbox"
                         defaultChecked
-                        className="checkbox size-4 rounded-sm mr-3 text-info"
+                        className="checkbox size-4 rounded-sm mr-3 text-[var(--primary-btn)]"
                       />
                     </p>
                   </div>

@@ -40,7 +40,7 @@ const DashboardManageBusinessPage = () => {
                   Edit your company settings and information
                 </p>
               </div>
-              <button className="btn btn-sm bg-success">
+              <button className="btn btn-sm bg-[var(--secondary-btn)]">
                 Create New Business
               </button>
             </div>
@@ -49,16 +49,18 @@ const DashboardManageBusinessPage = () => {
               <p className="text-gray-500 cursor-pointer">
                 <MdKeyboard size={25} />
               </p>
-              <button className="btn btn-sm btn-info btn-soft">
+              <button className="btn btn-sm bg-[var(--primary-btn)] btn-soft">
                 <RiChat1Line size={14} />
                 Chat Support
               </button>
-              <button className="btn btn-sm btn-outline btn-info">
+              <button className="btn btn-sm btn-outline bg-[var(--primary-btn)]">
                 <MdOutlineCalendarToday size={14} />
                 Close Financial Year
               </button>
               <button className="btn btn-sm ">Cancel</button>
-              <button className="btn btn-sm btn-primary">Save Changes</button>
+              <button className="btn btn-sm bg-[var(--primary-btn)]">
+                Save Changes
+              </button>
             </div>
           </motion.header>
 
@@ -183,21 +185,21 @@ const DashboardManageBusinessPage = () => {
                 </p>
                 <div className="flex   ">
                   <div className="flex items-center gap-2 w-3/4 justify-between">
-                    <button className="text-xs font-semibold cursor-pointer flex items-center hover:bg-gray-100 justify-between border w-1/2 p-2 border-gray-300  rounded hover:border-info">
+                    <button className="text-xs font-semibold cursor-pointer flex items-center hover:bg-gray-100 justify-between border w-1/2 p-2 border-gray-300  rounded hover:border-[var(--primary-btn)]">
                       Yes
                       <input
                         type="radio"
                         name="radio-9"
-                        className="radio radio-info radio-sm"
+                        className="radio radio-[var(--primary-btn)] radio-sm"
                         defaultChecked
                       />
                     </button>
-                    <button className="text-xs font-semibold cursor-pointer hover:bg-gray-100 w-1/2 p-2 flex items-center justify-between border border-gray-300  rounded hover:border-info">
+                    <button className="text-xs font-semibold cursor-pointer hover:bg-gray-100 w-1/2 p-2 flex items-center justify-between border border-gray-300  rounded hover:border-[var(--primary-btn)]">
                       No
                       <input
                         type="radio"
                         name="radio-9"
-                        className="radio radio-info radio-sm"
+                        className="radio radio-[var(--primary-btn)] radio-sm"
                         defaultChecked
                       />
                     </button>
@@ -352,7 +354,9 @@ const DashboardManageBusinessPage = () => {
                     placeholder=" www.websites.com"
                     className="input input-sm  "
                   />
-                  <button className="btn btn-sm btn-info ml-3">Add</button>
+                  <button className="btn btn-sm bg-[var(--primary-btn)] ml-3">
+                    Add
+                  </button>
                 </div>
               </div>
             </motion.div>
@@ -413,11 +417,11 @@ const DashboardManageBusinessPage = () => {
                 </button>
               </div>
               <div className="flex items-center justify-between p-4 gap-2">
-                <div className="w-1/2 text-sm flex flex-col items-center justify-center px-2 py-5  border rounded border-zinc-300 cursor-pointer hover:border-info hover:shadow-2xl">
+                <div className="w-1/2 text-sm flex flex-col items-center justify-center px-2 py-5  border rounded border-zinc-300 cursor-pointer hover:border-[var(--primary-btn)] hover:shadow-2xl">
                   <FaFileSignature size={50} />
                   Upload Signature from Desktop
                 </div>
-                <div className="w-1/2 text-sm flex flex-col items-center justify-center px-2 py-5  border rounded border-zinc-300 cursor-pointer hover:border-info hover:shadow-2xl">
+                <div className="w-1/2 text-sm flex flex-col items-center justify-center px-2 py-5  border rounded border-zinc-300 cursor-pointer hover:border-[var(--primary-btn)] hover:shadow-2xl">
                   <PiRectangleBold size={50} />
                   Upload Signature from Desktop
                 </div>

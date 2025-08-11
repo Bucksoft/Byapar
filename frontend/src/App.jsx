@@ -1,6 +1,5 @@
 import { Routes, Route } from "react-router-dom";
 import LoginPage from "./pages/LoginPage";
-import { HomePage } from "./pages/HomePage";
 import DashboardPage from "./pages/DashboardPage";
 import DashboardPartiesPage from "./pages/DashboardPartiesPage";
 import DashboardLayout from "./layout/DashboardLayout";
@@ -39,6 +38,7 @@ import DashboardCreditNotePage from "./pages/DashboardCreditNotePage";
 import DashboardDeliveryChallanPage from "./pages/DashboardDeliveryChallanPage";
 import DashboardProformaPage from "./pages/DashboardProformaPage";
 import DashboardAddPartyPage from "./pages/DashboardAddPartyPage";
+import HomePage from "./pages/HomePage";
 
 function App() {
   return (
