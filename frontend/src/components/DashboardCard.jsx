@@ -5,7 +5,7 @@ const DashboardCard = ({ details }) => {
     <div
       className={` ${
         details.id === 2 ? "bg-warning" : "bg-secondary"
-      }   w-full px-5 py-3 mt-3 rounded-lg `}
+      } w-full px-5 py-3 mt-3 rounded-lg `}
     >
       <h1 className="text-white font-semibold">{details.title}</h1>
       <p

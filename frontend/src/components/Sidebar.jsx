@@ -42,7 +42,7 @@ const Sidebar = () => {
 
   return (
     <>
-      <section className="bg-[rgb(6,7,28)] text-white/70 shadow-md max-h-screen overflow-y-auto hide-scrollbar border border-zinc-200 ">
+      <section className="bg-[var(--sidebar-background)] text-white/70 shadow-md max-h-screen overflow-y-auto hide-scrollbar border border-zinc-200 ">
         {/* nav */}
         <motion.h1
           initial={{
@@ -54,7 +54,7 @@ const Sidebar = () => {
             filter: "blur(0)",
           }}
           onScroll={() => console.log("Sad")}
-          className="sticky top-0  z-10 text-md text-white font-semibold flex items-center gap-3 w-full px-5 py-3 border-b border-zinc-200 bg-white"
+          className="sticky top-0  z-10 text-md text-white font-semibold flex items-center gap-3 w-full px-5 py-3 bg-info/10 backdrop-blur-md"
         >
           <img
             src={ByaparLogo}
@@ -217,7 +217,9 @@ const Sidebar = () => {
         </div>
 
         <div className="px-5 py-2 border-b border-zinc-800">
-          <label className="font-semibold text-xs text-info">SETTINGS</label>
+          <label className="font-semibold text-xs text-[var(--primary-btn)]">
+            SETTINGS
+          </label>
           <motion.div
             className="mt-3"
             variants={container}

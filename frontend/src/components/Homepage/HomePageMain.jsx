@@ -106,10 +106,10 @@ const HomePageMain = () => {
         </div>
       </div>
 
-      <p className=" absolute bottom-15 right-60 text-xs font-bold">
+      <div className=" absolute bottom-15 right-60 text-xs font-bold">
         Creating and sending invoices is super{" "}
         <p>quick and professional-looking.</p>
-      </p>
+      </div>
       <div className="border bottom-0 max-w-7xl  p-5 bg-black/90 mx-auto rounded-md z-500"></div>
 
       {/* <p className="text-xl text-gray-600 mb-8 leading-relaxed">

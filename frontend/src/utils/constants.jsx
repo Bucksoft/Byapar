@@ -213,7 +213,7 @@ export const pricing_Review = [
     review: `We were searching for an affordable app to manage our business operations, and this one delivers far 
         more than expected for the price. The monthly plan fits our budget, and the features are comparable to much more 
         expensive tools. Highly recommended for startups and small teams.`,
-    stars: <LiaStarSolid />,
+    stars: <LiaStarSolid size={18} />,
   },
   {
     id: 2,
@@ -221,7 +221,7 @@ export const pricing_Review = [
     review: `After using this app for just three months, we've seen an increase in productivity and a noticeable reduction
          in operational costs. The yearly plan offers great savings, and we’re already seeing the return on investment. 
          Definitely one of the smartest purchases we’ve made for the business.`,
-    stars: <LiaStarSolid />,
+    stars: <LiaStarSolid size={18} />,
   },
   {
     id: 3,
@@ -229,7 +229,7 @@ export const pricing_Review = [
     review: `I love how the pricing adapts to different stages of business growth. We started on the entry-level plan and 
         recently upgraded to a premium one without any hassle. It’s great to have an app that grows with you, both in features
         and pricing.`,
-    stars: <LiaStarSolid />,
+    stars: <LiaStarSolid size={18} />,
   },
 ];
 

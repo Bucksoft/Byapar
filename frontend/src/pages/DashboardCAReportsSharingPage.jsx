@@ -74,7 +74,7 @@ const DashboardCAReportsSharingPage = () => {
               <input
                 type="checkbox"
                 defaultChecked
-                className="toggle toggle-sm toggle-[var(--primary-btn)]"
+                className="toggle toggle-sm text-[var(--primary-btn)]"
               />
             </div>
           </div>

@@ -1,7 +1,12 @@
 import { Star } from "lucide-react";
 import React from "react";
+import { pricing_Review } from "../../utils/constants";
 
 const HomePageReview = () => {
+  function getRandomColorHash() {
+    const hex = Math.floor(Math.random() * 0xffffff).toString(16);
+    return `#${hex.padStart(6, "0")}`;
+  }
   return (
     <section id="testimonials" className="py-20 bg-white">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -14,9 +19,36 @@ const HomePageReview = () => {
             BYAPAR.
           </p>
         </div>
-
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-          <div className="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-2xl p-8 border border-blue-100"></div>
+        <div className="grid grid-cols-3 gap-4 rounded-md p-2 px-5  mb-10">
+          {pricing_Review?.map((review) => (
+            // card
+            <div
+              key={review?.id}
+              className="card p-2 w-full  bg-gradient-to-br from-amber-100 to-purple-100  card-xs shadow-lg shadow-zinc-400"
+            >
+              <div className="card-body  ">
+                <div className="flex items-center gap-2 ">
+                  <div className="avatar avatar-placeholder">
+                    <div
+                      className={`w-8 rounded-full text-black`}
+                      style={{ backgroundColor: getRandomColorHash() }}
+                    >
+                      <span className="text-xs">{review?.name[0]}</span>
+                    </div>
+                  </div>
+                  <h2 className="card-title">{review?.name}</h2>
+                </div>
+                <p >{review?.review}</p>
+                <div className="justify-end card-actions text-yellow-500 ">
+                  <span className="">{review?.stars}</span>
+                  <span className="">{review?.stars}</span>
+                  <span className="">{review?.stars}</span>
+                  <span className="">{review?.stars}</span>
+                  <span className="">{review?.stars}</span>
+                </div>
+              </div>
+            </div>
+          ))}
         </div>
       </div>
     </section>
