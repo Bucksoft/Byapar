@@ -6,11 +6,9 @@ import {
   dashboardFields,
   settingLinks,
 } from "../lib/dashboardFields";
-import { IoSettings } from "react-icons/io5";
-import { Link, NavLink, useNavigate } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { TbLogout2 } from "react-icons/tb";
-import { BiChevronDown } from "react-icons/bi";
 
 export const container = {
   hidden: { opacity: 0 },
@@ -42,7 +40,7 @@ const Sidebar = () => {
 
   return (
     <>
-      <section className="bg-[var(--sidebar-background)] text-white/70 shadow-md max-h-screen overflow-y-auto hide-scrollbar border border-zinc-200 ">
+      <section className="bg-[var(--sidebar-background)] text-white/70 shadow-md max-h-screen overflow-y-auto hide-scrollbar border border-zinc-200">
         {/* nav */}
         <motion.h1
           initial={{

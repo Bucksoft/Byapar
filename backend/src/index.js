@@ -3,6 +3,7 @@ import dotenv from "dotenv";
 import { connectDB } from "./lib/db.js";
 import cors from "cors";
 import userRoutes from "./routes//user.routes.js";
+import { loginViaGoogleCallback } from "./controllers/user.controller.js";
 
 dotenv.config();
 const PORT = process.env.PORT || 8000;
@@ -17,6 +18,7 @@ app.use(
 app.use(express.json());
 
 app.use("/api/v1/user", userRoutes);
+app.use("/auth/google/callback", loginViaGoogleCallback);
 
 app.listen(PORT, () => {
   connectDB();

@@ -19,7 +19,6 @@ const LoginPage = () => {
   const mutation = useMutation({
     mutationFn: async (email) => {
       const res = await axiosInstance.post("/user/login", { email });
-      console.log("RESPONSE FROM BACKEND : ", res);
       return res;
     },
     onSuccess: () => {
@@ -29,6 +28,10 @@ const LoginPage = () => {
       inputRef.current.focus();
     },
   });
+
+  const handleGoogleLogin = () => {
+    window.location.href = "http://localhost:8000/api/v1/user";
+  };
 
   return (
     <>
@@ -89,7 +92,7 @@ const LoginPage = () => {
                 <span className="h-[1px] bg-zinc-400 w-full" />
               </div>
 
-              <button className="btn btn-neutral ">
+              <button onClick={handleGoogleLogin} className="btn btn-neutral">
                 <FcGoogle size={20} /> Log In with Google
               </button>
             </div>
