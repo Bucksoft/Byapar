@@ -11,7 +11,7 @@ const OtpInputForm = ({ email }) => {
   const [otp, setOtp] = useState("");
 
   const mutation = useMutation({
-    mutationFn: async ({ otp }) => {
+    mutationFn: async (otp) => {
       const res = await axiosInstance.post("/user/verify-otp", { otp, email });
       console.log("OTP INPUT FORM RESPONSE", res);
       return res;

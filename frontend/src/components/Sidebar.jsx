@@ -54,7 +54,7 @@ const Sidebar = () => {
             filter: "blur(0)",
           }}
           onScroll={() => console.log("Sad")}
-          className="sticky top-0  z-10 text-md text-white font-semibold flex items-center gap-3 w-full px-5 py-3 bg-info/10 backdrop-blur-md"
+          className="sticky top-0 z-10 text-md text-white font-semibold flex items-center gap-3 w-full px-5 py-3 bg-info/10 backdrop-blur-md"
         >
           <img
             src={ByaparLogo}
@@ -215,7 +215,6 @@ const Sidebar = () => {
             ))}
           </motion.div>
         </div>
-
         <div className="px-5 py-2 border-b border-zinc-800">
           <label className="font-semibold text-xs text-[var(--primary-btn)]">
             SETTINGS

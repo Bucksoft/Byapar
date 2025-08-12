@@ -1,4 +1,4 @@
-import { MessageCircle } from "lucide-react";
+import { Menu, MessageCircle } from "lucide-react";
 import Sidebar, { container, dashboardLinksItems } from "../components/Sidebar";
 import { IoReceiptOutline } from "react-icons/io5";
 import DashboardCard from "../components/DashboardCard";
@@ -29,10 +29,13 @@ const DashboardPage = () => {
               className="w-full bg-white rounded-lg px-5 py-3 flex items-center justify-between"
             >
               <span className="font-semibold text-lg">Dashboard</span>
-              <button className="btn btn-sm btn-soft bg-[var(--primary-btn)]">
-                {" "}
-                <MessageCircle size={15} /> Chat
-              </button>
+              <div className="flex items-center gap-3">
+                <button className="btn btn-sm btn-soft bg-[var(--primary-btn)]">
+                  <MessageCircle size={15} /> Chat
+                </button>
+
+                <Menu className="md:hidden block" />
+              </div>
             </motion.nav>
 
             {/* Invoice creation  */}

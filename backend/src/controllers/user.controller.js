@@ -8,6 +8,7 @@ import { UserCredential } from "../models/user.schema.js";
 // login user via email and OTP
 export async function login(req, res) {
   try {
+    // get data
     const { email } = req.body;
     if (!email) {
       return res
@@ -15,6 +16,7 @@ export async function login(req, res) {
         .json({ status: "Failed", err: "Email not provided" });
     }
 
+    // validation
     const result = loginSchema.safeParse({
       email,
     });
@@ -23,7 +25,7 @@ export async function login(req, res) {
       const errors = result.error.format();
       return res
         .status(400)
-        .json({ status: "Failed", err: "Validation failed", errors });
+        .json({ status: "Failed", err: "Invalid email address", errors });
     }
 
     // login logic
@@ -36,13 +38,6 @@ export async function login(req, res) {
     });
     // 2. Send OTP via email to user.
     await sendOTPviaMail(email, otp);
-
-    // 3. save otp record
-    const otpRecord = await OTP.create({
-      email,
-      otp,
-      expiresIn: new Date(Date.now() + 1 * 60 * 1000),
-    });
 
     return res.status(200).json({
       status: "success",
@@ -72,7 +67,6 @@ export async function verifyOTP(req, res) {
     }
 
     const otpRecord = await OTP.findOne({ email, otp });
-    console.log(otpRecord);
     if (!otpRecord) {
       return res
         .status(400)

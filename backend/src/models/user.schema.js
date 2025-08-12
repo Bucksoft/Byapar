@@ -9,6 +9,10 @@ export const userCredentialSchema = new mongoose.Schema(
     passCode: {
       type: String,
     },
+    email: {
+      type: String,
+      required: true,
+    },
     userType: {
       type: String,
       enum: ["retailer", "wholeseller"],
