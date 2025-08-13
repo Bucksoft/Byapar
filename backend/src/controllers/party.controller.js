@@ -1,3 +1,5 @@
+import { partySchema } from "../config/validation";
+
 export function createParty(req, res) {
   try {
     // 1. GET THE DATA FROM THE FRONTEND
@@ -10,11 +12,16 @@ export function createParty(req, res) {
     }
 
     // 2. VALIDATION
+    const validationResult = partySchema.safeParse(req.body);
     // ----> VALIDATION FAILED --- return res 400
-    
+    if (!validationResult.success) {
+      const validationErrors = validationResult.error.format();
+      return res
+        .status(422)
+        .json({ success: false, msg: "Validation failed", validationErrors });
+    }
 
-
-    // 3. CHECK IF EXISTS OR NOT
+    // 3. CHECK IF PARTY ALREADY EXISTS OR NOT
     // IF EXISTS, RETURN FAILURE RESPONSE
 
     // 4. STORE DATA IN DATABASE
