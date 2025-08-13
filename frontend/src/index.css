@@ -8,6 +8,8 @@ body {
 
 :root {
   --primary-btn: rgb(0, 186, 254);
+  --primary-text-color: rgb(255, 255, 255);
+  --secondary-text-color: rgb(0, 186, 254);
   --sidebar-background: #111727;
   --secondary-btn: rgb(0, 211, 144);
   --badge: rgb(66, 42, 213);

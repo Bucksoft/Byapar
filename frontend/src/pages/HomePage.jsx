@@ -1,22 +1,29 @@
-import HomePageFeature from "../components/Homepage/HomePageFeature";
-import HomePageFooter from "../components/Homepage/HomePageFooter";
-import HomePageHighlight from "../components/Homepage/HomePageHighlight";
-import HomePageMain from "../components/Homepage/HomePageMain";
+import wave from "../assets/wave.svg";
+import Button from "../components/Button";
 import HomePageNavigation from "../components/Homepage/HomePageNavigation";
-import HomePagePricing from "../components/Homepage/HomePagePricing";
-import HomePageReview from "../components/Homepage/HomePageReview";
+import { BsBoxArrowInUpRight } from "react-icons/bs";
 
 const HomePage = () => {
   return (
-    <div className="min-h-screen bg-white">
+    <main className="min-h-screen">
       <HomePageNavigation />
-      <HomePageMain />
-      <HomePageFeature />
-      <HomePageReview />
-      <HomePagePricing />
-      <HomePageHighlight />
-      <HomePageFooter />
-    </div>
+      <div className=" -mt-10 flex items-center justify-center flex-col gap-4">
+        <h1 className="text-6xl font-bold bg-gradient-to-r from-cyan-500 to-blue-500 bg-clip-text text-transparent">
+          Byapar
+        </h1>
+        <p className="text-3xl text-zinc-700 font-medium">
+          The Powerhouse for Billing & Inventory
+        </p>
+        <p className="text-zinc-500 w-3/4 text-center">
+          Byapar empowers your business with effortless GST billing, smart
+          inventory tracking, and customer management — saving time, reducing
+          errors, and boosting growth.
+        </p>
+        <div className="mt-8">
+          <Button text={"Get Started"} logo={<BsBoxArrowInUpRight />} />
+        </div>
+      </div>
+    </main>
   );
 };
 

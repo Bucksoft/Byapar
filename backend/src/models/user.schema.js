@@ -35,6 +35,10 @@ export const userCredentialSchema = new mongoose.Schema(
       type: Date,
       required: true,
     },
+    role:{
+      type:String,
+      enum:['admin', 'subadmin', 'cashier', 'account']
+    }
   },
   { timestamps: true }
 );

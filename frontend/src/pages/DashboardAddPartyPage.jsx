@@ -1,6 +1,18 @@
 import { ArrowLeft, IndianRupee, Landmark, Settings } from "lucide-react";
+import { statesAndCities } from "../utils/constants";
+import { useState } from "react";
 
 const DashboardAddPartyPage = () => {
+  const [selectedState, setSelectedState] = useState("");
+  const [cities, setCities] = useState([]);
+
+  const handleStateChange = (e) => {
+    const stateName = e.target.value;
+    setSelectedState(stateName);
+    const stateInfo = statesAndCities.find((s) => s.state === stateName);
+    setCities(stateInfo ? stateInfo.cities : []);
+  };
+
   return (
     <main className="h-screen overflow-y-scroll  w-full ">
       {/* navigation */}
@@ -125,6 +137,46 @@ const DashboardAddPartyPage = () => {
             <div>
               <select defaultValue="Pick a color" className="select select-sm ">
                 <option>Customer</option>
+              </select>
+            </div>
+          </div>
+
+          <div>
+            <label htmlFor="State" className="text-xs text-zinc-700">
+              State
+            </label>
+            <div>
+              <select
+                value={selectedState}
+                onChange={handleStateChange}
+                className="select select-sm"
+              >
+                <option value="" disabled>
+                  --Select State--
+                </option>
+                {statesAndCities?.map((s, index) => (
+                  <option key={index} value={s.state}>
+                    {s.state}
+                  </option>
+                ))}
+              </select>
+            </div>
+          </div>
+
+          <div>
+            <label htmlFor="City" className="text-xs text-zinc-700">
+              City
+            </label>
+            <div>
+              <select disabled={!cities.length} className="select select-sm ">
+                <option value="" disabled>
+                  --Select city--
+                </option>
+                {cities?.map((city, index) => (
+                  <option key={index} value={city}>
+                    {city}
+                  </option>
+                ))}
               </select>
             </div>
           </div>

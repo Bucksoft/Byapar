@@ -40,7 +40,7 @@ const Sidebar = () => {
 
   return (
     <>
-      <section className="bg-[var(--sidebar-background)] text-white/70 shadow-md max-h-screen overflow-y-auto hide-scrollbar border border-zinc-200">
+      <section className="bg-[var(--sidebar-background)] text-white/70 shadow-md max-h-screen overflow-y-auto hide-scrollbar border border-zinc-200 relative ">
         {/* nav */}
         <motion.h1
           initial={{
@@ -247,12 +247,12 @@ const Sidebar = () => {
           </motion.div>
         </div>
 
-        <div className="px-5 pt-2 pb-8 border-b border-zinc-800">
+        <div className="px-5 py-2 pb-8 border-b border-zinc-800">
           <label className="font-semibold text-xs text-[var(--primary-btn)]">
             BUSINESS TOOLS
           </label>
           <motion.div
-            className="mt-3"
+            className="mt-3 mb-12"
             variants={container}
             initial="hidden"
             animate="show"
@@ -281,8 +281,8 @@ const Sidebar = () => {
           </motion.div>
         </div>
 
-        <button className="hover:bg-slate-800  transition-all ease-in-out duration-700 hover:text-white group px-5 py-3 flex items-center gap-3 bg-[var(--primary-btn)] text-white w-full cursor-pointer">
-          <TbLogout2 className="group-hover:rotate-90 transition-all ease-in-out duration-200 group-hover:scale-120" />{" "}
+        <button className="hover:bg-slate-800 fixed bottom-0 transition-all ease-in-out duration-700 hover:text-white group px-5 py-3 flex items-center gap-3 bg-[var(--primary-btn)] text-white w-1/5  cursor-pointer">
+          <TbLogout2 className="group-hover:rotate-90 transition-all ease-in-out duration-200 group-hover:scale-120" />
           Logout
         </button>
       </section>

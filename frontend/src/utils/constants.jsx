@@ -362,3 +362,151 @@ export const states = [
   "Foreign Country",
   "Other Territory",
 ];
+
+export const statesAndCities = [
+  {
+    state: "Andhra Pradesh",
+    cities: ["Hyderabad", "Visakhapatnam", "Vijayawada", "Guntur", "Tirupati"],
+  },
+  {
+    state: "Arunachal Pradesh",
+    cities: ["Itanagar", "Tawang", "Pasighat", "Ziro"],
+  },
+  {
+    state: "Assam",
+    cities: ["Guwahati", "Dibrugarh", "Jorhat", "Silchar", "Tezpur"],
+  },
+  {
+    state: "Bihar",
+    cities: ["Patna", "Gaya", "Darbhanga", "Bhagalpur", "Muzaffarpur"],
+  },
+  {
+    state: "Chhattisgarh",
+    cities: ["Raipur", "Bhilai", "Bilaspur", "Korba", "Durg"],
+  },
+  {
+    state: "Goa",
+    cities: ["Panaji", "Margao", "Mapusa", "Vasco da Gama"],
+  },
+  {
+    state: "Gujarat",
+    cities: ["Ahmedabad", "Surat", "Vadodara", "Rajkot", "Bhavnagar"],
+  },
+  {
+    state: "Haryana",
+    cities: ["Chandigarh", "Gurugram", "Faridabad", "Panipat", "Karnal"],
+  },
+  {
+    state: "Himachal Pradesh",
+    cities: ["Shimla", "Dharamshala", "Mandi", "Solan", "Bilaspur"],
+  },
+  {
+    state: "Jharkhand",
+    cities: ["Ranchi", "Jamshedpur", "Dhanbad", "Bokaro", "Hazaribagh"],
+  },
+  {
+    state: "Karnataka",
+    cities: ["Bengaluru", "Mysuru", "Mangaluru", "Hubballi", "Belagavi"],
+  },
+  {
+    state: "Kerala",
+    cities: ["Thiruvananthapuram", "Kochi", "Kozhikode", "Thrissur", "Kollam"],
+  },
+  {
+    state: "Madhya Pradesh",
+    cities: ["Bhopal", "Indore", "Gwalior", "Jabalpur", "Ujjain"],
+  },
+  {
+    state: "Maharashtra",
+    cities: ["Mumbai", "Pune", "Nagpur", "Nashik", "Aurangabad"],
+  },
+  {
+    state: "Manipur",
+    cities: ["Imphal", "Thoubal", "Churachandpur", "Ukhrul"],
+  },
+  {
+    state: "Meghalaya",
+    cities: ["Shillong", "Tura", "Jowai", "Baghmara"],
+  },
+  {
+    state: "Mizoram",
+    cities: ["Aizawl", "Lunglei", "Champhai", "Serchhip"],
+  },
+  {
+    state: "Nagaland",
+    cities: ["Kohima", "Dimapur", "Mokokchung", "Tuensang"],
+  },
+  {
+    state: "Odisha",
+    cities: ["Bhubaneswar", "Cuttack", "Rourkela", "Sambalpur", "Berhampur"],
+  },
+  {
+    state: "Punjab",
+    cities: ["Chandigarh", "Amritsar", "Ludhiana", "Jalandhar", "Patiala"],
+  },
+  {
+    state: "Rajasthan",
+    cities: ["Jaipur", "Jodhpur", "Udaipur", "Kota", "Bikaner"],
+  },
+  {
+    state: "Sikkim",
+    cities: ["Gangtok", "Namchi", "Gyalshing"],
+  },
+  {
+    state: "Tamil Nadu",
+    cities: ["Chennai", "Coimbatore", "Madurai", "Tiruchirappalli", "Salem"],
+  },
+  {
+    state: "Telangana",
+    cities: ["Hyderabad", "Warangal", "Karimnagar", "Nizamabad"],
+  },
+  {
+    state: "Tripura",
+    cities: ["Agartala", "Udaipur", "Kailasahar"],
+  },
+  {
+    state: "Uttar Pradesh",
+    cities: ["Lucknow", "Kanpur", "Varanasi", "Agra", "Meerut"],
+  },
+  {
+    state: "Uttarakhand",
+    cities: ["Dehradun", "Haridwar", "Rishikesh", "Nainital"],
+  },
+  {
+    state: "West Bengal",
+    cities: ["Kolkata", "Siliguri", "Howrah", "Asansol"],
+  },
+  // Union Territories
+  {
+    state: "Andaman and Nicobar Islands",
+    cities: ["Port Blair"],
+  },
+  {
+    state: "Chandigarh",
+    cities: ["Chandigarh"],
+  },
+  {
+    state: "Dadra and Nagar Haveli and Daman and Diu",
+    cities: ["Daman", "Diu", "Silvassa"],
+  },
+  {
+    state: "Delhi",
+    cities: ["New Delhi", "Delhi"],
+  },
+  {
+    state: "Jammu and Kashmir",
+    cities: ["Srinagar", "Jammu"],
+  },
+  {
+    state: "Ladakh",
+    cities: ["Leh", "Kargil"],
+  },
+  {
+    state: "Lakshadweep",
+    cities: ["Kavaratti"],
+  },
+  {
+    state: "Puducherry",
+    cities: ["Puducherry", "Karaikal", "Mahe", "Yanam"],
+  },
+];

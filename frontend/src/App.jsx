@@ -39,8 +39,19 @@ import DashboardDeliveryChallanPage from "./pages/DashboardDeliveryChallanPage";
 import DashboardProformaPage from "./pages/DashboardProformaPage";
 import DashboardAddPartyPage from "./pages/DashboardAddPartyPage";
 import HomePage from "./pages/HomePage";
+import { useQuery } from "@tanstack/react-query";
+import { axiosInstance } from "./config/axios";
 
 function App() {
+  const a = useQuery({
+    queryFn: async () => {
+      const res = await axiosInstance.get("/user/me", {
+        withCredentials: true,
+      });
+      console.log("USER DETAILS ", res);
+    },
+  });
+
   return (
     <>
       <Routes>
