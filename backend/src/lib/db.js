@@ -19,7 +19,7 @@ if (!result.success) {
 export async function connectDB() {
   try {
     await mongoose.connect(MONGO_URL);
-    console.info(`DB connected ☑`);
+    console.info(`DB connected ✅`);
   } catch (error) {
     console.error(`Error in connecting to DB ${error} ❌`);
     process.exit(1);

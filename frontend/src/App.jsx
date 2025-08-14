@@ -1,4 +1,4 @@
-import { Routes, Route } from "react-router-dom";
+import { Routes, Route, useNavigate } from "react-router-dom";
 import LoginPage from "./pages/LoginPage";
 import DashboardPage from "./pages/DashboardPage";
 import DashboardPartiesPage from "./pages/DashboardPartiesPage";
@@ -41,16 +41,26 @@ import DashboardAddPartyPage from "./pages/DashboardAddPartyPage";
 import HomePage from "./pages/HomePage";
 import { useQuery } from "@tanstack/react-query";
 import { axiosInstance } from "./config/axios";
+import CustomLoader from "./components/Loader";
+import { useAuthStore } from "./store/authStore";
 
 function App() {
-  const a = useQuery({
+  const { user, setUser } = useAuthStore();
+  const { isLoading } = useQuery({
     queryFn: async () => {
-      const res = await axiosInstance.get("/user/me", {
-        withCredentials: true,
-      });
-      console.log("USER DETAILS ", res);
+      const res = await axiosInstance.get("/user/me");
+      setUser(res.data?.user);
     },
   });
+
+  // if (isLoading) {
+  //   return (
+  //     <div className="h-screen w-full flex items-center justify-center">
+  //       <CustomLoader text={"Loading...."} />
+  //     </div>
+  //   );
+
+  // }
 
   return (
     <>

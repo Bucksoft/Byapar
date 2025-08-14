@@ -1,6 +1,7 @@
 import wave from "../../assets/wave.svg";
 import Button from "../../components/Button";
 import { CiLogin } from "react-icons/ci";
+import { Link } from "react-router-dom";
 
 const HomePageNavigation = () => {
   return (
@@ -25,7 +26,9 @@ const HomePageNavigation = () => {
           </ul>
 
           {/* Login Button */}
-          <Button text="Login" logo={<CiLogin />} />
+          <Link to={"/login"}>
+            <Button text="Login" logo={<CiLogin />} />
+          </Link>
         </nav>
       </header>
     </div>

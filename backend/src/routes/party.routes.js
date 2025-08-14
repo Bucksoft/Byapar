@@ -1,5 +1,5 @@
 import express from "express";
-import { createParty } from "../controllers/party.controller";
+import { createParty } from "../controllers/party.controller.js";
 
 const router = express.Router();
 

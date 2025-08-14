@@ -215,3 +215,16 @@ export async function getUserCredential(req, res) {
     return res.status(500).json({ msg: "Failed to fetch user details" });
   }
 }
+
+// logout user
+export async function logoutUser(req, res) {
+  try {
+    res.clearCookie("token");
+    return res
+      .status(200)
+      .json({ success: true, msg: "User logged out successfully" });
+  } catch (error) {
+    console.log("ERROR IN LOGGING OUT USER : ", error);
+    return res.status(500).json({ msg: "Failed to logout user" });
+  }
+}

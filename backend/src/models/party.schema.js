@@ -1,12 +1,12 @@
 import mongoose from "mongoose";
 
 const partySchema = new mongoose.Schema({
-  party_name: {
+  partyName: {
     type: String,
     required: [true, "Party name is required"],
   },
-  mobile_number: {
-    type: Number,
+  mobileNumber: {
+    type: String,
     required: [true, "Mobile number is required"],
   },
   email: {
@@ -14,11 +14,11 @@ const partySchema = new mongoose.Schema({
     required: [true, "Email is required"],
     unique: true,
   },
-  opening_balance: {
+  openingBalance: {
     type: String,
     default: "0",
   },
-  opening_balance_type: {
+  openingBalanceType: {
     type: String,
     enum: ["to_collect", "to_pay"],
     default: "to_collect",
@@ -28,17 +28,17 @@ const partySchema = new mongoose.Schema({
     required: true,
     unique: true,
   },
-  PAN_no: {
+  PANno: {
     type: String,
     required: true,
     unique: true,
   },
-  party_type: {
+  partyType: {
     type: String,
-    enum: ["customer", "supplier"],
-    default: "customer",
+    enum: ["Customer", "Supplier"],
+    default: "Customer",
   },
-  category_name: {
+  categoryName: {
     type: String,
     required: true,
   },
@@ -50,23 +50,23 @@ const partySchema = new mongoose.Schema({
     type: String,
     required: true,
   },
-  billing_address: {
+  billingAddress: {
     type: String,
     required: true,
   },
-  shipping_address: {
+  shippingAddress: {
     type: String,
     required: true,
   },
-  credit_period: {
+  creditPeriod: {
     type: Date,
     default: Date.now,
   },
-  credit_limit: {
+  creditLimit: {
     type: String,
     required: true,
   },
-  client_id: {
+  clientId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "UserCredential",
   },

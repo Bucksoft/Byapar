@@ -1,6 +1,7 @@
-import { partySchema } from "../config/validation";
+import { partySchema } from "../config/validation.js";
+import Party from "../models/party.schema.js";
 
-export function createParty(req, res) {
+export async function createParty(req, res) {
   try {
     // 1. GET THE DATA FROM THE FRONTEND
     const data = req.body;
@@ -12,24 +13,40 @@ export function createParty(req, res) {
     }
 
     // 2. VALIDATION
-    const validationResult = partySchema.safeParse(req.body);
+    const validaionResult = partySchema.safeParse(data);
     // ----> VALIDATION FAILED --- return res 400
-    if (!validationResult.success) {
-      const validationErrors = validationResult.error.format();
+    if (!validaionResult.success) {
+      const validationError = validaionResult.error.format();
       return res
         .status(422)
-        .json({ success: false, msg: "Validation failed", validationErrors });
+        .json({ success: false, msg: "Validation failed", validationError });
     }
 
     // 3. CHECK IF PARTY ALREADY EXISTS OR NOT
+    const { email } = data;
+    const partyExists = await Party.findOne({ email });
     // IF EXISTS, RETURN FAILURE RESPONSE
+    if (partyExists) {
+      return res
+        .status(400)
+        .json({ success: false, msg: "Party already exists" });
+    }
 
     // 4. STORE DATA IN DATABASE
+    const party = await Party.create(req.body);
     // ------> FAILED TO STORE DATA IN DATABASE
-
+    if (!party) {
+      return res
+        .status(422)
+        .json({ success: false, msg: "Failed to create party" });
+    }
     // 5. SUCCESS RESPONSE
+    return res
+      .status(201)
+      .json({ success: true, msg: "Party created successfully", party });
   } catch (error) {
-    console.log("ERROR IN CREATING PARTY ");
-    return res.status(500).json({ err: "Internal server error" });
+    console.log("ERROR IN CREATING PARTY");
+    console.log(error);
+    return res.status(500).json({ err: "Internal server error", error });
   }
 }

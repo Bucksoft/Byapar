@@ -9,33 +9,32 @@ export const loginSchema = z.object({
 });
 
 export const partySchema = z.object({
-  party_name: z
+  partyName: z
     .string()
     .min(3, "Party name must be atleast 3 characters long")
     .max(30, "Party name must be atmost 30 characters long"),
-  mobile_number: z.number().length(10, "Mobile number must be 10 digits long"),
+  mobileNumber: z.string(),
   email: z.email(),
-  opening_balance: z.string().min(0),
-  opening_balance_type: z.string(),
+  openingBalance: z.string().min(0),
+  openingBalanceType: z.string(),
   GSTIN: z.string().length(15, "GSTIN must be 15 characters long"),
-  PAN_no: z.string().length(10, "PAN number must be 10 characters long"),
-  party_type: z.string(),
-  category_name: z
+  PANno: z.string().length(10, "PAN number must be 10 characters long"),
+  partyType: z.string(),
+  categoryName: z
     .string()
     .min(3, "Category name must atleast 3 characters long")
     .max(30, "Category name must atmost 30 characters long"),
   state: z.string(),
   city: z.string(),
-  billing_address: z
+  billingAddress: z
     .string()
     .min(10, "Billing address must be atleast 10 characters long")
     .max(100, "Billing address must be atmost 100 characters long"),
-  shipping_address: z
+  shippingAddress: z
     .string()
     .min(10, "shipping address must be atleast 10 characters long")
     .max(100, "shipping address must be atmost 100 characters long"),
-  credit_period: z.date(),
-  credit_limit: z.string(),
+  creditPeriod: z.string(),
+  creditLimit: z.string(),
   status: z.enum(["active", "inactive"]).default("active"),
-  flag: z.string(),
 });

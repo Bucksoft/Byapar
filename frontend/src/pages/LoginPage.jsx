@@ -9,6 +9,7 @@ import OtpInputForm from "../components/OtpInputForm";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import CustomLoader from "../components/Loader";
+import { toast } from "react-hot-toast";
 
 const LoginPage = () => {
   const [email, setEmail] = useState("");
@@ -23,6 +24,7 @@ const LoginPage = () => {
     },
     onSuccess: () => {
       setOtpInput(true);
+      toast.success("Logged In");
     },
     onError: () => {
       inputRef.current.focus();

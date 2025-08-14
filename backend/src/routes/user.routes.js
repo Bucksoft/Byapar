@@ -3,6 +3,7 @@ import {
   getUserCredential,
   googleOAuthRedirection,
   login,
+  logoutUser,
   verifyOTP,
 } from "../controllers/user.controller.js";
 import dotenv from "dotenv";
@@ -15,5 +16,6 @@ router.route("/login").post(login);
 router.route("/verify-otp").post(verifyOTP);
 router.route("/").get(googleOAuthRedirection);
 router.route("/me").get(isAuth, getUserCredential);
+router.route("/logout").post(isAuth, logoutUser);
 
 export default router;

@@ -9,6 +9,11 @@ import {
 import { NavLink, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { TbLogout2 } from "react-icons/tb";
+import { useAuthStore } from "../store/authStore";
+import { useMutation } from "@tanstack/react-query";
+import { axiosInstance } from "../config/axios";
+import CustomLoader from "./Loader";
+import toast from "react-hot-toast";
 
 export const container = {
   hidden: { opacity: 0 },
@@ -33,10 +38,20 @@ export const dashboardLinksItems = {
 
 const Sidebar = () => {
   const navigate = useNavigate();
+  const { user, setUser } = useAuthStore();
   const handleChange = (e) => {
     const selectedLink = e.target.value;
     if (selectedLink) navigate(selectedLink);
   };
+
+  const mutation = useMutation({
+    mutationFn: async () => {
+      await axiosInstance.post("/user/logout");
+      setUser(null);
+      navigate("/login");
+      toast.success("Logged out");
+    },
+  });
 
   return (
     <>
@@ -72,7 +87,7 @@ const Sidebar = () => {
               />
             </div>
           </div>
-          <span className="font-medium">BuckSoftechPvtLtd</span>
+          <span className="font-medium text-xs">{user?.email}</span>
         </div>
 
         {/* dropdown */}
@@ -281,9 +296,20 @@ const Sidebar = () => {
           </motion.div>
         </div>
 
-        <button className="hover:bg-slate-800 fixed bottom-0 transition-all ease-in-out duration-700 hover:text-white group px-5 py-3 flex items-center gap-3 bg-[var(--primary-btn)] text-white w-1/5  cursor-pointer">
-          <TbLogout2 className="group-hover:rotate-90 transition-all ease-in-out duration-200 group-hover:scale-120" />
-          Logout
+        <button
+          onClick={() => mutation.mutate()}
+          className="hover:bg-slate-800 fixed bottom-0 transition-all ease-in-out duration-700 hover:text-white group px-5 py-3 flex items-center gap-3 bg-[var(--primary-btn)] text-white w-1/5  cursor-pointer"
+        >
+          {mutation.isPending ? (
+            <>
+              <CustomLoader text={"Logging out...."} />
+            </>
+          ) : (
+            <>
+              <TbLogout2 className="group-hover:rotate-90 transition-all ease-in-out duration-200 group-hover:scale-120" />
+              Logout
+            </>
+          )}
         </button>
       </section>
     </>
