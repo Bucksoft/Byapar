@@ -50,3 +50,17 @@ export async function createParty(req, res) {
     return res.status(500).json({ err: "Internal server error", error });
   }
 }
+
+// get All parties
+export async function getAllParties(req, res) {
+  try {
+    const parties = await Party.find();
+    if (!parties) {
+      return res.status(400).json({ success: false, msg: "Parties not found" });
+    }
+    return res.status(200).json(parties);
+  } catch (error) {
+    console.log("ERROR IN FETCHING ALL PARTIES ");
+    return res.status(500).json({ err: "Internal server error", error });
+  }
+}

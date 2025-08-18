@@ -15,10 +15,10 @@ const partySchema = new mongoose.Schema({
     unique: true,
   },
   openingBalance: {
-    type: String,
-    default: "0",
+    type: Number,
+    default: 0,
   },
-  openingBalanceType: {
+  openingBalanceStatus: {
     type: String,
     enum: ["to_collect", "to_pay"],
     default: "to_collect",
@@ -31,7 +31,6 @@ const partySchema = new mongoose.Schema({
   PANno: {
     type: String,
     required: true,
-    unique: true,
   },
   partyType: {
     type: String,
@@ -59,11 +58,11 @@ const partySchema = new mongoose.Schema({
     required: true,
   },
   creditPeriod: {
-    type: Date,
-    default: Date.now,
+    type: Number,
+    required: true,
   },
   creditLimit: {
-    type: String,
+    type: Number,
     required: true,
   },
   clientId: {
@@ -74,6 +73,10 @@ const partySchema = new mongoose.Schema({
     type: String,
     enum: ["active", "inactive"],
     default: "active",
+  },
+  pincode: {
+    type: String,
+    required: true,
   },
   flag: {
     type: String,

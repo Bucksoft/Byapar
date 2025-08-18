@@ -1,30 +1,33 @@
 import { ArrowLeft, IndianRupee, Landmark, Settings } from "lucide-react";
 import { statesAndCities } from "../utils/constants";
 import { useState } from "react";
-import { useMutation } from "@tanstack/react-query";
+import { QueryClient, useMutation } from "@tanstack/react-query";
 import { axiosInstance } from "../config/axios";
 import toast from "react-hot-toast";
+import { Link, useNavigate } from "react-router-dom";
 
 const DashboardAddPartyPage = () => {
-  const [selectedState, setSelectedState] = useState("");
+  const navigate = useNavigate();
+  const queryClient = new QueryClient();
   const [addCategoryPopup, setAddCategoryPopup] = useState(false);
   const [cities, setCities] = useState([]);
   const [data, setData] = useState({
     partyName: "",
     mobileNumber: "",
     email: "",
-    openingBalance: "",
-    openingBalanceType: "to_collect",
+    openingBalance: 0,
+    openingBalanceStatus: "to_collect",
     GSTIN: "",
     PANno: "",
-    partyType: "",
+    partyType: "Customer",
     categoryName: "",
     state: "",
     city: "",
     billingAddress: "",
     shippingAddress: "",
-    creditPeriod: "",
-    creditLimit: "",
+    creditPeriod: null,
+    creditLimit: null,
+    pincode: "",
   });
 
   // handling the input field changes
@@ -49,6 +52,7 @@ const DashboardAddPartyPage = () => {
     },
     onSuccess: () => {
       toast.success("Party created");
+      queryClient.invalidateQueries({ queryKey: ["parties"] });
     },
   });
 
@@ -58,7 +62,7 @@ const DashboardAddPartyPage = () => {
         {/* navigation */}
         <header className="flex items-center justify-between p-3 bg-white">
           <h1 className="flex items-center gap-2">
-            <ArrowLeft size={20} />
+            <ArrowLeft size={20} onClick={() => navigate(-1)} />
             Create Party
           </h1>
           <div className="space-x-3">
@@ -92,6 +96,12 @@ const DashboardAddPartyPage = () => {
                 value={data.partyName}
                 onChange={handleInputChange}
               />
+              <small className="text-xs text-[var(--error-text-color)] ">
+                {
+                  mutation.error?.response?.data?.validationError?.partyName
+                    ?._errors[0]
+                }
+              </small>
             </div>
             <div>
               <label htmlFor="mobile_number" className="text-xs text-zinc-700">
@@ -106,6 +116,12 @@ const DashboardAddPartyPage = () => {
                 onChange={handleInputChange}
                 placeholder="Enter mobile number"
               />
+              <small className="text-xs text-[var(--error-text-color)] ">
+                {
+                  mutation.error?.response?.data?.validationError?.mobileNumber
+                    ?._errors[0]
+                }
+              </small>
             </div>
             <div>
               <label htmlFor="email" className="text-xs text-zinc-700">
@@ -120,6 +136,12 @@ const DashboardAddPartyPage = () => {
                 className="input input-sm"
                 placeholder="Enter email"
               />
+              <small className="text-xs text-[var(--error-text-color)] ">
+                {
+                  mutation.error?.response?.data?.validationError?.email
+                    ?._errors[0]
+                }
+              </small>
             </div>
             <div>
               <label
@@ -137,18 +159,30 @@ const DashboardAddPartyPage = () => {
                   className="input input-sm px-6"
                   placeholder="0"
                   value={data.openingBalance}
-                  onChange={handleInputChange}
+                  onChange={(e) =>
+                    setData({
+                      ...data,
+                      openingBalance: parseInt(e.target.value),
+                    })
+                  }
                 />
+
                 <select
-                  name="openingBalanceType"
-                  value={data.openingBalanceType}
+                  name="openingBalanceStatus"
+                  value={data.openingBalanceStatus}
                   onChange={handleInputChange}
-                  className="select select-sm "
+                  className="select select-sm"
                 >
                   <option>To Collect</option>
                   <option>To Pay</option>
                 </select>
               </div>
+              <small className="text-xs text-[var(--error-text-color)] ">
+                {
+                  mutation.error?.response?.data?.validationError
+                    ?.openingBalance?._errors[0]
+                }
+              </small>
             </div>
           </div>
           <div className="grid grid-cols-4 gap-3 mt-2 ">
@@ -165,6 +199,12 @@ const DashboardAddPartyPage = () => {
                 className="input input-sm"
                 placeholder="Enter GSTIN"
               />
+              <small className="text-xs text-[var(--error-text-color)] ">
+                {
+                  mutation.error?.response?.data?.validationError?.GSTIN
+                    ?._errors[0]
+                }
+              </small>
             </div>
             <button className="btn btn-sm mt-6 bg-[var(--secondary-btn)]">
               Get Details
@@ -182,6 +222,12 @@ const DashboardAddPartyPage = () => {
                 className="input input-sm"
                 placeholder="Enter party PAN number"
               />
+              <small className="text-xs text-[var(--error-text-color)] ">
+                {
+                  mutation.error?.response?.data?.validationError?.PANno
+                    ?._errors[0]
+                }
+              </small>
             </div>
           </div>
           <p className="text-xs text-zinc-500 mt-5">
@@ -213,9 +259,10 @@ const DashboardAddPartyPage = () => {
               >
                 Party Category
               </label>
+
               <details className="dropdown mt-1">
                 <summary className="select select-sm">Party Category</summary>
-                <ul className="menu dropdown-content bg-base-100 rounded-box z-1 w-52 p-2 shadow-sm">
+                <ul className="menu dropdown-content bg-base-100 rounded-box  w-52 p-2 shadow-sm">
                   <button
                     onClick={() => setAddCategoryPopup(true)}
                     className="btn btn-sm btn-dash btn-info mt-2"
@@ -224,6 +271,12 @@ const DashboardAddPartyPage = () => {
                   </button>
                 </ul>
               </details>
+              <small className="text-xs text-[var(--error-text-color)] mt-1 ">
+                {
+                  mutation.error?.response?.data?.validationError?.categoryName
+                    ?._errors[0]
+                }
+              </small>
             </div>
 
             <div>
@@ -247,6 +300,12 @@ const DashboardAddPartyPage = () => {
                   ))}
                 </select>
               </div>
+              <small className="text-xs text-[var(--error-text-color)] ">
+                {
+                  mutation.error?.response?.data?.validationError?.state
+                    ?._errors[0]
+                }
+              </small>
             </div>
 
             <div>
@@ -259,7 +318,7 @@ const DashboardAddPartyPage = () => {
                   disabled={!cities.length}
                   value={data.city}
                   onChange={handleInputChange}
-                  className="select select-sm "
+                  className="select select-sm"
                 >
                   <option value="" disabled>
                     --Select city--
@@ -271,6 +330,12 @@ const DashboardAddPartyPage = () => {
                   ))}
                 </select>
               </div>
+              <small className="text-xs text-[var(--error-text-color)] ">
+                {
+                  mutation.error?.response?.data?.validationError?.city
+                    ?._errors[0]
+                }
+              </small>
             </div>
             <div>
               <label htmlFor="pincode" className="text-xs text-zinc-700">
@@ -279,13 +344,19 @@ const DashboardAddPartyPage = () => {
               <div>
                 <input
                   type="text"
-                  id="PAN_number"
-                  name="PANno"
-                  value={data.PANno}
+                  id="Pincode"
+                  name="pincode"
+                  value={data.pincode}
                   onChange={handleInputChange}
                   className="input input-sm"
-                  placeholder="Enter party PAN number"
+                  placeholder="Enter Pincode"
                 />
+                <small className="text-xs text-[var(--error-text-color)]">
+                  {
+                    mutation.error?.response?.data?.validationError?.pincode
+                      ?._errors[0]
+                  }
+                </small>
               </div>
             </div>
           </div>
@@ -305,6 +376,12 @@ const DashboardAddPartyPage = () => {
               className="textarea w-full"
               placeholder="Enter billing address"
             ></textarea>
+            <small className="text-xs text-[var(--error-text-color)] ">
+              {
+                mutation.error?.response?.data?.validationError?.billingAddress
+                  ?._errors[0]
+              }
+            </small>
           </div>
           <div className="flex flex-col gap-2">
             <label htmlFor="Billing_address" className="text-xs text-zinc-700">
@@ -317,6 +394,12 @@ const DashboardAddPartyPage = () => {
               className="textarea w-full bg-zinc-300"
               placeholder="Enter shipping address"
             ></textarea>
+            <small className="text-xs text-[var(--error-text-color)] ">
+              {
+                mutation.error?.response?.data?.validationError?.shippingAddress
+                  ?._errors[0]
+              }
+            </small>
           </div>
         </section>
 
@@ -326,14 +409,25 @@ const DashboardAddPartyPage = () => {
               Credit Period
             </label>
             <input
-              type="text"
+              type="number"
               id="Credit_period"
               name="creditPeriod"
               className="input input-sm"
               value={data.creditPeriod}
-              onChange={handleInputChange}
+              onChange={(e) =>
+                setData({
+                  ...data,
+                  creditPeriod: parseInt(e.target.value) || 0,
+                })
+              }
               placeholder="30 (in days)"
             />
+            <small className="text-xs text-[var(--error-text-color)] ">
+              {
+                mutation.error?.response?.data?.validationError?.creditPeriod
+                  ?._errors[0]
+              }
+            </small>
           </div>
           <div className="flex flex-col gap-2">
             <label htmlFor="Billing_address" className="text-xs text-zinc-700">
@@ -342,15 +436,26 @@ const DashboardAddPartyPage = () => {
             <div className="flex items-center relative">
               <IndianRupee className="absolute z-10 left-2" size={11} />
               <input
-                type="text"
+                type="number"
                 id="credit_limit"
                 name="creditLimit"
                 value={data.creditLimit}
-                onChange={handleInputChange}
+                onChange={(e) =>
+                  setData({
+                    ...data,
+                    creditLimit: parseInt(e.target.value) || 0,
+                  })
+                }
                 className="input input-sm px-6"
                 placeholder="0"
               />
             </div>
+            <small className="text-xs text-[var(--error-text-color)] ">
+              {
+                mutation.error?.response?.data?.validationError?.creditLimit
+                  ?._errors[0]
+              }
+            </small>
           </div>
         </section>
 
