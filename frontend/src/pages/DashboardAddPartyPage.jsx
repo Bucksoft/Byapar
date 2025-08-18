@@ -5,6 +5,7 @@ import { QueryClient, useMutation } from "@tanstack/react-query";
 import { axiosInstance } from "../config/axios";
 import toast from "react-hot-toast";
 import { Link, useNavigate } from "react-router-dom";
+import CustomLoader from "../components/Loader";
 
 const DashboardAddPartyPage = () => {
   const navigate = useNavigate();
@@ -16,7 +17,7 @@ const DashboardAddPartyPage = () => {
     mobileNumber: "",
     email: "",
     openingBalance: 0,
-    openingBalanceStatus: "to_collect",
+    openingBalanceStatus: "To Collect",
     GSTIN: "",
     PANno: "",
     partyType: "Customer",
@@ -48,11 +49,16 @@ const DashboardAddPartyPage = () => {
   // handling actual form submission
   const mutation = useMutation({
     mutationFn: async (data) => {
-      await axiosInstance.post("/parties", data);
+      const res = await axiosInstance.post("/parties", data);
+      console.log(res);
     },
     onSuccess: () => {
       toast.success("Party created");
       queryClient.invalidateQueries({ queryKey: ["parties"] });
+    },
+    onError: (err) => {
+      console.log(err);
+      toast.error(err.response.data.msg || err.response.data.err);
     },
   });
 
@@ -70,10 +76,17 @@ const DashboardAddPartyPage = () => {
               Party Settings <Settings size="16" />{" "}
             </button>
             <button
-              className="btn btn-sm bg-[var(--primary-btn)]"
+              className={`btn btn-sm bg-[var(--primary-btn)] ${
+                mutation.isPending && ""
+              } `}
+              disabled={mutation.isPending}
               onClick={() => mutation.mutate(data)}
             >
-              Save
+              {mutation.isPending ? (
+                <CustomLoader text={"Saving..."} />
+              ) : (
+                <>Save</>
+              )}
             </button>
           </div>
         </header>
@@ -93,6 +106,7 @@ const DashboardAddPartyPage = () => {
                 name="partyName"
                 className="input input-sm"
                 placeholder="Enter party name"
+                disabled={mutation.isPending}
                 value={data.partyName}
                 onChange={handleInputChange}
               />
@@ -112,6 +126,7 @@ const DashboardAddPartyPage = () => {
                 id="mobile_number"
                 name="mobileNumber"
                 className="input input-sm"
+                disabled={mutation.isPending}
                 value={data.mobileNumber}
                 onChange={handleInputChange}
                 placeholder="Enter mobile number"
@@ -132,6 +147,7 @@ const DashboardAddPartyPage = () => {
                 id="email"
                 name="email"
                 value={data.email}
+                disabled={mutation.isPending}
                 onChange={handleInputChange}
                 className="input input-sm"
                 placeholder="Enter email"
@@ -158,6 +174,7 @@ const DashboardAddPartyPage = () => {
                   name="openingBalance"
                   className="input input-sm px-6"
                   placeholder="0"
+                  disabled={mutation.isPending}
                   value={data.openingBalance}
                   onChange={(e) =>
                     setData({
@@ -169,6 +186,7 @@ const DashboardAddPartyPage = () => {
 
                 <select
                   name="openingBalanceStatus"
+                  disabled={mutation.isPending}
                   value={data.openingBalanceStatus}
                   onChange={handleInputChange}
                   className="select select-sm"
@@ -194,6 +212,7 @@ const DashboardAddPartyPage = () => {
                 type="text"
                 id="GST_in"
                 name="GSTIN"
+                disabled={mutation.isPending}
                 value={data.GSTIN}
                 onChange={handleInputChange}
                 className="input input-sm"
@@ -217,6 +236,7 @@ const DashboardAddPartyPage = () => {
                 type="text"
                 id="PAN_number"
                 name="PANno"
+                disabled={mutation.isPending}
                 value={data.PANno}
                 onChange={handleInputChange}
                 className="input input-sm"
@@ -243,6 +263,7 @@ const DashboardAddPartyPage = () => {
               </label>
               <select
                 name="partyType"
+                disabled={mutation.isPending}
                 value={data.partyType}
                 onChange={handleInputChange}
                 className="select select-sm "
@@ -287,6 +308,7 @@ const DashboardAddPartyPage = () => {
                 <select
                   name="state"
                   value={data.state}
+                  disabled={mutation.isPending}
                   onChange={handleInputChange}
                   className="select select-sm"
                 >
@@ -315,7 +337,7 @@ const DashboardAddPartyPage = () => {
               <div>
                 <select
                   name="city"
-                  disabled={!cities.length}
+                  disabled={!cities.length || mutation.isPending}
                   value={data.city}
                   onChange={handleInputChange}
                   className="select select-sm"
@@ -346,6 +368,7 @@ const DashboardAddPartyPage = () => {
                   type="text"
                   id="Pincode"
                   name="pincode"
+                  disabled={mutation.isPending}
                   value={data.pincode}
                   onChange={handleInputChange}
                   className="input input-sm"
@@ -371,6 +394,7 @@ const DashboardAddPartyPage = () => {
             </label>
             <textarea
               name="billingAddress"
+              disabled={mutation.isPending}
               value={data.billingAddress}
               onChange={handleInputChange}
               className="textarea w-full"
@@ -389,6 +413,7 @@ const DashboardAddPartyPage = () => {
             </label>
             <textarea
               name="shippingAddress"
+              disabled={mutation.isPending}
               value={data.shippingAddress}
               onChange={handleInputChange}
               className="textarea w-full bg-zinc-300"
@@ -412,6 +437,7 @@ const DashboardAddPartyPage = () => {
               type="number"
               id="Credit_period"
               name="creditPeriod"
+              disabled={mutation.isPending}
               className="input input-sm"
               value={data.creditPeriod}
               onChange={(e) =>
@@ -439,6 +465,7 @@ const DashboardAddPartyPage = () => {
                 type="number"
                 id="credit_limit"
                 name="creditLimit"
+                disabled={mutation.isPending}
                 value={data.creditLimit}
                 onChange={(e) =>
                   setData({
@@ -476,6 +503,7 @@ const DashboardAddPartyPage = () => {
                 <input
                   type="text"
                   name="categoryName"
+                  disabled={mutation.isPending}
                   value={data.categoryName}
                   onChange={handleInputChange}
                   placeholder="Enter category name"

@@ -43,6 +43,7 @@ import { useQuery } from "@tanstack/react-query";
 import { axiosInstance } from "./config/axios";
 import CustomLoader from "./components/Loader";
 import { useAuthStore } from "./store/authStore";
+import DashboardPartyPage from "./pages/DashboardPartyPage";
 
 function App() {
   const { user, setUser } = useAuthStore();
@@ -70,6 +71,11 @@ function App() {
         <Route path="/dashboard" element={<DashboardLayout />}>
           <Route index element={<DashboardPage />} />
           <Route path="/dashboard/parties" element={<DashboardPartiesPage />} />
+          <Route
+            path="/dashboard/parties/:id"
+            element={<DashboardPartyPage />}
+          />
+
           <Route path="/dashboard/items" element={<DashboardItemsPage />} />
           <Route path="/dashboard/godown" element={<DashboardGodownPage />} />
 

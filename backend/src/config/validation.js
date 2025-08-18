@@ -30,12 +30,12 @@ export const partySchema = z.object({
   openingBalance: z.number().default(0),
 
   openingBalanceStatus: z
-    .enum(["to_collect", ""], {
+    .enum(["To Collect", "To Pay"], {
       errorMap: () => ({
-        message: "Opening balance status must be either to_collect or to_debit",
+        message: "Opening balance status must be either To Collect or To Pay",
       }),
     })
-    .default("to_collect"),
+    .default("To Collect"),
 
   GSTIN: z
     .string()

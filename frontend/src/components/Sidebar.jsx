@@ -148,9 +148,7 @@ const Sidebar = () => {
                       className="group-hover:translate-x-2 px-4 text-xs py-2 cursor-pointer outline-none w-full transition-all duration-200 ease-in-out"
                     >
                       {/* Disabled visible placeholder */}
-                      <option value="" disabled>
-                        {field.label}
-                      </option>
+                      <option disabled>{field.label}</option>
 
                       {field.subLinks.map((sublink) => (
                         <option

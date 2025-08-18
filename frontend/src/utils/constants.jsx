@@ -11,6 +11,10 @@ import invoDel from "../assets/InvoiceDelivery.jpg";
 import invoP from "../assets/InvoiceP.png";
 import payment from "../assets/Payment.png";
 import { LiaStarSolid } from "react-icons/lia";
+import { CiCreditCard1 } from "react-icons/ci";
+import { FaRegCircleUser } from "react-icons/fa6";
+import { MdMenuBook } from "react-icons/md";
+import { TbReportAnalytics } from "react-icons/tb";
 
 export const badges = [
   {
@@ -508,5 +512,28 @@ export const statesAndCities = [
   {
     state: "Puducherry",
     cities: ["Puducherry", "Karaikal", "Mahe", "Yanam"],
+  },
+];
+
+export const dashboardSinglePartyMenus = [
+  {
+    id: 1,
+    title: "Transactions",
+    icon: <CiCreditCard1 />,
+  },
+  {
+    id: 2,
+    title: "Profile",
+    icon: <FaRegCircleUser />,
+  },
+  {
+    id: 3,
+    title: "Ledger (Statement)",
+    icon: <MdMenuBook />,
+  },
+  {
+    id: 4,
+    title: "Item Wise Report",
+    icon: <TbReportAnalytics />,
   },
 ];

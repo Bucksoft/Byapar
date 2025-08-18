@@ -64,3 +64,17 @@ export async function getAllParties(req, res) {
     return res.status(500).json({ err: "Internal server error", error });
   }
 }
+
+export async function getSingleParty(req, res) {
+  try {
+    const { id } = req.params;
+    const party = await Party.findById(id);
+    if (!party) {
+      return res.status(400).json({ success: false, msg: "Party not found" });
+    }
+    return res.status(200).json({ success: true, party });
+  } catch (error) {
+    console.log("ERROR IN FETCHING SINGLE PARTY ");
+    return res.status(500).json({ err: "Internal server error", error });
+  }
+}

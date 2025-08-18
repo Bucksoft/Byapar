@@ -99,9 +99,8 @@ const DashboardPartiesPage = () => {
         </motion.div>
 
         {/* parties information is displayed here */}
-        {parties.map((party) => (
+        {
           <motion.div
-            key={party?._id}
             initial={{
               opacity: 0,
               scale: 0,
@@ -116,7 +115,7 @@ const DashboardPartiesPage = () => {
             }}
             className="overflow-x-auto rounded-box border border-base-content/5 bg-base-100 mt-8 "
           >
-            <table className="table">
+            <table className="table text-xs text-center">
               {/* head */}
               <thead>
                 <tr>
@@ -129,31 +128,36 @@ const DashboardPartiesPage = () => {
               </thead>
               <tbody>
                 {/* row 1 */}
-                <motion.tr
-                  initial={{
-                    opacity: 0,
-                    scaleY: 0,
-                  }}
-                  animate={{
-                    opacity: 1,
-                    scaleY: 1,
-                  }}
-                  transition={{
-                    ease: "easeInOut",
-                    duration: 0.2,
-                    delay: 0.2,
-                  }}
-                >
-                  <td>{party?.partyName}</td>
-                  <td>{party?.categoryName}</td>
-                  <td>{party?.mobileNumber}</td>
-                  <td>{party?.partyType}</td>
-                  <td>₹ {party?.openingBalance}</td>
-                </motion.tr>
+                {parties.map((party) => (
+                  <motion.tr
+                    key={party._id}
+                    initial={{
+                      opacity: 0,
+                      scaleY: 0,
+                    }}
+                    animate={{
+                      opacity: 1,
+                      scaleY: 1,
+                    }}
+                    transition={{
+                      ease: "easeInOut",
+                      duration: 0.2,
+                      delay: 0.2,
+                    }}
+                  >
+                    <td>
+                      <Link to={party?._id}>{party?.partyName}</Link>
+                    </td>
+                    <td>{party?.categoryName}</td>
+                    <td>{party?.mobileNumber}</td>
+                    <td>{party?.partyType}</td>
+                    <td>₹ {party?.openingBalance}</td>
+                  </motion.tr>
+                ))}
               </tbody>
             </table>
           </motion.div>
-        ))}
+        }
 
         <motion.div
           initial={{
