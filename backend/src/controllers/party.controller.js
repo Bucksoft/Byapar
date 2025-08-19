@@ -73,6 +73,11 @@ export async function getSingleParty(req, res) {
   try {
     // GET THE ID OF THE PARTY FROM PARMAS
     const { id } = req.params;
+    if (!id) {
+      return res
+        .status(400)
+        .json({ success: false, msg: "Please provide party ID" });
+    }
     const party = await Party.findById(id);
     //  GIVE A PROPER RESPONSE IF THERE ARE NO PARTIES
     if (!party) {
@@ -90,6 +95,11 @@ export async function updatePartyDetails(req, res) {
   try {
     // GET THE ID OF THE PARTY AND DATA
     const { id } = req.params;
+    if (!id) {
+      return res
+        .status(400)
+        .json({ success: false, msg: "Please provide party ID" });
+    }
     const data = req.body;
     // FIND THE PARTY AND UPDATE ITS FIELDS.
     const updatedParty = await Party.findByIdAndUpdate(id, data, { new: true });
@@ -113,6 +123,11 @@ export async function deleteParty(req, res) {
   try {
     // get the id of the party
     const { id } = req.params;
+    if (!id) {
+      return res
+        .status(400)
+        .json({ success: false, msg: "Please provide party ID" });
+    }
     const party = await Party.findByIdAndDelete(id);
     if (!party) {
       return res
@@ -127,6 +142,3 @@ export async function deleteParty(req, res) {
     return res.status(500).json({ err: "Internal server error", error });
   }
 }
-
-
-

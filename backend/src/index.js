@@ -4,6 +4,7 @@ import { connectDB } from "./lib/db.js";
 import cors from "cors";
 import userRoutes from "./routes//user.routes.js";
 import partyRoutes from "./routes/party.routes.js";
+import businessRoutes from "./routes/business.routes.js";
 import { loginViaGoogleCallback } from "./controllers/user.controller.js";
 import cookieParser from "cookie-parser";
 
@@ -19,10 +20,11 @@ app.use(
 );
 app.use(express.json());
 app.use(cookieParser());
+
 app.use("/api/v1/user", userRoutes);
 app.use("/auth/google/callback", loginViaGoogleCallback);
-
 app.use("/api/v1/parties", partyRoutes);
+app.use("/api/v1/business", businessRoutes);
 
 app.listen(PORT, () => {
   connectDB();

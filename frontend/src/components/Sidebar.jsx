@@ -87,7 +87,9 @@ const Sidebar = () => {
               />
             </div>
           </div>
-          <span className="font-medium text-xs">{user?.email}</span>
+          <span className="font-medium text-xs">
+            {user?.email || "Business name"}
+          </span>
         </div>
 
         {/* dropdown */}
@@ -133,7 +135,7 @@ const Sidebar = () => {
             className="mt-3"
           >
             {dashboardFields?.map((field, index) => (
-              <motion.div variants={dashboardLinksItems}>
+              <motion.div key={index} variants={dashboardLinksItems}>
                 {field.label === "Items" ||
                 field.label === "Sales" ||
                 field.label === "Purchases" ? (

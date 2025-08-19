@@ -2,7 +2,6 @@ import { FaIndianRupeeSign } from "react-icons/fa6";
 import {
   ChevronLeft,
   ChevronRight,
-  EllipsisVertical,
   Plus,
   Search,
   SquarePen,
@@ -15,7 +14,7 @@ import { dashboardPartiesCardDetails } from "../lib/dashboardPartiesCards";
 import { motion } from "framer-motion";
 import { container, dashboardLinksItems } from "../components/Sidebar";
 import { Link } from "react-router-dom";
-import { useMutation, useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { axiosInstance } from "../config/axios";
 import { useState } from "react";
 import CustomLoader from "../components/Loader";
@@ -26,13 +25,17 @@ import { queryClient } from "../main";
 const DashboardPartiesPage = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const { setParties } = usePartyStore();
-  // FETHCING AL PARTIES DETAILS
+  const queryClient = useQueryClient();
+
+  // FETCHING ALL PARTIES
   const { isLoading, data } = useQuery({
     queryKey: ["parties"],
     queryFn: async () => {
       const res = await axiosInstance.get("/parties/all");
-      setParties(res.data);
       return res.data;
+    },
+    onSuccess: (data) => {
+      setParties(data);
     },
   });
 

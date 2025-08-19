@@ -1,6 +1,9 @@
 import mongoose from "mongoose";
 
 const businessSchema = new mongoose.Schema({
+  logo: {
+    type: String,
+  },
   businessName: {
     type: String,
     required: [true, "Business name is required"],
@@ -13,12 +16,12 @@ const businessSchema = new mongoose.Schema({
     type: String,
     required: [true, "Industry type is required"],
   },
-  company_phoneNo: {
+  companyPhoneNo: {
     type: Number,
   },
-  business_regType: {
+  businessRegType: {
     type: String,
-    required: true, // private, public
+    required: true,
   },
   companyEmail: {
     type: String,
@@ -52,6 +55,9 @@ const businessSchema = new mongoose.Schema({
     type: Boolean,
   },
   additionalInfo: {
+    type: String,
+  },
+  signature: {
     type: String,
   },
 });
