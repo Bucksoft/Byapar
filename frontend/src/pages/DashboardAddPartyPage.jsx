@@ -1,15 +1,17 @@
 import { ArrowLeft, IndianRupee, Landmark, Settings } from "lucide-react";
 import { statesAndCities } from "../utils/constants";
 import { useState } from "react";
-import { QueryClient, useMutation } from "@tanstack/react-query";
+import { useMutation } from "@tanstack/react-query";
 import { axiosInstance } from "../config/axios";
 import toast from "react-hot-toast";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import CustomLoader from "../components/Loader";
+import { usePartyStore } from "../store/partyStore";
+import { queryClient } from "../main";
 
 const DashboardAddPartyPage = () => {
   const navigate = useNavigate();
-  const queryClient = new QueryClient();
+  const { setParty } = usePartyStore();
   const [addCategoryPopup, setAddCategoryPopup] = useState(false);
   const [cities, setCities] = useState([]);
   const [data, setData] = useState({
@@ -50,14 +52,14 @@ const DashboardAddPartyPage = () => {
   const mutation = useMutation({
     mutationFn: async (data) => {
       const res = await axiosInstance.post("/parties", data);
-      console.log(res);
+      return res.data.party;
     },
-    onSuccess: () => {
+    onSuccess: (data) => {
       toast.success("Party created");
+      setParty(data);
       queryClient.invalidateQueries({ queryKey: ["parties"] });
     },
     onError: (err) => {
-      console.log(err);
       toast.error(err.response.data.msg || err.response.data.err);
     },
   });

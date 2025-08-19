@@ -1,22 +1,11 @@
 import { useQuery } from "@tanstack/react-query";
-import { useNavigate, useParams } from "react-router-dom";
+import { Link, useNavigate, useParams } from "react-router-dom";
 import { axiosInstance } from "../config/axios";
-import { GrDocumentExcel } from "react-icons/gr";
 
-import {
-  ArrowLeft,
-  ChevronDown,
-  Download,
-  MessageSquare,
-  Plus,
-  Printer,
-  Share,
-} from "lucide-react";
+import { ArrowLeft } from "lucide-react";
 import { FaRegEdit } from "react-icons/fa";
 import { dashboardSinglePartyMenus } from "../utils/constants";
 import { useState } from "react";
-import { LiaRupeeSignSolid } from "react-icons/lia";
-import { BsWhatsapp } from "react-icons/bs";
 import PartyTransactions from "../components/Party/PartyTransactions";
 import PartyProfile from "../components/Party/PartyProfile";
 import PartyLedgerStatement from "../components/Party/PartyLedgerStatement";
@@ -65,10 +54,12 @@ const DashboardPartyPage = () => {
                   <option>Sales Return</option>
                 </select>
               </fieldset>
-              <button className="btn btn-sm ">
-                <FaRegEdit />
-                Edit
-              </button>
+              <Link to={`/dashboard/edit-party/${party?._id}`}>
+                <button className="btn btn-sm ">
+                  <FaRegEdit />
+                  Edit
+                </button>
+              </Link>
             </div>
           </nav>
         </header>

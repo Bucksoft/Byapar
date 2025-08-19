@@ -44,6 +44,7 @@ import { axiosInstance } from "./config/axios";
 import CustomLoader from "./components/Loader";
 import { useAuthStore } from "./store/authStore";
 import DashboardPartyPage from "./pages/DashboardPartyPage";
+import PartyEditPage from "./components/Party/PartyEditPage";
 
 function App() {
   const { user, setUser } = useAuthStore();
@@ -88,6 +89,8 @@ function App() {
             path="/dashboard/add-party"
             element={<DashboardAddPartyPage />}
           />
+
+          <Route path="/dashboard/edit-party/:id" element={<PartyEditPage />} />
 
           <Route
             path="/dashboard/payment-out"

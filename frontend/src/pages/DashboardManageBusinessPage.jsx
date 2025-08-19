@@ -46,14 +46,14 @@ const DashboardManageBusinessPage = () => {
             </div>
 
             <div className="flex items-center justify-center mr-3 gap-4 ">
-              <p className="text-gray-500 cursor-pointer">
+              {/* <p className="text-gray-500 cursor-pointer">
                 <MdKeyboard size={25} />
-              </p>
-              <button className="btn btn-sm bg-[var(--primary-btn)] btn-soft">
+              </p> */}
+              {/* <button className="btn btn-sm  ">
                 <RiChat1Line size={14} />
                 Chat Support
-              </button>
-              <button className="btn btn-sm btn-outline bg-[var(--primary-btn)]">
+              </button> */}
+              <button className="btn btn-sm  bg-[var(--primary-btn)]">
                 <MdOutlineCalendarToday size={14} />
                 Close Financial Year
               </button>

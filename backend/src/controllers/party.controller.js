@@ -54,10 +54,13 @@ export async function createParty(req, res) {
 // get All parties
 export async function getAllParties(req, res) {
   try {
+    // FETCH THE DETAILS OF THE PARTIES
     const parties = await Party.find();
+    //  GIVE A PROPER RESPONSE IF THERE ARE NO PARTIES
     if (!parties) {
       return res.status(400).json({ success: false, msg: "Parties not found" });
     }
+    // GIVE SUCCESS RESPONSE IF PARTIES ARE FOUND
     return res.status(200).json(parties);
   } catch (error) {
     console.log("ERROR IN FETCHING ALL PARTIES ");
@@ -65,10 +68,13 @@ export async function getAllParties(req, res) {
   }
 }
 
+// function to get single party details
 export async function getSingleParty(req, res) {
   try {
+    // GET THE ID OF THE PARTY FROM PARMAS
     const { id } = req.params;
     const party = await Party.findById(id);
+    //  GIVE A PROPER RESPONSE IF THERE ARE NO PARTIES
     if (!party) {
       return res.status(400).json({ success: false, msg: "Party not found" });
     }
@@ -78,3 +84,49 @@ export async function getSingleParty(req, res) {
     return res.status(500).json({ err: "Internal server error", error });
   }
 }
+
+// function to update party details
+export async function updatePartyDetails(req, res) {
+  try {
+    // GET THE ID OF THE PARTY AND DATA
+    const { id } = req.params;
+    const data = req.body;
+    // FIND THE PARTY AND UPDATE ITS FIELDS.
+    const updatedParty = await Party.findByIdAndUpdate(id, data, { new: true });
+    console.log("UPDATED PARTY", updatedParty);
+    if (!updatedParty) {
+      return res
+        .status(400)
+        .json({ success: false, msg: "Party could not be updated" });
+    }
+    return res
+      .status(200)
+      .json({ msg: "Party updated successfully", updatedParty });
+  } catch (error) {
+    console.log("ERROR IN UPDATING PARTY DETAILS");
+    return res.status(500).json({ err: "Internal server error", error });
+  }
+}
+
+// function to delete party
+export async function deleteParty(req, res) {
+  try {
+    // get the id of the party
+    const { id } = req.params;
+    const party = await Party.findByIdAndDelete(id);
+    if (!party) {
+      return res
+        .status(400)
+        .json({ success: false, msg: "Party could not be deleted" });
+    }
+    return res
+      .status(200)
+      .json({ success: true, msg: "Party deleted successfully" });
+  } catch (error) {
+    console.log("ERROR IN DELETING PARTY DETAILS");
+    return res.status(500).json({ err: "Internal server error", error });
+  }
+}
+
+
+

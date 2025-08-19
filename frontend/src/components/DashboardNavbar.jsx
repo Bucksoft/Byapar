@@ -28,7 +28,7 @@ const DashboardNavbar = ({ title, isReport }) => {
             <div
               tabIndex={0}
               role="button"
-              className="btn btn-sm m-1 btn-dash btn-wide bg-[var(--primary-btn)]"
+              className="btn btn-sm m-1 btn-wide bg-[var(--primary-btn)]"
             >
               <TbReportSearch size={14} /> Reports
             </div>

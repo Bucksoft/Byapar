@@ -55,9 +55,9 @@ const DashboardItemsPage = () => {
           className="flex items-center justify-between mt-8 "
         >
           <div className="flex items-center gap-2">
-            <label className="input">
+            <label className="input input-sm">
               <Search size={16} className="text-zinc-400" />
-              <input type="search" required placeholder="Search" />
+              <input type="search" required placeholder="Search"  />
             </label>
             <button className="btn btn-ghost ">
               <LuPackageSearch className="flex items-center" /> Show Low Stock
