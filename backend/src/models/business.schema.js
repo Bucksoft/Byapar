@@ -17,7 +17,7 @@ const businessSchema = new mongoose.Schema({
     required: [true, "Industry type is required"],
   },
   companyPhoneNo: {
-    type: Number,
+    type: String,
   },
   businessRegType: {
     type: String,
@@ -25,6 +25,8 @@ const businessSchema = new mongoose.Schema({
   },
   companyEmail: {
     type: String,
+    required: true,
+    unique: true,
   },
   billingAddress: {
     type: String,
@@ -36,10 +38,11 @@ const businessSchema = new mongoose.Schema({
     type: String,
   },
   pincode: {
-    type: Number,
+    type: String,
   },
   gstRegistered: {
-    type: Boolean,
+    type: String,
+    default: "no",
   },
   gstNumber: {
     type: String,
@@ -50,9 +53,11 @@ const businessSchema = new mongoose.Schema({
   },
   TDS: {
     type: Boolean,
+    default: false,
   },
   TCS: {
     type: Boolean,
+    default: false,
   },
   additionalInfo: {
     type: String,

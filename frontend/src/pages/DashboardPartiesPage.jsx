@@ -20,37 +20,11 @@ import { useState } from "react";
 import CustomLoader from "../components/Loader";
 import { usePartyStore } from "../store/partyStore";
 import toast from "react-hot-toast";
-import { queryClient } from "../main";
+import { queryClient } from "../main.jsx";
 
 const DashboardPartiesPage = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const { setParties } = usePartyStore();
-  const queryClient = useQueryClient();
-
-  // FETCHING ALL PARTIES
-  const { isLoading, data } = useQuery({
-    queryKey: ["parties"],
-    queryFn: async () => {
-      const res = await axiosInstance.get("/parties/all");
-      return res.data;
-    },
-    onSuccess: (data) => {
-      setParties(data);
-    },
-  });
-
-  // search functionality
-  const parties = data?.filter((item) =>
-    item?.partyName.toLowerCase().includes(searchQuery.toLowerCase())
-  );
-
-  if (isLoading) {
-    return (
-      <div className="h-screen w-full grid place-items-center">
-        <CustomLoader text={"Loading...."} />
-      </div>
-    );
-  }
 
   // DELETE PARTY
   const mutation = useMutation({
@@ -63,6 +37,29 @@ const DashboardPartiesPage = () => {
       queryClient.invalidateQueries({ queryKey: ["parties"] });
     },
   });
+
+  // FETCHING ALL PARTIES
+  const { isLoading, data } = useQuery({
+    queryKey: ["parties"],
+    queryFn: async () => {
+      const res = await axiosInstance.get("/parties/all");
+      setParties(res.data);
+      return res.data;
+    },
+  });
+
+  // SEARCH FUNCTIONALITY
+  const parties = data?.filter((item) =>
+    item?.partyName.toLowerCase().includes(searchQuery.toLowerCase())
+  );
+
+  if (isLoading) {
+    return (
+      <div className="h-screen w-full grid place-items-center">
+        <CustomLoader text={"Loading...."} />
+      </div>
+    );
+  }
 
   return (
     <main className="h-full p-2">

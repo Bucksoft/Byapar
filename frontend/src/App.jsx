@@ -41,10 +41,13 @@ import DashboardAddPartyPage from "./pages/DashboardAddPartyPage";
 import HomePage from "./pages/HomePage";
 import { useQuery } from "@tanstack/react-query";
 import { axiosInstance } from "./config/axios";
-import CustomLoader from "./components/Loader";
 import { useAuthStore } from "./store/authStore";
 import DashboardPartyPage from "./pages/DashboardPartyPage";
 import PartyEditPage from "./components/Party/PartyEditPage";
+import DashboardSalesInvoicePage from "./pages/DashboardSalesInvoicePage";
+import DashboardQuotationInvoiceForm from "./pages/DashboardQuotationInvoiceForm";
+import DashboardProformaInvoicePage from "./pages/DashboardProformaInvoicePage";
+import DashboardSalesReturnInvoicePage from "./pages/DashboardSalesInvoicePage";
 
 function App() {
   const { user, setUser } = useAuthStore();
@@ -52,6 +55,7 @@ function App() {
     queryFn: async () => {
       const res = await axiosInstance.get("/user/me");
       setUser(res.data?.user);
+      return res.data;
     },
   });
 
@@ -75,6 +79,26 @@ function App() {
           <Route
             path="/dashboard/parties/:id"
             element={<DashboardPartyPage />}
+          />
+
+          <Route
+            path="/dashboard/parties/sales-invoice"
+            element={<DashboardSalesInvoicePage />}
+          />
+
+          <Route
+            path="/dashboard/parties/create-quotation"
+            element={<DashboardQuotationInvoiceForm />}
+          />
+
+          <Route
+            path="/dashboard/parties/proforma-invoice"
+            element={<DashboardProformaInvoicePage />}
+          />
+
+          <Route
+            path="/dashboard/parties/sales-return"
+            element={<DashboardSalesReturnInvoicePage />}
           />
 
           <Route path="/dashboard/items" element={<DashboardItemsPage />} />

@@ -1,12 +1,23 @@
 import { states } from "../../utils/constants";
 import { LuImagePlus } from "react-icons/lu";
 import { motion } from "framer-motion";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useMutation } from "@tanstack/react-query";
 import { queryClient } from "../../main";
 import { MdOutlineCalendarToday } from "react-icons/md";
+import { axiosInstance } from "../../config/axios";
+import CustomLoader from "../Loader";
+import toast from "react-hot-toast";
+import { Trash } from "lucide-react";
 
 const BusinessForm = () => {
+  const [additionalInformation, setAdditionalInformation] = useState([{}]);
+  const [additionalInfoKey, setAdditionalInfoKey] = useState("");
+  const [additionalInfoValue, setAdditionalInfoValue] = useState("");
+  const [logoPreviewUrl, setLogoPreviewUrl] = useState("");
+  const [logo, setLogo] = useState(null);
+  const [signature, setSignature] = useState(null);
+
   const [data, setData] = useState({
     businessName: "",
     businessType: "",
@@ -22,35 +33,74 @@ const BusinessForm = () => {
     panNumber: "",
     TDS: false,
     TCS: false,
-    additionalInfo: "",
     pincode: "",
   });
 
-  // handling the input field changes
+  const handleLogoChange = (e) => {
+    const file = e.target.files[0];
+    console.log("logo FILE ", file);
+    if (!file) return;
+    setLogo(file);
+    const url = URL.createObjectURL(file);
+    setLogoPreviewUrl(url);
+    e.target.value = null;
+  };
+
+  const handleSignatureChange = (e) => {
+    const file = e.target.files[0];
+    console.log(file);
+    if (!file) return;
+    setSignature(file);
+    e.target.value = null;
+  };
+
+  useEffect(() => {
+    return () => {
+      if (logoPreviewUrl) URL.revokeObjectURL(logoPreviewUrl);
+    };
+  }, [logoPreviewUrl]);
+
   const handleInputChange = (e) => {
-    const { name, value } = e.target;
+    const { name, value, type, checked } = e.target;
     setData((prev) => ({
       ...prev,
-      [name]: value,
+      [name]: type === "checkbox" ? checked : value,
     }));
   };
 
-  // handling actual form submission
   const mutation = useMutation({
-    mutationFn: async (data) => {
-      //   const res = await axiosInstance.post("/business", data);
-      //   return res.data.party;
-      console.log(data);
+    mutationFn: async (formData) => {
+      const res = await axiosInstance.post("/business", formData);
+      return res.data.business;
     },
-    onSuccess: (data) => {
-      toast.success("Party created");
-      setParty(data);
+    onSuccess: () => {
+      toast.success("Business created");
       queryClient.invalidateQueries({ queryKey: ["business"] });
     },
     onError: (err) => {
-      toast.error(err.response.data.msg || err.response.data.err);
+      toast.error(err.response?.data?.msg || err.response?.data?.err);
     },
   });
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    const formData = new FormData();
+    Object.entries(data).forEach(([key, value]) => {
+      formData.append(key, value);
+    });
+
+    if (logo) formData.append("logo", logo);
+    if (signature) formData.append("signature", signature);
+
+    if (additionalInformation.length > 0) {
+      formData.append(
+        "additionalInformation",
+        JSON.stringify(additionalInformation)
+      );
+    }
+
+    mutation.mutate(formData);
+  };
 
   return (
     <>
@@ -96,13 +146,22 @@ const BusinessForm = () => {
           <button className="btn btn-sm ">Cancel</button>
           <button
             onClick={() => mutation.mutate(data)}
+            disabled={mutation.isPending}
             className="btn btn-sm bg-[var(--primary-btn)]"
           >
-            Save Changes
+            {mutation.isPending ? (
+              <CustomLoader text={"Saving..."} />
+            ) : (
+              "Save Changes"
+            )}
           </button>
         </div>
       </motion.header>
-      <div className="min-h-screen  grid grid-cols-2 gap-2">
+
+      <form
+        onSubmit={handleSubmit}
+        className="min-h-screen  grid grid-cols-2 gap-2"
+      >
         {/* left  */}
         <motion.div
           initial={{
@@ -132,16 +191,28 @@ const BusinessForm = () => {
                 duration: 0.3,
                 delay: 0.3,
               }}
-              htmlFor="file"
-              className="border flex-col items-center  justify-center bg-[#F6F9FF] border-blue-500 flex border-dashed  cursor-pointer p-5 text-xs gap-2"
+              htmlFor="logo"
+              className="border flex-col items-center justify-center bg-[#F6F9FF] border-blue-500 flex border-dashed  cursor-pointer p-5 text-xs gap-2"
             >
-              <LuImagePlus size={20} className="text-blue-500" />
-              <span className="text-nowrap text-blue-500 font-semibold">
-                Upload Logo
-              </span>
-              <small className="text-nowrap">JPG/PNG, max-5MB</small>
+              {logoPreviewUrl ? (
+                <img src={logoPreviewUrl} size={100} />
+              ) : (
+                <>
+                  <LuImagePlus size={20} className="text-blue-500" />
+                  <span className="text-nowrap text-blue-500 font-semibold">
+                    Upload Logo
+                  </span>
+                  <small className="text-nowrap">JPG/PNG, max-5MB</small>
+                </>
+              )}
             </motion.label>
-            <input type="file" id="file" className="hidden" />
+            <input
+              type="file"
+              id="logo"
+              name="logo"
+              className="hidden"
+              onClick={handleLogoChange}
+            />
             <div className="flex ml-3 flex-col gap-2 justify-center  w-full">
               <p className="text-[13px]  text-gray-500">
                 Business Name<span className="text-red-600">*</span>
@@ -154,19 +225,31 @@ const BusinessForm = () => {
                 placeholder="Business Name"
                 className="input input-sm"
               />
+              <small className="text-xs text-[var(--error-text-color)] ">
+                {
+                  mutation.error?.response?.data?.validationError?.businessName
+                    ?._errors[0]
+                }
+              </small>
             </div>
           </div>
           <div className="flex gap-5 mb-4 items-center justify-between">
             <div className="flex  flex-col gap-2 justify-center  w-full">
               <p className="text-[13px]  text-gray-500">Phone number</p>
               <input
-                type="text"
+                type="number"
                 name="companyPhoneNo"
                 value={data.companyPhoneNo}
                 onChange={handleInputChange}
                 placeholder="Enter Company Phone Number"
                 className="input input-sm"
               />
+              <small className="text-xs text-[var(--error-text-color)] ">
+                {
+                  mutation.error?.response?.data?.validationError
+                    ?.companyPhoneNo?._errors[0]
+                }
+              </small>
             </div>
             <div className="flex ml-3 flex-col gap-2 justify-center  w-full">
               <p className="text-[13px]  text-gray-500">Company Email</p>
@@ -178,6 +261,12 @@ const BusinessForm = () => {
                 placeholder="Enter Company Email"
                 className="input input-sm"
               />
+              <small className="text-xs text-[var(--error-text-color)] ">
+                {
+                  mutation.error?.response?.data?.validationError?.companyEmail
+                    ?._errors[0]
+                }
+              </small>
             </div>
           </div>
           <div className="flex flex-col mb-4 ">
@@ -189,6 +278,12 @@ const BusinessForm = () => {
               placeholder="Enter Billing Address"
               className="textarea w-full"
             />
+            <small className="text-xs text-[var(--error-text-color)] ">
+              {
+                mutation.error?.response?.data?.validationError?.billingAddress
+                  ?._errors[0]
+              }
+            </small>
           </div>
 
           <div className=" flex gap-5 mb-4 items-center justify-between">
@@ -207,6 +302,12 @@ const BusinessForm = () => {
                   ))}
                 </select>
               </fieldset>
+              <small className="text-xs text-[var(--error-text-color)] ">
+                {
+                  mutation.error?.response?.data?.validationError?.state
+                    ?._errors[0]
+                }
+              </small>
             </div>
             <div className="flex ml-3 flex-col gap-2 justify-center  w-full">
               <p className="text-[13px]  text-gray-500">PIN Code</p>
@@ -219,6 +320,12 @@ const BusinessForm = () => {
                 disabled={mutation?.isPending}
                 onChange={handleInputChange}
               />
+              <small className="text-xs text-[var(--error-text-color)] ">
+                {
+                  mutation.error?.response?.data?.validationError?.pincode
+                    ?._errors[0]
+                }
+              </small>
             </div>
           </div>
 
@@ -233,6 +340,12 @@ const BusinessForm = () => {
               placeholder="Enter City"
               className="input input-sm"
             />
+            <small className="text-xs text-[var(--error-text-color)] ">
+              {
+                mutation.error?.response?.data?.validationError?.city
+                  ?._errors[0]
+              }
+            </small>
           </div>
 
           <div className="w-full mt-5 flex relative flex-col">
@@ -275,7 +388,7 @@ const BusinessForm = () => {
               GSTIN<span className="text-red-600">*</span>
             </p>
             <input
-              type="number"
+              type="text"
               name="gstNumber"
               value={data.gstNumber}
               disabled={mutation?.isPending}
@@ -283,6 +396,12 @@ const BusinessForm = () => {
               placeholder="Enter your GST number"
               className="input input-sm"
             />
+            <small className="text-xs text-[var(--error-text-color)] ">
+              {
+                mutation.error?.response?.data?.validationError?.gstNumber
+                  ?._errors[0]
+              }
+            </small>
           </div>
 
           <div className=" font-semibold mt-3 base flex items-center justify-between w-full p-[5.8px] px-3 text-xs border border-gray-300  rounded text-purple-300">
@@ -305,6 +424,12 @@ const BusinessForm = () => {
               placeholder="Enter PAN number"
               className="input input-sm"
             />
+            <small className="text-xs text-[var(--error-text-color)] ">
+              {
+                mutation.error?.response?.data?.validationError?.panNumber
+                  ?._errors[0]
+              }
+            </small>
           </div>
 
           <div className="w-full text-sm mt-2 mb-5 flex items-center justify-between">
@@ -327,12 +452,12 @@ const BusinessForm = () => {
             Enable TCS
             <input
               type="checkbox"
-              name="TDS"
+              name="TCS"
               checked={data.TCS}
               onChange={(e) =>
                 setData((prev) => ({
                   ...prev,
-                  TDS: e.target.checked,
+                  TCS: e.target.checked,
                 }))
               }
               className="toggle toggle-sm"
@@ -372,6 +497,12 @@ const BusinessForm = () => {
                 <option>Manufacturer</option>
                 <option>Services</option>
               </select>
+              <small className="text-xs text-[var(--error-text-color)] ">
+                {
+                  mutation.error?.response?.data?.validationError?.businessType
+                    ?._errors[0]
+                }
+              </small>
             </div>
             <div className="w-1/2 flex flex-col justify-between">
               <p className="text-[13px]  text-gray-600 mb-2">Industry Type</p>
@@ -390,6 +521,12 @@ const BusinessForm = () => {
                 <option>Building Material and Construction</option>
                 <option>Cleaning and pest Control</option>
               </select>
+              <small className="text-xs text-[var(--error-text-color)] ">
+                {
+                  mutation.error?.response?.data?.validationError?.industryType
+                    ?._errors[0]
+                }
+              </small>
             </div>
           </div>
 
@@ -413,6 +550,12 @@ const BusinessForm = () => {
               <option>Section 8 Company</option>
               <option>Business Not Registered</option>
             </select>
+            <small className="text-xs text-[var(--error-text-color)] ">
+              {
+                mutation.error?.response?.data?.validationError?.businessRegType
+                  ?._errors[0]
+              }
+            </small>
           </div>
 
           <div className="flex items-center py-2 my-3 justify-center bg-[#F8F9FC]">
@@ -425,12 +568,19 @@ const BusinessForm = () => {
 
           <p className="text-[13px] text-gray-500">Signature</p>
           <div className="flex items-center justify-between py-2">
-            <button
-              onClick={() => setShowPopup(true)}
+            <label
+              htmlFor="signature"
               className="border border-dashed p-11 text-xs border-blue-500 text-blue-500 cursor-pointer"
             >
               + Add Signature
-            </button>
+            </label>
+            <input
+              id="signature"
+              name="signature"
+              type="file"
+              onChange={handleSignatureChange}
+              className="hidden"
+            />
           </div>
 
           <div className="border rounded mt-2 border-gray-300">
@@ -446,20 +596,51 @@ const BusinessForm = () => {
                 type="text"
                 placeholder="Websites"
                 className="input input-sm "
+                value={additionalInfoKey}
+                onChange={(e) => setAdditionalInfoKey(e.target.value)}
               />
               <p className="px-3 text-gray-500">=</p>
               <input
                 type="text"
                 placeholder=" www.websites.com"
                 className="input input-sm  "
+                value={additionalInfoValue}
+                onChange={(e) => setAdditionalInfoValue(e.target.value)}
               />
-              <button className="btn btn-sm bg-[var(--primary-btn)] ml-3">
+              <button
+                onClick={() =>
+                  setAdditionalInformation((prev) => [
+                    ...prev,
+                    {
+                      key: additionalInfoKey,
+                      value: additionalInfoValue,
+                    },
+                  ])
+                }
+                className="btn btn-sm bg-[var(--primary-btn)] ml-3"
+              >
                 Add
               </button>
             </div>
+            {additionalInformation.length > 0 &&
+              additionalInformation.map((info, index) => (
+                <div
+                  key={index}
+                  className="px-4 py-2 text-sm flex items-center justify-between"
+                >
+                  <div>
+                    <h3>{info?.key}</h3>
+                    <span className="text-zinc-500">{info?.value}</span>
+                  </div>
+                  <Trash
+                    size={15}
+                    className="text-[var(--error-text-color)] cursor-pointer"
+                  />
+                </div>
+              ))}
           </div>
         </motion.div>
-      </div>
+      </form>
     </>
   );
 };

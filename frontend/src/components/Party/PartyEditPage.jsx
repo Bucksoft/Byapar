@@ -16,7 +16,6 @@ const PartyEditPage = () => {
   const { parties } = usePartyStore();
   const [addCategoryPopup, setAddCategoryPopup] = useState(false);
   const [cities, setCities] = useState([]);
-  console.log(party);
 
   const [data, setData] = useState({
     partyName: party?.partyName,
@@ -62,7 +61,7 @@ const PartyEditPage = () => {
 
   // Filtering the selected party to be edited from all the parties
   useEffect(() => {
-    const party = parties.find((party) => party?._id === id);
+    const party = parties?.find((party) => party?._id === id);
     setParty(party);
   }, [parties, id]);
 

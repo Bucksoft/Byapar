@@ -101,7 +101,7 @@ export const businessSchema = z.object({
     .min(5, "Business name must be atleast 5 characters long")
     .max(30, "Business name must be atmost 30 characters long"),
   businessType: z.enum(
-    ["retailer", "wholesaler", "distributor", "manufacturer", "services"],
+    ["Retailer", "Wholesaler", "Distributor", "Manufacturer", "Services"],
     {
       errorMap: () => ({
         message:
@@ -139,7 +139,7 @@ export const businessSchema = z.object({
       "Pincode must be a valid 6-digit Indian postal code"
     ),
 
-  gstRegistered: z.boolean().default(false),
+  // gstRegistered: z.boolean().default(false).optional(),
   gstNumber: z
     .string()
     .regex(
@@ -153,4 +153,80 @@ export const businessSchema = z.object({
   TCS: z.boolean().default(false),
   additionalInfo: z.string("Please enter some information").optional(),
   signature: z.string().optional(),
+});
+
+export const bankAccountSchema = z.object({
+  accountName: z.string().min(1, "Account name is required"),
+
+  openingBalance: z.number().optional(0),
+
+  asOfDate: z.preprocess(
+    (arg) =>
+      typeof arg === "string" || arg instanceof Date ? new Date(arg) : arg,
+    z.date({
+      required_error: "As of date is required",
+      invalid_type_error: "Invalid date format",
+    })
+  ),
+
+  bankAccountNumber: z
+    .string()
+    .regex(/^\d{9,18}$/, "Bank account number must be 9–18 digits"),
+
+  ifscCode: z
+    .string()
+    .regex(/^[A-Z]{4}0[A-Z0-9]{6}$/, "Invalid IFSC code format"),
+
+  bankAndBranchName: z.string().min(1, "Bank name & Branch name are required"),
+
+  accountHolderName: z.string().min(1, "Account holder name is required"),
+
+  upiId: z
+    .string()
+    .regex(/^[\w.-]{2,256}@[a-zA-Z]{2,64}$/, "Invalid UPI ID format")
+    .optional(),
+
+  partyId: z
+    .string()
+    .regex(/^[0-9a-fA-F]{24}$/, "Invalid Party ID")
+    .optional(),
+
+  clientId: z
+    .string()
+    .regex(/^[0-9a-fA-F]{24}$/, "Invalid Client ID")
+    .optional(),
+});
+
+
+export const paymentInSchema = z.object({
+  partyName: z
+    .string()
+    .min(3, "Party name must be at least 3 characters long")
+    .max(50, "Party name must be at most 50 characters long")
+    .regex(
+      /^[a-zA-Z0-9\s\-.&]+$/,
+      "Party name can only contain letters, numbers, spaces, and . - &"
+    ),
+
+  paymentAmount: z
+    .number({ invalid_type_error: "Payment amount must be a number" })
+    .min(0, "Payment amount cannot be negative"),
+
+  paymentDate: z.union([
+    z.string().nonempty("Payment date is required"),
+    z.date(),
+  ]),
+  paymentMode: z.string().nonempty("Payment mode cannot be left empty"),
+
+  paymentReceivedIn: z.string().nonempty("Select a bank account"),
+
+  paymentInNumber: z
+    .number({ invalid_type_error: "Payment number must be a number" })
+    .min(1, "Payment in number must be at least 1"),
+
+  notes: z
+    .string()
+    .min(10, "Notes must be at least 10 characters long")
+    .max(100, "Notes must be at most 100 characters long")
+    .optional(),
 });

@@ -6,19 +6,42 @@ export async function createBusiness(req, res) {
   try {
     // GET THE DATA FROM THE FRONTEND
     const data = req.body;
-    if (!data) {
-      return res
-        .status(400)
-        .json({ success: false, msg: "Please provide the data" });
+    const logoFile = req.files?.logo?.[0];
+    const signatureFile = req.files?.signature?.[0];
+    // if (logoFile) {
+    //   data.logo = logoFile.path;
+    // }
+    console.log("LOGO FILE : ", logoFile);
+    console.log("SIGNTAURE FILE : ", signatureFile);
+
+    // CHECK IF THE SAME BUSINESS IS ALREADY PRESENT OR NOT
+    if (data.TDS) {
+      data.TDS = Boolean(data.TDS);
     }
+
+    if (data.TCS) {
+      data.TCS = Boolean(data.TCS);
+    }
+
+    const companyEmail = data?.companyEmail;
+    const businessExists = await Business.findOne({ companyEmail });
+    if (businessExists) {
+      return res.status(400).json({
+        success: false,
+        msg: "Email is already in use. Please choose another email.",
+      });
+    }
+
+    console.log(data);
 
     // VALIDATE THE DATA
     const validatedResult = businessSchema.safeParse(data);
+    console.log(validatedResult);
     if (!validatedResult.success) {
-      const errors = validatedResult.error.format();
+      const validationError = validatedResult.error.format();
       return res
         .status(400)
-        .json({ success: true, msg: "Validation failed", errors });
+        .json({ success: true, msg: "Validation failed", validationError });
     }
 
     // CREATE THE BUSINESS

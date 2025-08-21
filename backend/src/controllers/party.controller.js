@@ -103,7 +103,6 @@ export async function updatePartyDetails(req, res) {
     const data = req.body;
     // FIND THE PARTY AND UPDATE ITS FIELDS.
     const updatedParty = await Party.findByIdAndUpdate(id, data, { new: true });
-    console.log("UPDATED PARTY", updatedParty);
     if (!updatedParty) {
       return res
         .status(400)

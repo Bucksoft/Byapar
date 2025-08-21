@@ -6,10 +6,17 @@ import {
   getBusiness,
   updateBusiness,
 } from "../controllers/business.controller.js";
+import { upload } from "../lib/multer.js";
 
 const router = express.Router();
 
-router.route("/").post(isAuth, createBusiness);
+router.route("/").post(
+  upload.fields([
+    { name: "logo", maxCount: 1 },
+    { name: "signature", maxCount: 1 },
+  ]),
+  createBusiness
+);
 router.route("/:id").patch(isAuth, updateBusiness);
 router.route("/:id").get(isAuth, getBusiness);
 router.route("/:id").delete(isAuth, deleteBusiness);

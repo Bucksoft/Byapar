@@ -1,8 +1,25 @@
 import { IoSettingsOutline } from "react-icons/io5";
 import { TbReportSearch } from "react-icons/tb";
 import { motion } from "framer-motion";
+import { useNavigate } from "react-router-dom";
+import { useState } from "react";
 
 const DashboardNavbar = ({ title, isReport }) => {
+  const navigate = useNavigate();
+  const [selectedLink, setSelectedLink] = useState("");
+  const handleChange = (e) => {
+    const link = e.target.value;
+    navigate(
+      `/dashboard/reports?type=${
+        link === "Stock Summary"
+          ? "Stock Value"
+          : link === "Low Stock Summary"
+          ? "Low Stock"
+          : link
+      }`
+    );
+  };
+
   return (
     <motion.div
       initial={{
@@ -23,27 +40,26 @@ const DashboardNavbar = ({ title, isReport }) => {
 
       {/* Reports dropdown */}
       <div className="flex gap-5 items-center ">
-        <div className="dropdown dropdown-end">
+        <div className="">
           {isReport && (
-            <div
-              tabIndex={0}
-              role="button"
-              className="btn btn-sm m-1 btn-wide bg-[var(--primary-btn)]"
+            <select
+              value={selectedLink}
+              onChange={handleChange}
+              className="select select-sm"
             >
-              <TbReportSearch size={14} /> Reports
-            </div>
+              <option disabled={true} className="hidden">
+                Reports
+              </option>
+              {title === "Items" && (
+                <>
+                  <option>Rate List</option>
+                  <option>Stock Summary</option>
+                  <option>Low Stock Summary</option>
+                  <option>Item Sales Summary</option>
+                </>
+              )}
+            </select>
           )}
-          <ul
-            tabIndex={0}
-            className="dropdown-content menu bg-base-100 rounded-box z-1 w-52 p-2 shadow-sm"
-          >
-            <li>
-              <a>Item 1</a>
-            </li>
-            <li>
-              <a>Item 2</a>
-            </li>
-          </ul>
         </div>
 
         <button className="btn btn-square btn-sm bg-transparent group">

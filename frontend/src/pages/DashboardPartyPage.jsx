@@ -27,6 +27,22 @@ const DashboardPartyPage = () => {
     },
   });
 
+  const handleSelectChange = (e) => {
+    console.log(e.target.value);
+    if (e.target.value === "Sales Invoice") {
+      navigate("/dashboard/parties/sales-invoice");
+    }
+    if (e.target.value === "Quotation") {
+      navigate("/dashboard/parties/create-quotation");
+    }
+    if (e.target.value === "Proforma Invoice") {
+      navigate("/dashboard/parties/proforma-invoice");
+    }
+    if (e.target.value === "Sales Return") {
+      navigate("/dashboard/parties/sales-return");
+    }
+  };
+
   return (
     <main className="h-full p-2">
       <div className="h-full w-full bg-white rounded-lg p-3">
@@ -45,13 +61,17 @@ const DashboardPartyPage = () => {
             <div className="flex items-center gap-3 text-sm">
               <fieldset className="fieldset">
                 <select
-                  defaultValue="Pick a browser"
+                  onChange={handleSelectChange}
+                  defaultValue="Sales Invoice"
                   className="select select-sm"
                 >
-                  <option>Sales Invoice</option>
-                  <option>Quotation</option>
-                  <option>Proforma Invoice</option>
-                  <option>Sales Return</option>
+                  <option value="Sales Invoice" disabled className="hidden">
+                    Create Sales Invoice
+                  </option>
+                  <option value="Sales Invoice">Sales Invoice</option>
+                  <option value="Quotation">Quotation</option>
+                  <option value="Proforma Invoice">Proforma Invoice</option>
+                  <option value="Sales Return">Sales Return</option>
                 </select>
               </fieldset>
               <Link to={`/dashboard/edit-party/${party?._id}`}>

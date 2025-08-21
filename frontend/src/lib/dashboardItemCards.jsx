@@ -14,6 +14,6 @@ export const dashboardItemsCardDetails = [
     icon: <BsFillBoxSeamFill />,
     label: "Low Stock",
     value: "1",
-    color: "warning-content",
+    color: "warning",
   },
 ];

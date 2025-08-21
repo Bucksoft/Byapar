@@ -1,8 +1,9 @@
 import { Calendar, ChevronDown, Keyboard, Search } from "lucide-react";
+import { useState } from "react";
 import { IoSettingsOutline } from "react-icons/io5";
 import { TbCoinRupee } from "react-icons/tb";
 
-const SalesNavigationMenus = ({ title, btnText, selectText }) => {
+const SalesNavigationMenus = ({ title, btnText, selectText, setPage }) => {
   return (
     <main>
       {title === "Payment In" && (
@@ -89,8 +90,13 @@ const SalesNavigationMenus = ({ title, btnText, selectText }) => {
         </div>
         <div>
           <div className="h-full">
-            <button className="btn bg-[var(--primary-btn)] btn-sm">
-              <span className="text-zinc-700">Create {btnText}</span>
+            <button
+              onClick={() =>
+                btnText === "Payment In" ? setPage("Payment In") : ""
+              }
+              className="btn bg-[var(--primary-btn)] btn-sm text-zinc-700"
+            >
+              Create {btnText}
             </button>
           </div>
         </div>

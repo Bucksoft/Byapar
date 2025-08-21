@@ -7,8 +7,12 @@ import { PiMicrosoftExcelLogoFill } from "react-icons/pi";
 import { dashboardItemsCardDetails } from "../lib/dashboardItemCards";
 import { motion } from "framer-motion";
 import { container, dashboardLinksItems } from "../components/Sidebar";
+import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 const DashboardItemsPage = () => {
+  const [menu, setMenu] = useState("");
+  const navigate = useNavigate();
   return (
     <main className="h-full p-2">
       <div className="h-full w-full bg-white rounded-lg p-3">
@@ -22,9 +26,12 @@ const DashboardItemsPage = () => {
         >
           {dashboardItemsCardDetails?.map((details) => (
             <motion.div
+              onClick={() =>
+                navigate(`/dashboard/reports?type=${details.label}`)
+              }
               variants={dashboardLinksItems}
               key={details.id}
-              className={`border rounded-md p-3 mt-5 shadow-md border-${details.color} bg-${details.color}/10 hover:-translate-y-1 transition-all ease-in-out duration-200 cursor-pointer`}
+              className={`border rounded-md p-3 mt-5 shadow-md border-${details?.color} bg-${details.color}/10 hover:-translate-y-1 transition-all ease-in-out duration-200 cursor-pointer`}
             >
               <p className={`flex items-center gap-3 text-${details.color}`}>
                 {details.icon} {details.label}
@@ -57,7 +64,7 @@ const DashboardItemsPage = () => {
           <div className="flex items-center gap-2">
             <label className="input input-sm">
               <Search size={16} className="text-zinc-400" />
-              <input type="search" required placeholder="Search"  />
+              <input type="search" required placeholder="Search" />
             </label>
             <button className="btn btn-ghost ">
               <LuPackageSearch className="flex items-center" /> Show Low Stock
@@ -65,7 +72,7 @@ const DashboardItemsPage = () => {
           </div>
 
           <div>
-            <button className="btn btn-sm btn-[var(--primary-btn)]">
+            <button className="btn btn-sm bg-[var(--primary-btn)]">
               <Plus size={14} /> Create Item
             </button>
           </div>
