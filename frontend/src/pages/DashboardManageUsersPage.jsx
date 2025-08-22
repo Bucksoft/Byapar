@@ -38,9 +38,13 @@ const DashboardManageUsersPage = () => {
                 ease: "easeInOut",
               }}
               onClick={() => setMenu("users")}
-              className="border flex flex-col gap-2 p-3 border-gray-300 w-1/3 cursor-pointer rounded-lg hover:bg-[#F1F0FC] hover:border-indigo-700 "
+              className={`  ${
+                menu === "users" ? "border border-info/20 bg-info/5" : ""
+              } border flex flex-col gap-2 p-3 border-gray-300 w-1/3 cursor-pointer rounded-lg hover:bg-[#F1F0FC] hover:border-indigo-700 `}
             >
-              <div className="text-xs flex gap-2  items-center text-green-700 ">
+              <div
+                className={"text-xs  flex gap-2  items-center text-green-700 "}
+              >
                 <LuUsers />
                 Number of Users
               </div>
@@ -61,9 +65,13 @@ const DashboardManageUsersPage = () => {
                 delay: 0.3,
               }}
               onClick={() => setMenu("activites")}
-              className="border flex flex-col p-3 gap-2 cursor-pointer border-gray-300 w-1/3 rounded-lg hover:bg-[#F1F0FC] hover:border-indigo-700 "
+              className={`  ${
+                menu === "activites" ? "border border-info/20 bg-info/5" : ""
+              } border flex flex-col p-3 gap-2 cursor-pointer border-gray-300 w-1/3 rounded-lg hover:bg-[#F1F0FC] hover:border-indigo-700 `}
             >
-              <div className="text-xs flex gap-2  items-center text-info   ">
+              <div
+                className={`  text-xs flex gap-2  items-center text-info   `}
+              >
                 <IoIosPulse />
                 Activities Performed
               </div>
@@ -153,10 +161,68 @@ const DashboardManageUsersPage = () => {
                     <FaPlus />
                     Add New User
                   </button>
-                  <button className="btn btn-sm">
+                  <button
+                    className="btn btn-sm"
+                    onClick={() =>
+                      document.getElementById("my_modal_2").showModal()
+                    }
+                  >
                     <FaPlus />
                     Add Your CA
                   </button>
+
+                  {/* Add your CA Popup */}
+                  <dialog id="my_modal_2" className="modal ">
+                    <div className="modal-box">
+                      <h3 className="font-medium">Add User</h3>
+                      <div className="text-xs w-full grid grid-cols-2 gap-3 mt-2  rounded-md p-2">
+                        <div>
+                          <label htmlFor="Name">Name</label>
+                          <input
+                            type="text"
+                            placeholder="Enter name"
+                            className="input input-sm mb-5"
+                          />
+                          <label htmlFor="Name" className="">
+                            User Role
+                          </label>
+                          <select
+                            defaultValue="Pick a color"
+                            className="select select-sm"
+                          >
+                            <option disabled={true} className="hidden">
+                              CA
+                            </option>
+                            <option>CA</option>
+                          </select>
+                        </div>
+                        <div>
+                          <label htmlFor="Name">Mobile Number</label>
+                          <input
+                            type="text"
+                            placeholder="Enter mobile number"
+                            className="input input-sm mb-5"
+                          />
+                          <label htmlFor="Name" className="">
+                            Email ID
+                          </label>
+                          <input
+                            type="text"
+                            placeholder="Enter email"
+                            className="input input-sm mb-5"
+                          />
+                        </div>
+                      </div>
+                      <div className="flex justify-end">
+                        <button className="btn btn-sm w-3/12 mr-2 bg-[var(--primary-btn)]">
+                          Save
+                        </button>
+                      </div>
+                    </div>
+                    <form method="dialog" className="modal-backdrop">
+                      <button>close</button>
+                    </form>
+                  </dialog>
                 </motion.div>
               </section>
             </>

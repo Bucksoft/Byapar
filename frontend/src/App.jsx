@@ -48,6 +48,8 @@ import DashboardSalesInvoicePage from "./pages/DashboardSalesInvoicePage";
 import DashboardQuotationInvoiceForm from "./pages/DashboardQuotationInvoiceForm";
 import DashboardProformaInvoicePage from "./pages/DashboardProformaInvoicePage";
 import DashboardSalesReturnInvoicePage from "./pages/DashboardSalesInvoicePage";
+import DashboardItemsBasicDetailPage from "./pages/Items/DashboardItemsBasicDetailPage";
+import DashboardItemsSidebar from "./pages/Items/DashboardItemsSidebar";
 
 function App() {
   const { user, setUser } = useAuthStore();
@@ -102,6 +104,11 @@ function App() {
           />
 
           <Route path="/dashboard/items" element={<DashboardItemsPage />} />
+          <Route
+            path="/dashboard/items/basic-details"
+            element={<DashboardItemsSidebar />}
+          />
+
           <Route path="/dashboard/godown" element={<DashboardGodownPage />} />
 
           <Route

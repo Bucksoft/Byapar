@@ -6,9 +6,9 @@ const DashboardLayout = () => {
   const [showSidebar, setShowSidebar] = useState(false);
 
   return (
-    <main className="flex max-h-screen w-full bg-zinc-100">
+    <main className="flex max-h-screen w-full bg-zinc-100 ">
       {/* Sidebar for large screens */}
-      <section className="hidden md:block w-1/5">
+      <section className="hidden md:block w-1/6">
         <Sidebar />
       </section>
 

@@ -22,7 +22,7 @@ const DashboardSalesPage = () => {
             <motion.div
               variants={dashboardLinksItems}
               key={details.id}
-              className={`border mt-5 rounded-md p-3 shadow-md border-${details.color} bg-${details.color}/10 hover:-translate-y-1 transition-all ease-in-out duration-200 cursor-pointer`}
+              className={`border mt-5 rounded-md p-3 shadow-md border-${details?.color} bg-${details?.color}/10 hover:-translate-y-1 transition-all ease-in-out duration-200 cursor-pointer`}
             >
               <p className={`flex items-center gap-3 text-${details.color}`}>
                 {details.icon} {details.label}
@@ -51,7 +51,7 @@ const DashboardSalesPage = () => {
           className="flex items-center justify-between mt-8 "
         >
           <div className="flex items-center gap-2">
-            <label className="input">
+            <label className="input input-sm">
               <Search size={16} className="text-zinc-400" />
               <input type="search" required placeholder="Search" />
             </label>

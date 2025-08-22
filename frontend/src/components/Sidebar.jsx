@@ -6,7 +6,7 @@ import {
   dashboardFields,
   settingLinks,
 } from "../lib/dashboardFields";
-import { NavLink, useNavigate } from "react-router-dom";
+import { Link, NavLink, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { TbLogout2 } from "react-icons/tb";
 import { useAuthStore } from "../store/authStore";
@@ -14,6 +14,7 @@ import { useMutation } from "@tanstack/react-query";
 import { axiosInstance } from "../config/axios";
 import CustomLoader from "./Loader";
 import toast from "react-hot-toast";
+import { useState } from "react";
 
 export const container = {
   hidden: { opacity: 0 },
@@ -39,6 +40,7 @@ export const dashboardLinksItems = {
 const Sidebar = () => {
   const navigate = useNavigate();
   const { user, setUser } = useAuthStore();
+  const [currentLink, setCurrentLink] = useState("");
   const handleChange = (e) => {
     const selectedLink = e.target.value;
     if (selectedLink) navigate(selectedLink);
@@ -53,9 +55,11 @@ const Sidebar = () => {
     },
   });
 
+  console.log(currentLink);
+
   return (
     <>
-      <section className="bg-[var(--sidebar-background)] text-white/70 shadow-md max-h-screen overflow-y-auto hide-scrollbar border border-zinc-200 relative ">
+      <section className="bg-[var(--sidebar-background)] text-white/70 shadow-md max-h-screen overflow-y-auto hide-scrollbar border border-zinc-200 relative">
         {/* nav */}
         <motion.h1
           initial={{
@@ -66,8 +70,7 @@ const Sidebar = () => {
             translateX: 0,
             filter: "blur(0)",
           }}
-          onScroll={() => console.log("Sad")}
-          className="sticky top-0 z-10 text-md text-white font-semibold flex items-center gap-3 w-full px-5 py-3 bg-info/10 backdrop-blur-md"
+          className="sticky top-0 z-10 text-md text-white font-semibold flex items-center gap-3 w-full px-5 py-3 bg-white/10 backdrop-blur-md"
         >
           <img
             src={ByaparLogo}
@@ -78,54 +81,22 @@ const Sidebar = () => {
         </motion.h1>
 
         {/* business details */}
-        <div className="flex gap-3 px-5 py-3 items-center">
-          <div className="avatar">
-            <div className="w-10 rounded">
+        <div className="flex flex-col gap-3 px-5 py-3 items-center border-b border-b-zinc-800">
+          <div className="avatar avatar-sm">
+            <div className="w-9 rounded-full">
               <img
                 src="https://img.daisyui.com/images/profile/demo/superperson@192.webp"
                 alt="Tailwind-CSS-Avatar-component"
               />
             </div>
           </div>
-          <span className="font-medium text-xs">
+          <p className="font-medium text-xs">
             {user?.email || "Business name"}
-          </span>
+          </p>
         </div>
 
-        {/* dropdown */}
-        <div className="dropdown dropdown-start w-full flex justify-center  border-b pb-3 border-zinc-800">
-          <motion.div
-            initial={{
-              filter: "blur(10px)",
-              scale: 0,
-            }}
-            animate={{
-              filter: "blur(0)",
-              scale: 1,
-            }}
-            tabIndex={0}
-            role="button"
-            className="btn btn-sm m-1 w-3/4 bg-[var(--primary-btn)] text-white border-none rounded-full shadow-sm  
-            transition-all ease-in-out duration-200 hover:h-10 shadow-info/60
-            "
-          >
-            <Plus size={16} /> Create
-          </motion.div>
-          <ul
-            tabIndex={0}
-            className="dropdown-content menu bg-base-200 text-black rounded-box z-1 w-52 p-2 shadow-sm"
-          >
-            <li>
-              <a>Item 1</a>
-            </li>
-            <li>
-              <a>Item 2</a>
-            </li>
-          </ul>
-        </div>
-
-        <div className="px-5 py-2 border-b border-zinc-800">
-          <label className="font-semibold text-xs text-[var(--primary-btn)]">
+        <div className="py-2 border-b border-zinc-800">
+          <label className="font-semibold pl-4 text-xs text-[var(--primary-btn)]">
             GENERAL
           </label>
           <motion.div
@@ -136,67 +107,89 @@ const Sidebar = () => {
           >
             {dashboardFields?.map((field, index) => (
               <motion.div key={index} variants={dashboardLinksItems}>
+                {/* Fields that have sublinks */}
                 {field.label === "Items" ||
                 field.label === "Sales" ||
                 field.label === "Purchases" ? (
-                  <div className="group flex items-center px-4 hover:text-[var(--primary-btn)] transition-all duration-200 ease-in-out">
-                    <span className="group-hover:-translate-x-2 transition-all duration-200 ease-in-out">
-                      {field.icon}
-                    </span>
-                    <select
-                      name={field.label}
-                      onChange={handleChange}
-                      defaultValue="" // ensures first option is shown initially
-                      className="group-hover:translate-x-2 px-4 text-xs py-2 cursor-pointer outline-none w-full transition-all duration-200 ease-in-out"
+                  <div className="group flex flex-col items-start transition-all duration-200 ease-in-out">
+                    {/* Parent link */}
+                    <NavLink
+                      to={`/dashboard/${field.label.toLowerCase()}`}
+                      onClick={() => setCurrentLink(field?.label)}
+                      className={({ isActive }) =>
+                        `flex items-center gap-6 text-xs font-medium cursor-pointer py-2 pl-[13.5px] w-full transition-all duration-200 ease-in-out
+                ${
+                  isActive
+                    ? "bg-[var(--primary-btn)]/10 text-[var(--primary-btn)] border-l-2 scale-105"
+                    : "hover:text-[var(--primary-btn)] "
+                }`
+                      }
                     >
-                      {/* Disabled visible placeholder */}
-                      <option disabled>{field.label}</option>
+                      <span className="transition-all duration-200 group-hover:-translate-x-2">
+                        {field.icon}
+                      </span>
+                      {field.label}
+                    </NavLink>
 
-                      {field.subLinks.map((sublink) => (
-                        <option
-                          value={sublink.link}
-                          key={sublink.id}
-                          className="text-black"
-                        >
-                          {sublink.label}
-                        </option>
-                      ))}
-                    </select>
+                    {/* Sublinks */}
+                    {currentLink === field.label && (
+                      <div
+                        name={field.label}
+                        className="bg-white/10 rounded-lg overflow-hidden text-xs cursor-pointer outline-none w-[80%] mb-2 ml-7 z-10 transition-all duration-200 ease-in-out"
+                      >
+                        {field.subLinks?.map((sublink) => (
+                          <NavLink
+                            key={sublink.id}
+                            to={sublink.link}
+                            className={({ isActive }) =>
+                              `block p-2 rounded-md transition-all duration-200 ease-in-out 
+                      ${
+                        isActive
+                          ? "bg-[var(--primary-btn)]/20 text-[var(--primary-btn)] font-semibold"
+                          : "text-white hover:bg-white/20"
+                      }`
+                            }
+                          >
+                            {sublink.label}
+                          </NavLink>
+                        ))}
+                      </div>
+                    )}
                   </div>
                 ) : (
-                  <>
-                    <NavLink
-                      end
-                      to={
-                        field.label.toLowerCase() === "dashboard"
-                          ? "/dashboard"
-                          : `/dashboard/${field.label
-                              .toLowerCase()
-                              .replace(/\s+/g, "-")}`
-                      }
-                      className={({ isActive }) =>
-                        `group px-4 flex items-center gap-5 text-xs py-2 cursor-pointer transition-all ease-in-out duration-150 
-                  ${
-                    isActive
-                      ? "bg-[var(--primary-btn)]/10 text-[var(--primary-btn)] scale-105 border-l-2"
-                      : "hover:bg-[var(--primary-btn)]/0 hover:text-[var(--primary-btn)] hover:scale-105"
-                  }`
-                      }
-                    >
-                      {field?.icon}
-                      <span className="group-hover:translate-x-2 transition-all ease-in-out duration-200">
-                        {field.label}
-                      </span>
-                    </NavLink>
-                  </>
+                  // Normal fields without sublinks
+                  <NavLink
+                    onClick={() => setCurrentLink("")}
+                    end
+                    to={
+                      field.label.toLowerCase() === "dashboard"
+                        ? "/dashboard"
+                        : `/dashboard/${field.label
+                            .toLowerCase()
+                            .replace(/\s+/g, "-")}`
+                    }
+                    className={({ isActive }) =>
+                      `group px-4 flex items-center gap-5 text-xs py-2 cursor-pointer transition-all ease-in-out duration-150 
+              ${
+                isActive
+                  ? "bg-[var(--primary-btn)]/10 text-[var(--primary-btn)] scale-105 border-l-2"
+                  : "hover:text-[var(--primary-btn)] hover:scale-105 "
+              }`
+                    }
+                  >
+                    {field?.icon}
+                    <span className="group-hover:translate-x-2 transition-all ease-in-out duration-200">
+                      {field.label}
+                    </span>
+                  </NavLink>
                 )}
               </motion.div>
             ))}
           </motion.div>
         </div>
 
-        <div className="px-5 py-2 border-b border-zinc-800">
-          <label className="font-semibold text-xs text-[var(--primary-btn)]">
+        <div className=" py-2 border-b border-zinc-800">
+          <label className="pl-4 font-semibold text-xs text-[var(--primary-btn)]">
             ACCOUNTING SOLUTIONS
           </label>
           <motion.div
@@ -228,8 +221,9 @@ const Sidebar = () => {
             ))}
           </motion.div>
         </div>
-        <div className="px-5 py-2 border-b border-zinc-800">
-          <label className="font-semibold text-xs text-[var(--primary-btn)]">
+
+        <div className=" py-2 border-b border-zinc-800">
+          <label className=" pl-4 font-semibold text-xs text-[var(--primary-btn)]">
             SETTINGS
           </label>
           <motion.div
@@ -262,8 +256,8 @@ const Sidebar = () => {
           </motion.div>
         </div>
 
-        <div className="px-5 py-2 pb-8 border-b border-zinc-800">
-          <label className="font-semibold text-xs text-[var(--primary-btn)]">
+        <div className="py-2 pb-8 border-b border-zinc-800">
+          <label className=" pl-4 font-semibold text-xs text-[var(--primary-btn)]">
             BUSINESS TOOLS
           </label>
           <motion.div
@@ -298,18 +292,20 @@ const Sidebar = () => {
 
         <button
           onClick={() => mutation.mutate()}
-          className="hover:bg-slate-800 fixed bottom-0 transition-all ease-in-out duration-700 hover:text-white group px-5 py-3 flex items-center gap-3 bg-[var(--primary-btn)] text-white w-1/5  cursor-pointer"
+          className="fixed bottom-0 w-1/6 flex items-center justify-center p-2 "
         >
-          {mutation.isPending ? (
-            <>
-              <CustomLoader text={"Logging out...."} />
-            </>
-          ) : (
-            <>
-              <TbLogout2 className="group-hover:rotate-90 transition-all ease-in-out duration-200 group-hover:scale-120" />
-              Logout
-            </>
-          )}
+          <div className="flex items-center gap-3 justify-center bg-info px-5 py-2 rounded-md backdrop-blur-md w-[99%]">
+            {mutation.isPending ? (
+              <>
+                <CustomLoader text={"Logging out...."} />
+              </>
+            ) : (
+              <>
+                <TbLogout2 className="group-hover:rotate-90 transition-all ease-in-out duration-200 group-hover:scale-120" />
+                Logout
+              </>
+            )}
+          </div>
         </button>
       </section>
     </>

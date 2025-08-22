@@ -8,10 +8,9 @@ import { dashboardItemsCardDetails } from "../lib/dashboardItemCards";
 import { motion } from "framer-motion";
 import { container, dashboardLinksItems } from "../components/Sidebar";
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 const DashboardItemsPage = () => {
-  const [menu, setMenu] = useState("");
   const navigate = useNavigate();
   return (
     <main className="h-full p-2">
@@ -66,15 +65,18 @@ const DashboardItemsPage = () => {
               <Search size={16} className="text-zinc-400" />
               <input type="search" required placeholder="Search" />
             </label>
-            <button className="btn btn-ghost ">
+            <button className="btn btn-ghost btn-sm ">
               <LuPackageSearch className="flex items-center" /> Show Low Stock
             </button>
           </div>
 
           <div>
-            <button className="btn btn-sm bg-[var(--primary-btn)]">
+            <Link
+              to={"/dashboard/items/basic-details"}
+              className="btn btn-sm bg-[var(--primary-btn)]"
+            >
               <Plus size={14} /> Create Item
-            </button>
+            </Link>
           </div>
         </motion.div>
 

@@ -1,12 +1,10 @@
 import { IoSettingsOutline } from "react-icons/io5";
-import { TbReportSearch } from "react-icons/tb";
 import { motion } from "framer-motion";
 import { useNavigate } from "react-router-dom";
 import { useState } from "react";
 
 const DashboardNavbar = ({ title, isReport }) => {
   const navigate = useNavigate();
-  const [selectedLink, setSelectedLink] = useState("");
   const handleChange = (e) => {
     const link = e.target.value;
     navigate(
@@ -42,20 +40,18 @@ const DashboardNavbar = ({ title, isReport }) => {
       <div className="flex gap-5 items-center ">
         <div className="">
           {isReport && (
-            <select
-              value={selectedLink}
-              onChange={handleChange}
-              className="select select-sm"
-            >
-              <option disabled={true} className="hidden">
-                Reports
-              </option>
+            <select onChange={handleChange} className="select select-sm">
               {title === "Items" && (
                 <>
-                  <option>Rate List</option>
-                  <option>Stock Summary</option>
-                  <option>Low Stock Summary</option>
-                  <option>Item Sales Summary</option>
+                  <option value={"Rate List"} className="hidden">
+                    Rate List
+                  </option>
+                  <option value={"Rate List"}>Rate List</option>
+                  <option value={"Stock Summary"}>Stock Summary</option>
+                  <option value={"Low Stock Summary"}>Low Stock Summary</option>
+                  <option value={"Item Sales Summary"}>
+                    Item Sales Summary
+                  </option>
                 </>
               )}
             </select>

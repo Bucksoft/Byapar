@@ -73,7 +73,7 @@ const InvoicesForm = ({ title }) => {
             <div>
               <p className="text-xs pb-2 ">Sales Invoice Date: </p>
               <input
-                type="date"
+                type="date" 
                 placeholder=""
                 className="input input-xs border-none bg-zinc-200 w-30"
               />

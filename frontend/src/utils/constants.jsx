@@ -86,27 +86,27 @@ export const cardDetails = [
 export const newItemsSidebarDetails = [
   {
     id: 1,
-    icon: <FileBox />,
+    icon: <FileBox size={18} />,
     title: "Basic Details",
   },
   {
     id: 2,
-    icon: <PackageCheck />,
+    icon: <PackageCheck size={18} />,
     title: "Stock Details",
   },
   {
     id: 3,
-    icon: <ReceiptIndianRupee />,
+    icon: <ReceiptIndianRupee size={18} />,
     title: "Pricing Details",
   },
   {
     id: 4,
-    icon: <ReceiptIndianRupee />,
+    icon: <ReceiptIndianRupee size={18} />,
     title: "Party Wise Prices",
   },
   {
     id: 5,
-    icon: <StretchHorizontal />,
+    icon: <StretchHorizontal size={18} />,
     title: "Custom Fields",
   },
 ];

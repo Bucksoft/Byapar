@@ -34,6 +34,6 @@ app.use("/api/v1/payment-in", paymentInRoutes);
 app.listen(PORT, () => {
   connectDB();
   console.log(
-    `Server is running on port : https://srv624601.hstgr.cloud/Bharat-Chatbot-backend:${PORT}`
+    `Server is running on port :${PORT} ✅`
   );
 });

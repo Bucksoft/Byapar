@@ -5,7 +5,8 @@ import { badges } from "../utils/constants";
 import { useSearchParams } from "react-router-dom";
 import DashboardStockValuePage from "./DashboardStockValuePage";
 import DashboardLowStockPage from "./DashboardLowStockPage";
-import DashboardItemsSalesSummary from "./DashboardItemsSalesSummary";
+import DashboardItemsSalesAndPurchaseSummary from "./DashboardItemsSalesAndPurchaseSummary";
+import DashboardRateListPage from "./DashboardRateListPage";
 
 const DashboardReportPage = () => {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -17,7 +18,9 @@ const DashboardReportPage = () => {
       ) : param === "Low Stock" ? (
         <DashboardLowStockPage />
       ) : param === "Item Sales Summary" ? (
-        <DashboardItemsSalesSummary />
+        <DashboardItemsSalesAndPurchaseSummary />
+      ) : param === "Rate List" ? (
+        <DashboardRateListPage />
       ) : (
         <main className="h-full p-2">
           <div className="h-full w-full bg-white rounded-lg p-3">
