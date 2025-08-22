@@ -197,7 +197,6 @@ export const bankAccountSchema = z.object({
     .optional(),
 });
 
-
 export const paymentInSchema = z.object({
   partyName: z
     .string()
@@ -229,4 +228,46 @@ export const paymentInSchema = z.object({
     .min(10, "Notes must be at least 10 characters long")
     .max(100, "Notes must be at most 100 characters long")
     .optional(),
+});
+
+export const itemSchema = z.object({
+  itemType: z.enum(["product", "service"]).default("product"),
+
+  category: z.string().min(1, "Category is required"),
+
+  itemName: z.string().min(1, "Item name is required"),
+
+  showItemInOnlineStore: z.boolean().default(false),
+
+  salesPriceType: z.enum(["with tax", "without tax"]).default("with tax"),
+
+  salesPrice: z
+    .number({
+      required_error: "Sales price is required",
+      invalid_type_error: "Sales price must be a number",
+    })
+    .nonnegative("Sales price cannot be negative"),
+
+  gstTaxRate: z.string().min(1, "GST tax rate is required"),
+
+  measuringUnit: z.string().min(1, "Measuring unit is required"),
+
+  openingStock: z
+    .number({
+      required_error: "Opening stock is required",
+      invalid_type_error: "Opening stock must be a number",
+    })
+    .nonnegative("Opening stock cannot be negative"),
+
+  itemCode: z.string().min(1, "Item code is required"),
+
+  HSNCode: z.string().min(1, "HSN Code is required"),
+
+  asOfDate: z
+    .union([z.string().datetime(), z.date()])
+    .default(() => new Date()),
+
+  description: z.string().optional(),
+
+  fileURLs: z.array(z.string().url("Each file URL must be valid")).optional(),
 });

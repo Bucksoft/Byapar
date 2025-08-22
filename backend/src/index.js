@@ -6,6 +6,7 @@ import userRoutes from "./routes/user.routes.js";
 import partyRoutes from "./routes/party.routes.js";
 import businessRoutes from "./routes/business.routes.js";
 import paymentInRoutes from "./routes/paymentIn.routes.js";
+import itemRoutes from "./routes/item.route.js";
 import { loginViaGoogleCallback } from "./controllers/user.controller.js";
 import cookieParser from "cookie-parser";
 
@@ -29,11 +30,10 @@ app.use("/api/v1/business", businessRoutes);
 app.use("/api/v1/user", userRoutes);
 app.use("/auth/google/callback", loginViaGoogleCallback);
 app.use("/api/v1/parties", partyRoutes);
+app.use("/api/v1/item", itemRoutes);
 app.use("/api/v1/payment-in", paymentInRoutes);
 
 app.listen(PORT, () => {
   connectDB();
-  console.log(
-    `Server is running on port :${PORT} ✅`
-  );
+  console.log(`Server is running on port :${PORT} ✅`);
 });
