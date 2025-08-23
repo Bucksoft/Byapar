@@ -8,6 +8,7 @@ body {
 
 :root {
   --primary-btn: rgb(0, 186, 254);
+  --primary-border: #d1d5dc;
   --secondary-btn: rgb(0, 211, 144);
   --primary-text-color: rgb(255, 255, 255);
   --secondary-text-color: rgb(0, 186, 254);

@@ -19,7 +19,7 @@ const DashboardManageUsersPage = () => {
         <div className="flex flex-col w-full h-screen p-4">
           <div className="flex items-center justify-between ">
             <p className="text-lg">Manage Users</p>
-            <p className="p-2 border border-gray-300">
+            <p className="p-2 border border-[var(--primary-border)]">
               <AiOutlineQuestionCircle size={15} />
             </p>
           </div>
@@ -40,7 +40,7 @@ const DashboardManageUsersPage = () => {
               onClick={() => setMenu("users")}
               className={`  ${
                 menu === "users" ? "border border-info/20 bg-info/5" : ""
-              } border flex flex-col gap-2 p-3 border-gray-300 w-1/3 cursor-pointer rounded-lg hover:bg-[#F1F0FC] hover:border-indigo-700 `}
+              } border flex flex-col gap-2 p-3 border-[var(--primary-border)] w-1/3 cursor-pointer rounded-lg hover:bg-[#F1F0FC] hover:border-indigo-700 `}
             >
               <div
                 className={"text-xs  flex gap-2  items-center text-green-700 "}
@@ -67,7 +67,7 @@ const DashboardManageUsersPage = () => {
               onClick={() => setMenu("activites")}
               className={`  ${
                 menu === "activites" ? "border border-info/20 bg-info/5" : ""
-              } border flex flex-col p-3 gap-2 cursor-pointer border-gray-300 w-1/3 rounded-lg hover:bg-[#F1F0FC] hover:border-indigo-700 `}
+              } border flex flex-col p-3 gap-2 cursor-pointer border-[var(--primary-border)] w-1/3 rounded-lg hover:bg-[#F1F0FC] hover:border-indigo-700 `}
             >
               <div
                 className={`  text-xs flex gap-2  items-center text-info   `}
@@ -282,7 +282,7 @@ const DashboardManageUsersPage = () => {
                     ease: "easeInOut",
                     delay: 0.3,
                   }}
-                  className="border border-gray-300 rounded"
+                  className="border border-[var(--primary-border)] rounded"
                 >
                   <div className="overflow-x-auto rounded-box border border-base-content/5 bg-base-100">
                     <table className="table">
@@ -324,7 +324,7 @@ const DashboardManageUsersPage = () => {
                       ease: "easeInOut",
                       duration: 0.3,
                     }}
-                    className="border border-gray-300 flex items-center justify-between rounded px-3 bg-[#E3E9ED]"
+                    className="border border-[var(--primary-border)] flex items-center justify-between rounded px-3 bg-[#E3E9ED]"
                   >
                     <div className="flex items-center gap-3">
                       <img

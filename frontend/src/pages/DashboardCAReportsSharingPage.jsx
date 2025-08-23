@@ -63,7 +63,7 @@ const DashboardCAReportsSharingPage = () => {
           }}
           className="w-full px-2 py-5 flex"
         >
-          <div className=" flex border rounded w-full border-gray-300">
+          <div className=" flex border rounded w-full border-[var(--primary-border)]">
             <div className="  w-100  p-4  ">
               <p className="text-md font-normal">Enable Sharing</p>
               <p className="text-xs text-gray-500">

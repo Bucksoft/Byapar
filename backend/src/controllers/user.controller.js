@@ -29,6 +29,13 @@ export async function login(req, res) {
         .json({ status: "Failed", err: "Invalid email address", errors });
     }
 
+    // check if user already exists
+
+
+
+
+
+
     // login logic
     // 1. generate OTP - 6 digits
     const otp = crypto.randomInt(100000, 1000000).toString();

@@ -2,7 +2,7 @@ import { RxCross2 } from "react-icons/rx";
 
 const SettingPricingCard = ({ plan }) => {
   return (
-    <div className="border-gray-300 rounded-md ">
+    <div className="border-[var(--primary-border)] rounded-md ">
       <div className=" rounded-md overflow-hidden ">
         <div
           className={`border-3 ${

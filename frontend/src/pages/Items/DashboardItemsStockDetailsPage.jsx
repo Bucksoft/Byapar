@@ -6,6 +6,7 @@ import {
   Search,
   UploadCloud,
 } from "lucide-react";
+import { uomList } from "../../utils/constants";
 
 const DashboardItemsStockDetailsPage = () => {
   return (
@@ -15,7 +16,7 @@ const DashboardItemsStockDetailsPage = () => {
         <div>
           <div className=" flex flex-col">
             <span className="text-xs text-gray-600">Item Code</span>
-            <div className=" flex items-center h-8 border border-gray-300 rounded-xs w-full">
+            <div className=" flex items-center h-8 border border-[var(--primary-border)] rounded-xs w-full">
               <input
                 type="text"
                 placeholder="eg: ITEM 45652"
@@ -43,34 +44,36 @@ const DashboardItemsStockDetailsPage = () => {
 
           <div className="flex flex-col mt-8">
             <span className="text-xs text-gray-600">Measuring Unit</span>
-            <div className="flex items-center h-8 border border-gray-300 rounded-xs">
+            <div className="flex items-center h-8 border border-[var(--primary-border)] rounded-xs">
               <Search size={16} className="w-10 text-gray-600" />
+
               <input
                 type="text"
                 placeholder="Select Pieces (PCS)"
                 className="w-full text-xs text-gray-600 outline-none"
+                readOnly
               />
-              <div className="dropdown dropdown-center w-5 mr-5">
+
+              <div className="dropdown dropdown-end w-5 mr-5">
                 <div
                   tabIndex={0}
                   role="button"
-                  className="text-xs text-gray-600 font-medium flex items-center justify-between"
+                  className="text-xs text-gray-600 font-medium flex items-center justify-between cursor-pointer"
                 >
-                  <ChevronDown size={20} className=" text-gray-600" />
+                  <ChevronDown size={20} className="text-gray-600" />
                 </div>
+
                 <ul
                   tabIndex={0}
-                  className="dropdown-content menu bg-base-100 rounded-box z-1 w-52 p-2 shadow-xs className='w-5 text-gray-600'"
+                  className="dropdown-content bg-base-100 rounded-box shadow-md w-52 max-h-40 overflow-y-auto mt-2 text-gray-600 flex flex-col space-y-1 p-2"
                 >
-                  <li>
-                    <a>All Expenses Categories</a>
-                  </li>
-                  <li>
-                    <a>Bank Fee & Charges</a>
-                  </li>
-                  <li>
-                    <a>Raw Material</a>
-                  </li>
+                  {uomList.map((unit, index) => (
+                    <li key={index} className="w-full">
+                      <button className="w-full text-left text-xs px-2 py-1 hover:bg-gray-100 rounded">
+                        {unit?.label} ({unit?.code})
+                      </button>
+                    </li>
+                  ))}
                 </ul>
               </div>
             </div>
@@ -87,7 +90,7 @@ const DashboardItemsStockDetailsPage = () => {
               <input
                 type="text"
                 placeholder="eg: 150 PCS"
-                className="px-2 w-full border border-gray-300 rounded-xs h-8 text-xs text-gray-600"
+                className="px-2 w-full border border-[var(--primary-border)] rounded-xs h-8 text-xs text-gray-600"
               />
             </div>
           </div>
@@ -108,7 +111,7 @@ const DashboardItemsStockDetailsPage = () => {
               <input
                 type="text"
                 placeholder="eg: 85214"
-                className="px-2 w-full border border-gray-300 rounded-xs h-8 text-xs text-gray-600"
+                className="px-2 w-full border border-[var(--primary-border)] rounded-xs h-8 text-xs text-gray-600"
               />
               <p className="text-xs text-info mt-1">Find HSN Code</p>
             </div>
@@ -119,7 +122,7 @@ const DashboardItemsStockDetailsPage = () => {
             <div
               tabIndex={0}
               role="button"
-              className="flex items-center justify-between border-gray-300 border rounded-xs  h-8 text-xs font-medium"
+              className="flex items-center justify-between border-[var(--primary-border)] border rounded-xs  h-8 text-xs font-medium"
             >
               <div className="flex items-center gap-2">
                 <Calendar size={16} className="text-zinc-300 ml-5" />
@@ -154,11 +157,11 @@ const DashboardItemsStockDetailsPage = () => {
         <textarea
           name=""
           id=""
-          className="w-full rounded-md border-gray-300 border h-18"
+          className="w-full rounded-md border-[var(--primary-border)] border h-18"
         ></textarea>
       </div>
 
-      <div className="border border-dashed border-gray-300 rounded-md flex items-center h-20 mt-2">
+      <div className="border border-dashed border-[var(--primary-border)] rounded-md flex items-center h-20 mt-2">
         <UploadCloud size={30} className="text-gray-600 mx-10" />
         <div>
           <p className="text-xs text-gray-600">

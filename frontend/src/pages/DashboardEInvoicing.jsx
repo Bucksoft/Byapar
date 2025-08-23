@@ -42,12 +42,12 @@ const DashboardEInvoicing = () => {
               ease: "easeInOut",
               duration: 0.3,
             }}
-            className=" border-gray-300  flex items-center justify-between  p-2  "
+            className=" border-[var(--primary-border)]  flex items-center justify-between  p-2  "
           >
             <div className="flex justify-between items-center mr-16 space-x-5">
               <div className="font-semibold text-lg pl-2">E-Invoicing</div>
 
-              <button className="btn btn-outline bg-[var(--primary-btn)] btn-sm">
+              <button className="btn btn-dash btn-info btn-sm">
                 What is e-Invoicing
               </button>
             </div>

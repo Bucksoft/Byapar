@@ -55,7 +55,7 @@ const DashboardReferAndEarnPage = () => {
           }}
           className="px-6"
         >
-          <div className="flex border bg-gradient-to-r from-[#020211] to-[#6E1A66] shadow rounded-2xl border-gray-300 ">
+          <div className="flex border bg-gradient-to-r from-[#020211] to-[#6E1A66] shadow rounded-2xl border-[var(--primary-border)] ">
             <div className=" w-full p-2 px-4 flex-col">
               <div className="flex gap-2">
                 <p className="text-2xl text-yellow-500 font-bold">Earn ₹501</p>
@@ -125,7 +125,7 @@ const DashboardReferAndEarnPage = () => {
                 transition={{
                   ease: "easeInOut",
                 }}
-                className="border rounded border-gray-300 shadow bg-white w-1/2"
+                className="border rounded border-[var(--primary-border)] shadow bg-white w-1/2"
               >
                 <div className="flex p-3 flex-col bg-[var(--primary-btn)]/10">
                   <p className="text-sm flex items-center gap-2 text-blue-600">
@@ -151,7 +151,7 @@ const DashboardReferAndEarnPage = () => {
                   ease: "easeInOut",
                   delay: 0.3,
                 }}
-                className="border rounded border-gray-300 shadow bg-white w-1/2"
+                className="border rounded border-[var(--primary-border)] shadow bg-white w-1/2"
               >
                 <div className="flex p-3 flex-col bg-success/20">
                   <p className="text-sm flex items-center gap-2 text-green-600">
@@ -167,11 +167,12 @@ const DashboardReferAndEarnPage = () => {
             </div>
 
             {/* Refer Now Section */}
-            <div className="flex items-center w-full border-b  border-gray-300">
+            <div className="flex items-center w-full border-b  border-[var(--primary-border)]">
               <button
                 onClick={() => setMenu("signed_up")}
                 className={`text-base cursor-pointer gap-2 ${
-                  menu === "signed_up" && "bg-[var(--primary-btn)]/10 text-[var(--primary-btn)]"
+                  menu === "signed_up" &&
+                  "bg-[var(--primary-btn)]/10 text-[var(--primary-btn)]"
                 } flex items-center px-5 font-semibold p-2 mr-2`}
               >
                 <HiOutlineUser />
@@ -245,7 +246,7 @@ const DashboardReferAndEarnPage = () => {
         {/* Footer Section */}
         <section>
           <div className=" grid grid-cols-3 py-8">
-            <div className="flex flex-col ml-6 bg-gradient-to-b from-zinc-200 to-zinc-100 border  border-gray-300 shadow rounded-2xl  items-center justify-center py-8">
+            <div className="flex flex-col ml-6 bg-gradient-to-b from-zinc-200 to-zinc-100 border  border-[var(--primary-border)] shadow rounded-2xl  items-center justify-center py-8">
               <p className="text-blue-600 mb-4 font-bold">
                 <RiShareLine size={30} />
               </p>
@@ -253,7 +254,7 @@ const DashboardReferAndEarnPage = () => {
               <p className="text-base">friends</p>
             </div>
 
-            <div className="flex flex-col ml-6 border bg-gradient-to-b from-zinc-200 to-zinc-100 border-gray-300 shadow rounded-2xl  items-center justify-center py-8">
+            <div className="flex flex-col ml-6 border bg-gradient-to-b from-zinc-200 to-zinc-100 border-[var(--primary-border)] shadow rounded-2xl  items-center justify-center py-8">
               <p className="text-green-600 mb-4 font-bold">
                 <FiDownload size={30} />
               </p>
@@ -263,7 +264,7 @@ const DashboardReferAndEarnPage = () => {
               <p className="text-base">subscribe the plan</p>
             </div>
 
-            <div className="flex flex-col ml-6 border bg-gradient-to-b from-zinc-200 to-zinc-100 border-gray-300 shadow rounded-2xl  items-center justify-center mr-6 py-10">
+            <div className="flex flex-col ml-6 border bg-gradient-to-b from-zinc-200 to-zinc-100 border-[var(--primary-border)] shadow rounded-2xl  items-center justify-center mr-6 py-10">
               <p className="text-yellow-500 mb-4 font-bold">
                 <IoGiftSharp size={30} />
               </p>
@@ -288,11 +289,11 @@ const DashboardReferAndEarnPage = () => {
                 <RxCross2 />
               </button>
             </div>
-            <div className="flex  flex-col border-b border-gray-300 items-center justify-between p-4 gap-2">
+            <div className="flex  flex-col border-b border-[var(--primary-border)] items-center justify-between p-4 gap-2">
               <input
                 type="text "
                 placeholder=" Search Party Name / Phone Number"
-                className="w-110 text-sm font-semibold text-gray-600 border rounded   hover:border-blue-500 border-gray-300 p-2 "
+                className="w-110 text-sm font-semibold text-gray-600 border rounded   hover:border-blue-500 border-[var(--primary-border)] p-2 "
               />
               <div className="flex gap-3 justify-between items-center">
                 <button className="text-sm flex items-center text-shadow-sky-500 gap-2 border border-blue-300 hover:bg-cyan-400 hover:border-blue-500 bg-blue-300 font-semibold rounded p-2">

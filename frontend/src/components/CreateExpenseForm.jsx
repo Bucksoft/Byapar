@@ -222,7 +222,7 @@ const CreateExpenseForm = ({ setOpenCreateExpense }) => {
           </div>
           {/* bottom section */}
           {checked !== undefined && (
-            <div className="border-b border-gray-300 p-2">
+            <div className="border-b border-[var(--primary-border)] p-2">
               <button
                 className={`${
                   checked ? "w-full" : "w-200"
@@ -273,7 +273,7 @@ const CreateExpenseForm = ({ setOpenCreateExpense }) => {
               <div className="p-3">
                 <span>Total Expense Amount</span>
               </div>
-              <div className="border border-gray-300 w-60 rounded-md h-7 flex items-center justify-between bg-[#E9ECF1]">
+              <div className="border border-[var(--primary-border)] w-60 rounded-md h-7 flex items-center justify-between bg-[#E9ECF1]">
                 <div className="bg-gray-50 w-full h-full rounded-tl-md rounded-bl-md flex items-center justify-center text-zinc-500">
                   <IndianRupee size={11} />
                 </div>

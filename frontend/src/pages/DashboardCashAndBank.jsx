@@ -11,7 +11,7 @@ import { motion } from "framer-motion";
 const DashboardCashAndBank = () => {
   return (
     <main className="p-2">
-      <div className="max-h-screen w-full bg-white roundes  ">
+      <div className="max-h-screen w-full bg-white ">
         <motion.header
           initial={{
             translateY: -100,
@@ -25,16 +25,16 @@ const DashboardCashAndBank = () => {
             ease: "easeInOut",
             duration: 0.3,
           }}
-          className="py-4   w-full bg-white  mb-2"
+          className="py-4 w-full bg-white mb-2"
         >
           <div className="w-full flex items-center justify-between px-5">
             <h1 className="text-xl font-semibold">Cash and Bank</h1>
             <div className="flex items-center justify-between gap-2">
-              <button className="flex border border-gray-300 hover gap-2 px-4 py-2 btn btn-sm  rounded text-sm">
+              <button className="flex border font-normal border-[var(--primary-border)] hover gap-2 px-4 py-2 btn btn-sm  rounded text-sm">
                 <FaPlusMinus />
                 Add/reduce Money
               </button>
-              <button className="flex border border-gray-300 gap-2 btn btn-sm px-4 py-2 rounded text-sm">
+              <button className="flex font-normal border border-[var(--primary-border)] gap-2 btn btn-sm px-4 py-2 rounded text-sm">
                 <FaArrowRightArrowLeft />
                 Transfer Money
               </button>
@@ -69,16 +69,16 @@ const DashboardCashAndBank = () => {
                 <FaIndianRupeeSign /> 0
               </p>
             </div>
-            <div className="h-10 flex bg-purple-50 items-center border-l border-b border-gray-300  justify-between p-4">
+            <div className="h-10 flex bg-purple-50 items-center border-l border-b border-[var(--primary-border)]  justify-between p-4">
               <p className="text-sm text-gray-500 font-semibold">Cash</p>
             </div>
-            <div className="h-23 flex bg-white items-center border-l border-b border-gray-300 justify-between p-4">
+            <div className="h-23 flex bg-white items-center border-l border-b border-[var(--primary-border)] justify-between p-4">
               <p className="text-sm">Cash in hand</p>
               <p className="flex items-center font-medium">
                 <FaIndianRupeeSign /> 0
               </p>
             </div>
-            <div className="h-10 flex bg-white items-center border-l border-b border-gray-300 justify-between p-4">
+            <div className="h-10 flex bg-white items-center border-l border-b border-[var(--primary-border)] justify-between p-4">
               <p className="text-sm text-gray-500 font-semibold">
                 Bank Accounts
               </p>
@@ -100,8 +100,8 @@ const DashboardCashAndBank = () => {
 
           {/* right body */}
           <div className=" w-3/4 bg-white ">
-            <div className="flex bg-white py-4 items-center justify-between border border-gray-300 h-16 w-full">
-              <div className=" flex bg-purple-100 items-center h-16 p-4 justify-between border-r border-t border-b border-gray-300">
+            <div className="flex bg-white py-4 items-center justify-between border border-[var(--primary-border)] h-16 w-full">
+              <div className=" flex bg-purple-100 items-center h-16 p-4 justify-between border-r border-t border-b border-[var(--primary-border)]">
                 <motion.p
                   initial={{
                     translateX: -100,
@@ -136,7 +136,7 @@ const DashboardCashAndBank = () => {
                 ease: "easeInOut",
                 duration: 0.3,
               }}
-              className="flex boredr border-gray-300 px-4 py-2 "
+              className="flex boredr border-[var(--primary-border)] px-4 py-2 "
             >
               <div className="dropdown w-full ">
                 <div
@@ -177,7 +177,7 @@ const DashboardCashAndBank = () => {
                   </li>
                 </ul>
               </div>
-              <button className="border border-gray-300  p-1  flex justify-center hover:bg-zinc-200 cursor-pointer rounded-lg text-zinc-500 items-center">
+              <button className="border border-[var(--primary-border)]  p-1  flex justify-center hover:bg-zinc-200 cursor-pointer rounded-lg text-zinc-500 items-center">
                 <MdOutlineFileDownload size={25} />
               </button>
             </motion.div>

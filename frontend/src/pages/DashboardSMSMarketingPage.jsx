@@ -25,7 +25,7 @@ const DashboardSMSMarketingPage = () => {
           ease: "easeInOut",
           duration: 0.3,
         }}
-        className="flex items-center justify-between p-4 bg-white border-b border-gray-300"
+        className="flex items-center justify-between p-4 bg-white border-b border-[var(--primary-border)]"
       >
         <p className="">SMS Marketing</p>
         <div className="text-sm flex items-center gap-2">
@@ -36,7 +36,9 @@ const DashboardSMSMarketingPage = () => {
           <div className="text-sm ">
             <MdKeyboard size={30} />
           </div>
-          <button className="btn bg-[var(--primary-btn)] btn-sm">Creat Campaign</button>
+          <button className="btn bg-[var(--primary-btn)] btn-sm">
+            Creat Campaign
+          </button>
         </div>
       </motion.header>
 
@@ -148,7 +150,7 @@ const DashboardSMSMarketingPage = () => {
           transition={{
             ease: "easeInOut",
             duration: 0.3,
-            delay:0.3
+            delay: 0.3,
           }}
           className="flex flex-col bg-gradient-to-r from-orange-400 to-red-600 mt-3 rounded items-center justify-between"
         >
@@ -162,9 +164,7 @@ const DashboardSMSMarketingPage = () => {
                 business grow
               </p>
 
-              <button className="btn btn-sm mt-2 w-1/4">
-                Select Template
-              </button>
+              <button className="btn btn-sm mt-2 w-1/4">Select Template</button>
             </div>
 
             <img src={discount} alt="src/assets/discount" className=" w-42" />

@@ -15,18 +15,19 @@ const DashboardStaffPage = () => {
           {/* Title */}
           <motion.p
             initial={{
-              translateY:-100,
-              opacity:0
+              translateY: -100,
+              opacity: 0,
             }}
             animate={{
-              translateY:0,
-              opacity:1
+              translateY: 0,
+              opacity: 1,
             }}
             transition={{
-              ease:'easeInOut',
-              duration:0.3
+              ease: "easeInOut",
+              duration: 0.3,
             }}
-          className="text-lg mb-4 border-b border-zinc-300 pb-2">
+            className="text-lg mb-4 border-b border-zinc-300 pb-2"
+          >
             Staff Attendance & Payroll
           </motion.p>
 
@@ -55,7 +56,7 @@ const DashboardStaffPage = () => {
                   className="w-full max-w-[150px] object-contain"
                 />
               </div>
-              <p className="text-center text-sm border-t border-gray-300 p-3">
+              <p className="text-center text-sm border-t border-[var(--primary-border)] p-3">
                 Mark your staff's attendance digitally
               </p>
             </motion.div>
@@ -84,7 +85,7 @@ const DashboardStaffPage = () => {
                   className="w-full max-w-[150px] object-contain"
                 />
               </div>
-              <p className="text-center text-sm border-t border-gray-300 p-3">
+              <p className="text-center text-sm border-t border-[var(--primary-border)] p-3">
                 Simplify payroll by adding salary, advance & pending payments
               </p>
             </motion.div>
@@ -113,7 +114,7 @@ const DashboardStaffPage = () => {
                   className="w-full max-w-[150px] object-contain"
                 />
               </div>
-              <p className="text-center text-sm border-t border-gray-300 p-4">
+              <p className="text-center text-sm border-t border-[var(--primary-border)] p-4">
                 Set custom reminders to mark attendance timely
               </p>
             </motion.div>
@@ -157,19 +158,20 @@ const DashboardStaffPage = () => {
               Add staff to mark attendance and manage payroll with ease!
             </motion.span>
             <motion.button
-            initial={{
-              translateY:100,
-              opacity:0
-            }}
-            animate={{
-              translateY:0,
-              opacity:1
-            }}
-            transition={{
-              ease:"easeInOut",
-              duration:0.3
-            }}
-            className="btn btn-[var(--primary-btn)] btn-sm mt-5">
+              initial={{
+                translateY: 100,
+                opacity: 0,
+              }}
+              animate={{
+                translateY: 0,
+                opacity: 1,
+              }}
+              transition={{
+                ease: "easeInOut",
+                duration: 0.3,
+              }}
+              className="btn btn-[var(--primary-btn)] btn-sm mt-5"
+            >
               <PlusIcon size={18} />
               Add Staff
             </motion.button>

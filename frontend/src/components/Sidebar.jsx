@@ -46,14 +46,14 @@ const Sidebar = () => {
     if (selectedLink) navigate(selectedLink);
   };
 
-  const mutation = useMutation({
+  const mutation = {
     mutationFn: async () => {
       await axiosInstance.post("/user/logout");
       setUser(null);
       navigate("/login");
       toast.success("Logged out");
     },
-  });
+  };
 
   console.log(currentLink);
 

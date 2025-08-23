@@ -3,7 +3,7 @@ import { PlusIcon } from "lucide-react";
 
 const DashboardItemsCustomFieldsPage = () => {
   return (
-    <main className="flex flex-col justify-center items-center  mt-30">
+    <main className="flex flex-col justify-center items-center  h-full">
       <div className="h-40 w-50">
         <img src={dcsearch} alt="" className="h-40" />
       </div>

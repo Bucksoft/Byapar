@@ -36,9 +36,7 @@ const InvoicesForm = ({ title }) => {
         <div className="border-t border-r border-zinc-300 ">
           <div className="bg-red flex items-center justify-between p-2 border-b border-b-zinc-300">
             <span className="text-xs">Bill To</span>
-            <button className="btn btn-xs text-xxs border">
-              Change Party
-            </button>
+            <button className="btn btn-xs text-xxs border">Change Party</button>
           </div>
           <div className="p-2">
             <p className="text-sm font-medium pt-5">Cash Sale</p>
@@ -73,7 +71,7 @@ const InvoicesForm = ({ title }) => {
             <div>
               <p className="text-xs pb-2 ">Sales Invoice Date: </p>
               <input
-                type="date" 
+                type="date"
                 placeholder=""
                 className="input input-xs border-none bg-zinc-200 w-30"
               />
@@ -131,32 +129,42 @@ const InvoicesForm = ({ title }) => {
 
       {/* third  */}
       <div className="w-full grid grid-cols-11 text-sm">
-        <span className="border-t  p-2 border-gray-300 ">NO</span>
-        <span className="border-t border-l  p-2 border-gray-300 col-span-3">
+        <span className="border-t  p-2 border-[var(--primary-border)] ">
+          NO
+        </span>
+        <span className="border-t border-l  p-2 border-[var(--primary-border)] col-span-3">
           Items/ Services
         </span>
-        <span className="border-t border-l p-2 border-gray-300 ">HSN/ SAC</span>
-        <span className="border-t border-l p-2 border-gray-300 ">Qty</span>
-        <span className="border-l border-t p-2 border-gray-300 ">
+        <span className="border-t border-l p-2 border-[var(--primary-border)] ">
+          HSN/ SAC
+        </span>
+        <span className="border-t border-l p-2 border-[var(--primary-border)] ">
+          Qty
+        </span>
+        <span className="border-l border-t p-2 border-[var(--primary-border)] ">
           Price/Item (₹)
         </span>
-        <span className="border-l border-t p-2 border-gray-300 ">Discount</span>
-        <span className="border-l border-t p-2 border-gray-300 ">Tax</span>
-        <span className="border-l border-t p-2 border-gray-300 ">
+        <span className="border-l border-t p-2 border-[var(--primary-border)] ">
+          Discount
+        </span>
+        <span className="border-l border-t p-2 border-[var(--primary-border)] ">
+          Tax
+        </span>
+        <span className="border-l border-t p-2 border-[var(--primary-border)] ">
           Amount (₹)
         </span>
-        <span className="border-l border-t border-r p-2 border-gray-300  text-gray-500">
+        <span className="border-l border-t border-r p-2 border-[var(--primary-border)]  text-gray-500">
           <FaCirclePlus size={24} />
         </span>
       </div>
       {/* button barcode div */}
-      <div className="p-2 flex border-t border-r border-gray-300">
+      <div className="p-2 flex border-t border-r border-[var(--primary-border)]">
         <div className="w-7/10">
           <button className="btn btn-info btn-sm btn-dash w-full hover:bg-none">
             +Add Item
           </button>
         </div>
-        <div className="px-2 ml-2 border border-gray-300 w-3/10 rounded-sm">
+        <div className="px-2 ml-2 border border-[var(--primary-border)] w-3/10 rounded-sm">
           <div className="flex items-center gap-10 justify-center">
             <img src={scanner} alt="qrcode_scanner" className="size-6" />
             <span className="font-medium">Scan Barcode</span>
@@ -165,14 +173,16 @@ const InvoicesForm = ({ title }) => {
       </div>
 
       <div className="w-full grid grid-cols-11 text-sm">
-        <span className="border-t border-b border-r p-2 border-gray-300 col-span-8 text-end">
+        <span className="border-t border-b border-r p-2 border-[var(--primary-border)] col-span-8 text-end">
           SUBTOTAL
         </span>
-        <span className="border-t border-b p-2 border-gray-300 ">₹ 0</span>
-        <span className="border-t border-l border-b p-2 border-gray-300 ">
+        <span className="border-t border-b p-2 border-[var(--primary-border)] ">
           ₹ 0
         </span>
-        <span className="border p-2 border-gray-300 ">₹ 0</span>
+        <span className="border-t border-l border-b p-2 border-[var(--primary-border)] ">
+          ₹ 0
+        </span>
+        <span className="border p-2 border-[var(--primary-border)] ">₹ 0</span>
       </div>
 
       {/* bottom grid part */}

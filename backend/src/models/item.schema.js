@@ -48,14 +48,14 @@ const itemSchema = new mongoose.Schema(
     },
     itemCode: {
       type: String,
-      required: true,
+      // required: true,
       unique: true,
       trim: true,
       index: true,
     },
     HSNCode: {
       type: String,
-      required: true,
+      // required: true,
       trim: true,
       index: true,
     },

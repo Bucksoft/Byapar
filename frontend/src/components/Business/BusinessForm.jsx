@@ -117,7 +117,7 @@ const BusinessForm = () => {
           ease: "easeInOut",
           duration: 0.3,
         }}
-        className="flex items-center  p-2 justify-between border-b border-gray-300"
+        className="flex items-center  p-2 justify-between border-b border-[var(--primary-border)]"
       >
         <div className="flex items-center justify-center gap-5  mr-4">
           <div className="flex ml-3 flex-col ">
@@ -354,7 +354,7 @@ const BusinessForm = () => {
             </p>
             <div className="flex   ">
               <div className="flex items-center gap-2 w-3/4 justify-between">
-                <label className="text-xs font-semibold cursor-pointer flex items-center hover:bg-gray-100 justify-between border w-1/2 p-2 border-gray-300 rounded hover:border-[var(--primary-btn)]">
+                <label className="text-xs font-semibold cursor-pointer flex items-center hover:bg-gray-100 justify-between border w-1/2 p-2 border-[var(--primary-border)] rounded hover:border-[var(--primary-btn)]">
                   Yes
                   <input
                     type="radio"
@@ -367,7 +367,7 @@ const BusinessForm = () => {
                   />
                 </label>
 
-                <label className="text-xs font-semibold cursor-pointer hover:bg-gray-100 w-1/2 p-2 flex items-center justify-between border border-gray-300 rounded hover:border-[var(--primary-btn)]">
+                <label className="text-xs font-semibold cursor-pointer hover:bg-gray-100 w-1/2 p-2 flex items-center justify-between border border-[var(--primary-border)] rounded hover:border-[var(--primary-btn)]">
                   No
                   <input
                     type="radio"
@@ -404,7 +404,7 @@ const BusinessForm = () => {
             </small>
           </div>
 
-          <div className=" font-semibold mt-3 base flex items-center justify-between w-full p-[5.8px] px-3 text-xs border border-gray-300  rounded text-purple-300">
+          <div className=" font-semibold mt-3 base flex items-center justify-between w-full p-[5.8px] px-3 text-xs border border-[var(--primary-border)]  rounded text-purple-300">
             Enable e-Invoicing
             <input
               type="checkbox"
@@ -583,8 +583,8 @@ const BusinessForm = () => {
             />
           </div>
 
-          <div className="border rounded mt-2 border-gray-300">
-            <div className="py-3 border-b border-gray-300">
+          <div className="border rounded mt-2 border-[var(--primary-border)]">
+            <div className="py-3 border-b border-[var(--primary-border)]">
               <p className="text-xs ml-5 text-gray-500">Add Business Details</p>
               <p className="text-[12px] ml-5 text-gray-500 ">
                 Add additional business information such as MSME number, Website

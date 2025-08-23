@@ -8,6 +8,7 @@ import { useNavigate } from "react-router-dom";
 import CustomLoader from "../components/Loader";
 import { usePartyStore } from "../store/partyStore";
 import { queryClient } from "../main";
+import { motion } from "framer-motion";
 
 const DashboardAddPartyPage = () => {
   const navigate = useNavigate();
@@ -499,21 +500,37 @@ const DashboardAddPartyPage = () => {
         </section>
         {addCategoryPopup && (
           <>
-            <div className="h-full z-2000 w-full bg-black/20 backdrop-blur flex items-center justify-center absolute top-0">
-              <div className="w-3/8 p-4 shadow-lg rounded-lg bg-white">
-                <h1 className="font-medium">Add a Category</h1>
+            <div className="fixed inset-0 z-100 flex items-center justify-center bg-black/40 backdrop-blur-sm">
+              {/* Modal Box with Animation */}
+              <motion.div
+                initial={{ scale: 0.9, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                exit={{ scale: 0.9, opacity: 0 }}
+                transition={{ duration: 0.2 }}
+                className="bg-white shadow-2xl rounded-2xl p-6 w-[400px] max-w-[90%]"
+              >
+                {/* Header */}
+                <h1 className="text-lg font-semibold text-gray-800">
+                  Add Category
+                </h1>
+                <p className="text-sm text-gray-500 mt-1">
+                  Create a new category for your items
+                </p>
+
+                {/* Input */}
                 <input
                   type="text"
-                  name="categoryName"
+                  className="input input-sm mt-4 w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400"
+                  placeholder="Ex: Electronics"
                   disabled={mutation.isPending}
                   value={data.categoryName}
                   onChange={handleInputChange}
-                  placeholder="Enter category name"
-                  className="input input-sm mt-5 w-full"
                 />
-                <div className="w-full flex items-center justify-end gap-3">
+
+                {/* Footer Actions */}
+                <div className="mt-5 flex justify-end gap-3">
                   <button
-                    className="btn btn-sm mt-3"
+                    className="btn btn-sm"
                     onClick={() => setAddCategoryPopup(false)}
                   >
                     Cancel
@@ -524,12 +541,12 @@ const DashboardAddPartyPage = () => {
                         setAddCategoryPopup(false);
                       }
                     }}
-                    className="btn btn-sm mt-3 bg-[var(--secondary-btn)]"
+                    className="btn btn-sm bg-[var(--secondary-btn)]"
                   >
                     Add
                   </button>
                 </div>
-              </div>
+              </motion.div>
             </div>
           </>
         )}
