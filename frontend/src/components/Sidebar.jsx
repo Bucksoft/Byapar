@@ -55,8 +55,6 @@ const Sidebar = () => {
     },
   };
 
-  console.log(currentLink);
-
   return (
     <>
       <section className="bg-[var(--sidebar-background)] text-white/70 shadow-md max-h-screen overflow-y-auto hide-scrollbar border border-zinc-200 relative">

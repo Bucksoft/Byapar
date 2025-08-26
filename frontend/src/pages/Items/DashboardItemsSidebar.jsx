@@ -22,11 +22,10 @@ const DashboardItemsSidebar = () => {
   const [currentField, setCurrentField] = useState("Basic Details");
 
   useEffect(() => {
-    const itemToBeEdited = items.find((item) => item?.id === state);
-    setItemToBeEdited(itemToBeEdited);
-  }, [state]);
-
-  // TODO : item to be edited is an array , i need to extract the first index to edit
+    if (!state || !items?.length) return;
+    const matchingItems = items.filter((item) => item?._id === state);
+    setItemToBeEdited(matchingItems[0]);
+  }, [state, items]);
 
   const initialFormState = {
     itemType: "product",
@@ -49,10 +48,20 @@ const DashboardItemsSidebar = () => {
   };
   const [data, setData] = useState(initialFormState);
 
+  useEffect(() => {
+    if (itemToBeEdited) {
+      setData({
+        ...initialFormState,
+        ...itemToBeEdited,
+      });
+    }
+  }, [itemToBeEdited]);
+
   const handleSidebar = (title) => {
     setCurrentField(title);
   };
 
+  // create new item mutation
   const mutation = useMutation({
     mutationFn: async (data) => {
       const res = await axiosInstance.post("/item", { data });
@@ -62,7 +71,28 @@ const DashboardItemsSidebar = () => {
       toast.success(data.msg);
       setItem(data);
       setData(initialFormState);
-      queryClient.invalidateQueries({ queryKey: ["item"] });
+      queryClient.invalidateQueries({ queryKey: ["items"] });
+      navigate(`/dashboard/items`);
+    },
+    onError: (err) => {
+      toast.error(
+        err?.response?.data?.validationError?.itemName._errors[0] ||
+          "Something went wrong"
+      );
+    },
+  });
+
+  // edit details mutation 
+  const editMutation = useMutation({
+    mutationFn: async (data) => {
+      const res = await axiosInstance.patch(`/item/${state}`, { data });
+      return res.data;
+    },
+    onSuccess: (data) => {
+      toast.success(data.msg);
+      setItem(data);
+      setData(initialFormState);
+      queryClient.invalidateQueries({ queryKey: ["items"] });
       navigate(`/dashboard/items`);
     },
     onError: (err) => {
@@ -174,17 +204,31 @@ const DashboardItemsSidebar = () => {
                 >
                   Cancel
                 </button>
-                <button
-                  disabled={mutation.isPending}
-                  onClick={() => mutation.mutate(data)}
-                  className="btn btn-sm bg-[var(--primary-btn)] w-1/7"
-                >
-                  {mutation.isPending ? (
-                    <CustomLoader text={"Loading..."} />
-                  ) : (
-                    "Save"
-                  )}
-                </button>
+                {state ? (
+                  <button
+                    disabled={editMutation.isPending}
+                    onClick={() => editMutation.mutate(data)}
+                    className="btn btn-sm bg-[var(--primary-btn)] w-1/7"
+                  >
+                    {editMutation.isPending ? (
+                      <CustomLoader text={"Updating..."} />
+                    ) : (
+                      "Save Changes"
+                    )}
+                  </button>
+                ) : (
+                  <button
+                    disabled={mutation.isPending}
+                    onClick={() => mutation.mutate(data)}
+                    className="btn btn-sm bg-[var(--primary-btn)] w-1/7"
+                  >
+                    {mutation.isPending ? (
+                      <CustomLoader text={"Loading..."} />
+                    ) : (
+                      "Save"
+                    )}
+                  </button>
+                )}
               </div>
             </motion.div>
           </div>

@@ -144,14 +144,12 @@ export async function getAllItems(req, res) {
 export async function updateItem(req, res) {
   try {
     const { id } = req.params;
-
     if (!id) {
       return res
         .status(400)
         .json({ success: true, msg: "Please provide the item id" });
     }
-
-    const parsedData = itemSchema.safeParse(req.body);
+    const parsedData = itemSchema.safeParse(req.body.data);
 
     const updatedItem = await Item.findByIdAndUpdate(id, parsedData.data);
     if (!updatedItem) {
@@ -159,7 +157,9 @@ export async function updateItem(req, res) {
         .status(400)
         .json({ success: true, msg: "Item could not be updated" });
     }
-    return res.status(200).json({ success: true, updatedItem });
+    return res
+      .status(200)
+      .json({ success: true, msg: "Item updated successfully", updatedItem });
   } catch (error) {
     console.error("Error in creating item", error);
     return res

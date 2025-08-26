@@ -112,10 +112,11 @@ const DashboardItemsBasicDetailPage = ({ data, setData, err }) => {
               onChange={handleInputChange}
             >
               {uomList.map((unit, index) => (
-                <option key={index} className="w-full">
-                  <button className="w-full text-left text-xs px-2 py-1 hover:bg-gray-100 rounded">
-                    {unit?.label} ({unit?.code})
-                  </button>
+                <option
+                  key={index}
+                  className="w-full text-left text-xs px-2 py-1 hover:bg-gray-100 rounded"
+                >
+                  {unit?.label} ({unit?.code})
                 </option>
               ))}
             </select>
@@ -131,6 +132,7 @@ const DashboardItemsBasicDetailPage = ({ data, setData, err }) => {
             <input
               type="text"
               value={data.category}
+              readOnly
               placeholder="Select Category"
               className="w-full text-xs outline-none pl-3"
             />
@@ -190,10 +192,11 @@ const DashboardItemsBasicDetailPage = ({ data, setData, err }) => {
               name="gstTaxRate"
             >
               {gstRates.map((gstRate, index) => (
-                <option key={index} className="w-full">
-                  <button className="w-full text-left text-xs px-2 py-1 hover:bg-gray-100 rounded">
-                    {gstRate?.label}
-                  </button>
+                <option
+                  key={index}
+                  className="w-full text-left text-xs px-2 py-1 hover:bg-gray-100 rounded"
+                >
+                  {gstRate?.label}
                 </option>
               ))}
             </select>
