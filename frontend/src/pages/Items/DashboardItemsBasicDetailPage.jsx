@@ -2,10 +2,8 @@ import { ChevronDown, IndianRupee, Search } from "lucide-react";
 import { gstRates, uomList } from "../../utils/constants";
 import { useState } from "react";
 import { motion } from "framer-motion";
-import { queryClient } from "../../main";
-import { useMutation } from "@tanstack/react-query";
 
-const DashboardItemsBasicDetailPage = ({ data, setData }) => {
+const DashboardItemsBasicDetailPage = ({ data, setData, err }) => {
   const [showAddCategoryPopup, setShowAddCategoryPopup] = useState(false);
 
   const handleInputChange = (e) => {
@@ -16,17 +14,12 @@ const DashboardItemsBasicDetailPage = ({ data, setData }) => {
     }));
   };
 
-
-  const mutation = useMutation({
-    
-  })
-
   return (
     <main className="grid grid-cols-2 gap-15">
       {/* left container */}
       <div className="">
         <div className=" flex flex-col">
-          <span className="text-xs text-gray-600">Item Type</span>
+          <p className="text-xs text-gray-600">Item Type </p>
           <div className="h-full flex">
             <p className="px-2 py-2 text-xs text-gray-600 w-1/2 mt-2 border border-[var(--primary-border)] rounded-xs flex items-center justify-between">
               {" "}
@@ -56,7 +49,9 @@ const DashboardItemsBasicDetailPage = ({ data, setData }) => {
         </div>
 
         <div className=" flex flex-col mt-5">
-          <span className="text-xs text-gray-600">Item Name</span>
+          <p className="text-xs text-gray-600">
+            Item Name <span className="text-red-500">*</span>{" "}
+          </p>
           <div className="">
             <input
               type="text"
@@ -66,6 +61,9 @@ const DashboardItemsBasicDetailPage = ({ data, setData }) => {
               placeholder="eg: Apple 5kg size"
               className="px-2 w-full border border-[var(--primary-border)] rounded-xs h-8 text-xs text-gray-500"
             />
+            <span className="text-xs text-red-500">
+              {err?.validationError?.itemName?._errors[0]}
+            </span>
           </div>
         </div>
 
@@ -77,18 +75,28 @@ const DashboardItemsBasicDetailPage = ({ data, setData }) => {
               type="text"
               value={data.salesPrice}
               name="salesPrice"
-              onChange={handleInputChange}
+              onChange={(e) =>
+                setData((prev) => ({
+                  ...prev,
+                  salesPrice: Number(e.target.value),
+                }))
+              }
               placeholder="eg: 200"
               className="w-60 text-xs text-gray-600 outline-none"
             />
             <select
               name="salesPriceType"
               value={data.salesPriceType}
-              onChange={handleInputChange}
-              className="outline-none text-xs px-3 bg-zinc-200 rounded-md mr-3"
+              onChange={(e) =>
+                setData((prev) => ({
+                  ...prev,
+                  salesPriceType: e.target.value.toLowerCase(),
+                }))
+              }
+              className="select select-sm w-3/8 text-info select-ghost"
             >
-              <option>With Tax</option>
-              <option>Without Tax</option>
+              <option value={"with tax"}>With Tax</option>
+              <option value={"without tax"}>Without Tax</option>
             </select>
           </div>
         </div>
@@ -198,8 +206,13 @@ const DashboardItemsBasicDetailPage = ({ data, setData }) => {
             <input
               name="openingStock"
               value={data.openingStock}
-              onChange={handleInputChange}
-              type="text"
+              onChange={(e) =>
+                setData((prev) => ({
+                  ...prev,
+                  openingStock: Number(e.target.value),
+                }))
+              }
+              type="number"
               placeholder="eg: 150 PCS"
               className="px-2 w-full border border-[var(--primary-border)] rounded-xs h-8 text-xs text-gray-600"
             />

@@ -50,6 +50,7 @@ import DashboardProformaInvoicePage from "./pages/DashboardProformaInvoicePage";
 import DashboardSalesReturnInvoicePage from "./pages/DashboardSalesInvoicePage";
 import DashboardItemsBasicDetailPage from "./pages/Items/DashboardItemsBasicDetailPage";
 import DashboardItemsSidebar from "./pages/Items/DashboardItemsSidebar";
+import SingleItemPage from "./components/Items/SingleItemPage";
 
 function App() {
   const { user, setUser } = useAuthStore();
@@ -104,6 +105,8 @@ function App() {
           />
 
           <Route path="/dashboard/items" element={<DashboardItemsPage />} />
+          <Route path="/dashboard/items/:id" element={<SingleItemPage />} />
+
           <Route
             path="/dashboard/items/basic-details"
             element={<DashboardItemsSidebar />}

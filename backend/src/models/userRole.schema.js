@@ -3,16 +3,15 @@ import mongoose from "mongoose";
 const userRoleSchema = new mongoose.Schema({
   name: {
     type: String,
-    required: true,
+    // required: true,
   },
   mobileNumber: {
     type: String,
-    required: true,
+    // required: true,
   },
-
   role: {
     type: String,
-    required: true,
+    // required: true,
     enum: [
       "admin",
       "subadmin",

@@ -3,8 +3,15 @@ import { Item } from "../models/item.schema.js";
 
 export async function createItem(req, res) {
   try {
+    console.log("REQUEST BODY ", req.body.data);
     // get and parse the data
-    const parsedData = itemSchema.safeParse(req.body);
+    const parsedData = itemSchema.safeParse(req.body.data);
+    if (!parsedData.success) {
+      const validationError = parsedData.error.format();
+      return res
+        .status(422)
+        .json({ success: false, msg: "Validation failed", validationError });
+    }
 
     // check for existing item
     const existingItem = await Item.findOne({
@@ -21,6 +28,7 @@ export async function createItem(req, res) {
     }
 
     // create a new item
+    console.log("PARSED DATA ", parsedData);
     const newItem = await Item.create(parsedData.data);
 
     // return success response
@@ -28,17 +36,6 @@ export async function createItem(req, res) {
       .status(201)
       .json({ success: true, msg: "Item created", newItem });
   } catch (error) {
-    if (error.name === "ZodError") {
-      return res.status(422).json({
-        success: false,
-        msg: "Validation failed",
-        errors: error.errors.map((e) => ({
-          path: e.path.join("."),
-          message: e.message,
-        })),
-      });
-    }
-
     console.error("Error in creating item", error);
     return res
       .status(500)
@@ -48,23 +45,58 @@ export async function createItem(req, res) {
 
 export async function deleteItem(req, res) {
   try {
+    const idsToBeDeleted = req.body;
+
+    if (!Array.isArray(idsToBeDeleted) || idsToBeDeleted.length === 0) {
+      return res.status(400).json({
+        success: false,
+        msg: "Invalid request. Provide an array of item IDs.",
+      });
+    }
+
+    const itemsToBeDeleted = await Item.find({ _id: { $in: idsToBeDeleted } });
+
+    if (itemsToBeDeleted.length === 0) {
+      return res.status(404).json({
+        success: false,
+        msg: "No items found with the provided IDs.",
+      });
+    }
+
+    await Item.deleteMany({ _id: { $in: idsToBeDeleted } });
+
+    return res.status(200).json({
+      success: true,
+      msg: "Items deleted successfully.",
+      deletedCount: itemsToBeDeleted.length,
+    });
+  } catch (error) {
+    console.error("Error in deleting items:", error);
+    return res
+      .status(500)
+      .json({ success: false, msg: "Internal Server Error" });
+  }
+}
+
+export async function deleteSingleItem(req, res) {
+  try {
     const { id } = req.params;
     if (!id) {
       return res
         .status(400)
-        .json({ success: true, msg: "Please provide the item id" });
+        .json({ success: false, msg: "Provide a valid item id" });
     }
     const deletedItem = await Item.findByIdAndDelete(id);
     if (!deletedItem) {
       return res
         .status(400)
-        .json({ success: true, msg: "Item could not be deleted" });
+        .json({ success: false, msg: "Item not found with that id" });
     }
     return res
       .status(200)
       .json({ success: true, msg: "Item deleted successfully" });
   } catch (error) {
-    console.error("Error in creating item", error);
+    console.error("Error in deleting item:", error);
     return res
       .status(500)
       .json({ success: false, msg: "Internal Server Error" });
@@ -129,17 +161,6 @@ export async function updateItem(req, res) {
     }
     return res.status(200).json({ success: true, updatedItem });
   } catch (error) {
-    if (error.name === "ZodError") {
-      return res.status(422).json({
-        success: false,
-        msg: "Validation failed",
-        errors: error.errors.map((e) => ({
-          path: e.path.join("."),
-          message: e.message,
-        })),
-      });
-    }
-
     console.error("Error in creating item", error);
     return res
       .status(500)

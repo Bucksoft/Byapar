@@ -233,13 +233,14 @@ export const paymentInSchema = z.object({
 export const itemSchema = z.object({
   itemType: z.enum(["product", "service"]).default("product"),
 
-  category: z.string().min(1, "Category is required"),
+  category: z.string().optional(),
 
-  itemName: z.string().min(1, "Item name is required"),
+  itemName: z.string().min(1, "Item Name is required"),
 
-  showItemInOnlineStore: z.boolean().default(false),
+  showItemInOnlineStore: z.boolean().default(false).optional(),
 
   salesPriceType: z.enum(["with tax", "without tax"]).default("with tax"),
+  purchasePriceType: z.enum(["with tax", "without tax"]).default("with tax"),
 
   salesPrice: z
     .number({
@@ -248,9 +249,9 @@ export const itemSchema = z.object({
     })
     .nonnegative("Sales price cannot be negative"),
 
-  gstTaxRate: z.string().min(1, "GST tax rate is required"),
+  gstTaxRate: z.string().default("none"),
 
-  measuringUnit: z.string().min(1, "Measuring unit is required"),
+  measuringUnit: z.string().optional(),
 
   openingStock: z
     .number({
@@ -259,15 +260,15 @@ export const itemSchema = z.object({
     })
     .nonnegative("Opening stock cannot be negative"),
 
-  itemCode: z.string().min(1, "Item code is required"),
+  itemCode: z.string().optional(),
 
-  HSNCode: z.string().min(1, "HSN Code is required"),
+  HSNCode: z.string().optional(),
 
-  asOfDate: z
-    .union([z.string().datetime(), z.date()])
-    .default(() => new Date()),
+  godown: z.string().optional(),
+
+  asOfDate: z.union([z.string(), z.date()]).default(() => new Date()),
 
   description: z.string().optional(),
 
-  fileURLs: z.array(z.string().url("Each file URL must be valid")).optional(),
+  fileURLs: z.array(z.string()).optional(),
 });

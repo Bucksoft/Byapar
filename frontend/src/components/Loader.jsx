@@ -1,6 +1,12 @@
 const CustomLoader = ({ text }) => {
   return (
-    <div className="flex items-center gap-2 text-zinc-800 text-xs">
+    <div
+      className={`flex items-center gap-2  ${
+        text === "Deleting..."
+          ? "text-[var(--error-text-color)]"
+          : "text-zinc-800"
+      }  text-xs`}
+    >
       <span className="loading loading-dots loading-xs"></span> {text}
     </div>
   );

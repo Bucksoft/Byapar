@@ -1,177 +1,182 @@
-import {
-  Calendar,
-  ChevronDown,
-  Info,
-  Plus,
-  Search,
-  UploadCloud,
-} from "lucide-react";
+import React, { useState } from "react";
+import { Plus, Info, UploadCloud } from "lucide-react";
 import { uomList } from "../../utils/constants";
+import { DayPicker } from "react-day-picker";
+import "react-day-picker/dist/style.css";
 
-const DashboardItemsStockDetailsPage = () => {
+const DashboardItemsStockDetailsPage = ({ data, setData }) => {
+  const [showDatepicker, setShowDatepicker] = useState(false);
+
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setData((prev) => ({
+      ...prev,
+      [name]: value,
+    }));
+  };
+
+  const formatDate = (date) => {
+    if (!date) return "";
+    if (typeof date === "string") return date;
+    if (date instanceof Date && !isNaN(date)) {
+      return date.toISOString().split("T")[0];
+    }
+    return "";
+  };
+
   return (
-    <main>
-      <div className="grid grid-cols-2 gap-5">
-        {/* left container */}
-        <div>
-          <div className=" flex flex-col">
-            <span className="text-xs text-gray-600">Item Code</span>
-            <div className=" flex items-center h-8 border border-[var(--primary-border)] rounded-xs w-full">
+    <main className="p-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        {/* Left section */}
+        <div className="space-y-5">
+          <div className="flex flex-col">
+            <label className="text-xs text-gray-600">Item Code</label>
+            <div className="flex items-center border border-gray-300 rounded">
               <input
                 type="text"
+                name="itemCode"
+                value={data.itemCode}
+                onChange={handleInputChange}
                 placeholder="eg: ITEM 45652"
-                className=" px-2 text-xs text-gray-600 outline-none w-60"
+                className="input input-sm border-none"
               />
-              <div className="dropdown dropdown-center w-fit">
-                <div
-                  tabIndex={0}
-                  role="button"
-                  className=" text-xs text-gray-600 font-medium flex items-center h-full"
-                >
-                  <span className="h-full">Generate Barcode</span>
-                </div>
-                <ul
-                  tabIndex={0}
-                  className="dropdown-content menu bg-base-100 rounded-box w-52 shadow-xs text-gray-600"
-                >
-                  <li>All Expenses Categories</li>
-                  <li>Bank Fee & Charges</li>
-                  <li>Raw Material</li>
-                </ul>
-              </div>
+              <span className="text-xs text-gray-600 pr-2">
+                Generate Barcode
+              </span>
             </div>
           </div>
 
-          <div className="flex flex-col mt-8">
-            <span className="text-xs text-gray-600">Measuring Unit</span>
-            <div className="flex items-center h-8 border border-[var(--primary-border)] rounded-xs">
-              <Search size={16} className="w-10 text-gray-600" />
-
-              <input
-                type="text"
-                placeholder="Select Pieces (PCS)"
-                className="w-full text-xs text-gray-600 outline-none"
-                readOnly
-              />
-
-              <div className="dropdown dropdown-end w-5 mr-5">
-                <div
-                  tabIndex={0}
-                  role="button"
-                  className="text-xs text-gray-600 font-medium flex items-center justify-between cursor-pointer"
-                >
-                  <ChevronDown size={20} className="text-gray-600" />
-                </div>
-
-                <ul
-                  tabIndex={0}
-                  className="dropdown-content bg-base-100 rounded-box shadow-md w-52 max-h-40 overflow-y-auto mt-2 text-gray-600 flex flex-col space-y-1 p-2"
-                >
-                  {uomList.map((unit, index) => (
-                    <li key={index} className="w-full">
-                      <button className="w-full text-left text-xs px-2 py-1 hover:bg-gray-100 rounded">
-                        {unit?.label} ({unit?.code})
-                      </button>
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            </div>
+          <div className="flex flex-col">
+            <label className="text-xs text-gray-600">Measuring Unit</label>
+            <select
+              name="measuringUnit"
+              value={data.measuringUnit}
+              onChange={handleInputChange}
+              className="select select-sm w-full"
+            >
+              {uomList.map((unit, idx) => (
+                <option key={idx} value={unit.code}>
+                  {unit.label} ({unit.code})
+                </option>
+              ))}
+            </select>
           </div>
 
-          <div className="mt-5 flex items-center">
-            <Plus size={16} className="text-info" />
-            <span className="text-info text-xs ml-1">Alternative Unit</span>
+          <div className="flex items-center space-x-1 text-info text-xs">
+            <Plus size={16} />
+            <span>Alternative Unit</span>
           </div>
 
-          <div className="flex flex-col mt-2">
-            <span className="text-xs text-gray-600">Opening Stocks</span>
-            <div className="">
-              <input
-                type="text"
-                placeholder="eg: 150 PCS"
-                className="px-2 w-full border border-[var(--primary-border)] rounded-xs h-8 text-xs text-gray-600"
-              />
-            </div>
+          <div className="flex flex-col">
+            <label className="text-xs text-gray-600">Godowns</label>
+            <select
+              name="godown"
+              value={data.godown}
+              onChange={handleInputChange}
+              className="select select-sm w-full"
+            >
+              <option disabled value="">
+                Select Godown
+              </option>
+              <option value="Godown name">Godown name</option>
+            </select>
           </div>
 
-          <div className="mt-5 flex items-center">
-            <Plus size={16} className="text-info" />
-            <span className="text-info text-xs ml-1">
-              Enable low stock quantity warning
-            </span>
-            <Info size={16} className="text-info ml-2" />
+          <div className="flex flex-col">
+            <label className="text-xs text-gray-600">Opening Stocks</label>
+            <input
+              name="openingStock"
+              type="number"
+              value={data.openingStock}
+              onChange={(e) =>
+                setData((prev) => ({
+                  ...prev,
+                  openingStock: Number(e.target.value),
+                }))
+              }
+              placeholder="eg: 150"
+              className="input input-sm"
+            />
+          </div>
+
+          <div className="flex items-center space-x-1 text-info text-xs">
+            <Plus size={16} />
+            <span>Enable low stock quantity warning</span>
+            <Info size={16} />
           </div>
         </div>
-        {/* right container */}
-        <div>
-          <div className=" flex flex-col ">
-            <span className="text-xs text-gray-600">HSN Code</span>
-            <div className="">
-              <input
-                type="text"
-                placeholder="eg: 85214"
-                className="px-2 w-full border border-[var(--primary-border)] rounded-xs h-8 text-xs text-gray-600"
-              />
-              <p className="text-xs text-info mt-1">Find HSN Code</p>
-            </div>
+
+        {/* Right section */}
+        <div className="space-y-5 ">
+          <div className="flex flex-col relative">
+            <label className="text-xs text-gray-600">HSN Code</label>
+            <input
+              type="text"
+              name="HSNCode"
+              value={data.HSNCode}
+              onChange={handleInputChange}
+              placeholder="eg: 85214"
+              className="input input-sm w-full"
+            />
+            <p className="text-xs text-info mt-1 cursor-pointer absolute right-2 top-5">
+              Find HSN Code
+            </p>
           </div>
 
-          <div className="dropdown dropdown-end w-full mt-26">
-            <span className="text-xs text-gray-600">As of Date</span>
-            <div
-              tabIndex={0}
-              role="button"
-              className="flex items-center justify-between border-[var(--primary-border)] border rounded-xs  h-8 text-xs font-medium"
+          <div className="flex flex-col relative ">
+            <label className="text-xs text-gray-600">As of Date</label>
+            <button
+              type="button"
+              onClick={() => setShowDatepicker((v) => !v)}
+              className="btn btn-sm btn-outline border-zinc-300"
             >
-              <div className="flex items-center gap-2">
-                <Calendar size={16} className="text-zinc-300 ml-5" />
-                <span className="text-gray-600 text-xs">Last 365 days</span>
+              <p>{formatDate(data?.asOfDate) || "Pick a date"}</p>
+            </button>
+            {showDatepicker && (
+              <div className="absolute z-10 mt-1 bg-white border rounded shadow-lg">
+                <DayPicker
+                  mode="single"
+                  selected={data.asOfDate ? new Date(data.asOfDate) : undefined}
+                  onSelect={(date) => {
+                    setShowDatepicker(false);
+                    const iso = date ? date.toISOString().split("T")[0] : "";
+                    setData((prev) => ({
+                      ...prev,
+                      asOfDate: iso,
+                    }));
+                  }}
+                />
               </div>
-              <ChevronDown size={20} className="text-gray-600 mr-3" />
-            </div>
-            <ul
-              tabIndex={0}
-              className="dropdown-content menu bg-base-100 rounded-box p-2 shadow-xs text-gray-600"
-            >
-              <li>
-                <a>Today</a>
-              </li>
-              <li>
-                <a>Yesterday</a>
-              </li>
-              <li>
-                <a>This week</a>
-              </li>
-              <li>
-                <a>Last week</a>
-              </li>
-            </ul>
+            )}
           </div>
         </div>
       </div>
 
-      {/* TextArea */}
-      <div>
-        <p className="text-xs text-gray-600 my-3">Description</p>
+      {/* Description */}
+      <div className="mt-6">
+        <label className="text-xs text-gray-600 mb-1 block">Description</label>
         <textarea
-          name=""
-          id=""
-          className="w-full rounded-md border-[var(--primary-border)] border h-18"
-        ></textarea>
+          name="description"
+          value={data.description}
+          onChange={handleInputChange}
+          placeholder="Enter description"
+          rows={3}
+          className="w-full p-2 text-xs text-gray-600 border border-gray-300 rounded"
+        />
       </div>
 
-      <div className="border border-dashed border-[var(--primary-border)] rounded-md flex items-center h-20 mt-2">
-        <UploadCloud size={30} className="text-gray-600 mx-10" />
+      {/* Upload section */}
+      <div className="mt-4 border-2 border-dashed border-gray-300 rounded-md flex items-center h-24 p-4">
+        <UploadCloud size={30} className="text-gray-600 mx-4" />
         <div>
           <p className="text-xs text-gray-600">
-            Please select or drag and drop 5 files
+            Please select or drag and drop up to 5 files
           </p>
           <p className="text-xs text-gray-600">
-            Maximum of 5 images in JPEG or PNG, files size less than 5 MB
+            JPEG or PNG, max size 5 MB each
           </p>
         </div>
-        <button className="btn btn-info ml-40">Select files</button>
+        <button className="btn btn-info ml-auto">Select files</button>
       </div>
     </main>
   );

@@ -38,8 +38,6 @@ export const userCredentialSchema = new mongoose.Schema(
     role: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "UserRole",
-      
-      default: "admin",
     },
   },
   { timestamps: true }

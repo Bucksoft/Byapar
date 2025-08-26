@@ -10,7 +10,7 @@ const itemSchema = new mongoose.Schema(
     },
     category: {
       type: String,
-      required: [true, "Category is required"],
+      // required: [true, "Category is required"],
       trim: true,
     },
     itemName: {
@@ -26,30 +26,36 @@ const itemSchema = new mongoose.Schema(
       type: String,
       enum: ["with tax", "without tax"],
       default: "with tax",
-      required: true,
+      // required: true,
+    },
+    purchasePriceType: {
+      type: String,
+      enum: ["with tax", "without tax"],
+      default: "with tax",
+      // required: true,
     },
     salesPrice: {
       type: Number,
-      required: [true, "Sales price is required"],
+      // required: [true, "Sales price is required"],
       min: [0, "Sales price cannot be negative"],
     },
     gstTaxRate: {
       type: String,
-      required: [true, "GST tax rate is required"],
+      // required: [true, "GST tax rate is required"],
     },
     measuringUnit: {
       type: String,
-      required: [true, "Measuring unit is required"],
+      // required: [true, "Measuring unit is required"],
     },
     openingStock: {
       type: Number,
-      required: [true, "Opening stock is required"],
+      // required: [true, "Opening stock is required"],
       min: [0, "Opening stock cannot be negative"],
     },
     itemCode: {
       type: String,
       // required: true,
-      unique: true,
+      // unique: true,
       trim: true,
       index: true,
     },
@@ -62,6 +68,9 @@ const itemSchema = new mongoose.Schema(
     asOfDate: {
       type: Date,
       default: Date.now,
+    },
+    godown: {
+      type: String,
     },
     description: {
       type: String,

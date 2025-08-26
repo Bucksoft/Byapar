@@ -12,9 +12,10 @@ import invoP from "../assets/InvoiceP.png";
 import payment from "../assets/Payment.png";
 import { LiaStarSolid } from "react-icons/lia";
 import { CiCreditCard1 } from "react-icons/ci";
-import { FaRegCircleUser } from "react-icons/fa6";
+import { FaRegCircleUser, FaRegFileLines } from "react-icons/fa6";
 import { MdMenuBook } from "react-icons/md";
-import { TbReportAnalytics } from "react-icons/tb";
+import { TbBuildingWarehouse, TbReportAnalytics } from "react-icons/tb";
+import { LuFileUser } from "react-icons/lu";
 
 export const badges = [
   {
@@ -539,6 +540,7 @@ export const dashboardSinglePartyMenus = [
 ];
 
 export const gstRates = [
+  { id: 0, label: "None" },
   { id: 1, label: "Exempted" },
   { id: 2, label: "GST @ 0%" },
   { id: 3, label: "GST @ 0.1%" },
@@ -773,4 +775,48 @@ export const uomList = [
   { id: 212, label: "Weeks", code: "WEEK" },
   { id: 213, label: "Yards", code: "YDS" },
   { id: 214, label: "Years", code: "YRS" },
+];
+
+export const dashboardSingleItemPageMenus = [
+  {
+    id: 1,
+    icon: <FaRegFileLines />,
+    title: "Item Details",
+  },
+  {
+    id: 2,
+    icon: <TbReportAnalytics />,
+    title: "Stock Details",
+  },
+  {
+    id: 3,
+    icon: <LuFileUser />,
+    title: "Party Wise Report",
+  },
+  {
+    id: 4,
+    icon: <TbBuildingWarehouse />,
+    title: "Godown",
+  },
+  {
+    id: 5,
+    icon: <LuFileUser />,
+    title: "Party Wise Prices",
+  },
+];
+
+export const dateRanges = [
+  "Today",
+  "Yesterday",
+  "This Week",
+  "Last Week",
+  "Last 7 Days",
+  "This Month",
+  "Previous Month",
+  "Last 30 Days",
+  "This Quarter",
+  "Previous Quarter",
+  "Current Fiscal Year",
+  "Previous Fiscal Year",
+  "Last 365 Days",
 ];

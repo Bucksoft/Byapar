@@ -17,7 +17,7 @@ const DashboardGodownPage = () => {
               Godowns and Store locations
             </p>
             <button className="btn btn-sm p-2 rounded-sm mt-5 bg-[var(--primary-btn)] font-medium">
-              Enable Godwon
+              Enable Godown
             </button>
           </div>
         </div>

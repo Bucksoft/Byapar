@@ -1,4 +1,4 @@
-import { ArrowLeft, Calendar } from "lucide-react";
+import { ArrowLeft } from "lucide-react";
 import "cally";
 import { useState } from "react";
 import { DayPicker } from "react-day-picker";
