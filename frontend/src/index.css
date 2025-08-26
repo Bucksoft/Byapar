@@ -8,6 +8,7 @@ body {
 
 :root {
   --primary-btn: rgb(0, 186, 254);
+  --primary-background: #e4e4e7;
   --primary-border: #d1d5dc;
   --secondary-btn: rgb(0, 211, 144);
   --primary-text-color: rgb(255, 255, 255);
@@ -29,4 +30,15 @@ body {
 .hide-scrollbar {
   -ms-overflow-style: none; /* IE and Edge */
   scrollbar-width: none; /* Firefox */
+}
+/* Chrome, Safari, Edge, Opera */
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* Firefox */
+input[type="number"] {
+  -moz-appearance: textfield;
 }

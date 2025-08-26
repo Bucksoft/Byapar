@@ -30,16 +30,16 @@ const DashboardPartyPage = () => {
   const handleSelectChange = (e) => {
     console.log(e.target.value);
     if (e.target.value === "Sales Invoice") {
-      navigate("/dashboard/parties/sales-invoice");
+      navigate("/dashboard/parties/sales-invoice", { state: { id: id } });
     }
     if (e.target.value === "Quotation") {
-      navigate("/dashboard/parties/create-quotation");
+      navigate("/dashboard/parties/create-quotation", { state: { id: id } });
     }
     if (e.target.value === "Proforma Invoice") {
-      navigate("/dashboard/parties/proforma-invoice");
+      navigate("/dashboard/parties/proforma-invoice", { state: { id: id } });
     }
     if (e.target.value === "Sales Return") {
-      navigate("/dashboard/parties/sales-return");
+      navigate("/dashboard/parties/sales-return", { state: { id: id } });
     }
   };
 

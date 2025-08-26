@@ -41,8 +41,8 @@ const DashboardItemsPage = () => {
   }, [isSuccess, items]);
 
   const searchedItems = items?.filter((item) =>
-    item?.itemName.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+   item?.itemName.toLowerCase().includes(searchQuery.toLowerCase())
+  ); 
 
   return (
     <main className="h-full p-2">

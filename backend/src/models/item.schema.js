@@ -52,6 +52,9 @@ const itemSchema = new mongoose.Schema(
       // required: [true, "Opening stock is required"],
       min: [0, "Opening stock cannot be negative"],
     },
+    stock: {
+      type: Number,
+    },
     itemCode: {
       type: String,
       // required: true,

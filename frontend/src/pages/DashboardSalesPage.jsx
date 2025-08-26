@@ -5,6 +5,7 @@ import { Plus, Search } from "lucide-react";
 import { FaFileInvoice } from "react-icons/fa";
 import { motion } from "framer-motion";
 import { container, dashboardLinksItems } from "../components/Sidebar";
+import { Link } from "react-router-dom";
 
 const DashboardSalesPage = () => {
   return (
@@ -58,9 +59,12 @@ const DashboardSalesPage = () => {
           </div>
 
           <div>
-            <button className="btn btn-sm bg-[var(--primary-btn)]">
+            <Link
+              to={"/dashboard/parties/sales-invoice"}
+              className="btn btn-sm bg-[var(--primary-btn)]"
+            >
               <Plus size={14} /> Create Sales Invoice
-            </button>
+            </Link>
           </div>
         </motion.div>
 
