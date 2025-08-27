@@ -7,6 +7,7 @@ import partyRoutes from "./routes/party.routes.js";
 import businessRoutes from "./routes/business.routes.js";
 import paymentInRoutes from "./routes/paymentIn.routes.js";
 import itemRoutes from "./routes/item.route.js";
+import salesRoutes from "./routes/salesInvoice.routes.js";
 import { loginViaGoogleCallback } from "./controllers/user.controller.js";
 import cookieParser from "cookie-parser";
 
@@ -32,6 +33,7 @@ app.use("/auth/google/callback", loginViaGoogleCallback);
 app.use("/api/v1/parties", partyRoutes);
 app.use("/api/v1/item", itemRoutes);
 app.use("/api/v1/payment-in", paymentInRoutes);
+app.use("/api/v1/sales-invoice", salesRoutes);
 
 app.listen(PORT, () => {
   connectDB();

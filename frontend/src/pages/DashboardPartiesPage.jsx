@@ -13,7 +13,7 @@ import DashboardNavbar from "../components/DashboardNavbar";
 import { dashboardPartiesCardDetails } from "../lib/dashboardPartiesCards";
 import { motion } from "framer-motion";
 import { container, dashboardLinksItems } from "../components/Sidebar";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { axiosInstance } from "../config/axios";
 import { useState } from "react";
@@ -25,6 +25,7 @@ import { queryClient } from "../main.jsx";
 const DashboardPartiesPage = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const { setParties } = usePartyStore();
+  const navigate = useNavigate();
 
   // DELETE PARTY
   const mutation = useMutation({
@@ -167,6 +168,8 @@ const DashboardPartiesPage = () => {
                 {/* row 1 */}
                 {parties.map((party) => (
                   <motion.tr
+                    className="cursor-pointer"
+                    onClick={() => navigate(party?._id)}
                     key={party._id}
                     initial={{
                       opacity: 0,
@@ -182,9 +185,7 @@ const DashboardPartiesPage = () => {
                       delay: 0.2,
                     }}
                   >
-                    <td className="text-left">
-                      <Link to={party?._id}>{party?.partyName}</Link>
-                    </td>
+                    <td className="text-left">{party?.partyName}</td>
                     <td>{party?.categoryName}</td>
                     <td>{party?.mobileNumber}</td>
                     <td>{party?.partyType}</td>

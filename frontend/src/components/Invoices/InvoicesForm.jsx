@@ -1,91 +1,64 @@
-import { ArrowLeft, CircleX, Keyboard, Percent, Settings } from "lucide-react";
-import { useEffect, useState } from "react";
-import { FaCirclePlus, FaPlus } from "react-icons/fa6";
+import { ArrowLeft } from "lucide-react";
+import { useState } from "react";
 import { IoCloseCircle } from "react-icons/io5";
-import scanner from "../../assets/scanner.png";
 import BankAccountPopup from "../BankAccountPopup";
-import { Link, useNavigate } from "react-router-dom";
-import { usePartyStore } from "../../store/partyStore";
-import { useItemStore } from "../../store/itemStore";
-import { LiaRupeeSignSolid } from "react-icons/lia";
-import { BsTrash3 } from "react-icons/bs";
+import { useNavigate } from "react-router-dom";
+import { useMutation } from "@tanstack/react-query";
+import { axiosInstance } from "../../config/axios";
+import { toast } from "react-hot-toast";
+import SalesInvoicePartyDetailsSection from "./SalesInvoicePartyDetailsSection";
+import SalesInvoiceItemTable from "./SalesInvoiceItemTable";
 
 const InvoicesForm = ({ title, party }) => {
-  const [open, setOpen] = useState(false);
+  const invoiceData = {
+    paymentTerms: 0,
+    dueDate: new Date(Date.now()),
+    salesInvoiceDate: new Date(Date.now()),
+    salesInvoiceNumber: 1,
+    partyName: party?.partyName || "",
+    items: [],
+
+    discountSubtotal: 0,
+    taxableAmount: "",
+    balanceAmount: 0,
+    sgst: "",
+    cgst: "",
+  };
+
   const navigate = useNavigate();
   const [notes, setNotes] = useState(false);
   const [termCondition, setTermCondition] = useState(false);
   const [charges, setCharges] = useState(false);
   const [discount, setDiscount] = useState(false);
   const [selectCheckBox, setSelectCheckBox] = useState(false);
-  const [searchPartyQuery, setSearchPartyQuery] = useState("");
-  const [searchItemQuery, setSearchItemQuery] = useState("");
-  const [showCounterId, setShowCounterId] = useState();
-  const [quantities, setQuantities] = useState({});
+
   const [addedItems, setAddedItems] = useState([]);
   const [gstAmount, setGstAmount] = useState(0);
   const [basePrice, setBasePrice] = useState(0);
+  const [data, setData] = useState(invoiceData);
 
-  const { parties } = usePartyStore();
-  const { items } = useItemStore();
+  const mutation = useMutation({
+    mutationFn: async (data) => {
+      console.log("DATA TO SEND ", { ...data, partyName: party?.partyName });
+      const res = await axiosInstance.post(`/sales-invoice`, {
+        ...data,
+        partyName: party?.partyName,
+      });
+      return res.data;
+    },
 
-  const searchedParties = parties?.filter((party) =>
-    party?.partyName.toLowerCase().includes(searchPartyQuery.toLowerCase())
-  );
-
-  const searchedItems = items?.filter((item) =>
-    item?.itemName.toLowerCase().includes(searchItemQuery.toLowerCase())
-  );
-
-  useEffect(() => {
-    if (!addedItems?.length || !quantities) return;
-
-    const getGSTPercentage = (rateString) => {
-      const match = rateString?.match(/(\d+)%/);
-      return match ? parseFloat(match[1]) : 0;
-    };
-
-    const updatedItems = addedItems.map((item) => {
-      const qty = quantities[item._id] || 0;
-      const gstRate = getGSTPercentage(item?.gstTaxRate);
-      const price = Number(item?.salesPrice) || 0;
-
-      let basePrice = 0;
-      let gstAmount = 0;
-      let finalPrice = 0;
-
-      if (item?.salesPriceType === "without tax") {
-        gstAmount = (price * gstRate) / 100;
-        basePrice = price;
-        finalPrice = basePrice + gstAmount;
-        setGstAmount(gstAmount);
-        setBasePrice(basePrice);
-      } else if (item?.salesPriceType === "with tax") {
-        basePrice = price * (100 / (100 + gstRate));
-        gstAmount = price - basePrice;
-        finalPrice = price;
-        setGstAmount(gstAmount);
-        setBasePrice(basePrice);
-      }
-
-      const totalAmount = finalPrice * qty;
-
-      return {
-        ...item,
-        quantity: qty,
-        basePrice: basePrice.toFixed(2),
-        gstAmount: gstAmount.toFixed(2),
-        finalPrice: finalPrice.toFixed(2),
-        totalAmount: totalAmount.toFixed(2),
-      };
-    });
-
-    setAddedItems(updatedItems);
-  }, [addedItems.length, quantities]);
+    onSuccess: (data) => {
+      toast.success(data.msg);
+    },
+    onError: (err) => {
+      console.log(`ERROR IN CREATING INVOICE `, err);
+      toast.error(err.response.data.msg || "Something went wrong");
+    },
+  });
 
   return (
     <main className="max-h-screen w-full">
-      {/* navbar */}
+      {/* navbar starts ----------------------------------------------------- */}
       <header className="p-2 w-full flex items-center justify-between ">
         <div className="flex items-center justify-center">
           <ArrowLeft size={18} onClick={() => navigate(-1)} />
@@ -93,440 +66,26 @@ const InvoicesForm = ({ title, party }) => {
         </div>
         <div className="flex items-center justify-center gap-5">
           <button className="btn btn-sm">Settings</button>
-          <button className="btn bg-[var(--primary-btn)] btn-sm">
+          <button
+            onClick={() => mutation.mutate(data)}
+            className="btn bg-[var(--primary-btn)] btn-sm"
+          >
             Save {title}
           </button>
         </div>
       </header>
+      {/* navbar ends ----------------------------------------------------- */}
 
-      <section className="grid grid-cols-3  h-48">
-        {/* first block */}
-        <div className="border-t border-r border-zinc-300 ">
-          <div className="bg-red flex items-center justify-between p-2 border-b border-b-zinc-300">
-            <span className="text-xs">Bill To</span>
+      {/* Upper section of invoice form invoice number, dates , party name details etc */}
+      <SalesInvoicePartyDetailsSection
+        data={data}
+        setData={setData}
+        party={party}
+      />
+      {/* Upper section of invoice form invoice number, dates , party name details etc ends here ---------------------------------------*/}
 
-            {/* Change and add new party dropdown  ----------------------------------------------*/}
-
-            <div className="dropdown dropdown-end">
-              <div tabIndex={0} role="button" className="btn btn-xs text-xxs ">
-                Change Party
-              </div>
-              <ul
-                tabIndex={0}
-                className="dropdown-content menu bg-base-100 rounded-box z-1 w-52 p-2 shadow-sm"
-              >
-                <input
-                  type="text"
-                  className="input input-sm"
-                  placeholder="Search parties"
-                  onChange={(e) => setSearchPartyQuery(e.target.value)}
-                />
-                {searchedParties.map((party) => (
-                  <li>
-                    <a>{party?.partyName}</a>
-                  </li>
-                ))}
-                <li>
-                  <Link
-                    to={"/dashboard/add-party"}
-                    className="btn btn-sm btn-dash btn-info"
-                  >
-                    Create party
-                  </Link>
-                </li>
-              </ul>
-            </div>
-
-            {/* Change and add new party dropdown ends  ----------------------------------------------*/}
-          </div>
-
-          <div className=" p-2 ">
-            <p className="text-sm font-medium ">Cash Sale</p>
-            <p className="text-xs pt-1 text-zinc-400">
-              Phone Number:{" "}
-              <span className="text-black">{party?.mobileNumber}</span>{" "}
-            </p>
-          </div>
-        </div>
-        {/* second block */}
-        <div className="border-t border-r border-zinc-300 ">
-          <div className="bg-red flex items-center justify-between p-2 border-b border-b-zinc-300">
-            <span className="text-xs">Ship To</span>
-            <button className="btn btn-xs text-xxs border">
-              Change Shipping Address
-            </button>
-          </div>
-          <div className="p-2">
-            <p className="text-sm font-medium ">Business Name</p>
-            <p className="text-xs pt-1 text-zinc-400">
-              Phone Number:{" "}
-              <span className="text-black">{party?.mobileNumber}</span>
-            </p>
-          </div>
-        </div>
-        {/* third block */}
-        <div className="border-t border-r border-zinc-300 pt-1">
-          {/* upper part */}
-          <div className=" p-2 flex space-x-2 items-center">
-            <div className="">
-              <p className="text-xs pb-2">Sales Invoice No: </p>
-              <input
-                type="number"
-                placeholder="1"
-                className="input input-xs border-none bg-zinc-200 w-30"
-              />
-            </div>
-            <div>
-              <p className="text-xs pb-2 ">Sales Invoice Date: </p>
-              <input
-                type="date"
-                placeholder=""
-                defaultValue={new Date().toISOString().split("T")[0]}
-                className="input input-xs border-none bg-zinc-200 w-30"
-              />
-            </div>
-          </div>
-          {/* lower */}
-
-          <div className="p-2">
-            <button
-              onClick={() => setOpen(true)}
-              className={`btn btn-info btn-sm btn-dash px-20 w-fit ${
-                open ? "hidden" : ""
-              }`}
-            >
-              +Add Due Date
-            </button>
-          </div>
-
-          {open && (
-            <>
-              <div className="flex justify-end  relative">
-                <IoCloseCircle
-                  size={25}
-                  onClick={() => setOpen(false)}
-                  className="text-gray-500 absolute top-0 right-57"
-                />
-              </div>
-              <div className="px-2 py-4 flex space-x-2 border border-dashed w-fit m-2 rounded-md ">
-                <div>
-                  <p className="text-xs pb-2">Payment Terms: </p>
-                  <div className="relative rounded-sm">
-                    <input
-                      type="number"
-                      placeholder=""
-                      className="input input-xs w-30"
-                    />
-                    <span className="text-xs absolute z-50 left-21 top-1 bg-zinc-200 ">
-                      Days
-                    </span>
-                  </div>
-                </div>
-                <div className="">
-                  <p className="text-xs pb-2">Due Date: </p>
-                  <input
-                    type="date"
-                    placeholder=""
-                    defaultValue={new Date().toISOString().split("T")[0]}
-                    className="input input-xs border-none bg-zinc-200 w-30"
-                  />
-                </div>
-              </div>
-            </>
-          )}
-        </div>
-      </section>
-
-      {/* third  */}
-      <div className="w-full grid grid-cols-11 text-xs">
-        <span className="border-t p-2 border-[var(--primary-border)]  uppercase bg-[var(--primary-background)]">
-          NO
-        </span>
-        <span className="border-t border-l  p-2 border-[var(--primary-border)] col-span-3 uppercase bg-[var(--primary-background)]">
-          Items/ Services
-        </span>
-        <span className="border-t border-l p-2 border-[var(--primary-border)]  uppercase bg-[var(--primary-background)]">
-          HSN/ SAC
-        </span>
-        <span className="border-t border-l p-2 border-[var(--primary-border)]  uppercase bg-[var(--primary-background)]">
-          Qty
-        </span>
-        <span className="border-l text-nowrap  border-t p-2 border-[var(--primary-border)]  uppercase bg-[var(--primary-background)]">
-          Price/Item (₹)
-        </span>
-        <span className="border-l border-t p-2 border-[var(--primary-border)]  uppercase bg-[var(--primary-background)]">
-          Discount
-        </span>
-        <span className="border-l border-t p-2 border-[var(--primary-border)] uppercase bg-[var(--primary-background)]">
-          Tax
-        </span>
-        <span className="border-l border-t p-2 border-[var(--primary-border)] uppercase bg-[var(--primary-background)]">
-          Amount (₹)
-        </span>
-        <span className="border-l border-t border-r p-2 border-[var(--primary-border)]  text-gray-500 uppercase bg-[var(--primary-background)]">
-          {/* <FaCirclePlus size={24} /> */}
-        </span>
-      </div>
-
-      {addedItems.map((addedItem, index) => (
-        <div className="w-full grid grid-cols-11 text-xs" key={addedItem?._id}>
-          <span className="border-t p-2 border-[var(--primary-border)] ">
-            {index + 1}
-          </span>
-          <span className="border-t border-l  p-2 border-[var(--primary-border)] col-span-3">
-            {addedItem?.itemName}
-          </span>
-          <span className="border-t border-l p-2 border-[var(--primary-border)] ">
-            {addedItem?.HSNCode || "-"}
-          </span>
-          <span className="border-t border-l p-2 border-[var(--primary-border)] ">
-            <input
-              className="input input-xs bg-zinc-100 text-right"
-              value={addedItem?.quantity}
-            />
-          </span>
-          <span className="border-l text-nowrap  border-t p-2 border-[var(--primary-border)] ">
-            <input
-              className="input input-xs bg-zinc-100 text-right"
-              value={addedItem?.basePrice}
-            />
-          </span>
-
-          <span className="border-l relative border-t p-2 border-[var(--primary-border)] ">
-            <input
-              className="input input-xs bg-zinc-100 text-right"
-              // value={addedItem?.salesPrice}
-            />
-            <Percent size={10} className="absolute top-[14.3px] left-3 z-10" />
-            <input
-              className="input input-xs bg-zinc-100 text-right mt-1"
-              // value={addedItem?.salesPrice}
-            />
-            <LiaRupeeSignSolid className="absolute top-[41.3px] left-3 z-10" />
-          </span>
-
-          <p className="border-l  border-t p-2 border-[var(--primary-border)] ">
-            <input
-              className="input input-xs bg-zinc-100 text-right"
-              value={addedItem?.gstAmount}
-            />
-            <h5 className="text-zinc-500 mt-1">({addedItem?.gstTaxRate})</h5>
-            <small className="text-[var(--secondary-text-color)]">
-              {addedItem?.salesPriceType}
-            </small>
-          </p>
-
-          <span className="relative border-l border-t p-2 border-[var(--primary-border)] ">
-            <input
-              className="input input-xs bg-zinc-100 text-right"
-              value={addedItem?.totalAmount}
-            />
-            <LiaRupeeSignSolid className="absolute top-[14.3px] left-3 z-10" />
-          </span>
-
-          <span className="border-l grid place-items-center border-t border-r p-2 border-[var(--primary-border)]  text-[var(--error-text-color)]">
-            <BsTrash3
-              size={20}
-              className="cursor-pointer"
-              onClick={() => {
-                const filteredItems = addedItems.filter(
-                  (item) => item?._id !== addedItem?._id
-                );
-                setAddedItems(filteredItems);
-              }}
-            />
-          </span>
-        </div>
-      ))}
-
-      {/* button barcode div */}
-      <div className="p-2 flex border-t border-r border-[var(--primary-border)]">
-        {/* Add Item dialog box -------------------------------------------------------- */}
-
-        <div className="w-7/10">
-          <button
-            onClick={() => document.getElementById("my_modal_1").showModal()}
-            className="btn btn-info btn-sm btn-dash w-full hover:bg-none"
-          >
-            + Add Item
-          </button>
-
-          <dialog id="my_modal_1" className="modal">
-            <div className="modal-box max-w-5xl p-0">
-              <h3 className="font-semibold text-lg bg-zinc-100 p-2">
-                Add Items
-              </h3>
-              <div className="p-4">
-                <div className="flex items-center gap-3">
-                  <input
-                    type="text"
-                    placeholder="Search Items"
-                    className="input input-sm w-1/2"
-                    value={searchItemQuery}
-                    onChange={(e) => setSearchItemQuery(e.target.value)}
-                  />
-                  <select
-                    defaultValue="Select Category"
-                    className="select select-sm"
-                  >
-                    <option disabled={true}>Select Category</option>
-                    <option>Crimson</option>
-                  </select>
-                  <Link
-                    to={"/dashboard/items/basic-details"}
-                    className="btn btn-dash btn-info btn-sm  w-1/2"
-                  >
-                    Create New Item
-                  </Link>
-                </div>
-
-                <div className="overflow-x-auto mt-4  rounded-box border border-base-content/5 bg-base-100">
-                  <table className="table">
-                    {/* head */}
-                    <thead>
-                      <tr className="text-xs bg-zinc-100">
-                        <th>Item Name</th>
-                        <th>Item Code</th>
-                        <th>Sales Price</th>
-                        <th>Purchase Price</th>
-                        <th>Current Stock</th>
-                        <th>Quantity</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {items &&
-                        searchedItems.map((item) => (
-                          <tr>
-                            <td>{item?.itemName || "-"}</td>
-                            <td>{item?.itemCode || "-"}</td>
-                            <td className="flex items-center">
-                              <LiaRupeeSignSolid /> {item?.salesPrice || "-"}
-                            </td>
-                            <td>-</td>
-                            <td>{item?.openingStock || "-"}</td>
-                            <td>
-                              {showCounterId === item?._id ? (
-                                <div className="flex justify-center">
-                                  <button
-                                    onClick={() =>
-                                      setQuantities((prev) => ({
-                                        ...prev,
-                                        [item._id]: Math.max(
-                                          (prev[item._id] || 0) - 1,
-                                          0
-                                        ),
-                                      }))
-                                    }
-                                    className="btn btn-xs btn-info"
-                                  >
-                                    -
-                                  </button>
-
-                                  <input
-                                    type="number"
-                                    min={0}
-                                    value={quantities[item._id] || 0}
-                                    onChange={(e) =>
-                                      setQuantities((prev) => ({
-                                        ...prev,
-                                        [item._id]: Number(e.target.value),
-                                      }))
-                                    }
-                                    placeholder="0"
-                                    className="input input-xs w-15 text-center"
-                                  />
-
-                                  <button
-                                    onClick={() =>
-                                      setQuantities((prev) => ({
-                                        ...prev,
-                                        [item._id]: (prev[item._id] || 0) + 1,
-                                      }))
-                                    }
-                                    className="btn btn-xs btn-info"
-                                  >
-                                    +
-                                  </button>
-
-                                  <CircleX
-                                    size={18}
-                                    className="ml-2"
-                                    onClick={() => setShowCounterId(false)}
-                                  />
-                                </div>
-                              ) : (
-                                <button
-                                  onClick={() => setShowCounterId(item?._id)}
-                                  className="btn btn-xs w-full "
-                                >
-                                  Add
-                                </button>
-                              )}
-                            </td>
-                          </tr>
-                        ))}
-                    </tbody>
-                  </table>
-                </div>
-              </div>
-              <div className="modal-action p-4 ">
-                <form method="dialog">
-                  {/* if there is a button in form, it will close the modal */}
-                  <button className="btn btn-sm w-32">Cancel</button>
-                </form>
-                <button
-                  className="btn btn-sm w-32 bg-[var(--primary-btn)]"
-                  onClick={() => {
-                    const selected = items
-                      .filter((item) => (quantities[item._id] || 0) > 0)
-                      .map((item) => ({
-                        ...item,
-                        quantity: quantities[item._id],
-                      }));
-
-                    setAddedItems(selected);
-                    document.getElementById("my_modal_1").close();
-                    setShowCounterId(false);
-                  }}
-                >
-                  Done
-                </button>
-              </div>
-            </div>
-          </dialog>
-        </div>
-
-        {/* Add Item dialog box ends -------------------------------------------------------- */}
-
-        <div className="px-2 ml-2 border border-[var(--primary-border)] w-3/10 rounded-sm">
-          <div className="flex items-center gap-10 justify-center">
-            <img src={scanner} alt="qrcode_scanner" className="size-6" />
-            <span className="font-medium">Scan Barcode</span>
-          </div>
-        </div>
-      </div>
-
-      <div className="w-full grid grid-cols-11 text-sm">
-        <span className="border-t border-b border-r p-2 border-[var(--primary-border)] col-span-8 text-end font-semibold">
-          SUBTOTAL
-        </span>
-        <span className="border-t border-r border-b p-2 border-[var(--primary-border)] ">
-          ₹ 0
-        </span>
-        <span className="border-t border-b p-2 border-[var(--primary-border)]">
-          ₹{" "}
-          {addedItems
-            .reduce((acc, item) => acc + Number(item?.gstAmount || 0), 0)
-            .toFixed(2)}
-        </span>
-
-        <span className="border p-2 border-[var(--primary-border)] ">
-          ₹{" "}
-          {addedItems
-            .reduce((acc, item) => acc + Number(item?.totalAmount || 0), 0)
-            .toFixed(2)}
-        </span>
-      </div>
+      {/* This is the table where items are listed with their prices ----------------------------*/}
+      <SalesInvoiceItemTable data={data} setData={setData} />
 
       {/* bottom grid part */}
       <div className="grid grid-cols-2 w-full ">
@@ -540,7 +99,7 @@ const InvoicesForm = ({ title, party }) => {
                 notes ? "hidden" : ""
               }`}
             >
-              +Add Notes
+              + Add Notes
             </span>
             {notes && (
               <div className="p-2">
@@ -649,7 +208,10 @@ const InvoicesForm = ({ title, party }) => {
           <div className="flex justify-between py-2">
             <span className={`px-2 w-fit text-xs`}>Taxable Amount</span>
             <span className=" text-xs pr-5">
-              ₹ {addedItems.length > 0 ? basePrice.toFixed(2) : 0}
+              ₹{" "}
+              {addedItems.length > 0
+                ? Number(basePrice.toFixed(2)).toLocaleString("en-IN")
+                : 0}
             </span>
           </div>
           {addedItems.length > 0 && (
@@ -657,13 +219,13 @@ const InvoicesForm = ({ title, party }) => {
               <div className="flex justify-between py-2">
                 <span className={`px-2 w-fit text-xs`}>SGST</span>
                 <span className=" text-xs pr-5">
-                  ₹ {(gstAmount / 2).toFixed(2)}
+                  ₹ {Number((gstAmount / 2).toFixed(2)).toLocaleString("en-IN")}
                 </span>
               </div>
               <div className="flex justify-between py-2">
                 <span className={`px-2 w-fit text-xs`}>CGST</span>
                 <span className=" text-xs pr-5">
-                  ₹ {(gstAmount / 2).toFixed(2)}
+                  ₹ {Number((gstAmount / 2).toFixed(2)).toLocaleString("en-IN")}
                 </span>
               </div>
             </>
@@ -757,7 +319,9 @@ const InvoicesForm = ({ title, party }) => {
               {addedItems.length > 0 ? (
                 <>
                   ₹{" "}
-                  {Number(basePrice.toFixed(2)) + Number(gstAmount.toFixed(2))}
+                  {Number(
+                    Number(basePrice.toFixed(2)) + Number(gstAmount.toFixed(2))
+                  ).toLocaleString("en-IN")}
                 </>
               ) : (
                 <input
@@ -780,8 +344,13 @@ const InvoicesForm = ({ title, party }) => {
                 <span className="mr-4">
                   {addedItems.length > 0 ? (
                     <>
-                      ₹ Number(basePrice.toFixed(2)) +
-                      Number(gstAmount.toFixed(2))
+                      {"₹" +
+                        Number(
+                          Number(basePrice.toFixed(2)) +
+                            Number(gstAmount.toFixed(2))
+                        )
+                          .toFixed(2)
+                          .toLocaleString("en-IN")}
                     </>
                   ) : (
                     <span>₹ 0</span>

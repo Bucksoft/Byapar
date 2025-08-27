@@ -1,8 +1,8 @@
 import express from "express";
-import { createPaymentIn } from "../controllers/paymentIn.controller.js";
+import { createSalesInvoice } from "../controllers/salesInvoice.controller.js";
 import { isAuth } from "../middleware/auth.middleware.js";
-
 const router = express.Router();
-router.post("/", isAuth, createPaymentIn);
+
+router.route("/").post(isAuth, createSalesInvoice);
 
 export default router;

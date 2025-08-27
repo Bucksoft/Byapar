@@ -6,13 +6,14 @@ import {
   getAllItems,
   updateItem,
 } from "../controllers/item.controller.js";
+import { isAuth } from "../middleware/auth.middleware.js";
 
 const router = express.Router();
 
-router.route("/").post(createItem);
-router.route("/all").get(getAllItems);
-router.route("/").delete(deleteItem);
-router.route("/:id").delete(deleteSingleItem);
-router.route("/:id").patch(updateItem);
+router.route("/").post(isAuth, createItem);
+router.route("/all").get(isAuth, getAllItems);
+router.route("/").delete(isAuth, deleteItem);
+router.route("/:id").delete(isAuth, deleteSingleItem);
+router.route("/:id").patch(isAuth, updateItem);
 
 export default router;
