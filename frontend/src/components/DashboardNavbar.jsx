@@ -41,7 +41,7 @@ const DashboardNavbar = ({ title, isReport }) => {
         <div className="">
           {isReport && (
             <select onChange={handleChange} className="select select-sm">
-              {title === "Items" && (
+              {title === "Items" ? (
                 <>
                   <option value={"Rate List"} className="hidden">
                     Rate List
@@ -53,6 +53,18 @@ const DashboardNavbar = ({ title, isReport }) => {
                     Item Sales Summary
                   </option>
                 </>
+              ) : (
+                title === "Sales Invoice" && (
+                  <>
+                    <option value={"Sales Summary"} className="hidden">
+                      Sales Summary
+                    </option>
+                    <option value={"Sales Summary"}>Sales Summary</option>
+                    <option value={"GSTR-1 (Sales)"}>GSTR-1 (Sales)</option>
+                    <option value={"DayBook"}>DayBook</option>
+                    <option value={"Bill Wise Profit"}>Bill Wise Profit</option>
+                  </>
+                )
               )}
             </select>
           )}

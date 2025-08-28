@@ -373,11 +373,11 @@ const SalesInvoiceItemTable = ({ data, setData }) => {
           ₹ 0
         </span>
         <span className="border-t border-b p-2 border-[var(--primary-border)]">
-          ₹ {Number(data.taxSubTotal).toLocaleString("en-IN")}
+          ₹ {Number(data.taxSubTotal || 0).toLocaleString("en-IN")}
         </span>
 
         <span className="border p-2 border-[var(--primary-border)] ">
-          ₹ {Number(data.amountSubTotal).toLocaleString("en-IN")}
+          ₹ {Number(data.amountSubTotal || 0).toLocaleString("en-IN")}
         </span>
       </div>
     </>

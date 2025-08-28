@@ -6,6 +6,7 @@ const SalesInvoicePartyDetailsSection = ({ data, setData, party }) => {
   const [searchPartyQuery, setSearchPartyQuery] = useState("");
   const [open, setOpen] = useState(false);
   const { parties } = usePartyStore();
+  
   const searchedParties = parties?.filter((party) =>
     party?.partyName.toLowerCase().includes(searchPartyQuery.toLowerCase())
   );

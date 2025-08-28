@@ -31,8 +31,8 @@ const salesInvoiceSchema = new mongoose.Schema({
   discountSubtotal: {
     type: Number,
   },
-  notes: [String],
-  termsAndCondition: [String],
+  notes: String,
+  termsAndCondition: String,
   taxableAmount: String,
   sgst: String,
   cgst: String,
@@ -43,6 +43,11 @@ const salesInvoiceSchema = new mongoose.Schema({
   balanceAmount: {
     type: Number,
     required: true,
+  },
+  status: {
+    type: String,
+    enum: ["paid", "unpaid"],
+    default: "unpaid",
   },
 });
 

@@ -31,11 +31,6 @@ export async function login(req, res) {
 
     // check if user already exists
 
-
-
-
-
-
     // login logic
     // 1. generate OTP - 6 digits
     const otp = crypto.randomInt(100000, 1000000).toString();
@@ -212,7 +207,6 @@ export async function getUserCredential(req, res) {
   try {
     const id = req.user?.id;
     const user = await UserCredential.findById(id);
-    console.log(id);
     if (!user) {
       return res.status(400).json({ success: false, msg: "User not found" });
     }

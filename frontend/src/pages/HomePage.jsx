@@ -1,8 +1,6 @@
-import wave from "../assets/wave.svg";
 import Button from "../components/Button";
 import HomePageNavigation from "../components/Homepage/HomePageNavigation";
 import { BsBoxArrowInUpRight } from "react-icons/bs";
-import { useAuthStore } from "../store/authStore";
 
 const HomePage = () => {
   return (

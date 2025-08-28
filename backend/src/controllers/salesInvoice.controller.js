@@ -5,20 +5,21 @@ import Party from "../models/party.schema.js";
 export async function createSalesInvoice(req, res) {
   try {
     const validatedResult = salesInvoiceSchema.safeParse(req.body);
-    const partyName = validatedResult.data?.partyName;
-    const party = await Party.findOne({
-      partyName,
-    });
-    
-    if (!party) {
-      res.status(400).json({ success: false, msg: "Party doesn't exists" });
-    }
-
     if (!validatedResult.success) {
       const validationError = validatedResult.error.format();
       return res
         .status(422)
         .json({ success: false, msg: "Validation failed", validationError });
+    }
+    const partyName = validatedResult.data?.partyName;
+    const party = await Party.findOne({
+      partyName,
+    });
+
+    if (!party) {
+      return res
+        .status(400)
+        .json({ success: false, msg: "Party doesn't exists" });
     }
 
     const existingInvoice = await SalesInvoice.findOne({
@@ -50,6 +51,44 @@ export async function createSalesInvoice(req, res) {
     });
   } catch (error) {
     console.log("ERROR IN CREATING SALES INVOICE ");
+    return res.status(500).json({ err: "Internal server error", error });
+  }
+}
+
+export async function getAllInvoices(req, res) {
+  try {
+    const invoices = await SalesInvoice.find().populate("partyId");
+    if (!invoices) {
+      return res
+        .status(400)
+        .json({ success: false, msg: "Invoices not found" });
+    }
+    return res.status(200).json({ success: true, invoices });
+  } catch (error) {
+    console.log("ERROR IN GETTING  SALES INVOICE ");
+    return res.status(500).json({ err: "Internal server error", error });
+  }
+}
+
+export async function deleteInvoice(req, res) {
+  try {
+    const { id } = req.params;
+    if (!id) {
+      return res
+        .status(400)
+        .json({ success: false, msg: "Please provide invoice id" });
+    }
+    const deletedInvoice = await SalesInvoice.findByIdAndDelete(id);
+    if (!deleteInvoice) {
+      return res
+        .status(400)
+        .json({ success: false, msg: "Failed to delete sales invoice" });
+    }
+    return res
+      .status(200)
+      .json({ success: true, msg: "Invoice deleted successfully" });
+  } catch (error) {
+    console.log("ERROR IN DELETING SALES INVOICE ");
     return res.status(500).json({ err: "Internal server error", error });
   }
 }

@@ -1,8 +1,14 @@
 import express from "express";
-import { createSalesInvoice } from "../controllers/salesInvoice.controller.js";
+import {
+  createSalesInvoice,
+  deleteInvoice,
+  getAllInvoices,
+} from "../controllers/salesInvoice.controller.js";
 import { isAuth } from "../middleware/auth.middleware.js";
 const router = express.Router();
 
 router.route("/").post(isAuth, createSalesInvoice);
+router.route("/").get(isAuth, getAllInvoices);
+router.route("/:id").delete(isAuth, deleteInvoice);
 
 export default router;

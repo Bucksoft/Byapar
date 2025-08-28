@@ -6,20 +6,20 @@ export const dashboardSaledCardsDetails = [
     label: "Total Sales",
     value: "0",
     icon: <FaFileInvoice />,
-    color: "primary",
+    color: "#FF637D",
   },
   {
     id: 2,
     label: "Paid",
     value: "0",
     icon: <FaFileInvoice />,
-    color: "warning",
+    color: "#FCB700",
   },
   {
     id: 3,
     label: "Unpaid",
     value: "0",
     icon: <FaFileInvoice />,
-    color: "success",
+    color: "#00D390",
   },
 ];

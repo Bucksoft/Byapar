@@ -41,10 +41,8 @@ const Sidebar = () => {
   const navigate = useNavigate();
   const { user, setUser } = useAuthStore();
   const [currentLink, setCurrentLink] = useState("");
-  const handleChange = (e) => {
-    const selectedLink = e.target.value;
-    if (selectedLink) navigate(selectedLink);
-  };
+  
+
 
   const mutation = {
     mutationFn: async () => {
@@ -70,12 +68,13 @@ const Sidebar = () => {
           }}
           className="sticky top-0 z-10 text-md text-white font-semibold flex items-center gap-3 w-full px-5 py-3 bg-white/10 backdrop-blur-md"
         >
-          <img
+          {/* <img
             src={ByaparLogo}
             alt="Byapar_logo"
-            className="-ml-8"
-            width={150}
-          />
+            className="-ml-8 w-16 h-16 "
+            width={100}
+          /> */}
+          Byapar
         </motion.h1>
 
         {/* business details */}

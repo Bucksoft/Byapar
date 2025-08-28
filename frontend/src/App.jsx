@@ -51,6 +51,8 @@ import DashboardSalesReturnInvoicePage from "./pages/DashboardSalesInvoicePage";
 import DashboardItemsBasicDetailPage from "./pages/Items/DashboardItemsBasicDetailPage";
 import DashboardItemsSidebar from "./pages/Items/DashboardItemsSidebar";
 import SingleItemPage from "./components/Items/SingleItemPage";
+import DashboardAllTransactionsPage from "./pages/DashboardAllTransactionsPage";
+import DashboardCreatePaymentOutPage from "./pages/Purchases/DashboardCreatePaymentOutPage";
 
 function App() {
   const { user, setUser } = useAuthStore();
@@ -82,6 +84,11 @@ function App() {
           <Route
             path="/dashboard/parties/:id"
             element={<DashboardPartyPage />}
+          />
+
+          <Route
+            path="/dashboard/all-transactions"
+            element={<DashboardAllTransactionsPage />}
           />
 
           <Route
@@ -129,6 +136,10 @@ function App() {
           <Route
             path="/dashboard/payment-out"
             element={<DashboardPaymentOutPage />}
+          />
+          <Route
+            path="/dashboard/create-payment-out"
+            element={<DashboardCreatePaymentOutPage />}
           />
 
           <Route

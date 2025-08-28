@@ -4,8 +4,14 @@ import { IoReceiptOutline } from "react-icons/io5";
 import DashboardCard from "../components/DashboardCard";
 import { dashboardCardDetails } from "../lib/dashboardCardDetails";
 import { motion } from "framer-motion";
+import { useInvoiceStore } from "../store/invoicesStore";
+import { LiaRupeeSignSolid } from "react-icons/lia";
+import { useEffect } from "react";
+import { Link } from "react-router-dom";
 
 const DashboardPage = () => {
+  const { invoices } = useInvoiceStore();
+
   return (
     <main className="h-full ">
       <div className="h-full w-full  rounded-lg p-3">
@@ -90,22 +96,56 @@ const DashboardPage = () => {
                   Latest Transactions
                 </h1>
                 <div className="overflow-x-auto">
-                  <table className="table text-sm mt-2 ">
-                    {/* head */}
-                    <thead className="bg-zinc-200">
-                      <tr>
-                        <th className="font-medium">DATE</th>
-                        <th className="font-medium">TYPE</th>
-                        <th className="font-medium">TXN NO</th>
-                        <th className="font-medium">PARTY NAME</th>
-                        <th className="font-medium">AMOUNT</th>
-                      </tr>
-                    </thead>
-                  </table>
-                  <div className="text-sm text-center text-zinc-500 my-10 flex items-center justify-center flex-col gap-3">
-                    <IoReceiptOutline size={40} />
-                    Create your first transaction
-                  </div>
+                  {invoices ? (
+                    <>
+                      <table className="table text-sm mt-2 ">
+                        {/* head */}
+                        <thead className="bg-zinc-200">
+                          <tr>
+                            <th className="font-medium">DATE</th>
+                            <th className="font-medium">TYPE</th>
+                            <th className="font-medium">TXN NO</th>
+                            <th className="font-medium">PARTY NAME</th>
+                            <th className="font-medium">AMOUNT</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {invoices &&
+                            invoices.map((invoice) => (
+                              <tr>
+                                <td>
+                                  {invoice?.salesInvoiceDate.split("T")[0] ||
+                                    "-"}
+                                </td>
+                                <td>{invoice?.type || "-"}</td>
+                                <td>{invoice?.salesInvoiceNumber || "-"}</td>
+                                <td>{invoice?.partyId?.partyName || "-"}</td>
+                                <td className="flex items-center">
+                                  {" "}
+                                  <LiaRupeeSignSolid />{" "}
+                                  {Number(invoice?.totalAmount).toLocaleString(
+                                    "en-IN"
+                                  ) || "-"}
+                                </td>
+                              </tr>
+                            ))}
+                        </tbody>
+                      </table>
+                      <div className="w-full text-center mt-2">
+                        <Link
+                          to={"/dashboard/all-transactions"}
+                          className="text-xs text-blue-500 hover:text-blue-600  "
+                        >
+                          View All Transactions
+                        </Link>
+                      </div>
+                    </>
+                  ) : (
+                    <div className="text-sm text-center text-zinc-500 my-10 flex items-center justify-center flex-col gap-3">
+                      <IoReceiptOutline size={40} />
+                      Create your first transaction
+                    </div>
+                  )}
                 </div>
               </motion.div>
 

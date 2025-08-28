@@ -11,8 +11,6 @@ export async function createBusiness(req, res) {
     // if (logoFile) {
     //   data.logo = logoFile.path;
     // }
-    console.log("LOGO FILE : ", logoFile);
-    console.log("SIGNTAURE FILE : ", signatureFile);
 
     // CHECK IF THE SAME BUSINESS IS ALREADY PRESENT OR NOT
     if (data.TDS) {
@@ -32,11 +30,8 @@ export async function createBusiness(req, res) {
       });
     }
 
-    console.log(data);
-
     // VALIDATE THE DATA
     const validatedResult = businessSchema.safeParse(data);
-    console.log(validatedResult);
     if (!validatedResult.success) {
       const validationError = validatedResult.error.format();
       return res
@@ -45,7 +40,13 @@ export async function createBusiness(req, res) {
     }
 
     // CREATE THE BUSINESS
-    const business = await Business.create(validatedResult.data);
+    const dataToInsert = validatedResult.data;
+    const business = await Business.create({
+      ...dataToInsert,
+      clientId: req?.user?.id,
+    });
+
+    
     if (!business) {
       return res
         .status(400)
@@ -105,21 +106,21 @@ export async function getBusiness(req, res) {
     if (!id) {
       return res
         .status(400)
-        .json({ success: false, msg: "Please provide business ID" });
+        .json({ success: false, msg: "Please provide user ID" });
     }
 
     // FIND THE BUSINESS BASED ON THE ID AND UPDATE
-    const business = await Business.findById(id);
+    const business = await Business.findById({
+      clientId: req.user.id,
+    });
     if (!business) {
       return res
         .status(400)
-        .json({ success: false, msg: "Business could not be updated" });
+        .json({ success: false, msg: "Business not found" });
     }
 
     // RETURN SUCCESS RESPONSE
-    return res
-      .status(200)
-      .json({ success: true, msg: "Business details updated", business });
+    return res.status(200).json({ success: true, business });
   } catch (error) {
     console.log("Error in updating business details", error);
     return res
