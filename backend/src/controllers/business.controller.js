@@ -9,6 +9,10 @@ export async function createBusiness(req, res) {
     const logoFile = req.files?.logo?.[0];
     const signatureFile = req.files?.signature?.[0];
 
+    if (data.gstRegistered) {
+      data.gstRegistered = Boolean(data.gstRegistered);
+    }
+
     if (logoFile) {
       data.logo = logoFile.path;
     }

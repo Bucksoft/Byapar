@@ -9,11 +9,13 @@ import CustomLoader from "../components/Loader";
 import { usePartyStore } from "../store/partyStore";
 import { queryClient } from "../main";
 import { motion } from "framer-motion";
+import { useBusinessStore } from "../store/businessStore";
 
 const DashboardAddPartyPage = () => {
   const navigate = useNavigate();
   const { setParty } = usePartyStore();
   const [addCategoryPopup, setAddCategoryPopup] = useState(false);
+  const { business } = useBusinessStore();
   const [cities, setCities] = useState([]);
   const [data, setData] = useState({
     partyName: "",
@@ -33,6 +35,8 @@ const DashboardAddPartyPage = () => {
     creditLimit: null,
     pincode: "",
   });
+
+  console.log("CURRENT BUSINESS", business);
 
   // handling the input field changes
   const handleInputChange = (e) => {

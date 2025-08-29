@@ -94,66 +94,77 @@ export const partySchema = z.object({
   status: z.enum(["active", "inactive"]).default("active"),
 });
 
-export const businessSchema = z.object({
-  logo: z.string().optional(),
-  businessName: z
-    .string()
-    .min(5, "Business name must be atleast 5 characters long")
-    .max(30, "Business name must be atmost 30 characters long"),
-  businessType: z.enum(
-    ["Retailer", "Wholesaler", "Distributor", "Manufacturer", "Services"],
-    {
-      errorMap: () => ({
-        message:
-          "Business type cannot be other than Retailer, Wholesaler, Distributor, Manufacturer or Services",
-      }),
+export const businessSchema = z
+  .object({
+    logo: z.string().optional(),
+    businessName: z
+      .string()
+      .min(5, "Business name must be atleast 5 characters long")
+      .max(30, "Business name must be atmost 30 characters long"),
+    businessType: z.enum(
+      ["Retailer", "Wholesaler", "Distributor", "Manufacturer", "Services"],
+      {
+        errorMap: () => ({
+          message:
+            "Business type cannot be other than Retailer, Wholesaler, Distributor, Manufacturer or Services",
+        }),
+      }
+    ),
+    industryType: z.string("Please select an Industry type"),
+    businessRegType: z.string("Please select a Business registration type"),
+    companyPhoneNo: z
+      .string()
+      .regex(
+        /^[6-9]\d{9}$/,
+        "Mobile number must be a valid 10-digit Indian mobile number"
+      ),
+    companyEmail: z.email("Invalid email address"),
+    billingAddress: z
+      .string()
+      .min(10, "Billing address must be at least 10 characters long")
+      .max(200, "Billing address must be at most 200 characters long"),
+    state: z
+      .string()
+      .min(2, "State name must be at least 2 characters long")
+      .regex(/^[a-zA-Z\s]+$/, "State name can only contain letters and spaces"),
+
+    city: z
+      .string()
+      .min(2, "City name must be at least 2 characters long")
+      .regex(/^[a-zA-Z\s]+$/, "City name can only contain letters and spaces"),
+
+    pincode: z
+      .string()
+      .regex(
+        /^[1-9][0-9]{5}$/,
+        "Pincode must be a valid 6-digit Indian postal code"
+      ),
+
+    panNumber: z
+      .string()
+      .regex(/^[A-Z]{5}[0-9]{4}[A-Z]{1}$/, "Invalid PAN number"),
+    TDS: z.boolean().default(false),
+    TCS: z.boolean().default(false),
+    additionalInfo: z.string("Please enter some information").optional(),
+    signature: z.string().optional(),
+
+    gstRegistered: z.boolean().default(false).optional(),
+    gstNumber: z
+      .string()
+      .regex(
+        /^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}Z[0-9A-Z]{1}$/,
+        "Invalid GSTIN format"
+      ),
+  })
+  .superRefine((data, ctx) => {
+    if (data.gstRegistered && !data.gstNumber) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: "GST Number is required when GST Registered is true",
+        path: ["gstNumber"],
+      });
     }
-  ),
-  industryType: z.string("Please select an Industry type"),
-  businessRegType: z.string("Please select a Business registration type"),
-  companyPhoneNo: z
-    .string()
-    .regex(
-      /^[6-9]\d{9}$/,
-      "Mobile number must be a valid 10-digit Indian mobile number"
-    ),
-  companyEmail: z.email("Invalid email address"),
-  billingAddress: z
-    .string()
-    .min(10, "Billing address must be at least 10 characters long")
-    .max(200, "Billing address must be at most 200 characters long"),
-  state: z
-    .string()
-    .min(2, "State name must be at least 2 characters long")
-    .regex(/^[a-zA-Z\s]+$/, "State name can only contain letters and spaces"),
-
-  city: z
-    .string()
-    .min(2, "City name must be at least 2 characters long")
-    .regex(/^[a-zA-Z\s]+$/, "City name can only contain letters and spaces"),
-
-  pincode: z
-    .string()
-    .regex(
-      /^[1-9][0-9]{5}$/,
-      "Pincode must be a valid 6-digit Indian postal code"
-    ),
-
-  // gstRegistered: z.boolean().default(false).optional(),
-  gstNumber: z
-    .string()
-    .regex(
-      /^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}Z[0-9A-Z]{1}$/,
-      "Invalid GSTIN format"
-    ),
-  panNumber: z
-    .string()
-    .regex(/^[A-Z]{5}[0-9]{4}[A-Z]{1}$/, "Invalid PAN number"),
-  TDS: z.boolean().default(false),
-  TCS: z.boolean().default(false),
-  additionalInfo: z.string("Please enter some information").optional(),
-  signature: z.string().optional(),
-});
+  });
 
 export const bankAccountSchema = z.object({
   accountName: z.string().min(1, "Account name is required"),

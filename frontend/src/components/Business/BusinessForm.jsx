@@ -33,7 +33,7 @@ const BusinessForm = () => {
     billingAddress: "",
     state: "",
     city: "",
-    gstRegistered: "no",
+    gstRegistered: false,
     gstNumber: "",
     panNumber: "",
     TDS: false,
@@ -105,10 +105,6 @@ const BusinessForm = () => {
       formData.append(key, value);
     });
 
-    for (let pair of formData.entries()) {
-      console.log(`${pair[0]}:`, pair[1]);
-    }
-
     if (additionalInformation.length > 0) {
       formData.append(
         "additionalInformation",
@@ -116,7 +112,6 @@ const BusinessForm = () => {
       );
     }
 
-    console.log([...formData]);
     mutation.mutate(formData);
   };
 
@@ -379,55 +374,43 @@ const BusinessForm = () => {
             </p>
             <div className="flex   ">
               <div className="flex items-center gap-2 w-3/4 justify-between">
-                <label className="text-xs font-semibold cursor-pointer flex items-center hover:bg-gray-100 justify-between border w-1/2 p-2 border-[var(--primary-border)] rounded hover:border-[var(--primary-btn)]">
-                  Yes
+                <label className="text-xs font-semibold cursor-pointer flex items-center gap-2">
                   <input
-                    type="radio"
+                    type="checkbox"
                     name="gstRegistered"
-                    value="yes"
+                    checked={data.gstRegistered}
                     disabled={mutation?.isPending}
                     onChange={handleInputChange}
-                    className="radio radio-[var(--primary-btn)] radio-sm"
-                    checked={data.gstRegistered === "yes"}
+                    className="checkbox checkbox-sm checkbox-info"
                   />
-                </label>
-
-                <label className="text-xs font-semibold cursor-pointer hover:bg-gray-100 w-1/2 p-2 flex items-center justify-between border border-[var(--primary-border)] rounded hover:border-[var(--primary-btn)]">
-                  No
-                  <input
-                    type="radio"
-                    name="gstRegistered"
-                    value="no"
-                    disabled={mutation?.isPending}
-                    onChange={handleInputChange}
-                    className="radio radio-[var(--primary-btn)] radio-sm"
-                    checked={data.gstRegistered === "no"}
-                  />
+                  GST Registered
                 </label>
               </div>
             </div>
           </div>
 
-          <div className="flex flex-col gap-2 justify-center mt-3 w-full">
-            <p className="text-[13px] text-gray-500">
-              GSTIN<span className="text-red-600">*</span>
-            </p>
-            <input
-              type="text"
-              name="gstNumber"
-              value={data.gstNumber}
-              disabled={mutation?.isPending}
-              onChange={handleInputChange}
-              placeholder="Enter your GST number"
-              className="input input-sm"
-            />
-            <small className="text-xs text-[var(--error-text-color)] ">
-              {
-                mutation.error?.response?.data?.validationError?.gstNumber
-                  ?._errors[0]
-              }
-            </small>
-          </div>
+          {data.gstRegistered && (
+            <div className="flex flex-col gap-2 justify-center mt-3 w-full">
+              <p className="text-[13px] text-gray-500">
+                GSTIN<span className="text-red-600">*</span>
+              </p>
+              <input
+                type="text"
+                name="gstNumber"
+                value={data.gstNumber}
+                disabled={mutation?.isPending}
+                onChange={handleInputChange}
+                placeholder="Enter your GST number"
+                className="input input-sm"
+              />
+              <small className="text-xs text-[var(--error-text-color)] ">
+                {
+                  mutation.error?.response?.data?.validationError?.gstNumber
+                    ?._errors[0]
+                }
+              </small>
+            </div>
+          )}
 
           <div className=" font-semibold mt-3 base flex items-center justify-between w-full p-[5.8px] px-3 text-xs border border-[var(--primary-border)]  rounded text-purple-300">
             Enable e-Invoicing

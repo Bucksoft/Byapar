@@ -41,8 +41,8 @@ const businessSchema = new mongoose.Schema({
     type: String,
   },
   gstRegistered: {
-    type: String,
-    default: "no",
+    type: Boolean,
+    default: false,
   },
   gstNumber: {
     type: String,
