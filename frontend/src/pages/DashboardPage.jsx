@@ -1,12 +1,11 @@
 import { Menu, MessageCircle } from "lucide-react";
-import Sidebar, { container, dashboardLinksItems } from "../components/Sidebar";
+import { container, dashboardLinksItems } from "../components/Sidebar";
 import { IoReceiptOutline } from "react-icons/io5";
 import DashboardCard from "../components/DashboardCard";
 import { dashboardCardDetails } from "../lib/dashboardCardDetails";
 import { motion } from "framer-motion";
 import { useInvoiceStore } from "../store/invoicesStore";
 import { LiaRupeeSignSolid } from "react-icons/lia";
-import { useEffect } from "react";
 import { Link } from "react-router-dom";
 
 const DashboardPage = () => {
@@ -66,9 +65,12 @@ const DashboardPage = () => {
                   <span className="font-semibold">first invoice</span> in 30
                   seconds!
                 </h1>
-                <button className="w-1/5 btn btn-sm btn-soft ">
+                <Link
+                  to={"/dashboard/parties/sales-invoice"}
+                  className="w-1/5 btn btn-sm btn-soft "
+                >
                   Create Sales Invoice
-                </button>
+                </Link>
               </div>
             </motion.div>
 

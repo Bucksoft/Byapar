@@ -71,6 +71,10 @@ const partySchema = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: "UserCredential",
     },
+    businessId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Business",
+    },
     status: {
       type: String,
       enum: ["active", "inactive"],

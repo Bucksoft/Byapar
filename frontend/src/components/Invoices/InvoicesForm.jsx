@@ -30,6 +30,7 @@ const InvoicesForm = ({ title, party }) => {
   const [addedItems, setAddedItems] = useState([]);
   const [data, setData] = useState(invoiceData);
 
+  // This is the mutation for creating SALES INVOICE ------------------------------------------
   const mutation = useMutation({
     mutationFn: async (data) => {
       if (data.items.length <= 0) {
@@ -52,6 +53,7 @@ const InvoicesForm = ({ title, party }) => {
       toast.error(err.response.data.msg || "Something went wrong");
     },
   });
+  //  mutation for creating SALES INVOICE ENDS ------------------------------------------
 
   return (
     <main className="max-h-screen w-full">

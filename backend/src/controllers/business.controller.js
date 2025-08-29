@@ -8,9 +8,14 @@ export async function createBusiness(req, res) {
     const data = req.body;
     const logoFile = req.files?.logo?.[0];
     const signatureFile = req.files?.signature?.[0];
-    // if (logoFile) {
-    //   data.logo = logoFile.path;
-    // }
+
+    if (logoFile) {
+      data.logo = logoFile.path;
+    }
+
+    if (signatureFile) {
+      data.signature = signatureFile.path;
+    }
 
     // CHECK IF THE SAME BUSINESS IS ALREADY PRESENT OR NOT
     if (data.TDS) {
@@ -46,7 +51,6 @@ export async function createBusiness(req, res) {
       clientId: req?.user?.id,
     });
 
-    
     if (!business) {
       return res
         .status(400)

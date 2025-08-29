@@ -9,14 +9,19 @@ import { axiosInstance } from "../../config/axios";
 import CustomLoader from "../Loader";
 import toast from "react-hot-toast";
 import { Trash } from "lucide-react";
+import { useRef } from "react";
+import { useBusinessStore } from "../../store/businessStore";
 
 const BusinessForm = () => {
   const [additionalInformation, setAdditionalInformation] = useState([{}]);
   const [additionalInfoKey, setAdditionalInfoKey] = useState("");
   const [additionalInfoValue, setAdditionalInfoValue] = useState("");
   const [logoPreviewUrl, setLogoPreviewUrl] = useState("");
-  const [logo, setLogo] = useState(null);
-  const [signature, setSignature] = useState(null);
+  const [singaturePreviewUrl, setSignaturePreviewUrl] = useState("");
+  const [fileSizeError, setFileSizeError] = useState(false);
+  const logoRef = useRef(null);
+  const signatureRef = useRef(null);
+  const { setBusiness } = useBusinessStore();
 
   const [data, setData] = useState({
     businessName: "",
@@ -36,29 +41,31 @@ const BusinessForm = () => {
     pincode: "",
   });
 
+  // HANDLES THE LOGO CHANGE
   const handleLogoChange = (e) => {
     const file = e.target.files[0];
-    console.log("logo FILE ", file);
     if (!file) return;
-    setLogo(file);
+    const maxFileSize = 5 * 1024 * 1024;
+    if (file.size > maxFileSize) {
+      setFileSizeError(true);
+      toast.error("File is too big");
+      return;
+    }
+    logoRef.current = file;
     const url = URL.createObjectURL(file);
     setLogoPreviewUrl(url);
     e.target.value = null;
   };
 
+  // HANDLES THE SIGNTAURE CHANGE
   const handleSignatureChange = (e) => {
     const file = e.target.files[0];
-    console.log(file);
     if (!file) return;
-    setSignature(file);
+    signatureRef.current = file;
+    const url = URL.createObjectURL(file);
+    setSignaturePreviewUrl(url);
     e.target.value = null;
   };
-
-  useEffect(() => {
-    return () => {
-      if (logoPreviewUrl) URL.revokeObjectURL(logoPreviewUrl);
-    };
-  }, [logoPreviewUrl]);
 
   const handleInputChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -73,9 +80,10 @@ const BusinessForm = () => {
       const res = await axiosInstance.post("/business", formData);
       return res.data.business;
     },
-    onSuccess: () => {
+    onSuccess: (data) => {
       toast.success("Business created");
       queryClient.invalidateQueries({ queryKey: ["business"] });
+      setBusiness(data);
     },
     onError: (err) => {
       toast.error(err.response?.data?.msg || err.response?.data?.err);
@@ -85,12 +93,21 @@ const BusinessForm = () => {
   const handleSubmit = (e) => {
     e.preventDefault();
     const formData = new FormData();
+
+    if (logoRef) {
+      formData.append("logo", logoRef.current);
+    }
+
+    if (signatureRef) {
+      formData.append("signature", signatureRef.current);
+    }
     Object.entries(data).forEach(([key, value]) => {
       formData.append(key, value);
     });
 
-    if (logo) formData.append("logo", logo);
-    if (signature) formData.append("signature", signature);
+    for (let pair of formData.entries()) {
+      console.log(`${pair[0]}:`, pair[1]);
+    }
 
     if (additionalInformation.length > 0) {
       formData.append(
@@ -99,6 +116,7 @@ const BusinessForm = () => {
       );
     }
 
+    console.log([...formData]);
     mutation.mutate(formData);
   };
 
@@ -145,7 +163,7 @@ const BusinessForm = () => {
           </button>
           <button className="btn btn-sm ">Cancel</button>
           <button
-            onClick={() => mutation.mutate(data)}
+            onClick={handleSubmit}
             disabled={mutation.isPending}
             className="btn btn-sm bg-[var(--primary-btn)]"
           >
@@ -192,10 +210,12 @@ const BusinessForm = () => {
                 delay: 0.3,
               }}
               htmlFor="logo"
-              className="border flex-col items-center justify-center bg-[#F6F9FF] border-blue-500 flex border-dashed  cursor-pointer p-5 text-xs gap-2"
+              className={`border flex-col items-center justify-center bg-[#F6F9FF] ${
+                fileSizeError ? "border-red-500" : "border-blue-500"
+              }  flex border-dashed  cursor-pointer p-5 text-xs gap-2`}
             >
               {logoPreviewUrl ? (
-                <img src={logoPreviewUrl} size={100} />
+                <img src={logoPreviewUrl} size={80} />
               ) : (
                 <>
                   <LuImagePlus size={20} className="text-blue-500" />
@@ -209,10 +229,15 @@ const BusinessForm = () => {
             <input
               type="file"
               id="logo"
+              accept="image/*"
               name="logo"
               className="hidden"
+              max={"5MB"}
               onClick={handleLogoChange}
             />
+            {fileSizeError && (
+              <small className="text-red-500">File is too big</small>
+            )}
             <div className="flex ml-3 flex-col gap-2 justify-center  w-full">
               <p className="text-[13px]  text-gray-500">
                 Business Name<span className="text-red-600">*</span>
@@ -568,16 +593,24 @@ const BusinessForm = () => {
 
           <p className="text-[13px] text-gray-500">Signature</p>
           <div className="flex items-center justify-between py-2">
-            <label
-              htmlFor="signature"
-              className="border border-dashed p-11 text-xs border-blue-500 text-blue-500 cursor-pointer"
-            >
-              + Add Signature
-            </label>
+            {singaturePreviewUrl ? (
+              <img src={singaturePreviewUrl} size={100} />
+            ) : (
+              <>
+                <label
+                  htmlFor="signature"
+                  className="border border-dashed p-11 text-xs border-blue-500 text-blue-500 cursor-pointer"
+                >
+                  + Add Signature
+                </label>
+              </>
+            )}
+
             <input
               id="signature"
               name="signature"
               type="file"
+              accept="image/*"
               onChange={handleSignatureChange}
               className="hidden"
             />

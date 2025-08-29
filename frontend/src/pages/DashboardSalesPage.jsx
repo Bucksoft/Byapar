@@ -82,12 +82,17 @@ const DashboardSalesPage = () => {
               variants={dashboardLinksItems}
               key={details.id}
               style={{
-                borderColor: "var(--primary-background)",
-                backgroundColor: `${details.color}`,
+                borderColor: `${details.color}`,
+                // backgroundColor: `${details.color}`,
               }}
               className={`border mt-5 rounded-md p-3  shadow-md hover:-translate-y-1 transition-all ease-in-out duration-200 cursor-pointer`}
             >
-              <p className={`flex items-center gap-3 text-${details.color}`}>
+              <p
+                style={{
+                  color: `${details.color}`,
+                }}
+                className={`flex items-center gap-3 `}
+              >
                 {details.icon} {details.label}
               </p>
               <span className="font-medium text-2xl flex items-center gap-2">

@@ -97,11 +97,6 @@ function App() {
           />
 
           <Route
-            path="/dashboard/parties/create-quotation"
-            element={<DashboardQuotationInvoiceForm />}
-          />
-
-          <Route
             path="/dashboard/parties/proforma-invoice"
             element={<DashboardProformaInvoicePage />}
           />
@@ -167,6 +162,10 @@ function App() {
           <Route
             path="/dashboard/quotations"
             element={<DashboardQuotationPage />}
+          />
+          <Route
+            path="/dashboard/create-quotation"
+            element={<DashboardQuotationInvoiceForm />}
           />
           <Route
             path="/dashboard/payment-in"

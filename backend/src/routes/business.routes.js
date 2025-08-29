@@ -15,6 +15,7 @@ router.route("/").post(
     { name: "logo", maxCount: 1 },
     { name: "signature", maxCount: 1 },
   ]),
+  isAuth,
   createBusiness
 );
 router.route("/:id").patch(isAuth, updateBusiness);
