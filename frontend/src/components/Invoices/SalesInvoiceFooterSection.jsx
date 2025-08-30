@@ -1,13 +1,14 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { IoCloseCircle } from "react-icons/io5";
 import BankAccountPopup from "../BankAccountPopup";
 
-const SalesInvoiceFooterSection = ({ data, setData, addedItems, title }) => {
+const SalesInvoiceFooterSection = ({ data, setData, title }) => {
   const [notes, setNotes] = useState(false);
   const [termCondition, setTermCondition] = useState(false);
   const [charges, setCharges] = useState(false);
   const [discount, setDiscount] = useState(false);
   const [selectCheckBox, setSelectCheckBox] = useState(false);
+
   return (
     <div className="grid grid-cols-2 w-full ">
       {/* left grid part */}
@@ -146,25 +147,18 @@ const SalesInvoiceFooterSection = ({ data, setData, addedItems, title }) => {
         <div className="flex justify-between py-2">
           <span className={`px-2 w-fit text-xs`}>Taxable Amount</span>
           <span className=" text-xs pr-5">
-            ₹{" "}
-            {addedItems.length > 0
-              ? Number(basePrice.toFixed(2)).toLocaleString("en-IN")
-              : 0}
+            ₹ {Number(data?.taxableAmount).toLocaleString("en-IN") || 0}
           </span>
         </div>
-        {addedItems.length > 0 && (
+        {data.items.length > 0 && (
           <>
             <div className="flex justify-between py-2">
               <span className={`px-2 w-fit text-xs`}>SGST</span>
-              <span className=" text-xs pr-5">
-                ₹ {Number((gstAmount / 2).toFixed(2)).toLocaleString("en-IN")}
-              </span>
+              <span className=" text-xs pr-5">₹ {data?.sgst}</span>
             </div>
             <div className="flex justify-between py-2">
               <span className={`px-2 w-fit text-xs`}>CGST</span>
-              <span className=" text-xs pr-5">
-                ₹ {Number((gstAmount / 2).toFixed(2)).toLocaleString("en-IN")}
-              </span>
+              <span className=" text-xs pr-5">₹ {data?.cgst}</span>
             </div>
           </>
         )}
@@ -254,13 +248,8 @@ const SalesInvoiceFooterSection = ({ data, setData, addedItems, title }) => {
           </div>
           <div className="p-2 flex justify-between">
             <span className="text-sm font-semibold">Total Amount</span>
-            {addedItems.length > 0 ? (
-              <>
-                ₹{" "}
-                {Number(
-                  Number(basePrice.toFixed(2)) + Number(gstAmount.toFixed(2))
-                ).toLocaleString("en-IN")}
-              </>
+            {data.items.length > 0 ? (
+              <>₹ {Number(data?.totalAmount).toLocaleString("en-IN")}</>
             ) : (
               <input
                 type="text"
@@ -280,15 +269,9 @@ const SalesInvoiceFooterSection = ({ data, setData, addedItems, title }) => {
             <div className="text-xs text-[var(--badge)] flex justify-between items-center">
               <span>Balance Amount</span>
               <span className="mr-4">
-                {addedItems.length > 0 ? (
+                {data.items.length > 0 ? (
                   <>
-                    {"₹" +
-                      Number(
-                        Number(basePrice.toFixed(2)) +
-                          Number(gstAmount.toFixed(2))
-                      )
-                        .toFixed(2)
-                        .toLocaleString("en-IN")}
+                    {"₹" + Number(data?.balanceAmount).toLocaleString("en-IN")}
                   </>
                 ) : (
                   <span>₹ 0</span>

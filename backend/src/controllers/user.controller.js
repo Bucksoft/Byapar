@@ -1,4 +1,4 @@
-import { loginSchema } from "../config/validation.js";
+import { loginSchema, userAccountSchema } from "../config/validation.js";
 import crypto from "crypto";
 import { sendOTPviaMail } from "../utils/mail.js";
 import { OTP } from "../models/otp.schema.js";
@@ -190,7 +190,7 @@ export async function loginViaGoogleCallback(req, res) {
 
     res.cookie("token", token, {
       httpOnly: true,
-      maxAge: 60 * 60 * 1000,
+      maxAge: 60 * 60 * 60 * 1000,
     });
 
     res.redirect(`${process.env.FRONTEND_URI}/dashboard`);
@@ -227,5 +227,33 @@ export async function logoutUser(req, res) {
   } catch (error) {
     console.log("ERROR IN LOGGING OUT USER : ", error);
     return res.status(500).json({ msg: "Failed to logout user" });
+  }
+}
+
+// update user account
+export async function updateUserAccount(req, res) {
+  try {
+    const validationResult = userAccountSchema.safeParse(req.body.data);
+    if (!validationResult.success) {
+      const errors = validationResult.error.format();
+      return res.status(400).json({ success: false, errors });
+    }
+
+    const user = await UserCredential.findById(req?.user?.id);
+    if (!user) {
+      return res.status(400).json({ success: false, msg: "User not found" });
+    }
+    user.name = validationResult.data.name;
+    user.email = validationResult.data.email;
+    user.contact = validationResult.data.contact;
+
+    await user.save();
+
+    return res
+      .status(200)
+      .json({ success: true, msg: "Account updated successfully", user });
+  } catch (error) {
+    console.log("ERROR IN UPDATING USER : ", error);
+    return res.status(500).json({ msg: "Failed to update user" });
   }
 }

@@ -33,7 +33,7 @@ const salesInvoiceSchema = new mongoose.Schema({
   },
   notes: String,
   termsAndCondition: String,
-  taxableAmount: String,
+  taxableAmount: Number,
   sgst: String,
   cgst: String,
   totalAmount: {

@@ -42,12 +42,12 @@ const LoginPage = () => {
           {/* left section */}
           <section className="md:w-1/2  h-full flex flex-col items-center mt-32 justify-start">
             <div className="flex flex-col ">
-              <img
+              {/* <img
                 src={ByaparLogo}
                 alt="Byapar_logo"
                 width={200}
                 className="mb-16 -ml-10"
-              />
+              /> */}
 
               <h1 className="font-semibold text-xl">Login / Register</h1>
               <span className="text-sm">

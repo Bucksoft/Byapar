@@ -52,6 +52,9 @@ const itemSchema = new mongoose.Schema(
       // required: [true, "Opening stock is required"],
       min: [0, "Opening stock cannot be negative"],
     },
+    quantity: {
+      type: Number,
+    },
     stock: {
       type: Number,
     },
@@ -89,5 +92,11 @@ const itemSchema = new mongoose.Schema(
 );
 
 itemSchema.index({ category: 1, itemName: 1 });
+itemSchema.pre("save", function (next) {
+  if (this.isNew) {
+    this.quantity = this.openingStock || 0;
+  }
+  next();
+});
 
 export const Item = mongoose.model("Item", itemSchema);

@@ -13,12 +13,23 @@ const SalesInvoiceItemTable = ({ data, setData }) => {
   const [gstAmount, setGstAmount] = useState(0);
   const [basePrice, setBasePrice] = useState(0);
   const [quantities, setQuantities] = useState({});
+  const [discountAmount, setDiscountAmount] = useState(0);
+  const [discountPercent, setDiscountPercent] = useState(0);
+  const [gstTaxRateType, setGstTaxRateType] = useState("with tax");
+  const [itemId, setItemId] = useState();
+
   const { items } = useItemStore();
 
   const searchedItems = items?.filter((item) =>
     item?.itemName.toLowerCase().includes(searchItemQuery.toLowerCase())
   );
 
+  const handleSetGstTaxRateType = (e, itemId) => {
+    setGstTaxRateType(e.target.value);
+    setItemId(itemId);
+  };
+
+  // THIS USE EFFECT ADDS ALL THE VALUES IN THE MAIN DATA WHICH WILL BE SENT TO THE BACKEND
   useEffect(() => {
     if (!addedItems.length > 0) return;
 
@@ -30,18 +41,34 @@ const SalesInvoiceItemTable = ({ data, setData }) => {
       .reduce((acc, item) => acc + Number(item?.totalAmount || 0), 0)
       .toFixed(2);
 
-    const taxableAmount = Number(basePrice.toFixed(2)).toLocaleString("en-IN");
-    const cgst = Number((gstAmount / 2).toFixed(2)).toLocaleString("en-IN");
-    const sgst = Number((gstAmount / 2).toFixed(2)).toLocaleString("en-IN");
-    const totalAmount =
-      parseFloat(basePrice.toFixed(2)) + parseFloat(gstAmount.toFixed(2));
+    const totalTaxableAmount = addedItems
+      .reduce((acc, item) => acc + Number(item?.basePrice || 0), 0)
+      .toFixed(2);
+
+    const totalGstAmount = addedItems
+      .reduce((acc, item) => acc + Number(item?.gstAmount || 0), 0)
+      .toFixed(2);
+
+    const totalAmount = addedItems.reduce(
+      (acc, item) => acc + Number(item?.totalAmount || 0),
+      0
+    );
+
+    // const taxableAmount = Number(basePrice.toFixed(2)).toLocaleString("en-IN");
+    const cgst = Number((totalGstAmount / 2).toFixed(2)).toLocaleString(
+      "en-IN"
+    );
+    const sgst = Number((totalGstAmount / 2).toFixed(2)).toLocaleString(
+      "en-IN"
+    );
+
     const balanceAmount =
       parseFloat(basePrice.toFixed(2)) + parseFloat(gstAmount.toFixed(2));
     setData((prev) => ({
       ...prev,
       amountSubTotal: parseFloat(amountSubtotal),
       taxSubTotal: parseFloat(taxSubtotal),
-      taxableAmount: taxableAmount,
+      taxableAmount: parseFloat(totalTaxableAmount),
       cgst: cgst,
       sgst: sgst,
       totalAmount: parseFloat(totalAmount),
@@ -49,6 +76,7 @@ const SalesInvoiceItemTable = ({ data, setData }) => {
     }));
   }, [addedItems]);
 
+  // THIS USE EFFECT CALCULATES ALL THE VALUES AS SOON AS ITEMS ARE ADDED
   useEffect(() => {
     if (!addedItems?.length || !quantities) return;
 
@@ -65,15 +93,30 @@ const SalesInvoiceItemTable = ({ data, setData }) => {
       let basePrice = 0;
       let gstAmount = 0;
       let finalPrice = 0;
+      let discountedBasePrice = 0;
 
-      if (item?.salesPriceType === "without tax") {
+      if (gstTaxRateType === "without tax") {
         gstAmount = (price * gstRate) / 100;
         basePrice = price;
+        if (discountPercent) {
+          basePrice = basePrice * (discountPercent / 100);
+          setDiscountAmount(discountedBasePrice);
+        } else if (discountAmount) {
+          basePrice = basePrice - discountAmount;
+          setDiscountPercent((discountAmount / basePrice) * 100);
+        }
         finalPrice = basePrice + gstAmount;
         setGstAmount(gstAmount);
         setBasePrice(basePrice);
-      } else if (item?.salesPriceType === "with tax") {
+      } else if (gstTaxRateType === "with tax") {
         basePrice = price * (100 / (100 + gstRate));
+        if (discountPercent) {
+          basePrice = basePrice * (discountPercent / 100);
+          setDiscountAmount(discountedBasePrice);
+        } else if (discountAmount) {
+          basePrice = basePrice - discountAmount;
+          setDiscountPercent((discountAmount / basePrice) * 100);
+        }
         gstAmount = price - basePrice;
         finalPrice = price;
         setGstAmount(gstAmount);
@@ -81,11 +124,11 @@ const SalesInvoiceItemTable = ({ data, setData }) => {
       }
 
       const totalAmount = finalPrice * qty;
-
       return {
         ...item,
         quantity: qty,
         basePrice: basePrice.toFixed(2),
+        discountedBasePrice: discountedBasePrice.toFixed(2),
         gstAmount: gstAmount.toFixed(2),
         finalPrice: finalPrice.toFixed(2),
         totalAmount: totalAmount.toFixed(2),
@@ -93,7 +136,14 @@ const SalesInvoiceItemTable = ({ data, setData }) => {
     });
 
     setAddedItems(updatedItems);
-  }, [addedItems.length, quantities]);
+  }, [
+    addedItems.length,
+    quantities,
+    discountPercent,
+    discountAmount,
+    gstTaxRateType,
+  ]);
+
   return (
     <>
       <div className="w-full grid grid-cols-11 text-xs">
@@ -152,26 +202,49 @@ const SalesInvoiceItemTable = ({ data, setData }) => {
 
           <span className="border-l relative border-t p-2 border-[var(--primary-border)] ">
             <input
+              type="text"
               className="input input-xs bg-zinc-100 text-right"
-              // value={addedItem?.salesPrice}
+              value={data.discountPercent}
+              onChange={(e) =>
+                setData((prev) => ({
+                  ...prev,
+                  discountPercent: setDiscountPercent(
+                    parseFloat(e.target.value)
+                  ),
+                }))
+              }
             />
             <Percent size={10} className="absolute top-[14.3px] left-3 z-10" />
             <input
+              type="text"
               className="input input-xs bg-zinc-100 text-right mt-1"
-              // value={addedItem?.salesPrice}
+              value={data?.discountAmount}
+              onChange={(e) =>
+                setData((prev) => ({
+                  ...prev,
+                  discountAmount: setDiscountAmount(parseFloat(e.target.value)),
+                }))
+              }
             />
             <LiaRupeeSignSolid className="absolute top-[41.3px] left-3 z-10" />
           </span>
 
           <div className="border-l  border-t p-2 border-[var(--primary-border)] ">
             <input
-              className="input input-xs bg-zinc-100 text-right"
+              className="input input-xs bg-zinc-100 text-right "
               value={Number(addedItem?.gstAmount).toLocaleString("en-IN")}
             />
-            <h5 className="text-zinc-500 mt-1">({addedItem?.gstTaxRate})</h5>
-            <small className="text-[var(--secondary-text-color)]">
-              {addedItem?.salesPriceType}
+            <small className="text-zinc-500 mt-1 text-xs text-nowrap">
+              ({addedItem?.gstTaxRate})
             </small>
+            <select
+              value={gstTaxRateType}
+              onChange={(e) => handleSetGstTaxRateType(e, addedItem?._id)}
+              className="text-[var(--secondary-text-color)] "
+            >
+              <option value="with tax">with tax</option>
+              <option value="without tax">without tax</option>
+            </select>
           </div>
 
           <span className="relative border-l border-t p-2 border-[var(--primary-border)] ">
@@ -191,13 +264,14 @@ const SalesInvoiceItemTable = ({ data, setData }) => {
                   (item) => item?._id !== addedItem?._id
                 );
                 setAddedItems(filteredItems);
+                setData((prev) => ({ ...prev, items: filteredItems }));
               }}
             />
           </span>
         </div>
       ))}
 
-      {/* button barcode div */}
+      {/* ADD ITEMS POPUP */}
       <div className="p-2 flex border-t border-r border-[var(--primary-border)]">
         {/* Add Item dialog box -------------------------------------------------------- */}
 

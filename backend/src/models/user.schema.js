@@ -18,6 +18,7 @@ export const userCredentialSchema = new mongoose.Schema(
       enum: ["retailer", "wholeseller"],
       default: "retailer",
     },
+
     loginBy: {
       type: String,
       required: true,
@@ -34,6 +35,15 @@ export const userCredentialSchema = new mongoose.Schema(
     last_login: {
       type: Date,
       required: true,
+    },
+    name: {
+      type: String,
+    },
+    email: {
+      type: String,
+    },
+    contact: {
+      type: String,
     },
     role: {
       type: mongoose.Schema.Types.ObjectId,

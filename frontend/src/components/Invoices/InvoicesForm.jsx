@@ -19,6 +19,8 @@ const InvoicesForm = ({ title, party }) => {
     items: [],
     discountSubtotal: 0,
     taxableAmount: "",
+    discountAmount: 0,
+    discountPercent: 0,
     balanceAmount: 0,
     sgst: "",
     cgst: "",
@@ -49,7 +51,6 @@ const InvoicesForm = ({ title, party }) => {
       queryClient.invalidateQueries({ queryKey: ["invoices"] });
     },
     onError: (err) => {
-      console.log(`ERROR IN CREATING INVOICE `, err);
       toast.error(err.response.data.msg || "Something went wrong");
     },
   });

@@ -125,29 +125,24 @@ const DashboardItemsStockDetailsPage = ({ data, setData }) => {
 
           <div className="flex flex-col relative ">
             <label className="text-xs text-gray-600">As of Date</label>
-            <button
+            {/* <button
               type="button"
               onClick={() => setShowDatepicker((v) => !v)}
               className="btn btn-sm btn-outline border-zinc-300"
             >
               <p>{formatDate(data?.asOfDate) || "Pick a date"}</p>
-            </button>
-            {showDatepicker && (
-              <div className="absolute z-10 mt-1 bg-white border rounded shadow-lg">
-                <DayPicker
-                  mode="single"
-                  selected={data.asOfDate ? new Date(data.asOfDate) : undefined}
-                  onSelect={(date) => {
-                    setShowDatepicker(false);
-                    const iso = date ? date.toISOString().split("T")[0] : "";
-                    setData((prev) => ({
-                      ...prev,
-                      asOfDate: iso,
-                    }));
-                  }}
-                />
-              </div>
-            )}
+            </button> */}
+            <input
+              type="date"
+              className="input input-sm w-full"
+              onChange={() => {
+                const iso = date ? date.toISOString().split("T")[0] : "";
+                setData((prev) => ({
+                  ...prev,
+                  asOfDate: iso,
+                }));
+              }}
+            />
           </div>
         </div>
       </div>

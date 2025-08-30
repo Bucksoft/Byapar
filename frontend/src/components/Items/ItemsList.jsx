@@ -6,6 +6,7 @@ import toast from "react-hot-toast";
 import { BsTrash3 } from "react-icons/bs";
 import { queryClient } from "../../main";
 import { useNavigate } from "react-router-dom";
+import { PackagePlus } from "lucide-react";
 
 const ItemsList = ({ items }) => {
   const [selectedItems, setSelectedItems] = useState([]);
@@ -79,13 +80,18 @@ const ItemsList = ({ items }) => {
             <th>Stock Quantity</th>
             <th>Selling Price</th>
             <th>Purchase Price</th>
+            <th>Adjust Stock</th>
           </tr>
         </thead>
         <tbody>
           {/* row 1 */}
           {items.map((item, index) => (
-            <tr key={item?._id} className="hover:bg-zinc-100 cursor-pointer">
-              <td>
+            <tr
+              key={item?._id}
+              className="hover:bg-zinc-100 cursor-pointer"
+              onClick={() => navigate(`/dashboard/items/${item?._id}`)}
+            >
+              <td onClick={(e) => e.stopPropagation()}>
                 <input
                   type="checkbox"
                   className="checkbox checkbox-xs"
@@ -93,31 +99,25 @@ const ItemsList = ({ items }) => {
                   checked={selectedItems.includes(item?._id)}
                 />
               </td>
-              <td onClick={() => navigate(`/dashboard/items/${item?._id}`)}>
-                {index + 1}
-              </td>
-              <td onClick={() => navigate(`/dashboard/items/${item?._id}`)}>
-                {item?.itemName}
-              </td>
-              <td onClick={() => navigate(`/dashboard/items/${item?._id}`)}>
-                {item?.itemCode || "-"}
-              </td>
-              <td onClick={() => navigate(`/dashboard/items/${item?._id}`)}>
+              <td>{index + 1}</td>
+              <td>{item?.itemName}</td>
+              <td>{item?.itemCode || "-"}</td>
+              <td>
                 {item?.openingStock} {item?.measuringUnit}
               </td>
-              <td onClick={() => navigate(`/dashboard/items/${item?._id}`)}>
+              <td>
                 <div className="flex items-center">
                   {item?.salesPrice ? (
                     <>
                       <LiaRupeeSignSolid size={15} />
-                      {item?.salesPrice}
+                      {Number(item?.salesPrice).toLocaleString("en-IN")}
                     </>
                   ) : (
                     "-"
                   )}
                 </div>
               </td>
-              <td onClick={() => navigate(`/dashboard/items/${item?._id}`)}>
+              <td>
                 <div className="flex items-center">
                   {item?.purchasePrice ? (
                     <>
@@ -128,6 +128,41 @@ const ItemsList = ({ items }) => {
                     "-"
                   )}
                 </div>
+              </td>
+              <td>
+                {/* Open the modal using document.getElementById('ID').showModal() method */}
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    document.getElementById("my_modal_1").showModal();
+                  }}
+                >
+                  <PackagePlus className="cursor-pointer" size={18} />
+                </button>
+                <dialog id="my_modal_1" className="modal">
+                  <div className="modal-box">
+                    <h3 className="font-bold text-lg">Hello!</h3>
+                    <p className="py-4">
+                      Press ESC key or click the button below to close
+                    </p>
+
+
+                    
+
+
+                    <div className="modal-action">
+                      <form method="dialog">
+                        {/* if there is a button in form, it will close the modal */}
+                        <button
+                          className="btn"
+                          onClick={(e) => e.stopPropagation()}
+                        >
+                          Close
+                        </button>
+                      </form>
+                    </div>
+                  </div>
+                </dialog>
               </td>
             </tr>
           ))}

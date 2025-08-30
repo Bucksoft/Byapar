@@ -296,9 +296,20 @@ export const salesInvoiceSchema = z.object({
   discountSubtotal: z.number().optional(),
   notes: z.string().optional(),
   termsAndCondition: z.string().optional(),
-  taxableAmount: z.string().optional(),
+  taxableAmount: z.number().optional(),
   sgst: z.string().optional(),
   cgst: z.string().optional(),
   totalAmount: z.number().min(0, "Total amount is required"),
   balanceAmount: z.number().min(0, "Balance amount is required"),
+});
+
+export const userAccountSchema = z.object({
+  name: z.string().min(2, "Name must be atleast 2 characters long"),
+  email: z.email(),
+  contact: z
+    .string()
+    .regex(
+      /^[6-9]\d{9}$/,
+      "Mobile number must be a valid 10-digit Indian mobile number"
+    ),
 });

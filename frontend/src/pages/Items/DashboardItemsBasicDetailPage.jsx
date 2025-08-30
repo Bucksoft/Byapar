@@ -104,10 +104,10 @@ const DashboardItemsBasicDetailPage = ({ data, setData, err }) => {
         <div className="flex flex-col mt-5">
           <span className="text-xs text-gray-600">Measuring Unit</span>
 
-          <div className="flex items-center h-8 border border-[var(--primary-border)] rounded-xs">
+          <div className="">
             <select
               name="measuringUnit"
-              className="outline-none w-full text-zinc-500"
+              className="select select-sm w-full"
               value={data.measuringUnit}
               onChange={handleInputChange}
             >
@@ -125,7 +125,7 @@ const DashboardItemsBasicDetailPage = ({ data, setData, err }) => {
       </div>
 
       {/* right container */}
-      <div className="">
+      <div className="flex flex-col justify-between">
         <div className="flex flex-col">
           <span className="text-xs text-gray-600">Category</span>
           <div className="flex items-center h-8 border border-[var(--primary-border)] rounded-xs mt-2">
@@ -178,7 +178,7 @@ const DashboardItemsBasicDetailPage = ({ data, setData, err }) => {
 
         <div className="flex flex-col mt-5">
           <span className="text-xs text-gray-600">GST Tax Rate (%)</span>
-          <div className="flex items-center h-8 border border-[var(--primary-border)] rounded-xs ">
+          <div className="">
             {/* <Search size={16} className="w-10 text-gray-600" />
             <input
               type="text"
@@ -188,7 +188,7 @@ const DashboardItemsBasicDetailPage = ({ data, setData, err }) => {
             <select
               value={data.gstTaxRate}
               onChange={handleInputChange}
-              className="w-full text-zinc-500 outline-none"
+              className="select select-sm w-full"
               name="gstTaxRate"
             >
               {gstRates.map((gstRate, index) => (
