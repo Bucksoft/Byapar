@@ -48,11 +48,12 @@ import DashboardSalesInvoicePage from "./pages/DashboardSalesInvoicePage";
 import DashboardQuotationInvoiceForm from "./pages/DashboardQuotationInvoiceForm";
 import DashboardProformaInvoicePage from "./pages/DashboardProformaInvoicePage";
 import DashboardSalesReturnInvoicePage from "./pages/DashboardSalesInvoicePage";
-import DashboardItemsBasicDetailPage from "./pages/Items/DashboardItemsBasicDetailPage";
 import DashboardItemsSidebar from "./pages/Items/DashboardItemsSidebar";
 import SingleItemPage from "./components/Items/SingleItemPage";
 import DashboardAllTransactionsPage from "./pages/DashboardAllTransactionsPage";
 import DashboardCreatePaymentOutPage from "./pages/Purchases/DashboardCreatePaymentOutPage";
+import PaymentInForm from "./components/PaymentIn/PaymentInForm";
+import SalesInvoice from "./components/Invoices/SalesInvoice";
 
 function App() {
   const { user, setUser } = useAuthStore();
@@ -97,6 +98,11 @@ function App() {
           />
 
           <Route
+            path="/dashboard/sales-invoice/:id"
+            element={<SalesInvoice />}
+          />
+
+          <Route
             path="/dashboard/parties/proforma-invoice"
             element={<DashboardProformaInvoicePage />}
           />
@@ -135,6 +141,10 @@ function App() {
           <Route
             path="/dashboard/create-payment-out"
             element={<DashboardCreatePaymentOutPage />}
+          />
+          <Route
+            path="/dashboard/create-payment-in"
+            element={<PaymentInForm />}
           />
 
           <Route

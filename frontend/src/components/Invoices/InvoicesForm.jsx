@@ -49,6 +49,7 @@ const InvoicesForm = ({ title, party }) => {
     onSuccess: (data) => {
       toast.success(data.msg);
       queryClient.invalidateQueries({ queryKey: ["invoices"] });
+      navigate(`/dashboard/sales-invoice/${data?.salesInvoice?._id}`);
     },
     onError: (err) => {
       toast.error(err.response.data.msg || "Something went wrong");

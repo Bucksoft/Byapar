@@ -10,81 +10,62 @@ const SalesInvoiceItemTable = ({ data, setData }) => {
   const [searchItemQuery, setSearchItemQuery] = useState("");
   const [showCounterId, setShowCounterId] = useState();
   const [addedItems, setAddedItems] = useState([]);
-  const [gstAmount, setGstAmount] = useState(0);
-  const [basePrice, setBasePrice] = useState(0);
   const [quantities, setQuantities] = useState({});
-  const [discountAmount, setDiscountAmount] = useState(0);
-  const [discountPercent, setDiscountPercent] = useState(0);
-  const [gstTaxRateType, setGstTaxRateType] = useState("with tax");
-  const [itemId, setItemId] = useState();
-
+  const [gstTaxRate, setGstTaxRateType] = useState("");
   const { items } = useItemStore();
 
   const searchedItems = items?.filter((item) =>
     item?.itemName.toLowerCase().includes(searchItemQuery.toLowerCase())
   );
 
+  // Handle gst type change for a single item
   const handleSetGstTaxRateType = (e, itemId) => {
-    setGstTaxRateType(e.target.value);
-    setItemId(itemId);
+    const { value } = e.target;
+
+    // Update gstTaxRateType state (if needed globally)
+    setGstTaxRateType({ type: value, itemId });
+
+    // Update only the matching item in addedItems
+    setAddedItems((prevItems) =>
+      prevItems.map((item) =>
+        item._id === itemId
+          ? { ...item, gstTaxRate: value } // add/update gstTaxRate
+          : item
+      )
+    );
   };
 
-  // THIS USE EFFECT ADDS ALL THE VALUES IN THE MAIN DATA WHICH WILL BE SENT TO THE BACKEND
+  // Handle discount percent for single item
+  const handleSetDiscountPercent = (percent, itemId) => {
+    setAddedItems((prev) =>
+      prev.map((item) =>
+        item._id === itemId
+          ? { ...item, discountPercent: percent, discountAmount: 0 }
+          : item
+      )
+    );
+  };
+
+  // Handle discount amount for single item
+  const handleSetDiscountAmount = (amount, itemId) => {
+    setAddedItems((prev) =>
+      prev.map((item) =>
+        item._id === itemId
+          ? { ...item, discountAmount: amount, discountPercent: 0 }
+          : item
+      )
+    );
+  };
+
   useEffect(() => {
-    if (!addedItems.length > 0) return;
-
-    const taxSubtotal = addedItems
-      .reduce((acc, item) => acc + Number(item?.gstAmount || 0), 0)
-      .toFixed(2);
-
-    const amountSubtotal = addedItems
-      .reduce((acc, item) => acc + Number(item?.totalAmount || 0), 0)
-      .toFixed(2);
-
-    const totalTaxableAmount = addedItems
-      .reduce((acc, item) => acc + Number(item?.basePrice || 0), 0)
-      .toFixed(2);
-
-    const totalGstAmount = addedItems
-      .reduce((acc, item) => acc + Number(item?.gstAmount || 0), 0)
-      .toFixed(2);
-
-    const totalAmount = addedItems.reduce(
-      (acc, item) => acc + Number(item?.totalAmount || 0),
-      0
-    );
-
-    // const taxableAmount = Number(basePrice.toFixed(2)).toLocaleString("en-IN");
-    const cgst = Number((totalGstAmount / 2).toFixed(2)).toLocaleString(
-      "en-IN"
-    );
-    const sgst = Number((totalGstAmount / 2).toFixed(2)).toLocaleString(
-      "en-IN"
-    );
-
-    const balanceAmount =
-      parseFloat(basePrice.toFixed(2)) + parseFloat(gstAmount.toFixed(2));
-    setData((prev) => ({
-      ...prev,
-      amountSubTotal: parseFloat(amountSubtotal),
-      taxSubTotal: parseFloat(taxSubtotal),
-      taxableAmount: parseFloat(totalTaxableAmount),
-      cgst: cgst,
-      sgst: sgst,
-      totalAmount: parseFloat(totalAmount),
-      balanceAmount: parseFloat(balanceAmount),
-    }));
-  }, [addedItems]);
-
-  // THIS USE EFFECT CALCULATES ALL THE VALUES AS SOON AS ITEMS ARE ADDED
-  useEffect(() => {
-    if (!addedItems?.length || !quantities) return;
+    if (!addedItems?.length) return;
 
     const getGSTPercentage = (rateString) => {
       const match = rateString?.match(/(\d+)%/);
       return match ? parseFloat(match[1]) : 0;
     };
 
+    // ⚡ derive updated items locally, don't push to state
     const updatedItems = addedItems.map((item) => {
       const qty = quantities[item._id] || 0;
       const gstRate = getGSTPercentage(item?.gstTaxRate);
@@ -93,76 +74,110 @@ const SalesInvoiceItemTable = ({ data, setData }) => {
       let basePrice = 0;
       let gstAmount = 0;
       let finalPrice = 0;
-      let discountedBasePrice = 0;
 
-      if (gstTaxRateType === "without tax") {
+      if (item?.gstTaxRateType === "without tax") {
         gstAmount = (price * gstRate) / 100;
         basePrice = price;
-        if (discountPercent) {
-          basePrice = basePrice * (discountPercent / 100);
-          setDiscountAmount(discountedBasePrice);
-        } else if (discountAmount) {
-          basePrice = basePrice - discountAmount;
-          setDiscountPercent((discountAmount / basePrice) * 100);
-        }
         finalPrice = basePrice + gstAmount;
-        setGstAmount(gstAmount);
-        setBasePrice(basePrice);
-      } else if (gstTaxRateType === "with tax") {
+      } else {
         basePrice = price * (100 / (100 + gstRate));
-        if (discountPercent) {
-          basePrice = basePrice * (discountPercent / 100);
-          setDiscountAmount(discountedBasePrice);
-        } else if (discountAmount) {
-          basePrice = basePrice - discountAmount;
-          setDiscountPercent((discountAmount / basePrice) * 100);
-        }
         gstAmount = price - basePrice;
         finalPrice = price;
-        setGstAmount(gstAmount);
-        setBasePrice(basePrice);
+      }
+
+      // Discounts
+      if (item?.discountPercent) {
+        basePrice = basePrice - (basePrice * item.discountPercent) / 100;
+      } else if (item?.discountAmount) {
+        basePrice = basePrice - item.discountAmount;
+      }
+
+      basePrice = Math.max(basePrice, 0);
+
+      if (item?.gstTaxRateType === "without tax") {
+        gstAmount = (basePrice * gstRate) / 100;
+        finalPrice = basePrice + gstAmount;
+      } else {
+        gstAmount = price - basePrice;
+        finalPrice = price;
       }
 
       const totalAmount = finalPrice * qty;
+
       return {
         ...item,
         quantity: qty,
         basePrice: basePrice.toFixed(2),
-        discountedBasePrice: discountedBasePrice.toFixed(2),
         gstAmount: gstAmount.toFixed(2),
         finalPrice: finalPrice.toFixed(2),
         totalAmount: totalAmount.toFixed(2),
       };
     });
 
-    setAddedItems(updatedItems);
-  }, [
-    addedItems.length,
-    quantities,
-    discountPercent,
-    discountAmount,
-    gstTaxRateType,
-  ]);
+    // ✅ update only `data`, not `addedItems`
+    const taxSubtotal = updatedItems
+      .reduce((acc, item) => acc + Number(item?.gstAmount || 0), 0)
+      .toFixed(2);
+
+    const amountSubtotal = updatedItems
+      .reduce((acc, item) => acc + Number(item?.totalAmount || 0), 0)
+      .toFixed(2);
+
+    const totalTaxableAmount = updatedItems
+      .reduce((acc, item) => acc + Number(item?.basePrice || 0), 0)
+      .toFixed(2);
+
+    const totalGstAmount = updatedItems
+      .reduce((acc, item) => acc + Number(item?.gstAmount || 0), 0)
+      .toFixed(2);
+
+    const totalAmount = updatedItems.reduce(
+      (acc, item) => acc + Number(item?.totalAmount || 0),
+      0
+    );
+
+    const cgst = Number((totalGstAmount / 2).toFixed(2)).toLocaleString(
+      "en-IN"
+    );
+    const sgst = Number((totalGstAmount / 2).toFixed(2)).toLocaleString(
+      "en-IN"
+    );
+
+    const balanceAmount =
+      parseFloat(totalTaxableAmount) + parseFloat(totalGstAmount);
+
+    setData((prev) => ({
+      ...prev,
+      items: updatedItems, // still storing updated version here
+      amountSubTotal: parseFloat(amountSubtotal),
+      taxSubTotal: parseFloat(taxSubtotal),
+      taxableAmount: parseFloat(totalTaxableAmount),
+      cgst,
+      sgst,
+      totalAmount: parseFloat(totalAmount),
+      balanceAmount: parseFloat(balanceAmount),
+    }));
+  }, [addedItems, quantities]);
 
   return (
     <>
       <div className="w-full grid grid-cols-11 text-xs">
-        <span className="border-t p-2 border-[var(--primary-border)]  uppercase bg-[var(--primary-background)]">
+        <span className="border-t p-2 border-[var(--primary-border)] uppercase bg-[var(--primary-background)]">
           NO
         </span>
-        <span className="border-t border-l  p-2 border-[var(--primary-border)] col-span-3 uppercase bg-[var(--primary-background)]">
+        <span className="border-t border-l p-2 border-[var(--primary-border)] col-span-3 uppercase bg-[var(--primary-background)]">
           Items/ Services
         </span>
-        <span className="border-t border-l p-2 border-[var(--primary-border)]  uppercase bg-[var(--primary-background)]">
+        <span className="border-t border-l p-2 border-[var(--primary-border)] uppercase bg-[var(--primary-background)]">
           HSN/ SAC
         </span>
-        <span className="border-t border-l p-2 border-[var(--primary-border)]  uppercase bg-[var(--primary-background)]">
+        <span className="border-t border-l p-2 border-[var(--primary-border)] uppercase bg-[var(--primary-background)]">
           Qty
         </span>
-        <span className="border-l text-nowrap  border-t p-2 border-[var(--primary-border)]  uppercase bg-[var(--primary-background)]">
+        <span className="border-l text-nowrap border-t p-2 border-[var(--primary-border)] uppercase bg-[var(--primary-background)]">
           Price/Item (₹)
         </span>
-        <span className="border-l border-t p-2 border-[var(--primary-border)]  uppercase bg-[var(--primary-background)]">
+        <span className="border-l border-t p-2 border-[var(--primary-border)] uppercase bg-[var(--primary-background)]">
           Discount
         </span>
         <span className="border-l border-t p-2 border-[var(--primary-border)] uppercase bg-[var(--primary-background)]">
@@ -171,91 +186,117 @@ const SalesInvoiceItemTable = ({ data, setData }) => {
         <span className="border-l border-t p-2 border-[var(--primary-border)] uppercase bg-[var(--primary-background)]">
           Amount (₹)
         </span>
-        <span className="border-l border-t border-r p-2 border-[var(--primary-border)]  text-gray-500 uppercase bg-[var(--primary-background)]">
-          {/* <FaCirclePlus size={24} /> */}
-        </span>
+        <span className="border-l border-t border-r p-2 border-[var(--primary-border)] text-gray-500 uppercase bg-[var(--primary-background)]"></span>
       </div>
 
-      {addedItems.map((addedItem, index) => (
+      {data?.items.map((addedItem, index) => (
         <div className="w-full grid grid-cols-11 text-xs" key={addedItem?._id}>
-          <span className="border-t p-2 border-[var(--primary-border)] ">
+          {/* Row Number */}
+          <span className="border-t p-2 border-[var(--primary-border)]">
             {index + 1}
           </span>
-          <span className="border-t border-l  p-2 border-[var(--primary-border)] col-span-3">
+
+          {/* Item Name */}
+          <span className="border-t border-l p-2 border-[var(--primary-border)] col-span-3">
             {addedItem?.itemName}
           </span>
-          <span className="border-t border-l p-2 border-[var(--primary-border)] ">
+
+          {/* HSN */}
+          <span className="border-t border-l p-2 border-[var(--primary-border)]">
             {addedItem?.HSNCode || "-"}
           </span>
-          <span className="border-t border-l p-2 border-[var(--primary-border)] ">
+
+          {/* Quantity */}
+          <span className="border-t border-l p-2 border-[var(--primary-border)]">
             <input
               className="input input-xs bg-zinc-100 text-right"
-              value={addedItem?.quantity}
-            />
-          </span>
-          <span className="border-l text-nowrap  border-t p-2 border-[var(--primary-border)] ">
-            <input
-              className="input input-xs bg-zinc-100 text-right"
-              value={Number(addedItem?.basePrice).toLocaleString("en-IN")}
+              value={addedItem?.quantity || ""}
+              onChange={(e) =>
+                handleUpdateQuantity(
+                  parseInt(e.target.value) || 0,
+                  addedItem._id
+                )
+              }
             />
           </span>
 
-          <span className="border-l relative border-t p-2 border-[var(--primary-border)] ">
+          {/* Price */}
+          <span className="border-l text-nowrap border-t p-2 border-[var(--primary-border)]">
+            <input
+              className="input input-xs bg-zinc-100 text-right"
+              value={Number(addedItem?.basePrice || 0).toLocaleString("en-IN")}
+              readOnly
+            />
+          </span>
+
+          {/* Discount */}
+          <span className="border-l relative border-t p-2 border-[var(--primary-border)]">
+            {/* Discount % */}
             <input
               type="text"
               className="input input-xs bg-zinc-100 text-right"
-              value={data.discountPercent}
+              value={addedItem?.discountPercent || ""}
               onChange={(e) =>
-                setData((prev) => ({
-                  ...prev,
-                  discountPercent: setDiscountPercent(
-                    parseFloat(e.target.value)
-                  ),
-                }))
+                handleSetDiscountPercent(
+                  parseFloat(e.target.value) || 0,
+                  addedItem._id
+                )
               }
             />
             <Percent size={10} className="absolute top-[14.3px] left-3 z-10" />
+
+            {/* Discount Amount */}
             <input
               type="text"
               className="input input-xs bg-zinc-100 text-right mt-1"
-              value={data?.discountAmount}
+              value={addedItem?.discountAmount || ""}
               onChange={(e) =>
-                setData((prev) => ({
-                  ...prev,
-                  discountAmount: setDiscountAmount(parseFloat(e.target.value)),
-                }))
+                handleSetDiscountAmount(
+                  parseFloat(e.target.value) || 0,
+                  addedItem._id
+                )
               }
             />
             <LiaRupeeSignSolid className="absolute top-[41.3px] left-3 z-10" />
           </span>
 
-          <div className="border-l  border-t p-2 border-[var(--primary-border)] ">
+          {/* Tax */}
+          <div className="border-l border-t p-2 border-[var(--primary-border)]">
             <input
-              className="input input-xs bg-zinc-100 text-right "
-              value={Number(addedItem?.gstAmount).toLocaleString("en-IN")}
+              className="input input-xs bg-zinc-100 text-right"
+              value={Number(addedItem?.gstAmount || 0).toLocaleString("en-IN")}
+              readOnly
             />
             <small className="text-zinc-500 mt-1 text-xs text-nowrap">
               ({addedItem?.gstTaxRate})
             </small>
             <select
-              value={gstTaxRateType}
-              onChange={(e) => handleSetGstTaxRateType(e, addedItem?._id)}
-              className="text-[var(--secondary-text-color)] "
+              value={addedItem?.gstTaxRateType || "with tax"}
+              onChange={(e) => handleSetGstTaxRateType(e, addedItem._id)}
+              className="text-[var(--secondary-text-color)]"
             >
+              <option value="with tax" className="hidden">
+                with tax
+              </option>
               <option value="with tax">with tax</option>
               <option value="without tax">without tax</option>
             </select>
           </div>
 
-          <span className="relative border-l border-t p-2 border-[var(--primary-border)] ">
+          {/* Amount */}
+          <span className="relative border-l border-t p-2 border-[var(--primary-border)]">
             <input
               className="input input-xs bg-zinc-100 text-right"
-              value={Number(addedItem?.totalAmount).toLocaleString("en-IN")}
+              value={Number(addedItem?.totalAmount || 0).toLocaleString(
+                "en-IN"
+              )}
+              readOnly
             />
             <LiaRupeeSignSolid className="absolute top-[14.3px] left-3 z-10" />
           </span>
 
-          <span className="border-l grid place-items-center border-t border-r p-2 border-[var(--primary-border)]  text-[var(--error-text-color)]">
+          {/* Delete */}
+          <span className="border-l grid place-items-center border-t border-r p-2 border-[var(--primary-border)] text-[var(--error-text-color)]">
             <BsTrash3
               size={20}
               className="cursor-pointer"
