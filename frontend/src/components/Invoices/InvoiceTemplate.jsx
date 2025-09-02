@@ -7,6 +7,7 @@ import { useEffect, useRef } from "react";
 const InvoiceTemplate = ({
   color,
   textColor,
+  title,
   invoice,
   setInvoiceIdToDownload,
 }) => {
@@ -50,7 +51,7 @@ const InvoiceTemplate = ({
           }}
           className="mt-5 flex gap-2 items-center  text-sm"
         >
-          <BsTelephone className="" />
+          <BsTelephone className="text-info" />
           {business?.companyPhoneNo}
         </div>
 

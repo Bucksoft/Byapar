@@ -95,7 +95,7 @@ const SalesNavigationMenus = ({ title, btnText, selectText, setPage }) => {
               onClick={() => {
                 btnText === "Payment In" ? setPage("Payment In") : "";
                 navigate(
-                  `/dashboard/${
+                  `/dashboard/parties/${
                     "create-" + btnText.split(" ").join("-").toLowerCase()
                   }`
                 );

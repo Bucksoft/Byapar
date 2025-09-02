@@ -1,8 +1,4 @@
-import { Calendar, ChevronDown, Keyboard, Search } from "lucide-react";
-import React from "react";
 import { FaFileInvoice } from "react-icons/fa";
-import { IoSettingsOutline } from "react-icons/io5";
-import { TbReportSearch } from "react-icons/tb";
 import DashboardNavbar from "../components/DashboardNavbar";
 import SalesNavigationMenus from "../components/SalesNavigationMenus";
 

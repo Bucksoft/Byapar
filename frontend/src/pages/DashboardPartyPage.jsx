@@ -17,6 +17,7 @@ const DashboardPartyPage = () => {
   const navigate = useNavigate();
   const [selectedMenu, setSelectedMenu] = useState("transactions");
   const { invoices } = useInvoiceStore();
+  const [partyInvoices, setPartyInvoices] = useState();
 
   function handleSelectedMenu(menu) {
     setSelectedMenu(menu.toLowerCase());
@@ -29,11 +30,11 @@ const DashboardPartyPage = () => {
     },
   });
 
-  console.log("INVOICES ", invoices);
-
   useEffect(() => {
-    const partyInvoices = invoices.filter((invoice) => invoice?.partyId === id);
-    console.log(partyInvoices);
+    const partyInvoices = invoices.filter(
+      (invoice) => invoice?.partyId?._id === id
+    );
+    setPartyInvoices(partyInvoices);
   }, [id, invoices]);
 
   const handleSelectChange = (e) => {
@@ -127,7 +128,9 @@ const DashboardPartyPage = () => {
           </fieldset>
         </section>
 
-        {selectedMenu === "transactions" && <PartyTransactions party={party} />}
+        {selectedMenu === "transactions" && (
+          <PartyTransactions party={party} partyInvoices={partyInvoices} />
+        )}
 
         {selectedMenu === "profile" && <PartyProfile party={party} />}
 

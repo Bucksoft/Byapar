@@ -9,14 +9,14 @@ import SalesInvoiceItemTable from "./SalesInvoiceItemTable";
 import SalesInvoiceFooterSection from "./SalesInvoiceFooterSection";
 import { queryClient } from "../../main";
 
-const InvoicesForm = ({ title, party }) => {
+const InvoicesForm = ({ title, party, setParty }) => {
   const invoiceData = {
     paymentTerms: 0,
     dueDate: new Date(Date.now()),
     salesInvoiceDate: new Date(Date.now()),
     salesInvoiceNumber: 1,
     partyName: party?.partyName || "",
-    items: [{}],
+    items: [],
     discountSubtotal: 0,
     taxableAmount: "",
     discountAmount: 0,
@@ -32,14 +32,35 @@ const InvoicesForm = ({ title, party }) => {
   const [addedItems, setAddedItems] = useState([]);
   const [data, setData] = useState(invoiceData);
 
-  // This is the mutation for creating SALES INVOICE ------------------------------------------
   const mutation = useMutation({
     mutationFn: async (data) => {
-      if (data.items.length <= 0) {
-        toast.error("Please add atleast 1 item");
+      if (!party) {
+        toast.error("Please select a party");
         return;
       }
-      const res = await axiosInstance.post(`/sales-invoice`, {
+      if (data.items.length <= 0) {
+        toast.error("Please add at least 1 item");
+        return;
+      }
+
+      // Dynamically decide endpoint based on title
+      let endpoint = "";
+      switch (title) {
+        case "Quotation":
+          endpoint = "/quotation";
+          break;
+        case "Sales Invoice":
+          endpoint = "/sales-invoice";
+          break;
+        case "Purchase Invoice":
+          endpoint = "/purchase-invoice";
+          break;
+        default:
+          toast.error("Invalid invoice type");
+          return;
+      }
+
+      const res = await axiosInstance.post(endpoint, {
         ...data,
         partyName: party?.partyName,
       });
@@ -49,13 +70,21 @@ const InvoicesForm = ({ title, party }) => {
     onSuccess: (data) => {
       toast.success(data.msg);
       queryClient.invalidateQueries({ queryKey: ["invoices"] });
-      navigate(`/dashboard/sales-invoice/${data?.salesInvoice?._id}`);
+
+      // Navigate dynamically based on invoice type
+      if (data?.quotation?._id) {
+        navigate(`/dashboard/quotations/${data?.quotation?._id}`);
+      } else if (data?.salesInvoice?._id) {
+        navigate(`/dashboard/sales-invoice/${data?.salesInvoice?._id}`);
+      } else if (data?.purchaseInvoice?._id) {
+        navigate(`/dashboard/purchase-invoice/${data?.purchaseInvoice?._id}`);
+      }
     },
+
     onError: (err) => {
-      toast.error(err.response.data.msg || "Something went wrong");
+      toast.error(err.response?.data?.msg || "Something went wrong");
     },
   });
-  //  mutation for creating SALES INVOICE ENDS ------------------------------------------
 
   return (
     <main className="max-h-screen w-full">
@@ -82,6 +111,8 @@ const InvoicesForm = ({ title, party }) => {
         data={data}
         setData={setData}
         party={party}
+        setParty={setParty}
+        title={title}
       />
       {/* Upper section of invoice form invoice number, dates , party name details etc ends here ---------------------------------------*/}
 

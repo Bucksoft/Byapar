@@ -1,7 +1,9 @@
 import React from "react";
 import { GrDocumentExcel } from "react-icons/gr";
+import { LiaRupeeSignSolid } from "react-icons/lia";
 
-const PartyTransactions = ({ party }) => {
+const PartyTransactions = ({ party, partyInvoices }) => {
+  console.log(partyInvoices);
   return (
     <section>
       <div className="overflow-x-auto">
@@ -17,26 +19,36 @@ const PartyTransactions = ({ party }) => {
               <th>Status</th>
             </tr>
           </thead>
-          {/* <tbody>
-                    <tr>
-                      <th>1</th>
-                      <td>Cy Ganderton</td>
-                      <td>Quality Control Specialist</td>
-                      <td>Blue</td>
-                    </tr>
-                    <tr>
-                      <th>2</th>
-                      <td>Hart Hagerty</td>
-                      <td>Desktop Support Technician</td>
-                      <td>Purple</td>
-                    </tr>
-                    <tr>
-                      <th>3</th>
-                      <td>Brice Swyre</td>
-                      <td>Tax Accountant</td>
-                      <td>Red</td>
-                    </tr>
-                  </tbody> */}
+          <tbody>
+            {partyInvoices?.length > 0 &&
+              partyInvoices.map((partyInvoice, index) => (
+                <tr key={partyInvoice?._id}>
+                  <td>{index + 1}</td>
+                  <td>{partyInvoice?.salesInvoiceDate.split("T")[0] || "-"}</td>
+                  <td>{partyInvoice?.type || "-"}</td>
+                  <td>{partyInvoice?.salesInvoiceNumber || "-"}</td>
+                  <td>
+                    <div className="flex items-center">
+                      <LiaRupeeSignSolid />
+                      {Number(partyInvoice?.totalAmount).toLocaleString(
+                        "en-IN"
+                      ) || "-"}
+                    </div>
+                  </td>
+                  <td>
+                    <div
+                      className={`badge badge-sm  ${
+                        partyInvoice?.status === "unpaid"
+                          ? "badge-error"
+                          : "badge-success"
+                      }`}
+                    >
+                      {partyInvoice?.status}
+                    </div>
+                  </td>
+                </tr>
+              ))}
+          </tbody>
         </table>
         <div className="flex items-center justify-center w-full py-16 flex-col text-zinc-500 gap-2">
           <GrDocumentExcel size={25} />

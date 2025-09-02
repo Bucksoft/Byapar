@@ -11,23 +11,23 @@ import toast from "react-hot-toast";
 import { queryClient } from "../../main";
 import CustomLoader from "../Loader";
 
-const SalesInvoice = () => {
+const QuotationInvoice = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const [invoiceIdToDownload, setInvoiceIdToDownload] = useState("invoice");
 
   // THIS IS THE QUERY TO GET THE INVOICE BASED ON ID
-  const { isLoading, data: invoice } = useQuery({
+  const { isLoading, data: quotation } = useQuery({
     queryFn: async () => {
-      const res = await axiosInstance.get(`/sales-invoice/${id}`);
-      return res.data?.invoice;
+      const res = await axiosInstance.get(`/quotation/${id}`);
+      return res.data?.quotation;
     },
   });
 
   // THIS IS THE MUTATION TO DELETE THE INVOICE
   const mutation = useMutation({
     mutationFn: async (invoiceId) => {
-      const res = await axiosInstance.delete(`/sales-invoice/${invoiceId}`);
+      const res = await axiosInstance.delete(`/quotation/${invoiceId}`);
       return res.data;
     },
     onSuccess: (data) => {
@@ -43,14 +43,12 @@ const SalesInvoice = () => {
         <header className="flex items-center justify-between">
           <div className="flex items-center gap-3">
             <ArrowLeft onClick={() => navigate(-1)} />
-            <h1 className="font-medium">Quotation</h1>
-            <div className="badge badge-success badge-soft">Paid</div>
+            <h1 className="font-medium">Quotation </h1>
+            <div className="badge badge-success badge-soft">
+              {quotation?.status}
+            </div>
           </div>
           <div className="flex items-center gap-3">
-            <button className="btn btn-sm">
-              <GiProfit />
-              Profit Details
-            </button>
             <div className="dropdown dropdown-end">
               <div tabIndex={0} role="button" className="btn btn-sm">
                 <EllipsisVertical size={14} />
@@ -68,9 +66,7 @@ const SalesInvoice = () => {
                 <li>
                   <button>Duplicate</button>
                 </li>
-                <li>
-                  <button>Issue Credit Note</button>
-                </li>
+
                 <li
                   onClick={() => mutation.mutate(id)}
                   className="text-[var(--error-text-color)]"
@@ -107,30 +103,31 @@ const SalesInvoice = () => {
           </div>
 
           <div className="flex items-center gap-2">
-            <button className="btn btn-sm btn-soft btn-info">
-              Generate E-way Bill
-            </button>
-            <button className="btn btn-sm btn-soft btn-info">
-              <TbFileInvoice /> Generate e-Invoice
+            <button className="btn btn-sm btn-info">
+              <TbFileInvoice /> Convert to Invoice
             </button>
           </div>
         </section>
 
-        {isLoading ? (
-          <CustomLoader text={"Loading..."} />
-        ) : (
-          <section className="mt-3 bg-sky-50 flex justify-center py-1 overflow-y-scroll flex-1">
-            {/* Invoice template */}
-            <InvoiceTemplate
-              color={"green"}
-              invoice={invoice}
-              setInvoiceIdToDownload={setInvoiceIdToDownload}
-            />
-          </section>
-        )}
+        {/* Invoice template */}
+        <section className="mt-3 bg-sky-50 flex justify-center py-1 overflow-y-scroll flex-1">
+          {isLoading ? (
+            <CustomLoader text={"Loading..."} />
+          ) : (
+            <section className="mt-3 bg-sky-50 flex justify-center py-1 overflow-y-scroll flex-1">
+              {/* Invoice template */}
+              <InvoiceTemplate
+                color={"green"}
+                invoice={quotation}
+                title="Quotation"
+                setInvoiceIdToDownload={setInvoiceIdToDownload}
+              />
+            </section>
+          )}
+        </section>
       </div>
     </main>
   );
 };
 
-export default SalesInvoice;
+export default QuotationInvoice;

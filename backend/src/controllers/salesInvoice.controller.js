@@ -83,7 +83,7 @@ export async function deleteInvoice(req, res) {
         .json({ success: false, msg: "Please provide invoice id" });
     }
     const deletedInvoice = await SalesInvoice.findByIdAndDelete(id);
-    if (!deleteInvoice) {
+    if (!deletedInvoice) {
       return res
         .status(400)
         .json({ success: false, msg: "Failed to delete sales invoice" });

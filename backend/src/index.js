@@ -9,6 +9,7 @@ import paymentInRoutes from "./routes/paymentIn.routes.js";
 import itemRoutes from "./routes/item.route.js";
 import salesRoutes from "./routes/salesInvoice.routes.js";
 import pdfRoutes from "./routes/pdf.routes.js";
+import quotationRoutes from "./routes/quotation.routes.js";
 import { loginViaGoogleCallback } from "./controllers/user.controller.js";
 import cookieParser from "cookie-parser";
 
@@ -36,6 +37,7 @@ app.use("/api/v1/item", itemRoutes);
 app.use("/api/v1/payment-in", paymentInRoutes);
 app.use("/api/v1/sales-invoice", salesRoutes);
 app.use("/api/v1/generate-pdf", pdfRoutes);
+app.use("/api/v1/quotation", quotationRoutes);
 
 app.listen(PORT, () => {
   connectDB();

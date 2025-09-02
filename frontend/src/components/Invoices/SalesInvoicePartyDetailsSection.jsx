@@ -3,7 +3,13 @@ import { Link } from "react-router-dom";
 import { usePartyStore } from "../../store/partyStore";
 import { IoCloseCircle } from "react-icons/io5";
 
-const SalesInvoicePartyDetailsSection = ({ data, setData, party }) => {
+const SalesInvoicePartyDetailsSection = ({
+  title,
+  data,
+  setData,
+  party,
+  setParty,
+}) => {
   const [searchPartyQuery, setSearchPartyQuery] = useState("");
   const [open, setOpen] = useState(false);
   const { parties } = usePartyStore();
@@ -43,7 +49,7 @@ const SalesInvoicePartyDetailsSection = ({ data, setData, party }) => {
                   onChange={(e) => setSearchPartyQuery(e.target.value)}
                 />
                 {searchedParties.map((party) => (
-                  <li key={party?._id}>
+                  <li key={party?._id} onClick={() => setParty(party)}>
                     <a>{party?.partyName}</a>
                   </li>
                 ))}
@@ -90,7 +96,7 @@ const SalesInvoicePartyDetailsSection = ({ data, setData, party }) => {
           {/* upper part */}
           <div className=" p-2 flex space-x-2 items-center">
             <div className="">
-              <p className="text-xs pb-2">Sales Invoice No: </p>
+              <p className="text-xs pb-2">{title} No: </p>
               <input
                 type="number"
                 placeholder="1"
@@ -106,7 +112,7 @@ const SalesInvoicePartyDetailsSection = ({ data, setData, party }) => {
               />
             </div>
             <div>
-              <p className="text-xs pb-2 ">Sales Invoice Date: </p>
+              <p className="text-xs pb-2 ">{title} Date: </p>
               <input
                 type="date"
                 value={data.salesInvoiceDate}
@@ -118,60 +124,64 @@ const SalesInvoicePartyDetailsSection = ({ data, setData, party }) => {
           </div>
           {/* lower */}
 
-          <div className="p-2">
-            <button
-              onClick={() => setOpen(true)}
-              className={`btn btn-info btn-sm btn-dash px-20 w-fit ${
-                open ? "hidden" : ""
-              }`}
-            >
-              +Add Due Date
-            </button>
-          </div>
-
-          {open && (
+          {title !== "Quotation" && (
             <>
-              <div className="flex justify-end  relative">
-                <IoCloseCircle
-                  size={25}
-                  onClick={() => setOpen(false)}
-                  className="text-gray-500 absolute top-0 right-57"
-                />
+              <div className="p-2">
+                <button
+                  onClick={() => setOpen(true)}
+                  className={`btn btn-info btn-sm btn-dash px-20 w-fit ${
+                    open ? "hidden" : ""
+                  }`}
+                >
+                  +Add Due Date
+                </button>
               </div>
-              <div className="px-2 py-4 flex space-x-2 border border-dashed w-fit m-2 rounded-md ">
-                <div>
-                  <p className="text-xs pb-2">Payment Terms: </p>
-                  <div className="relative rounded-sm">
-                    <input
-                      type="number"
-                      placeholder="0"
-                      value={data.paymentTerms}
-                      onChange={(e) =>
-                        setData((prev) => ({
-                          ...prev,
-                          paymentTerms: Number(e.target.value),
-                        }))
-                      }
-                      name="paymentTerms"
-                      className="input input-xs w-30"
+
+              {open && (
+                <>
+                  <div className="flex justify-end  relative">
+                    <IoCloseCircle
+                      size={25}
+                      onClick={() => setOpen(false)}
+                      className="text-gray-500 absolute top-0 right-57"
                     />
-                    <span className="text-xs absolute z-50 left-21 top-1 bg-zinc-200 ">
-                      Days
-                    </span>
                   </div>
-                </div>
-                <div className="">
-                  <p className="text-xs pb-2">Due Date: </p>
-                  <input
-                    type="date"
-                    value={data.dueDate}
-                    onChange={handleInputChange}
-                    name="dueDate"
-                    defaultValue={new Date().toISOString().split("T")[0]}
-                    className="input input-xs border-none bg-zinc-200 w-30"
-                  />
-                </div>
-              </div>
+                  <div className="px-2 py-4 flex space-x-2 border border-dashed w-fit m-2 rounded-md ">
+                    <div>
+                      <p className="text-xs pb-2">Payment Terms: </p>
+                      <div className="relative rounded-sm">
+                        <input
+                          type="number"
+                          placeholder="0"
+                          value={data.paymentTerms}
+                          onChange={(e) =>
+                            setData((prev) => ({
+                              ...prev,
+                              paymentTerms: Number(e.target.value),
+                            }))
+                          }
+                          name="paymentTerms"
+                          className="input input-xs w-30"
+                        />
+                        <span className="text-xs absolute z-50 left-21 top-1 bg-zinc-200 ">
+                          Days
+                        </span>
+                      </div>
+                    </div>
+                    <div className="">
+                      <p className="text-xs pb-2">Due Date: </p>
+                      <input
+                        type="date"
+                        value={data.dueDate}
+                        onChange={handleInputChange}
+                        name="dueDate"
+                        defaultValue={new Date().toISOString().split("T")[0]}
+                        className="input input-xs border-none bg-zinc-200 w-30"
+                      />
+                    </div>
+                  </div>
+                </>
+              )}
             </>
           )}
         </div>

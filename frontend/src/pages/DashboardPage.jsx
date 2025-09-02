@@ -16,7 +16,7 @@ const DashboardPage = () => {
       <div className="h-full w-full  rounded-lg p-3">
         <div className="flex bg-zinc-100">
           {/* sidebar */}
-          {/* <Sidebar /> */} 
+          {/* <Sidebar /> */}
 
           <section className="w-full ">
             {/* Dashboard nav */}
@@ -114,7 +114,7 @@ const DashboardPage = () => {
                         <tbody>
                           {invoices &&
                             invoices.map((invoice) => (
-                              <tr>
+                              <tr key={invoice?._id}>
                                 <td>
                                   {invoice?.salesInvoiceDate.split("T")[0] ||
                                     "-"}

@@ -54,6 +54,7 @@ import DashboardAllTransactionsPage from "./pages/DashboardAllTransactionsPage";
 import DashboardCreatePaymentOutPage from "./pages/Purchases/DashboardCreatePaymentOutPage";
 import PaymentInForm from "./components/PaymentIn/PaymentInForm";
 import SalesInvoice from "./components/Invoices/SalesInvoice";
+import QuotationInvoice from "./components/Invoices/QuotationInvoice";
 
 function App() {
   const { user, setUser } = useAuthStore();
@@ -174,7 +175,11 @@ function App() {
             element={<DashboardQuotationPage />}
           />
           <Route
-            path="/dashboard/create-quotation"
+            path="/dashboard/quotations/:id"
+            element={<QuotationInvoice />}
+          />
+          <Route
+            path="/dashboard/parties/create-quotation"
             element={<DashboardQuotationInvoiceForm />}
           />
           <Route
