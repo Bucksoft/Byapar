@@ -104,6 +104,8 @@ export async function verifyOTP(req, res) {
     });
     res.cookie("token", token, {
       httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: process.env.NODE_ENV === "production" ? "None" : "Lax",
       maxAge: 60 * 60 * 1000,
     });
 
@@ -190,7 +192,9 @@ export async function loginViaGoogleCallback(req, res) {
 
     res.cookie("token", token, {
       httpOnly: true,
-      maxAge: 60 * 60 * 60 * 1000,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: process.env.NODE_ENV === "production" ? "None" : "Lax",
+      maxAge: 60 * 60 * 1000,
     });
 
     res.redirect(`${process.env.FRONTEND_URI}/dashboard`);

@@ -5,16 +5,18 @@ import { axiosInstance } from "../config/axios";
 import { ArrowLeft } from "lucide-react";
 import { FaRegEdit } from "react-icons/fa";
 import { dashboardSinglePartyMenus } from "../utils/constants";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import PartyTransactions from "../components/Party/PartyTransactions";
 import PartyProfile from "../components/Party/PartyProfile";
 import PartyLedgerStatement from "../components/Party/PartyLedgerStatement";
 import PartyItemWiseReport from "../components/Party/PartyItemWiseReport";
+import { useInvoiceStore } from "../store/invoicesStore";
 
 const DashboardPartyPage = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const [selectedMenu, setSelectedMenu] = useState("transactions");
+  const { invoices } = useInvoiceStore();
 
   function handleSelectedMenu(menu) {
     setSelectedMenu(menu.toLowerCase());
@@ -27,8 +29,14 @@ const DashboardPartyPage = () => {
     },
   });
 
+  console.log("INVOICES ", invoices);
+
+  useEffect(() => {
+    const partyInvoices = invoices.filter((invoice) => invoice?.partyId === id);
+    console.log(partyInvoices);
+  }, [id, invoices]);
+
   const handleSelectChange = (e) => {
-    console.log(e.target.value);
     if (e.target.value === "Sales Invoice") {
       navigate("/dashboard/parties/sales-invoice", { state: { id: id } });
     }

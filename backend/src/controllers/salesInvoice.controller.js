@@ -5,6 +5,7 @@ import Party from "../models/party.schema.js";
 export async function createSalesInvoice(req, res) {
   try {
     const validatedResult = salesInvoiceSchema.safeParse(req.body);
+    const data = req.body;
     if (!validatedResult.success) {
       const validationError = validatedResult.error.format();
       return res
@@ -35,7 +36,7 @@ export async function createSalesInvoice(req, res) {
 
     const salesInvoice = await SalesInvoice.create({
       partyId: party?._id,
-      ...validatedResult.data,
+      ...data,
     });
 
     if (!salesInvoice) {
@@ -51,6 +52,7 @@ export async function createSalesInvoice(req, res) {
     });
   } catch (error) {
     console.log("ERROR IN CREATING SALES INVOICE ");
+    console.log(error);
     return res.status(500).json({ err: "Internal server error", error });
   }
 }
@@ -91,6 +93,41 @@ export async function deleteInvoice(req, res) {
       .json({ success: true, msg: "Invoice deleted successfully" });
   } catch (error) {
     console.log("ERROR IN DELETING SALES INVOICE ");
+    console.log(error);
     return res.status(500).json({ err: "Internal server error", error });
+  }
+}
+
+export async function getInvoiceById(req, res) {
+  try {
+    const { id } = req.params;
+
+    if (!id) {
+      return res
+        .status(400)
+        .json({ success: false, msg: "Please provide a valid invoice id" });
+    }
+
+    let invoice = await SalesInvoice.findById(id)
+      .populate("partyId")
+      .populate("items.itemId");
+
+    if (!invoice) {
+      return res.status(404).json({ success: false, msg: "Invoice not found" });
+    }
+
+    invoice = invoice.toObject();
+
+    console.log("Fetched Invoice:", JSON.stringify(invoice, null, 2));
+
+    return res.status(200).json({
+      success: true,
+      invoice,
+    });
+  } catch (error) {
+    console.error("ERROR IN GETTING SALE INVOICE:", error);
+    return res
+      .status(500)
+      .json({ success: false, msg: "Internal server error" });
   }
 }

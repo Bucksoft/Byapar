@@ -290,7 +290,6 @@ export const salesInvoiceSchema = z.object({
   partyName: z.string().optional(),
   paymentTerms: z.number(),
   dueDate: z.union([z.string(), z.date()]).default(() => new Date()),
-  items: z.array(z.object()),
   taxSubTotal: z.number().optional(),
   amountSubTotal: z.number().min(0, "Amount subtotal is required"),
   discountSubtotal: z.number().optional(),

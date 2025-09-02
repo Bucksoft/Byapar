@@ -42,7 +42,6 @@ const DashboardItemsSidebar = () => {
     HSNCode: "",
     asOfDate: new Date(Date.now()),
     description: "",
-    description: "",
     godown: "",
     fileURLs: [""],
   };
@@ -82,7 +81,7 @@ const DashboardItemsSidebar = () => {
     },
   });
 
-  // edit details mutation 
+  // edit details mutation
   const editMutation = useMutation({
     mutationFn: async (data) => {
       const res = await axiosInstance.patch(`/item/${state}`, { data });

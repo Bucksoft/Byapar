@@ -16,7 +16,7 @@ const InvoicesForm = ({ title, party }) => {
     salesInvoiceDate: new Date(Date.now()),
     salesInvoiceNumber: 1,
     partyName: party?.partyName || "",
-    items: [],
+    items: [{}],
     discountSubtotal: 0,
     taxableAmount: "",
     discountAmount: 0,

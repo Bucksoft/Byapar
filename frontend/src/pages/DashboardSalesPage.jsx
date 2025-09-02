@@ -5,7 +5,7 @@ import { EllipsisVertical, Plus, Search } from "lucide-react";
 import { FaFileInvoice, FaRegEdit } from "react-icons/fa";
 import { motion } from "framer-motion";
 import { container, dashboardLinksItems } from "../components/Sidebar";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { queryClient } from "../main";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { axiosInstance } from "../config/axios";
@@ -23,6 +23,7 @@ const DashboardSalesPage = () => {
   const [showDeletePopup, setShowDeletePopup] = useState(false);
   const [invoiceId, setInvoiceId] = useState();
   const [searchQuery, setSearchQuery] = useState("");
+  const navigate = useNavigate();
 
   // to get all the invoices
   const {
@@ -67,8 +68,8 @@ const DashboardSalesPage = () => {
       : invoices;
 
   return (
-    <main className="h-full p-2">
-      <div className="h-full w-full bg-white rounded-lg p-3">
+    <main className="h-full p-2 ">
+      <div className="h-full w-full flex flex-col bg-white rounded-lg p-3">
         <DashboardNavbar title={"Sales Invoice"} isReport={"true"} />
 
         <motion.div
@@ -151,7 +152,7 @@ const DashboardSalesPage = () => {
           </div>
         </motion.div>
 
-        <div className="overflow-x-auto rounded-box border border-base-content/5 bg-base-100 mt-5">
+        <div className="overflow-x-auto flex-1 rounded-box border border-base-content/5 bg-base-100 mt-5 ">
           {isLoading ? (
             <div className="w-full py-3 flex justify-center">
               <CustomLoader text={"Getting all invoices..."} />
@@ -187,7 +188,13 @@ const DashboardSalesPage = () => {
               </thead>
               <tbody>
                 {(searchedInvoices || invoices).map((invoice) => (
-                  <tr key={invoice?._id}>
+                  <tr
+                    key={invoice?._id}
+                    onClick={() =>
+                      navigate(`/dashboard/sales-invoice/${invoice?._id}`)
+                    }
+                    className="cursor-pointer"
+                  >
                     <td>{invoice?.salesInvoiceDate.split("T")[0]}</td>
                     <td>{invoice?.salesInvoiceNumber}</td>
                     <td>{invoice?.partyId?.partyName}</td>
