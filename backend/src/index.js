@@ -33,7 +33,7 @@ app.use(express.urlencoded({ extended: true }));
 
 app.use("/api/v1/business", businessRoutes);
 app.use("/api/v1/user", userRoutes);
-app.use("/auth/google/callback", loginViaGoogleCallback);
+app.get("/auth/google/callback", loginViaGoogleCallback);
 app.use("/api/v1/parties", partyRoutes);
 app.use("/api/v1/item", itemRoutes);
 app.use("/api/v1/payment-in", paymentInRoutes);
@@ -43,7 +43,7 @@ app.use("/api/v1/quotation", quotationRoutes);
 
 const __dirname = path.resolve();
 app.use(express.static(path.join(__dirname, "frontend/dist")));
-app.get("*", (req, res) => {
+app.get("/*any", (req, res) => {
   res.sendFile(path.resolve(__dirname, "frontend", "dist", "index.html"));
 });
 
