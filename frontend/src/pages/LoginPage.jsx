@@ -32,7 +32,7 @@ const LoginPage = () => {
   });
 
   const handleGoogleLogin = () => {
-    window.location.href = "http://localhost:8000/api/v1/user";
+    window.location.href = "http://localhost:8000/api/v1/user/oauth";
   };
 
   return (

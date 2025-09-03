@@ -33,7 +33,7 @@ const DashboardAccountPage = () => {
 
   const mutation = useMutation({
     mutationFn: async (data) => {
-      const res = await axiosInstance.patch("/user", { data });
+      const res = await axiosInstance.patch("/user/account", { data });
       return res.data;
     },
     onSuccess: (data) => {
