@@ -33,11 +33,7 @@ const InvoiceTemplate = ({
       <div
         ref={invoiceIdToDownload}
         id="invoice"
-        style={{
-          backgroundColor: "#ffffff",
-          borderColor: "#e4e4e7",
-        }}
-        className="max-w-3xl w-full mx-auto p-4 border "
+        className="max-w-3xl h-screen bg-white mx-auto p-4 border "
       >
         {/* Party name */}
         <div className="flex items-center justify-between">
@@ -200,7 +196,7 @@ const InvoiceTemplate = ({
 
           {/* Footer section */}
           <div className="divider" />
-          <section className="grid grid-cols-2 text-xs mt-24">
+          <section className="grid grid-cols-2 text-xs mt-16">
             <div className="mt-4">
               {invoice?.termsAndCondition && (
                 <div>

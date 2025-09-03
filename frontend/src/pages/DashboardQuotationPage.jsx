@@ -1,8 +1,20 @@
 import { FaFileInvoice } from "react-icons/fa";
 import DashboardNavbar from "../components/DashboardNavbar";
 import SalesNavigationMenus from "../components/SalesNavigationMenus";
+import { useQuery } from "@tanstack/react-query";
+import { axiosInstance } from "../config/axios";
+import CustomLoader from "../components/Loader";
+import { LiaRupeeSignSolid } from "react-icons/lia";
 
 const DashboardQuotationPage = () => {
+  
+  const { isLoading, data: quotations } = useQuery({
+    queryFn: async () => {
+      const res = await axiosInstance.get(`/quotation`);
+      return res.data.quotations;
+    },
+  });
+
   return (
     <main className="h-screen w-full flex">
       <section className="h-full w-full bg-gray-100 p-2 ">
@@ -13,30 +25,60 @@ const DashboardQuotationPage = () => {
             btnText={"Quotation"}
             selectText={"quotation"}
           />
-          {/* table */}
-          <div className="border border-zinc-200 mt-5 h-80 rounded-md mx-4 ">
-            <table className="table ">
-              {/* head */}
-              <thead>
-                <tr className="text-xs bg-gray-100 border-b border-b-gray-200">
-                  <th className="border-r border-r-zinc-200 w-60">Date</th>
-                  <th className="border-r border-r-zinc-200 w-60">
-                    Invoice Number
-                  </th>
-                  <th className="border-r border-r-zinc-200 w-60">Due In</th>
 
-                  <th className="border-r border-r-zinc-200 w-60">Amount</th>
-                  <th className="border-r border-r-zinc-200 w-60">Status</th>
-                  <th className=" w-60">Mode of Payment</th>
-                </tr>
-              </thead>
-            </table>
-            <div className="w-full flex items-center justify-center py-20 flex-col gap-3 text-zinc-400">
-              <FaFileInvoice size={40} />
-              <span className="text-sm">
-                No transactions matching the current filter
-              </span>
-            </div>
+          {/* table */}
+          <div className=" mt-5 h-80 rounded-md mx-4 ">
+            {isLoading ? (
+              <div className="flex items-center">
+                <CustomLoader text={"Loading..."} />
+              </div>
+            ) : quotations ? (
+              <table className="table">
+                {/* head */}
+                <thead>
+                  <tr className="text-xs bg-gray-100 ">
+                    <th className=" w-60">Date</th>
+                    <th className="w-60">Quotation Number</th>
+                    <th className=" w-60">Party Name</th>
+
+                    <th className=" w-60">Due In</th>
+                    <th className=" w-60">Amount</th>
+                    <th className=" w-60">Status</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {quotations &&
+                    quotations?.map((quotation) => (
+                      <tr>
+                        <td>{quotation?.quotationDate.split("T")[0]}</td>
+                        <td>{quotation?.quotationNumber}</td>
+                        <td>{quotation?.partyId?.partyName}</td>
+                        <td>{"-"}</td>
+                        <td>
+                          <div className="flex items-center">
+                            <LiaRupeeSignSolid />
+                            {Number(quotation?.totalAmount).toLocaleString(
+                              "en-IN"
+                            )}
+                          </div>
+                        </td>
+                        <td>
+                          <div className="badge badge-accent">
+                            {quotation?.status}
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
+                </tbody>
+              </table>
+            ) : (
+              <div className="w-full flex items-center justify-center py-20 flex-col gap-3 text-zinc-400">
+                <FaFileInvoice size={40} />
+                <span className="text-sm">
+                  No transactions matching the current filter
+                </span>
+              </div>
+            )}
           </div>
         </div>
       </section>

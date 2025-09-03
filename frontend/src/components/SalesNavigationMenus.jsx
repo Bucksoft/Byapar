@@ -23,7 +23,7 @@ const SalesNavigationMenus = ({ title, btnText, selectText, setPage }) => {
           {/* search box */}
           <div className="">
             <label className="input input-sm">
-              <Search size={16} className="text-zinc-400" />
+              <Search size={16} className="" />
               <input type="search" required placeholder="Search" />
             </label>
           </div>
@@ -35,14 +35,14 @@ const SalesNavigationMenus = ({ title, btnText, selectText, setPage }) => {
               className="bg-white flex items-center justify-between btn btn-wide btn-sm w-full text-xs font-medium"
             >
               <div className="flex items-center gap-2">
-                <Calendar size={16} className="text-zinc-400" />
-                <span className="text-zinc-400">Last 365 days</span>
+                <Calendar size={16} className="" />
+                <span className="">Last 365 days</span>
               </div>
-              <ChevronDown size={16} className="text-zinc-400" />
+              <ChevronDown size={16} className="" />
             </div>
             <ul
               tabIndex={0}
-              className="dropdown-content menu bg-base-100 rounded-box z-1 w-52 p-2 shadow-sm  text-zinc-400"
+              className="dropdown-content menu bg-base-100 rounded-box z-1 w-52 p-2 shadow-sm  "
             >
               <li>
                 <a>Today</a>

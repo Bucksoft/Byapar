@@ -4,8 +4,13 @@ import { usePartyStore } from "../../store/partyStore";
 import { useEffect, useState } from "react";
 import { useInvoiceStore } from "../../store/invoicesStore";
 import { LiaRupeeSignSolid } from "react-icons/lia";
+import { useMutation } from "@tanstack/react-query";
+import { axiosInstance } from "../../config/axios";
+import CustomLoader from "../../components/Loader";
+import toast from "react-hot-toast";
 
 const PaymentInForm = () => {
+  const [settledInvoices, setSettledInvoices] = useState({});
   const navigate = useNavigate();
   const { parties } = usePartyStore();
   const { invoices } = useInvoiceStore();
@@ -19,6 +24,7 @@ const PaymentInForm = () => {
     paymentMode: "cash",
     paymentInNumber: 1,
     notes: "",
+    settledInvoices: {},
   });
 
   useEffect(() => {
@@ -34,8 +40,48 @@ const PaymentInForm = () => {
     setTotalInvoiceAmount(totalAmount);
   }, [selectedParty]);
 
-  // TODO : Work upon this -> This is the payment amount which will be used to calculate the pending amount
-  console.log(data.paymentAmount);
+  useEffect(() => {
+    if (!allInvoices.length) return;
+
+    let remainingPayment = data.paymentAmount;
+    const newSettled = {};
+
+    const sorted = [...allInvoices].sort(
+      (a, b) =>
+        new Date(a.salesInvoiceDate).getTime() -
+        new Date(b.salesInvoiceDate).getTime()
+    );
+
+    sorted.forEach((invoice) => {
+      if (remainingPayment > 0) {
+        const settleAmount = Math.min(invoice.totalAmount, remainingPayment);
+        newSettled[invoice?._id] = settleAmount;
+        remainingPayment -= settleAmount;
+      } else {
+        newSettled[invoice._id] = 0;
+      }
+    });
+
+    setSettledInvoices(newSettled);
+    setData((prev) => ({ ...prev, settledInvoices: newSettled }));
+  }, [data.paymentAmount, allInvoices]);
+
+  // handling actual form submission
+  const mutation = useMutation({
+    mutationFn: async (data) => {
+      console.log(data);
+      const res = await axiosInstance.post("/payment-in", data);
+      return res.data;
+    },
+    onSuccess: (data) => {
+      toast.success("Payment Successfull");
+      setParty(data);
+      queryClient.invalidateQueries({ queryKey: ["payment"] });
+    },
+    onError: (err) => {
+      toast.error(err.response.data.msg || err.response.data.err);
+    },
+  });
 
   return (
     <main className="h-full w-full p-2">
@@ -48,7 +94,19 @@ const PaymentInForm = () => {
           </div>
           <div>
             <button className="btn btn-soft btn-sm mr-2">Cancel</button>
-            <button className="btn btn-sm bg-[var(--primary-btn)]">Save</button>
+            <button
+              className={`btn btn-sm bg-[var(--primary-btn)] ${
+                mutation.isPending && ""
+              } `}
+              disabled={mutation.isPending}
+              onClick={() => mutation.mutate(data)}
+            >
+              {mutation.isPending ? (
+                <CustomLoader text={"Saving..."} />
+              ) : (
+                <>Save</>
+              )}
+            </button>
           </div>
         </header>
 
@@ -61,17 +119,22 @@ const PaymentInForm = () => {
             <select
               className="select select-sm w-full mt-2 mb-5"
               value={selectedParty}
-              onChange={(e) => setSelectedParty(e.target.value)}
+              onChange={(e) => {
+                setSelectedParty(e.target.value);
+                setData((prev) => ({
+                  ...prev,
+                  partyName: e.target.value, // 🔑 keep data.partyName updated
+                }));
+              }}
             >
-              <option className="hidden">testing-party</option>
+              <option className="hidden">Select Party</option>
               {parties.map((party) => (
-                <>
-                  <option value={party?.partyName} key={party?._id}>
-                    {party?.partyName}
-                  </option>
-                </>
+                <option value={party?.partyName} key={party?._id}>
+                  {party?.partyName}
+                </option>
               ))}
             </select>
+
             {selectedParty && (
               <p className="flex items-center mb-1 text-green-500 text-xs">
                 Current Balance :
@@ -129,6 +192,10 @@ const PaymentInForm = () => {
               <textarea
                 className="textarea mt-3 w-full"
                 placeholder="Enter notes"
+                value={data.notes}
+                onChange={(e) =>
+                  setData((prev) => ({ ...prev, notes: e.target.value }))
+                }
               />
             </div>
           </div>
@@ -161,10 +228,19 @@ const PaymentInForm = () => {
                         new Date(b.salesInvoiceDate).getTime()
                     )
                     .map((invoice) => (
-                      <tr key={invoice._id} className="hover:bg-gray-50">
+                      <tr key={invoice?._id} className="hover:bg-gray-50">
                         <td className="px-2 py-2">
                           <input
                             type="checkbox"
+                            checked={
+                              Number(
+                                Math.max(
+                                  invoice?.totalAmount -
+                                    (settledInvoices[invoice?._id] || 0),
+                                  0
+                                )
+                              ) === 0
+                            }
                             className="checkbox checkbox-sm checkbox-info"
                           />
                         </td>
@@ -187,26 +263,60 @@ const PaymentInForm = () => {
                         <td>
                           <span className="inline-flex items-center gap-1">
                             <LiaRupeeSignSolid />
-                            {Number(invoice?.totalAmount).toLocaleString(
-                              "en-IN"
-                            )}
+                            {Number(
+                              Math.max(
+                                invoice?.totalAmount -
+                                  (settledInvoices[invoice?._id] || 0),
+                                0
+                              )
+                            ).toLocaleString("en-IN")}
                           </span>
                         </td>
 
                         {/* Amount Settled */}
                         <td className="inline-flex items-center gap-1 justify-end w-full">
-                          <LiaRupeeSignSolid />0
+                          <LiaRupeeSignSolid />
+                          {Number(
+                            settledInvoices[invoice?._id] || 0
+                          ).toLocaleString("en-IN")}
                         </td>
                       </tr>
                     ))}
                 </tbody>
               </table>
-
-              <div className="p-4 font-medium flex justify-between border-t border-zinc-300">
+              {/* total amount */}
+              <div className="p-4 font-medium  flex justify-between border-t border-zinc-300">
                 <h2>Total</h2>
-                <span className="flex items-center">
-                  <LiaRupeeSignSolid /> 0
-                </span>
+                <div className="flex items-center  w-3/9 justify-between">
+                  <span className="flex items-center ">
+                    <LiaRupeeSignSolid />
+                    {/*  pending amount ka total */}
+                    {allInvoices
+                      .reduce(
+                        (sum, inv) =>
+                          sum +
+                          Math.max(
+                            inv?.totalAmount - (settledInvoices[inv._id] || 0),
+                            0
+                          ),
+                        0
+                      )
+                      .toLocaleString("en-IN")}
+                  </span>
+
+                  {/* Settled amount ka total */}
+                  <span className="flex items-center ">
+                    <LiaRupeeSignSolid />
+                    {/*  pending amount ka total */}
+                    {allInvoices
+                      .reduce(
+                        (sum, inv) =>
+                          sum + Math.max(settledInvoices[inv._id] || 0, 0),
+                        0
+                      )
+                      .toLocaleString("en-IN")}
+                  </span>
+                </div>
               </div>
             </div>
           )}

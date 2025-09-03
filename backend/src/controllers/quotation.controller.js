@@ -81,3 +81,20 @@ export async function getQuotationById(req, res) {
       .json({ success: false, msg: "Internal Server error" });
   }
 }
+
+export async function getAllQuotations(req, res) {
+  try {
+    const quotations = await Quotation.find().populate("partyId");
+    if (!quotations) {
+      return res
+        .status(400)
+        .json({ success: false, msg: "Quotations not found" });
+    }
+    return res.status(200).json({ success: true, quotations });
+  } catch (error) {
+    console.log("Error in getting  quotations", error);
+    return res
+      .status(500)
+      .json({ success: false, msg: "Internal Server error" });
+  }
+}

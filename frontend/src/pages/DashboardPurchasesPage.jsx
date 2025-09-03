@@ -4,6 +4,7 @@ import { Calendar, Plus, Search } from "lucide-react";
 import { FaFileInvoice } from "react-icons/fa6";
 import { motion } from "framer-motion";
 import { container, dashboardLinksItems } from "../components/Sidebar";
+import { Link } from "react-router-dom";
 
 const DashboardPurchasesPage = () => {
   return (
@@ -52,7 +53,7 @@ const DashboardPurchasesPage = () => {
           className="flex items-center justify-between mt-8"
         >
           <div className="flex items-center gap-3">
-            <label className="input">
+            <label className="input input-sm">
               <Search size={16} className="text-zinc-400" />
               <input type="search" required placeholder="Search" />
             </label>
@@ -60,7 +61,7 @@ const DashboardPurchasesPage = () => {
               <div
                 tabIndex={0}
                 role="button"
-                className="btn m-1 btn-dash btn-wide bg-[var(--primary-btn)] text-nowrap"
+                className="btn m-1 btn-sm btn-wide bg-[var(--primary-btn)] text-nowrap"
               >
                 <Calendar size={14} /> Last 365 days
               </div>
@@ -84,11 +85,11 @@ const DashboardPurchasesPage = () => {
             </div>
           </div>
 
-          <div>
+          <Link to={"/dashboard/purchase-invoice"}>
             <button className="btn btn-sm bg-[var(--primary-btn)]">
               <Plus size={14} /> Create Purchase Invoice
             </button>
-          </div>
+          </Link>
         </motion.div>
 
         <div className="mt-8 overflow-x-auto rounded-box border border-base-content/5 bg-base-100">

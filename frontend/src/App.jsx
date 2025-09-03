@@ -55,6 +55,10 @@ import DashboardCreatePaymentOutPage from "./pages/Purchases/DashboardCreatePaym
 import PaymentInForm from "./components/PaymentIn/PaymentInForm";
 import SalesInvoice from "./components/Invoices/SalesInvoice";
 import QuotationInvoice from "./components/Invoices/QuotationInvoice";
+import DashboardCreatePurchaseInvoicePage from "./pages/Purchases/DashboardCreatePurchaseInvoicePage";
+import DashboardCreatePurchaseReturnPage from "./pages/Purchases/DashboardCreatePurchaseReturnPage";
+import DashboardCreateDebitNotePage from "./pages/Purchases/DashboardCreateDebitNotePage";
+import DashboardCreatePurchaseOrder from "./pages/Purchases/DashboardCreatePurchaseOrder";
 
 function App() {
   const { user, setUser } = useAuthStore();
@@ -99,17 +103,22 @@ function App() {
           />
 
           <Route
+            path="/dashboard/purchase-invoice"
+            element={<DashboardCreatePurchaseInvoicePage />}
+          />
+
+          <Route
             path="/dashboard/sales-invoice/:id"
             element={<SalesInvoice />}
           />
 
           <Route
-            path="/dashboard/parties/proforma-invoice"
+            path="/dashboard/parties/create-proforma-invoice"
             element={<DashboardProformaInvoicePage />}
           />
 
           <Route
-            path="/dashboard/parties/sales-return"
+            path="/dashboard/parties/create-sales-return"
             element={<DashboardSalesReturnInvoicePage />}
           />
 
@@ -140,17 +149,12 @@ function App() {
             element={<DashboardPaymentOutPage />}
           />
           <Route
-            path="/dashboard/create-payment-out"
+            path="/dashboard/parties/create-payment-out"
             element={<DashboardCreatePaymentOutPage />}
           />
           <Route
-            path="/dashboard/create-payment-in"
+            path="/dashboard/parties/create-payment-in"
             element={<PaymentInForm />}
-          />
-
-          <Route
-            path="/dashboard/purhase-return"
-            element={<DashboardPurchaseReturnPage />}
           />
 
           <Route
@@ -159,13 +163,28 @@ function App() {
           />
 
           <Route
+            path="/dashboard/parties/create-debit-note"
+            element={<DashboardCreateDebitNotePage />}
+          />
+
+          <Route
             path="/dashboard/purchase-return"
             element={<DashboardPurchaseReturnPage />}
           />
 
           <Route
+            path="/dashboard/parties/create-purchase-return"
+            element={<DashboardCreatePurchaseReturnPage />}
+          />
+
+          <Route
             path="/dashboard/purchase-order"
             element={<DashoardPurchaseOrderPage />}
+          />
+
+          <Route
+            path="/dashboard/parties/create-purchase-order"
+            element={<DashboardCreatePurchaseOrder />}
           />
 
           <Route path="/dashboard/reports" element={<DashboardReportPage />} />

@@ -43,7 +43,7 @@ const SalesInvoice = () => {
         <header className="flex items-center justify-between">
           <div className="flex items-center gap-3">
             <ArrowLeft onClick={() => navigate(-1)} />
-            <h1 className="font-medium">Quotation</h1>
+            <h1 className="font-medium">Sales Invoice</h1>
             <div className="badge badge-success badge-soft">Paid</div>
           </div>
           <div className="flex items-center gap-3">
