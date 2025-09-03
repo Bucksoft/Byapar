@@ -12,6 +12,7 @@ import pdfRoutes from "./routes/pdf.routes.js";
 import quotationRoutes from "./routes/quotation.routes.js";
 import { loginViaGoogleCallback } from "./controllers/user.controller.js";
 import cookieParser from "cookie-parser";
+import path from "path";
 
 dotenv.config();
 const PORT = process.env.PORT || 8000;
@@ -24,10 +25,6 @@ app.use(
     credentials: true,
   })
 );
-app.use(express.static(path.join(__dirname, "frontend/dist")));
-app.get("*", (req, res) => {
-  res.sendFile(path.resolve(__dirname, "frontend", "dist", "index.html"));
-});
 
 app.use(cookieParser());
 
@@ -43,6 +40,11 @@ app.use("/api/v1/payment-in", paymentInRoutes);
 app.use("/api/v1/sales-invoice", salesRoutes);
 app.use("/api/v1/generate-pdf", pdfRoutes);
 app.use("/api/v1/quotation", quotationRoutes);
+
+app.use(express.static(path.join(__dirname, "frontend/dist")));
+app.get("*", (req, res) => {
+  res.sendFile(path.resolve(__dirname, "frontend", "dist", "index.html"));
+});
 
 app.listen(PORT, () => {
   connectDB();
