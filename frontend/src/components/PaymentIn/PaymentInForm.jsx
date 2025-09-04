@@ -46,6 +46,7 @@ const PaymentInForm = () => {
     let remainingPayment = data.paymentAmount;
     const newSettled = {};
 
+    // Sort invoices by oldest first
     const sorted = [...allInvoices].sort(
       (a, b) =>
         new Date(a.salesInvoiceDate).getTime() -
@@ -53,13 +54,23 @@ const PaymentInForm = () => {
     );
 
     sorted.forEach((invoice) => {
-      if (remainingPayment > 0) {
-        const settleAmount = Math.min(invoice.totalAmount, remainingPayment);
-        newSettled[invoice?._id] = settleAmount;
+      const alreadySettled = invoice?.settledAmount || 0;
+      const pending = Math.max(invoice.totalAmount - alreadySettled, 0);
+
+      if (remainingPayment > 0 && pending > 0) {
+        // Settle only as much as possible
+        const settleAmount = Math.min(pending, remainingPayment);
+
+        // Mark settlement for this invoice
+        newSettled[invoice._id] = settleAmount;
+
+        // Reduce remaining payment
         remainingPayment -= settleAmount;
       } else {
+        // Nothing settled for this invoice
         newSettled[invoice._id] = 0;
       }
+      console.log("NEW SETTLED ", newSettled);
     });
 
     setSettledInvoices(newSettled);
@@ -69,19 +80,27 @@ const PaymentInForm = () => {
   // handling actual form submission
   const mutation = useMutation({
     mutationFn: async (data) => {
+      if (data.paymentAmount <= 0) {
+        toast.error("Please enter a payment amount");
+        return;
+      }
       console.log(data);
       const res = await axiosInstance.post("/payment-in", data);
       return res.data;
     },
     onSuccess: (data) => {
-      toast.success("Payment Successfull");
+      if (data.success) {
+        toast.success(data.msg);
+      }
       setParty(data);
-      queryClient.invalidateQueries({ queryKey: ["payment"] });
+      queryClient.invalidateQueries({ queryKey: ["payment", "invoices"] });
     },
     onError: (err) => {
       toast.error(err.response.data.msg || err.response.data.err);
     },
   });
+
+  console.log(settledInvoices);
 
   return (
     <main className="h-full w-full p-2">
@@ -123,12 +142,12 @@ const PaymentInForm = () => {
                 setSelectedParty(e.target.value);
                 setData((prev) => ({
                   ...prev,
-                  partyName: e.target.value, // 🔑 keep data.partyName updated
+                  partyName: e.target.value,
                 }));
               }}
             >
               <option className="hidden">Select Party</option>
-              {parties.map((party) => (
+              {parties?.map((party) => (
                 <option value={party?.partyName} key={party?._id}>
                   {party?.partyName}
                 </option>
@@ -227,61 +246,59 @@ const PaymentInForm = () => {
                         new Date(a.salesInvoiceDate).getTime() -
                         new Date(b.salesInvoiceDate).getTime()
                     )
-                    .map((invoice) => (
-                      <tr key={invoice?._id} className="hover:bg-gray-50">
-                        <td className="px-2 py-2">
-                          <input
-                            type="checkbox"
-                            checked={
-                              Number(
-                                Math.max(
-                                  invoice?.totalAmount -
-                                    (settledInvoices[invoice?._id] || 0),
-                                  0
-                                )
-                              ) === 0
-                            }
-                            className="checkbox checkbox-sm checkbox-info"
-                          />
-                        </td>
+                    .map((invoice) => {
+                      const alreadySettled = invoice?.settledAmount || 0;
+                      const currentSettled = settledInvoices[invoice?._id] || 0;
+                      const pending = Math.max(
+                        invoice?.totalAmount -
+                          (alreadySettled + currentSettled),
+                        0
+                      );
 
-                        <td>{invoice?.salesInvoiceDate.split("T")[0]}</td>
-                        <td>{invoice?.dueDate.split("T")[0]}</td>
-                        <td>{invoice?.salesInvoiceNumber}</td>
+                      return (
+                        <tr key={invoice?._id} className="hover:bg-gray-50">
+                          {/* Checkbox → mark as fully settled if pending is 0 */}
+                          <td className="px-2 py-2">
+                            <input
+                              type="checkbox"
+                              checked={pending === 0}
+                              className="checkbox checkbox-sm checkbox-info"
+                              readOnly
+                            />
+                          </td>
 
-                        {/* Invoice Amount */}
-                        <td>
-                          <span className="inline-flex items-center gap-1">
-                            <LiaRupeeSignSolid className="text-gray-600" />
-                            {Number(invoice?.totalAmount).toLocaleString(
-                              "en-IN"
-                            )}
-                          </span>
-                        </td>
+                          <td>{invoice?.salesInvoiceDate.split("T")[0]}</td>
+                          <td>{invoice?.dueDate.split("T")[0]}</td>
+                          <td>{invoice?.salesInvoiceNumber}</td>
 
-                        {/* Pending Amount */}
-                        <td>
-                          <span className="inline-flex items-center gap-1">
+                          {/* Invoice Amount */}
+                          <td>
+                            <span className="inline-flex items-center gap-1">
+                              <LiaRupeeSignSolid className="text-gray-600" />
+                              {Number(invoice?.totalAmount).toLocaleString(
+                                "en-IN"
+                              )}
+                            </span>
+                          </td>
+
+                          {/* Pending Amount */}
+                          <td>
+                            <span className="inline-flex items-center gap-1">
+                              <LiaRupeeSignSolid />
+                              {pending.toLocaleString("en-IN")}
+                            </span>
+                          </td>
+
+                          {/* Amount Settled (previous + current) */}
+                          <td className="inline-flex items-center gap-1 justify-end w-full">
                             <LiaRupeeSignSolid />
                             {Number(
-                              Math.max(
-                                invoice?.totalAmount -
-                                  (settledInvoices[invoice?._id] || 0),
-                                0
-                              )
+                              alreadySettled + currentSettled
                             ).toLocaleString("en-IN")}
-                          </span>
-                        </td>
-
-                        {/* Amount Settled */}
-                        <td className="inline-flex items-center gap-1 justify-end w-full">
-                          <LiaRupeeSignSolid />
-                          {Number(
-                            settledInvoices[invoice?._id] || 0
-                          ).toLocaleString("en-IN")}
-                        </td>
-                      </tr>
-                    ))}
+                          </td>
+                        </tr>
+                      );
+                    })}
                 </tbody>
               </table>
               {/* total amount */}

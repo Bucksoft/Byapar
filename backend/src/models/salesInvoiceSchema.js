@@ -31,7 +31,13 @@ const salesInvoiceSchema = new mongoose.Schema(
     partyId: { type: mongoose.Schema.Types.ObjectId, ref: "Party" },
     notes: { type: String, default: "" },
     termsAndCondition: { type: String, default: "" },
-
+    settledAmount: {
+      type: Number,
+      default: 0,
+    },
+    pendingAmount: {
+      type: Number,
+    },
     status: {
       type: String,
       enum: ["paid", "unpaid"],

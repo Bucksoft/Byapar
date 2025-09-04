@@ -15,9 +15,9 @@ const router = express.Router();
 
 router.route("/login").post(login);
 router.route("/verify-otp").post(verifyOTP);
-router.route("/oauth").get(googleOAuthRedirection);
+router.route("/").get(googleOAuthRedirection);
 router.route("/me").get(isAuth, getUserCredential);
 router.route("/logout").post(isAuth, logoutUser);
-router.route("/account").patch(isAuth, updateUserAccount);
+router.route("/").patch(isAuth, updateUserAccount);
 
 export default router;

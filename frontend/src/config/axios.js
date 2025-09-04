@@ -1,8 +1,8 @@
 import axios from "axios";
 
 export const axiosInstance = axios.create({
-  baseURL: "http://localhost:8000/api/v1",
+  baseURL: "https://byapar.bucksoftech.top/api/v1",
   withCredentials: true,
 });
 
-// https://byapar.bucksoftech.top
+// https://byapar.bucksoftech.top --> BACKEND API BASE URL

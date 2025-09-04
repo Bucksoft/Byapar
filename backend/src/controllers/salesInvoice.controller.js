@@ -118,8 +118,6 @@ export async function getInvoiceById(req, res) {
 
     invoice = invoice.toObject();
 
-    console.log("Fetched Invoice:", JSON.stringify(invoice, null, 2));
-
     return res.status(200).json({
       success: true,
       invoice,

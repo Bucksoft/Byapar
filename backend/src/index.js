@@ -21,7 +21,7 @@ const app = express();
 
 app.use(
   cors({
-    origin: ["http://localhost:5173", "https://bb.bucksoftech.top"],
+    origin: ["https://bb.bucksoftech.top"],
     credentials: true,
   })
 );
@@ -41,11 +41,11 @@ app.use("/api/v1/sales-invoice", salesRoutes);
 app.use("/api/v1/generate-pdf", pdfRoutes);
 app.use("/api/v1/quotation", quotationRoutes);
 
-const __dirname = path.resolve();
-app.use(express.static(path.join(__dirname, "../frontend/dist")));
-app.get("/*any", (req, res) => {
-  res.sendFile(path.resolve(__dirname, "../frontend/dist", "index.html"));
-});
+// const __dirname = path.resolve();
+// app.use(express.static(path.join(__dirname, "../frontend/dist")));
+// app.get("/*any", (req, res) => {
+//   res.sendFile(path.resolve(__dirname, "../frontend/dist", "index.html"));
+// });
 
 app.listen(PORT, () => {
   connectDB();

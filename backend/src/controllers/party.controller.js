@@ -64,6 +64,7 @@ export async function getAllParties(req, res) {
     return res.status(200).json(parties);
   } catch (error) {
     console.log("ERROR IN FETCHING ALL PARTIES ");
+    console.log(error);
     return res.status(500).json({ err: "Internal server error", error });
   }
 }

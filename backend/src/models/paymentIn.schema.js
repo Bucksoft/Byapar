@@ -31,6 +31,7 @@ const paymentInSchema = new mongoose.Schema({
   notes: {
     type: String,
   },
+  settledInvoices: [{}],
 });
 
 export const PaymentIn = mongoose.model("PaymentIn", paymentInSchema);
