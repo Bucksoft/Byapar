@@ -21,7 +21,7 @@ const app = express();
 
 app.use(
   cors({
-    origin: ["https://bb.bucksoftech.top"],
+    origin: ["https://byapar-frontend.onrender.com"],
     credentials: true,
   })
 );
