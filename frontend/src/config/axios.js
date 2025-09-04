@@ -1,7 +1,8 @@
 import axios from "axios";
 
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL;
 export const axiosInstance = axios.create({
-  baseURL: "https://byapar.bucksoftech.top/api/v1",
+  baseURL: `${API_BASE_URL}/api/v1`,
   withCredentials: true,
 });
 

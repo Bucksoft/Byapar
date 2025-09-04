@@ -1,7 +1,7 @@
 import { MessageCircle } from "lucide-react";
 import suggestion from "../assets/suggestion.png";
 import personhandshake from "../assets/Personhandshake.png";
-import truckwithinvoice from "../assets/truckwithinvoice.png";
+import truckwithinvoice from "../assets/TruckwithInvoice.png";
 import phonesms from "../assets/phoneSMS.png";
 import desktop from "../assets/Desktop.png";
 import scanner from "../assets/scanner.png";
