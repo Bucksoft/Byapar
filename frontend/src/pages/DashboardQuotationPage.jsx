@@ -7,18 +7,19 @@ import CustomLoader from "../components/Loader";
 import { LiaRupeeSignSolid } from "react-icons/lia";
 
 const DashboardQuotationPage = () => {
-  
-  const { isLoading, data: quotations } = useQuery({
+  const { isLoading, data: quotations = [] } = useQuery({
+    queryKey: ["quotations"],
     queryFn: async () => {
       const res = await axiosInstance.get(`/quotation`);
-      return res.data.quotations;
+      // Ensure we always return an array
+      return Array.isArray(res.data.quotations) ? res.data.quotations : [];
     },
   });
 
   return (
     <main className="h-screen w-full flex">
       <section className="h-full w-full bg-gray-100 p-2 ">
-        <div className=" border border-zinc-300 h-full rounded-md bg-white p-3">
+        <div className="border border-zinc-300 h-full rounded-md bg-white p-3">
           <DashboardNavbar title={"Quotation / Estimate"} />
           <SalesNavigationMenus
             title={"Quotation / Estimate"}
@@ -27,48 +28,46 @@ const DashboardQuotationPage = () => {
           />
 
           {/* table */}
-          <div className=" mt-5 h-80 rounded-md mx-4 ">
+          <div className="mt-5 h-80 rounded-md mx-4">
             {isLoading ? (
               <div className="flex items-center">
                 <CustomLoader text={"Loading..."} />
               </div>
-            ) : quotations ? (
+            ) : quotations.length > 0 ? (
               <table className="table">
                 {/* head */}
                 <thead>
-                  <tr className="text-xs bg-gray-100 ">
-                    <th className=" w-60">Date</th>
+                  <tr className="text-xs bg-gray-100">
+                    <th className="w-60">Date</th>
                     <th className="w-60">Quotation Number</th>
-                    <th className=" w-60">Party Name</th>
-
-                    <th className=" w-60">Due In</th>
-                    <th className=" w-60">Amount</th>
-                    <th className=" w-60">Status</th>
+                    <th className="w-60">Party Name</th>
+                    <th className="w-60">Due In</th>
+                    <th className="w-60">Amount</th>
+                    <th className="w-60">Status</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {quotations &&
-                    quotations?.map((quotation) => (
-                      <tr>
-                        <td>{quotation?.quotationDate.split("T")[0]}</td>
-                        <td>{quotation?.quotationNumber}</td>
-                        <td>{quotation?.partyId?.partyName}</td>
-                        <td>{"-"}</td>
-                        <td>
-                          <div className="flex items-center">
-                            <LiaRupeeSignSolid />
-                            {Number(quotation?.totalAmount).toLocaleString(
-                              "en-IN"
-                            )}
-                          </div>
-                        </td>
-                        <td>
-                          <div className="badge badge-accent">
-                            {quotation?.status}
-                          </div>
-                        </td>
-                      </tr>
-                    ))}
+                  {quotations.map((quotation) => (
+                    <tr key={quotation._id}>
+                      <td>{quotation?.quotationDate?.split("T")[0]}</td>
+                      <td>{quotation?.quotationNumber}</td>
+                      <td>{quotation?.partyId?.partyName}</td>
+                      <td>-</td>
+                      <td>
+                        <div className="flex items-center">
+                          <LiaRupeeSignSolid />
+                          {Number(quotation?.totalAmount || 0).toLocaleString(
+                            "en-IN"
+                          )}
+                        </div>
+                      </td>
+                      <td>
+                        <div className="badge badge-accent">
+                          {quotation?.status}
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
                 </tbody>
               </table>
             ) : (

@@ -4,14 +4,29 @@ import { PaymentIn } from "../models/paymentIn.schema.js";
 
 export async function createPaymentIn(req, res) {
   try {
-    const { partyName, paymentAmount, paymentDate, paymentMode, notes } =
-      req.body;
+    const {
+      partyName,
+      paymentAmount,
+      paymentDate,
+      paymentMode,
+      notes,
+      paymentInNumber,
+    } = req.body;
     // 1. Find party
     const party = await Party.findOne({ partyName });
     if (!party) {
       return res.status(404).json({ message: "Party not found" });
     }
-    console.log(req.body);
+
+    const existingPaymentInNumber = await PaymentIn.findOne({
+      paymentInNumber,
+    });
+    if (existingPaymentInNumber) {
+      return res
+        .status(400)
+        .json({ success: false, msg: "Payment In number already exists" });
+    }
+    console.log(existingPaymentInNumber);
 
     // 2. Fetch those invoice which are going to be settled, sorted oldest first
     const invoiceIds = Object.keys(req.body.settledInvoices);
@@ -82,6 +97,8 @@ export async function createPaymentIn(req, res) {
       clientId: req.user.id,
       partyId: party._id,
       notes,
+      paymentInNumber,
+      settledInvoices: req.body.settledInvoices,
     });
 
     await paymentIn.save();
@@ -97,6 +114,76 @@ export async function createPaymentIn(req, res) {
     });
   } catch (error) {
     console.error("ERROR IN CREATING PAYMENT IN:", error);
+    return res
+      .status(500)
+      .json({ success: false, msg: "Internal Server Error" });
+  }
+}
+
+export async function getAllPaymentInDetails(req, res) {
+  try {
+    const paymentIns = await PaymentIn.find();
+    if (!paymentIns) {
+      return res
+        .status(400)
+        .json({ success: false, msg: "Payment In details not found" });
+    }
+    return res.status(200).json({ success: true, paymentIns });
+  } catch (error) {
+    console.error("ERROR IN GETTING PAYMENT IN DETAILS :", error);
+    return res
+      .status(500)
+      .json({ success: false, msg: "Internal Server Error" });
+  }
+}
+
+export async function getSinglePaymentInDetail(req, res) {
+  try {
+    const { id } = req.params;
+    if (!id) {
+      return res
+        .status(400)
+        .json({ success: false, msg: "Please provide the payment in id" });
+    }
+    const paymentIn = await PaymentIn.findById(id).populate("partyId");
+    if (!paymentIn) {
+      return res
+        .status(400)
+        .json({ success: false, msg: "Payment Id not found" });
+    }
+    // console.log(paymentIn.settledInvoices[0]);
+    const invoiceIds = Object.keys(paymentIn.settledInvoices[0]);
+    const invoices = await SalesInvoice.find({
+      _id: { $in: invoiceIds },
+    });
+    const data = {
+      paymentIn,
+      invoices,
+    };
+    return res.status(200).json({ success: true, data });
+  } catch (error) {
+    console.error("ERROR IN GETTING SINGLE PAYMENT IN DETAILS :", error);
+    return res
+      .status(500)
+      .json({ success: false, msg: "Internal Server Error" });
+  }
+}
+
+export async function deletePaymentIn(req, res) {
+  try {
+    const { id } = req.params;
+    if (!id) {
+      return res
+        .status(400)
+        .json({ success: false, msg: "Please provide the payment in id" });
+    }
+    const deletedPaymentIn = await PaymentIn.findByIdAndDelete(id);
+    if (!deletedPaymentIn) {
+      return res.status(400).json({ success: false, msg: "Failed to delete" });
+    }
+    return res.status(200).json({ success: true, msg: "Deleted successfully" });
+  } catch (error) {
+    console.error("ERROR IN DELETING PAYMENT IN DETAILS :", error);
     return res
       .status(500)
       .json({ success: false, msg: "Internal Server Error" });

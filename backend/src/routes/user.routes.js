@@ -4,6 +4,7 @@ import {
   googleOAuthRedirection,
   login,
   logoutUser,
+  refreshToken,
   updateUserAccount,
   verifyOTP,
 } from "../controllers/user.controller.js";
@@ -19,5 +20,6 @@ router.route("/").get(googleOAuthRedirection);
 router.route("/me").get(isAuth, getUserCredential);
 router.route("/logout").post(isAuth, logoutUser);
 router.route("/").patch(isAuth, updateUserAccount);
+router.route("/refresh").get(refreshToken);
 
 export default router;

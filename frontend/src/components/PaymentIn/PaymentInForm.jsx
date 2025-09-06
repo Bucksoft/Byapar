@@ -1,7 +1,7 @@
 import { ArrowLeft } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { usePartyStore } from "../../store/partyStore";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useInvoiceStore } from "../../store/invoicesStore";
 import { LiaRupeeSignSolid } from "react-icons/lia";
 import { useMutation } from "@tanstack/react-query";
@@ -17,6 +17,7 @@ const PaymentInForm = () => {
   const [selectedParty, setSelectedParty] = useState();
   const [totalInvoiceAmount, setTotalInvoiceAmount] = useState(0);
   const [allInvoices, setAllInvoices] = useState([]);
+  const paymentAmountRef = useRef();
   const [data, setData] = useState({
     partyName: "",
     paymentAmount: 0,
@@ -56,21 +57,13 @@ const PaymentInForm = () => {
     sorted.forEach((invoice) => {
       const alreadySettled = invoice?.settledAmount || 0;
       const pending = Math.max(invoice.totalAmount - alreadySettled, 0);
-
       if (remainingPayment > 0 && pending > 0) {
-        // Settle only as much as possible
         const settleAmount = Math.min(pending, remainingPayment);
-
-        // Mark settlement for this invoice
         newSettled[invoice._id] = settleAmount;
-
-        // Reduce remaining payment
         remainingPayment -= settleAmount;
       } else {
-        // Nothing settled for this invoice
         newSettled[invoice._id] = 0;
       }
-      console.log("NEW SETTLED ", newSettled);
     });
 
     setSettledInvoices(newSettled);
@@ -82,11 +75,19 @@ const PaymentInForm = () => {
     mutationFn: async (data) => {
       if (data.paymentAmount <= 0) {
         toast.error("Please enter a payment amount");
+        paymentAmountRef.current.style.outlineColor = "red";
+        paymentAmountRef.current.style.borderColor = "red";
+        paymentAmountRef.current.focus();
         return;
       }
+      if (!selectedParty) {
+        toast.error("Please enter a payment amount");
+        return;
+      }
+
       console.log(data);
-      const res = await axiosInstance.post("/payment-in", data);
-      return res.data;
+      // const res = await axiosInstance.post("/payment-in", data);
+      // return res.data;
     },
     onSuccess: (data) => {
       if (data.success) {
@@ -100,7 +101,24 @@ const PaymentInForm = () => {
     },
   });
 
-  console.log(settledInvoices);
+  // THIS FUNCTION IS USED FOR CALCULATING TOTAL VALUES
+  const totals = allInvoices.reduce(
+    (acc, invoice) => {
+      const alreadySettled = invoice?.settledAmount || 0;
+      const currentSettled = settledInvoices[invoice?._id] || 0;
+
+      const pending = Math.max(
+        invoice?.totalAmount - (alreadySettled + currentSettled),
+        0
+      );
+
+      acc.totalPending += pending;
+      acc.totalSettled += alreadySettled + currentSettled;
+
+      return acc;
+    },
+    { totalPending: 0, totalSettled: 0 }
+  );
 
   return (
     <main className="h-full w-full p-2">
@@ -167,6 +185,7 @@ const PaymentInForm = () => {
             <input
               type="number"
               placeholder="0"
+              ref={paymentAmountRef}
               value={data.paymentAmount}
               onChange={(e) =>
                 setData((prev) => ({
@@ -197,11 +216,19 @@ const PaymentInForm = () => {
                 </select>
               </div>
               <div className="flex flex-col w-full">
-                <label className="text-zinc-500">Payment Out Number</label>
+                <label className="text-zinc-500">Payment In Number</label>
                 <input
                   type="text"
                   className="input input-sm mt-2"
                   placeholder="1"
+                  name="paymentInNumber"
+                  value={data?.paymentInNumber}
+                  onChange={(e) =>
+                    setData((prev) => ({
+                      ...prev,
+                      paymentInNumber: e.target.value,
+                    }))
+                  }
                 />
               </div>
             </div>
@@ -308,30 +335,14 @@ const PaymentInForm = () => {
                   <span className="flex items-center ">
                     <LiaRupeeSignSolid />
                     {/*  pending amount ka total */}
-                    {allInvoices
-                      .reduce(
-                        (sum, inv) =>
-                          sum +
-                          Math.max(
-                            inv?.totalAmount - (settledInvoices[inv._id] || 0),
-                            0
-                          ),
-                        0
-                      )
-                      .toLocaleString("en-IN")}
+                    {totals.totalPending.toLocaleString("en-IN")}
                   </span>
 
                   {/* Settled amount ka total */}
                   <span className="flex items-center ">
                     <LiaRupeeSignSolid />
                     {/*  pending amount ka total */}
-                    {allInvoices
-                      .reduce(
-                        (sum, inv) =>
-                          sum + Math.max(settledInvoices[inv._id] || 0, 0),
-                        0
-                      )
-                      .toLocaleString("en-IN")}
+                    {totals.totalSettled.toLocaleString("en-IN")}
                   </span>
                 </div>
               </div>

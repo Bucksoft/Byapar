@@ -1,4 +1,4 @@
-import { Routes, Route, useNavigate } from "react-router-dom";
+import { Routes, Route } from "react-router-dom";
 import LoginPage from "./pages/LoginPage";
 import DashboardPage from "./pages/DashboardPage";
 import DashboardPartiesPage from "./pages/DashboardPartiesPage";
@@ -47,7 +47,7 @@ import PartyEditPage from "./components/Party/PartyEditPage";
 import DashboardSalesInvoicePage from "./pages/DashboardSalesInvoicePage";
 import DashboardQuotationInvoiceForm from "./pages/DashboardQuotationInvoiceForm";
 import DashboardProformaInvoicePage from "./pages/DashboardProformaInvoicePage";
-import DashboardSalesReturnInvoicePage from "./pages/DashboardSalesInvoicePage";
+import DashboardSalesReturnInvoicePage from "./pages/DashboardSalesReturnInvoicePage";
 import DashboardItemsSidebar from "./pages/Items/DashboardItemsSidebar";
 import SingleItemPage from "./components/Items/SingleItemPage";
 import DashboardAllTransactionsPage from "./pages/DashboardAllTransactionsPage";
@@ -59,6 +59,7 @@ import DashboardCreatePurchaseInvoicePage from "./pages/Purchases/DashboardCreat
 import DashboardCreatePurchaseReturnPage from "./pages/Purchases/DashboardCreatePurchaseReturnPage";
 import DashboardCreateDebitNotePage from "./pages/Purchases/DashboardCreateDebitNotePage";
 import DashboardCreatePurchaseOrder from "./pages/Purchases/DashboardCreatePurchaseOrder";
+import DashboardPaymentInDetails from "./pages/DashboardPaymentInDetails";
 
 function App() {
   const { user, setUser } = useAuthStore();
@@ -103,6 +104,11 @@ function App() {
           />
 
           <Route
+            path="/dashboard/parties/create-sales-return"
+            element={<DashboardSalesReturnInvoicePage />}
+          />
+
+          <Route
             path="/dashboard/purchase-invoice"
             element={<DashboardCreatePurchaseInvoicePage />}
           />
@@ -115,11 +121,6 @@ function App() {
           <Route
             path="/dashboard/parties/create-proforma-invoice"
             element={<DashboardProformaInvoicePage />}
-          />
-
-          <Route
-            path="/dashboard/parties/create-sales-return"
-            element={<DashboardSalesReturnInvoicePage />}
           />
 
           <Route path="/dashboard/items" element={<DashboardItemsPage />} />
@@ -205,6 +206,11 @@ function App() {
             path="/dashboard/payment-in"
             element={<DashboardPaymentInPage />}
           />
+          <Route
+            path="/dashboard/payment-in/:id"
+            element={<DashboardPaymentInDetails />}
+          />
+
           <Route
             path="/dashboard/sales-return"
             element={<DashboardSalesReturnPage />}

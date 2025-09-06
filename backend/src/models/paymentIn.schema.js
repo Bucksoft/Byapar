@@ -5,6 +5,11 @@ const paymentInSchema = new mongoose.Schema({
     type: String,
     required: [true, "Party name is required"],
   },
+  paymentInNumber: {
+    type: String,
+    required: true,
+    unique: true,
+  },
   paymentAmount: {
     type: Number,
     required: [true, "Payment Amount is required"],

@@ -21,7 +21,7 @@ const app = express();
 
 app.use(
   cors({
-    origin: ["https://byapar-frontend.onrender.com"],
+    origin: ["https://byapar-frontend.onrender.com", "http://localhost:5173"],
     credentials: true,
   })
 );

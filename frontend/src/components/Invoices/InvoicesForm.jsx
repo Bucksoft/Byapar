@@ -9,7 +9,7 @@ import SalesInvoiceItemTable from "./SalesInvoiceItemTable";
 import SalesInvoiceFooterSection from "./SalesInvoiceFooterSection";
 import { queryClient } from "../../main";
 
-const InvoicesForm = ({ title, party, setParty }) => {
+const InvoicesForm = ({ title, party, setParty, invoices }) => {
   const invoiceData = {
     paymentTerms: 0,
     dueDate: new Date(Date.now()),
@@ -26,6 +26,7 @@ const InvoicesForm = ({ title, party, setParty }) => {
     cgst: "",
     notes: "",
     termsAndCondition: "",
+    invoiceId:""
   };
 
   const navigate = useNavigate();
@@ -54,6 +55,9 @@ const InvoicesForm = ({ title, party, setParty }) => {
           break;
         case "Purchase Invoice":
           endpoint = "/purchase-invoice";
+          break;
+        case "Sales Return":
+          endpoint = "/sales-return";
           break;
         default:
           toast.error("Invalid invoice type");

@@ -2,10 +2,12 @@ import { useLocation } from "react-router-dom";
 import InvoicesForm from "../components/Invoices/InvoicesForm";
 import { useEffect, useState } from "react";
 import { usePartyStore } from "../store/partyStore";
+import { useInvoiceStore } from "../store/invoicesStore";
 
 const DashboardSalesInvoicePage = () => {
   const { state } = useLocation();
   const { parties } = usePartyStore();
+  const { invoices } = useInvoiceStore();
   const [party, setParty] = useState();
 
   useEffect(() => {
@@ -22,6 +24,7 @@ const DashboardSalesInvoicePage = () => {
             title={"Sales Invoice"}
             party={party}
             setParty={setParty}
+            invoices={invoices}
           />
         </div>
       </section>

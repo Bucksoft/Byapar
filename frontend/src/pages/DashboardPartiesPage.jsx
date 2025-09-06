@@ -194,8 +194,6 @@ const DashboardPartiesPage = () => {
                       <Link to={`/dashboard/edit-party/${party?._id}`}>
                         <SquarePen size={14} className="cursor-pointer" />{" "}
                       </Link>
-                      {/* Open the modal using document.getElementById('ID').showModal() method */}
-
                       <button
                         onClick={() =>
                           document.getElementById("my_modal_3").showModal()

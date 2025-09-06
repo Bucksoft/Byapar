@@ -5,13 +5,14 @@ import { useItemStore } from "../../store/itemStore";
 import { Link } from "react-router-dom";
 import { FaBarcode } from "react-icons/fa6";
 import { CircleX, Percent } from "lucide-react";
+import { useInvoiceStore } from "../../store/invoicesStore";
 
 const SalesInvoiceItemTable = ({ data, setData }) => {
   const [searchItemQuery, setSearchItemQuery] = useState("");
   const [showCounterId, setShowCounterId] = useState();
   const [addedItems, setAddedItems] = useState([]);
   const [quantities, setQuantities] = useState({});
-  const [gstTaxRate, setGstTaxRateType] = useState("");
+  const { invoices } = useInvoiceStore();
   const { items } = useItemStore();
 
   const searchedItems = items?.filter((item) =>
@@ -22,38 +23,50 @@ const SalesInvoiceItemTable = ({ data, setData }) => {
   const handleSetGstTaxRateType = (e, itemId) => {
     const { value } = e.target;
 
-    // Update gstTaxRateType state (if needed globally)
-    setGstTaxRateType({ type: value, itemId });
-
-    // Update only the matching item in addedItems
     setAddedItems((prevItems) =>
       prevItems.map((item) =>
-        item._id === itemId
-          ? { ...item, gstTaxRate: value } // add/update gstTaxRate
-          : item
+        item._id === itemId ? { ...item, gstTaxRateType: value } : item
       )
     );
   };
 
-  // Handle discount percent for single item
   const handleSetDiscountPercent = (percent, itemId) => {
     setAddedItems((prev) =>
-      prev.map((item) =>
-        item._id === itemId
-          ? { ...item, discountPercent: percent, discountAmount: 0 }
-          : item
-      )
+      prev.map((item) => {
+        const price = Number(item?.salesPrice) || 0;
+        const qty = item?.quantity || 1;
+        const totalBase = price * qty;
+
+        const discountAmount = (totalBase * percent) / 100;
+
+        return item._id === itemId
+          ? {
+              ...item,
+              discountPercent: percent,
+              discountAmount: discountAmount.toFixed(2), // auto-calc
+            }
+          : item;
+      })
     );
   };
 
-  // Handle discount amount for single item
   const handleSetDiscountAmount = (amount, itemId) => {
     setAddedItems((prev) =>
-      prev.map((item) =>
-        item._id === itemId
-          ? { ...item, discountAmount: amount, discountPercent: 0 }
-          : item
-      )
+      prev.map((item) => {
+        const price = Number(item?.salesPrice) || 0;
+        const qty = item?.quantity || 1;
+        const totalBase = price * qty;
+
+        const discountPercent = (amount / totalBase) * 100;
+
+        return item._id === itemId
+          ? {
+              ...item,
+              discountAmount: amount,
+              discountPercent: discountPercent.toFixed(2), // auto-calc
+            }
+          : item;
+      })
     );
   };
 
@@ -65,7 +78,6 @@ const SalesInvoiceItemTable = ({ data, setData }) => {
       return match ? parseFloat(match[1]) : 0;
     };
 
-    // ⚡ derive updated items locally, don't push to state
     const updatedItems = addedItems.map((item) => {
       const qty = quantities[item._id] || 0;
       const gstRate = getGSTPercentage(item?.gstTaxRate);
@@ -76,30 +88,36 @@ const SalesInvoiceItemTable = ({ data, setData }) => {
       let finalPrice = 0;
 
       if (item?.gstTaxRateType === "without tax") {
-        gstAmount = (price * gstRate) / 100;
+        // Base price is direct price
         basePrice = price;
-        finalPrice = basePrice + gstAmount;
-      } else {
-        basePrice = price * (100 / (100 + gstRate));
-        gstAmount = price - basePrice;
-        finalPrice = price;
-      }
 
-      // Discounts
-      if (item?.discountPercent) {
-        basePrice = basePrice - (basePrice * item.discountPercent) / 100;
-      } else if (item?.discountAmount) {
-        basePrice = basePrice - item.discountAmount;
-      }
+        // Apply discounts
+        if (item?.discountPercent) {
+          basePrice -= (basePrice * item.discountPercent) / 100;
+        } else if (item?.discountAmount) {
+          basePrice -= item.discountAmount;
+        }
 
-      basePrice = Math.max(basePrice, 0);
+        basePrice = Math.max(basePrice, 0);
 
-      if (item?.gstTaxRateType === "without tax") {
+        // GST after discount
         gstAmount = (basePrice * gstRate) / 100;
         finalPrice = basePrice + gstAmount;
       } else {
-        gstAmount = price - basePrice;
-        finalPrice = price;
+        // Price includes GST already
+        basePrice = price * (100 / (100 + gstRate));
+
+        // Apply discounts on base
+        if (item?.discountPercent) {
+          basePrice -= (basePrice * item.discountPercent) / 100;
+        } else if (item?.discountAmount) {
+          basePrice -= item.discountAmount;
+        }
+
+        basePrice = Math.max(basePrice, 0);
+
+        gstAmount = (basePrice * gstRate) / 100;
+        finalPrice = basePrice + gstAmount;
       }
 
       const totalAmount = finalPrice * qty;
@@ -114,25 +132,24 @@ const SalesInvoiceItemTable = ({ data, setData }) => {
       };
     });
 
-    // ✅ update only `data`, not `addedItems`
-    const taxSubtotal = updatedItems
-      .reduce((acc, item) => acc + Number(item?.gstAmount || 0), 0)
-      .toFixed(2);
-
-    const amountSubtotal = updatedItems
-      .reduce((acc, item) => acc + Number(item?.totalAmount || 0), 0)
-      .toFixed(2);
-
-    const totalTaxableAmount = updatedItems
-      .reduce((acc, item) => acc + Number(item?.basePrice || 0), 0)
-      .toFixed(2);
-
-    const totalGstAmount = updatedItems
-      .reduce((acc, item) => acc + Number(item?.gstAmount || 0), 0)
-      .toFixed(2);
-
-    const totalAmount = updatedItems.reduce(
+    // Totals
+    const amountSubtotal = updatedItems.reduce(
       (acc, item) => acc + Number(item?.totalAmount || 0),
+      0
+    );
+
+    const taxSubtotal = updatedItems.reduce(
+      (acc, item) => acc + Number(item?.gstAmount || 0) * item.quantity,
+      0
+    );
+
+    const totalTaxableAmount = updatedItems.reduce(
+      (acc, item) => acc + Number(item?.basePrice || 0) * item.quantity,
+      0
+    );
+
+    const totalGstAmount = updatedItems.reduce(
+      (acc, item) => acc + Number(item?.gstAmount || 0) * item.quantity,
       0
     );
 
@@ -143,21 +160,28 @@ const SalesInvoiceItemTable = ({ data, setData }) => {
       "en-IN"
     );
 
-    const balanceAmount =
-      parseFloat(totalTaxableAmount) + parseFloat(totalGstAmount);
+    const balanceAmount = totalTaxableAmount + totalGstAmount;
 
     setData((prev) => ({
       ...prev,
-      items: updatedItems, // still storing updated version here
-      amountSubTotal: parseFloat(amountSubtotal),
-      taxSubTotal: parseFloat(taxSubtotal),
-      taxableAmount: parseFloat(totalTaxableAmount),
+      items: updatedItems,
+      amountSubTotal: parseFloat(amountSubtotal.toFixed(2)),
+      taxSubTotal: parseFloat(taxSubtotal.toFixed(2)),
+      taxableAmount: parseFloat(totalTaxableAmount.toFixed(2)),
       cgst,
       sgst,
-      totalAmount: parseFloat(totalAmount),
-      balanceAmount: parseFloat(balanceAmount),
+      totalAmount: parseFloat(amountSubtotal.toFixed(2)),
+      balanceAmount: parseFloat(balanceAmount.toFixed(2)),
     }));
   }, [addedItems, quantities]);
+
+  // THIS USE EFFECT IS FOR SALES RETURN FOR FETCHING ALL THE ITEMS OF THAT PARTICULAR INVOICE
+  useEffect(() => {
+    const invoice = invoices.filter(
+      (invoice) => invoice?._id === data?.invoiceId
+    );
+    setData((prev) => ({ ...prev, items: invoice[0]?.items }));
+  }, [data?.invoiceId]);
 
   return (
     <>
@@ -189,7 +213,7 @@ const SalesInvoiceItemTable = ({ data, setData }) => {
         <span className="border-l border-t border-r p-2 border-[var(--primary-border)] text-gray-500 uppercase bg-[var(--primary-background)]"></span>
       </div>
 
-      {data?.items.map((addedItem, index) => (
+      {data?.items?.map((addedItem, index) => (
         <div className="w-full grid grid-cols-11 text-xs" key={addedItem?._id}>
           {/* Row Number */}
           <span className="border-t p-2 border-[var(--primary-border)]">
@@ -313,10 +337,14 @@ const SalesInvoiceItemTable = ({ data, setData }) => {
       ))}
 
       {/* ADD ITEMS POPUP */}
-      <div className="p-2 flex border-t border-r border-[var(--primary-border)]">
+      <div
+        className={`${
+          data?.invoiceId && "hidden"
+        } p-2 flex border-t border-r border-[var(--primary-border)]`}
+      >
         {/* Add Item dialog box -------------------------------------------------------- */}
 
-        <div className="w-7/10">
+        <div className="w-7/10 ">
           <button
             onClick={() => document.getElementById("my_modal_1").showModal()}
             className="btn btn-info  btn-dash w-full hover:bg-none"

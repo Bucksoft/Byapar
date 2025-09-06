@@ -9,7 +9,7 @@ const DashboardSalesReturnPage = () => {
         <DashboardNavbar title={"Sales Return"} />
         <SalesNavigationMenus btnText={"Sales Return"} />
         <div className="border border-zinc-200 mt-5 h-80 rounded-md mx-4 ">
-          <table className="table ">
+          <table className="table">
             {/* head */}
             <thead>
               <tr className="text-xs bg-gray-100 border-b border-b-gray-200">

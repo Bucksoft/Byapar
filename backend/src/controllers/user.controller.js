@@ -99,14 +99,31 @@ export async function verifyOTP(req, res) {
     }
 
     // generate jwt token
-    const token = jwt.sign({ id: user._id, email }, process.env.JWT_SECRET, {
-      expiresIn: "1h",
-    });
-    res.cookie("token", token, {
+    const accessToken = jwt.sign(
+      { id: user._id, email },
+      process.env.JWT_SECRET,
+      {
+        expiresIn: "15m",
+      }
+    );
+    const refreshToken = jwt.sign(
+      { id: user._id, email },
+      process.env.JWT_SECRET,
+      {
+        expiresIn: "7d",
+      }
+    );
+    res.cookie("accessToken", accessToken, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       sameSite: process.env.NODE_ENV === "production" ? "None" : "Lax",
-      maxAge: 60 * 60 * 1000,
+      maxAge: 15 * 60 * 1000,
+    });
+    res.cookie("refreshToken", refreshToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: process.env.NODE_ENV === "production" ? "None" : "Lax",
+      maxAge: 7 * 24 * 60 * 60 * 1000,
     });
 
     return res
@@ -187,7 +204,7 @@ export async function loginViaGoogleCallback(req, res) {
         email: user.email,
       },
       process.env.JWT_SECRET,
-      { expiresIn: "24h" }
+      { expiresIn: "1h" }
     );
 
     res.cookie("token", token, {
@@ -205,6 +222,32 @@ export async function loginViaGoogleCallback(req, res) {
 }
 
 // google authentication ends *********************************************************************
+
+// refresh token endpoint
+export async function refreshToken(req, res) {
+  const token = req.cookies.refreshToken;
+  if (!token) return res.status(401).json({ msg: "Refresh token missing" });
+
+  jwt.verify(token, process.env.JWT_SECRET, (err, decoded) => {
+    if (err) return res.status(403).json({ msg: "Invalid refresh token" });
+
+    // generate new access token
+    const accessToken = jwt.sign(
+      { id: decoded.id, email: decoded.email },
+      process.env.JWT_SECRET,
+      { expiresIn: "15m" }
+    );
+
+    res.cookie("accessToken", accessToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: process.env.NODE_ENV === "production" ? "None" : "Lax",
+      maxAge: 15 * 60 * 1000,
+    });
+
+    return res.json({ status: "Success", msg: "Access token refreshed" });
+  });
+}
 
 // get user profile details
 export async function getUserCredential(req, res) {
@@ -224,7 +267,8 @@ export async function getUserCredential(req, res) {
 // logout user
 export async function logoutUser(req, res) {
   try {
-    res.clearCookie("token");
+    res.clearCookie("accessToken");
+    res.clearCookie("refreshToken");
     return res
       .status(200)
       .json({ success: true, msg: "User logged out successfully" });

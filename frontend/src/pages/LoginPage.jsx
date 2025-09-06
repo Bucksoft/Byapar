@@ -2,20 +2,17 @@ import { Mail } from "lucide-react";
 import { FcGoogle } from "react-icons/fc";
 import ByaparLogo from "../assets/Byapar.png";
 import LoginImage from "../assets/Login_image.png";
-import { useMutation, useQueryClient } from "@tanstack/react-query";
+import { useMutation } from "@tanstack/react-query";
 import { useRef, useState } from "react";
 import { axiosInstance } from "../config/axios";
 import OtpInputForm from "../components/OtpInputForm";
-import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import CustomLoader from "../components/Loader";
-import { toast } from "react-hot-toast";
 
 const LoginPage = () => {
   const [email, setEmail] = useState("");
   const [otpInput, setOtpInput] = useState(false);
   const inputRef = useRef();
-  const queryClient = useQueryClient();
 
   const mutation = useMutation({
     mutationFn: async (email) => {
@@ -24,7 +21,6 @@ const LoginPage = () => {
     },
     onSuccess: () => {
       setOtpInput(true);
-      toast.success("Logged In");
     },
     onError: () => {
       inputRef.current.focus();
@@ -122,7 +118,7 @@ const LoginPage = () => {
               ease: "easeInOut",
               duration: 0.3,
             }}
-            className="absolute h-screen w-full bg-black/80 backdrop-blur-md flex items-center justify-center"
+            className="absolute h-screen w-full bg-black/70 backdrop-blur-md flex items-center justify-center"
           >
             <OtpInputForm email={email} />
           </motion.div>

@@ -1,12 +1,30 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import DashboardNavbar from "../components/DashboardNavbar";
 import { FaFileInvoice } from "react-icons/fa6";
-import { Calendar, ChevronDown, Search } from "lucide-react";
 import SalesNavigationMenus from "../components/SalesNavigationMenus";
 import PaymentInForm from "../components/PaymentIn/PaymentInForm";
+import { useQuery } from "@tanstack/react-query";
+import { axiosInstance } from "../config/axios";
+import { LiaRupeeSignSolid } from "react-icons/lia";
+import { SquarePen, Trash2 } from "lucide-react";
+import CustomLoader from "../components/Loader";
+import { useNavigate } from "react-router-dom";
+import { usePaymentInStore } from "../store/paymentInStore";
 
 const DashboardPaymentInPage = () => {
   const [page, setPage] = useState("");
+  const navigate = useNavigate();
+  const { setPaymentIns } = usePaymentInStore();
+
+  const { isLoading, data: paymentIns } = useQuery({
+    queryKey: ["paymentIns"],
+    queryFn: async () => {
+      const res = await axiosInstance.get("/payment-in");
+      setPaymentIns(res.data.paymentIns);
+      return res.data.paymentIns;
+    },
+  });
+
   return (
     <main className="h-full p-2">
       {page === "Payment In" ? (
@@ -20,28 +38,52 @@ const DashboardPaymentInPage = () => {
             setPage={setPage}
           />
 
-          <div className="border border-zinc-200 mt-5 h-80 rounded-md mx-4 ">
-            <table className="table ">
-              {/* head */}
-              <thead>
-                <tr className="text-xs bg-gray-100 border-b border-b-gray-200">
-                  <th className="border-r border-r-zinc-200 w-60">Date</th>
-                  <th className="border-r border-r-zinc-200 w-60">
-                    Payment Number
-                  </th>
-                  <th className="border-r border-r-zinc-200 w-60">
-                    Party Name
-                  </th>
-                  <th className="border-r border-r-zinc-200 w-60">Amount</th>
-                </tr>
-              </thead>
-            </table>
-            <div className="w-full flex items-center justify-center py-20 flex-col gap-3 text-zinc-400">
-              <FaFileInvoice size={40} />
-              <span className="text-sm">
-                No transactions matching the current filter
-              </span>
-            </div>
+          <div className=" mt-5 h-80 rounded-md mx-4 ">
+            {isLoading ? (
+              <div className="w-full flex justify-center py-16">
+                <CustomLoader text={"Loading..."} />
+              </div>
+            ) : paymentIns?.length > 0 ? (
+              <table className="table ">
+                <thead>
+                  <tr className="text-xs bg-zinc-100">
+                    <th>Date</th>
+                    <th>Payment Number</th>
+                    <th className="text-center">Party Name</th>
+                    <th className="text-right">Payment Amount</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {paymentIns?.map((paymentIn) => (
+                    <tr
+                      onClick={() =>
+                        navigate(`/dashboard/payment-in/${paymentIn?._id}`)
+                      }
+                      className="cursor-pointer"
+                    >
+                      <td>{paymentIn?.paymentDate.split("T")[0]}</td>
+                      <td>{paymentIn?.paymentInNumber || "-"}</td>
+                      <td className="text-center">{paymentIn?.partyName || "-"}</td>
+                      <td>
+                        <div className="flex items-center justify-end">
+                          <LiaRupeeSignSolid />
+                          {Number(paymentIn?.paymentAmount).toLocaleString(
+                            "en-IN"
+                          ) || "-"}
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            ) : (
+              <div className="w-full flex items-center justify-center py-20 flex-col gap-3 text-zinc-400">
+                <FaFileInvoice size={40} />
+                <span className="text-sm">
+                  No transactions matching the current filter
+                </span>
+              </div>
+            )}
           </div>
         </div>
       )}

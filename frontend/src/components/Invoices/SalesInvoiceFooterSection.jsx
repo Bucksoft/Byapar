@@ -150,7 +150,7 @@ const SalesInvoiceFooterSection = ({ data, setData, title }) => {
             ₹ {Number(data?.taxableAmount).toLocaleString("en-IN") || 0}
           </span>
         </div>
-        {data.items.length > 0 && (
+        {data?.items?.length > 0 && (
           <>
             <div className="flex justify-between py-2">
               <span className={`px-2 w-fit text-xs`}>SGST</span>
@@ -248,7 +248,7 @@ const SalesInvoiceFooterSection = ({ data, setData, title }) => {
           </div>
           <div className="p-2 flex justify-between">
             <span className="text-sm font-semibold">Total Amount</span>
-            {data.items.length > 0 ? (
+            {data?.items?.length > 0 ? (
               <>₹ {Number(data?.totalAmount).toLocaleString("en-IN")}</>
             ) : (
               <input
@@ -269,7 +269,7 @@ const SalesInvoiceFooterSection = ({ data, setData, title }) => {
             <div className="text-xs text-[var(--badge)] flex justify-between items-center">
               <span>Balance Amount</span>
               <span className="mr-4">
-                {data.items.length > 0 ? (
+                {data?.items?.length > 0 ? (
                   <>
                     {"₹" + Number(data?.balanceAmount).toLocaleString("en-IN")}
                   </>

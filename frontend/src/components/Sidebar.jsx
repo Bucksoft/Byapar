@@ -15,6 +15,7 @@ import { axiosInstance } from "../config/axios";
 import CustomLoader from "./Loader";
 import toast from "react-hot-toast";
 import { useState } from "react";
+import { IoMdArrowDropdown } from "react-icons/io";
 
 export const container = {
   hidden: { opacity: 0 },
@@ -41,8 +42,6 @@ const Sidebar = () => {
   const navigate = useNavigate();
   const { user, setUser } = useAuthStore();
   const [currentLink, setCurrentLink] = useState("");
-  
-
 
   const mutation = {
     mutationFn: async () => {
@@ -114,7 +113,7 @@ const Sidebar = () => {
                       to={`/dashboard/${field.label.toLowerCase()}`}
                       onClick={() => setCurrentLink(field?.label)}
                       className={({ isActive }) =>
-                        `flex items-center gap-6 text-xs font-medium cursor-pointer py-2 pl-[13.5px] w-full transition-all duration-200 ease-in-out
+                        `flex items-center  justify-between text-xs font-medium cursor-pointer py-2 pl-[13.5px] w-full transition-all duration-200 ease-in-out
                 ${
                   isActive
                     ? "bg-[var(--primary-btn)]/10 text-[var(--primary-btn)] border-l-2 scale-105"
@@ -122,10 +121,13 @@ const Sidebar = () => {
                 }`
                       }
                     >
-                      <span className="transition-all duration-200 group-hover:-translate-x-2">
-                        {field.icon}
-                      </span>
-                      {field.label}
+                      <div className="flex items-center gap-6">
+                        <span className="transition-all duration-200 group-hover:-translate-x-2">
+                          {field.icon}
+                        </span>
+                        {field.label}
+                      </div>
+                      <IoMdArrowDropdown className="mr-4" />
                     </NavLink>
 
                     {/* Sublinks */}

@@ -1,7 +1,10 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import { usePartyStore } from "../../store/partyStore";
 import { IoCloseCircle } from "react-icons/io5";
+import { useInvoiceStore } from "../../store/invoicesStore";
+import { Search } from "lucide-react";
+import { LiaFileInvoiceSolid, LiaRupeeSignSolid } from "react-icons/lia";
 
 const SalesInvoicePartyDetailsSection = ({
   title,
@@ -11,11 +14,20 @@ const SalesInvoicePartyDetailsSection = ({
   setParty,
 }) => {
   const [searchPartyQuery, setSearchPartyQuery] = useState("");
+  const [invoiceSearchQuery, setInvoiceSearchQuery] = useState("");
   const [open, setOpen] = useState(false);
+  const [partyInvoices, setPartyInvoices] = useState([]);
+  const [showPartyInvoicePopup, setShowPartyInvoicePopup] = useState(false);
+
   const { parties } = usePartyStore();
+  const { invoices } = useInvoiceStore();
 
   const searchedParties = parties?.filter((party) =>
     party?.partyName.toLowerCase().includes(searchPartyQuery.toLowerCase())
+  );
+
+  const searchedInvoices = invoices?.filter(
+    (invoice) => invoice?.salesInvoiceNumber === Number(invoiceSearchQuery)
   );
   const handleInputChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -24,6 +36,14 @@ const SalesInvoicePartyDetailsSection = ({
       [name]: type === "checkbox" ? checked : value,
     }));
   };
+
+  useEffect(() => {
+    const selectedPartyInvoices = invoices.filter(
+      (invoice) => invoice?.partyName === party?.partyName
+    );
+    setPartyInvoices(selectedPartyInvoices);
+  }, [party]);
+
   return (
     <>
       <section className="grid grid-cols-3 h-48 ">
@@ -36,7 +56,7 @@ const SalesInvoicePartyDetailsSection = ({
 
             <div className="dropdown dropdown-end">
               <div tabIndex={0} role="button" className="btn btn-xs text-xxs ">
-                Change Party
+                {!party ? "Add" : "Change"} Party
               </div>
               <ul
                 tabIndex={0}
@@ -78,7 +98,9 @@ const SalesInvoicePartyDetailsSection = ({
         {/* second block */}
         <div className="border-t border-r border-zinc-300 ">
           <div className="bg-red flex items-center justify-between p-2 border-b border-b-zinc-300">
-            <span className="text-xs">Ship To</span>
+            <span className="text-xs">
+              Ship {title === "Sales Return" ? "From" : "To"}
+            </span>
             <button className="btn btn-xs text-xxs border">
               Change Shipping Address
             </button>
@@ -92,7 +114,7 @@ const SalesInvoicePartyDetailsSection = ({
           </div>
         </div>
         {/* third block */}
-        <div className="border-t border-r border-zinc-300 pt-1">
+        <div className="border-t border-r border-zinc-300 pt-1 relative">
           {/* upper part */}
           <div className=" p-2 flex space-x-2 items-center">
             <div className="">
@@ -123,8 +145,7 @@ const SalesInvoicePartyDetailsSection = ({
             </div>
           </div>
           {/* lower */}
-
-          {title !== "Quotation" && (
+          {title === "Sales Invoice" ? (
             <>
               <div className="p-2">
                 <button
@@ -139,14 +160,14 @@ const SalesInvoicePartyDetailsSection = ({
 
               {open && (
                 <>
-                  <div className="flex justify-end  relative">
+                  <div className="flex justify-end relative">
                     <IoCloseCircle
                       size={25}
                       onClick={() => setOpen(false)}
-                      className="text-gray-500 absolute top-0 right-57"
+                      className="text-gray-500 absolute top-0 right-[57px]"
                     />
                   </div>
-                  <div className="px-2 py-4 flex space-x-2 border border-dashed w-fit m-2 rounded-md ">
+                  <div className="px-2 bg-pink-400 py-4 flex space-x-2 border border-dashed w-fit m-2 rounded-md">
                     <div>
                       <p className="text-xs pb-2">Payment Terms: </p>
                       <div className="relative rounded-sm">
@@ -163,19 +184,20 @@ const SalesInvoicePartyDetailsSection = ({
                           name="paymentTerms"
                           className="input input-xs w-30"
                         />
-                        <span className="text-xs absolute z-50 left-21 top-1 bg-zinc-200 ">
+                        <span className="text-xs absolute z-50 left-[84px] top-1 bg-zinc-200">
                           Days
                         </span>
                       </div>
                     </div>
-                    <div className="">
+                    <div>
                       <p className="text-xs pb-2">Due Date: </p>
                       <input
                         type="date"
-                        value={data.dueDate}
+                        value={
+                          data.dueDate || new Date().toISOString().split("T")[0]
+                        }
                         onChange={handleInputChange}
                         name="dueDate"
-                        defaultValue={new Date().toISOString().split("T")[0]}
                         className="input input-xs border-none bg-zinc-200 w-30"
                       />
                     </div>
@@ -183,7 +205,106 @@ const SalesInvoicePartyDetailsSection = ({
                 </>
               )}
             </>
-          )}
+          ) : title === "Quotation" ? (
+            <>{/* Validity date code comes here */}</>
+          ) : title === "Sales Return" ? (
+            <>
+              <div className="px-2 flex flex-col w-full relative">
+                <small>
+                  Invoice :{" "}
+                  {data?.invoiceId && (
+                    <span className="font-semibold">
+                      #
+                      {
+                        invoices.filter(
+                          (invoice) => invoice?._id === data?.invoiceId
+                        )[0]?.salesInvoiceNumber
+                      }
+                    </span>
+                  )}
+                  {!party && (
+                    <span className="text-red-500">Please select a party</span>
+                  )}{" "}
+                </small>
+                <Search
+                  size={15}
+                  className="absolute top-7 left-4 z-10 text-zinc-500"
+                />
+                <input
+                  type="text"
+                  className="input input-sm px-7"
+                  placeholder="Search invoices by invoice number"
+                  disabled={!party}
+                  value={invoiceSearchQuery}
+                  onChange={(e) => setInvoiceSearchQuery(e.target.value)}
+                  onClick={() => setShowPartyInvoicePopup((prev) => !prev)}
+                />
+              </div>
+              {showPartyInvoicePopup && (
+                <>
+                  <div className="absolute text-xs mt-1 mx-2 rounded-sm shadow-md z-100 bg-white shadow-zinc-500 w-3/4 ">
+                    <div className="overflow-x-auto">
+                      <table className="table table-xs">
+                        {/* head */}
+                        <thead>
+                          <tr className="text-xs bg-zinc-100">
+                            <th>Date</th>
+                            <th>Invoice no.</th>
+                            <th>Amount</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {partyInvoices?.length > 0 ? (
+                            (invoiceSearchQuery
+                              ? searchedInvoices
+                              : partyInvoices
+                            )?.map((partyInvoice) => (
+                              <tr
+                                key={partyInvoice._id}
+                                className="hover:bg-zinc-100 cursor-pointer"
+                                onClick={() => {
+                                  setData((prev) => ({
+                                    ...prev,
+                                    invoiceId: partyInvoice?._id,
+                                  }));
+                                  setShowPartyInvoicePopup(false);
+                                }}
+                              >
+                                <td>
+                                  {partyInvoice?.salesInvoiceDate.split("T")[0]}
+                                </td>
+                                <td>{partyInvoice?.salesInvoiceNumber}</td>
+                                <td>
+                                  <div className="flex items-center">
+                                    <LiaRupeeSignSolid />
+                                    {Number(
+                                      partyInvoice?.totalAmount
+                                    ).toLocaleString("en-IN")}
+                                  </div>
+                                </td>
+                              </tr>
+                            ))
+                          ) : (
+                            <tr>
+                              <td
+                                colSpan="3"
+                                className="text-center p-3 text-xs"
+                              >
+                                <div className="flex items-center justify-center gap-2">
+                                  <LiaFileInvoiceSolid size={16} />
+                                  No invoices
+                                </div>
+                              </td>
+                            </tr>
+                          )}
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                </>
+              )}
+            </>
+          ) : null}
         </div>
       </section>
     </>

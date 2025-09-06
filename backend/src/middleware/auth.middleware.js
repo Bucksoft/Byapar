@@ -2,11 +2,11 @@ import jwt from "jsonwebtoken";
 
 export async function isAuth(req, res, next) {
   try {
-    const { token } = req.cookies;
-    if (!token) {
+    const { accessToken } = req.cookies;
+    if (!accessToken) {
       return res.status(401).json({ success: false, msg: "Token not found" });
     }
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const decoded = jwt.verify(accessToken, process.env.JWT_SECRET);
     if (!decoded) {
       return res
         .status(401)
