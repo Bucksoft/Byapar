@@ -23,15 +23,23 @@ const quotationSchema = new mongoose.Schema(
     discountPercent: { type: Number, default: 0 },
     taxableAmount: { type: Number },
     taxSubTotal: { type: Number },
+    validFor: { type: Number },
+    validityDate: { type: Date, default: Date.now },
     sgst: String,
     cgst: String,
     totalAmount: { type: Number, required: true },
     balanceAmount: { type: Number, required: true },
-
     partyId: { type: mongoose.Schema.Types.ObjectId, ref: "Party" },
     notes: { type: String, default: "" },
     termsAndCondition: { type: String, default: "" },
-
+    businessId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Business",
+    },
+    clientId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "UserCredential",
+    },
     status: {
       type: String,
       enum: ["open", "close"],

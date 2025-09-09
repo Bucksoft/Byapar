@@ -10,8 +10,8 @@ import { isAuth } from "../middleware/auth.middleware.js";
 
 const router = express.Router();
 
-router.route("/").post(isAuth, createItem);
-router.route("/all").get(isAuth, getAllItems);
+router.route("/:id").post(isAuth, createItem);
+router.route("/all/:id").get(isAuth, getAllItems);
 router.route("/").delete(isAuth, deleteItem);
 router.route("/:id").delete(isAuth, deleteSingleItem);
 router.route("/:id").patch(isAuth, updateItem);

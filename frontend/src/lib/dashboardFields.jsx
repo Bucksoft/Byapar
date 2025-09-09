@@ -21,6 +21,7 @@ import {
   HiDocumentCurrencyRupee,
 } from "react-icons/hi2";
 import { IoIosGift, IoMdCart } from "react-icons/io";
+import { MdAddBusiness } from "react-icons/md";
 
 export const dashboardFields = [
   {
@@ -152,6 +153,15 @@ export const dashboardFields = [
       </>
     ),
     label: "Reports",
+  },
+  {
+    id: 7,
+    icon: (
+      <>
+        <MdAddBusiness size={16} />
+      </>
+    ),
+    label: "My Businesses",
   },
 ];
 

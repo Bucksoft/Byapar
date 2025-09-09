@@ -8,9 +8,9 @@ import {
 import { isAuth } from "../middleware/auth.middleware.js";
 const router = express.Router();
 
-router.route("/").post(isAuth, createSalesInvoice);
-router.route("/").get(isAuth, getAllInvoices);
+router.route("/:id").post(isAuth, createSalesInvoice);
+router.route("/:id").get(isAuth, getAllInvoices);
 router.route("/:id").delete(isAuth, deleteInvoice);
-router.route("/:id").get(isAuth, getInvoiceById);
+router.route("/invoice/:id").get(isAuth, getInvoiceById);
 
 export default router;

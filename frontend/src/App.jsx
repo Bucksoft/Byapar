@@ -1,4 +1,8 @@
 import { Routes, Route } from "react-router-dom";
+import { useQuery } from "@tanstack/react-query";
+import { axiosInstance } from "./config/axios";
+import { useAuthStore } from "./store/authStore";
+
 import LoginPage from "./pages/LoginPage";
 import DashboardPage from "./pages/DashboardPage";
 import DashboardPartiesPage from "./pages/DashboardPartiesPage";
@@ -39,9 +43,6 @@ import DashboardDeliveryChallanPage from "./pages/DashboardDeliveryChallanPage";
 import DashboardProformaPage from "./pages/DashboardProformaPage";
 import DashboardAddPartyPage from "./pages/DashboardAddPartyPage";
 import HomePage from "./pages/HomePage";
-import { useQuery } from "@tanstack/react-query";
-import { axiosInstance } from "./config/axios";
-import { useAuthStore } from "./store/authStore";
 import DashboardPartyPage from "./pages/DashboardPartyPage";
 import PartyEditPage from "./components/Party/PartyEditPage";
 import DashboardSalesInvoicePage from "./pages/DashboardSalesInvoicePage";
@@ -60,6 +61,8 @@ import DashboardCreatePurchaseReturnPage from "./pages/Purchases/DashboardCreate
 import DashboardCreateDebitNotePage from "./pages/Purchases/DashboardCreateDebitNotePage";
 import DashboardCreatePurchaseOrder from "./pages/Purchases/DashboardCreatePurchaseOrder";
 import DashboardPaymentInDetails from "./pages/DashboardPaymentInDetails";
+import DashboardCreateCreditNoteInvoicePage from "./pages/DashboardCreateCreditNoteInvoicePage";
+import DashboardMyBusinesses from "./pages/DashboardMyBusinesses";
 
 function App() {
   const { user, setUser } = useAuthStore();
@@ -88,6 +91,12 @@ function App() {
         <Route path="/dashboard" element={<DashboardLayout />}>
           <Route index element={<DashboardPage />} />
           <Route path="/dashboard/parties" element={<DashboardPartiesPage />} />
+
+          <Route
+            path="/dashboard/my-businesses"
+            element={<DashboardMyBusinesses />}
+          />
+
           <Route
             path="/dashboard/parties/:id"
             element={<DashboardPartyPage />}
@@ -219,6 +228,11 @@ function App() {
           <Route
             path="/dashboard/credit-note"
             element={<DashboardCreditNotePage />}
+          />
+
+          <Route
+            path="/dashboard/parties/create-credit-note"
+            element={<DashboardCreateCreditNoteInvoicePage />}
           />
 
           <Route

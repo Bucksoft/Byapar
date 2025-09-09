@@ -38,6 +38,10 @@ const salesReturnSchema = new mongoose.Schema(
     pendingAmount: {
       type: Number,
     },
+    businessId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Business",
+    },
     status: {
       type: String,
       enum: ["paid", "unpaid"],

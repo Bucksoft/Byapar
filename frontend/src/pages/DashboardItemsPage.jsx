@@ -15,10 +15,12 @@ import CustomLoader from "../components/Loader";
 import { useItemStore } from "../store/itemStore";
 import { useEffect, useState } from "react";
 import ItemsList from "../components/Items/ItemsList";
+import { useBusinessStore } from "../store/businessStore";
 
 const DashboardItemsPage = () => {
   const navigate = useNavigate();
   const { setItems } = useItemStore();
+  const { business } = useBusinessStore();
   const [searchQuery, setSearchQuery] = useState("");
 
   const {
@@ -28,7 +30,7 @@ const DashboardItemsPage = () => {
   } = useQuery({
     queryKey: ["items"],
     queryFn: async () => {
-      const res = await axiosInstance.get("/item/all");
+      const res = await axiosInstance.get(`/item/all/${business?._id}`);
       return res.data?.items;
     },
   });

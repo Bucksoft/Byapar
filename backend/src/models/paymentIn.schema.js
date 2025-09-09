@@ -33,6 +33,10 @@ const paymentInSchema = new mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: "UserCredential",
   },
+  businessId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Business",
+  },
   notes: {
     type: String,
   },

@@ -1,21 +1,20 @@
-import { Plus } from "lucide-react";
-import ByaparLogo from "../assets/Byapar.png";
 import {
   businessTools,
   dashboardAccountingFields,
   dashboardFields,
   settingLinks,
 } from "../lib/dashboardFields";
-import { Link, NavLink, useNavigate } from "react-router-dom";
+import { NavLink, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { TbLogout2 } from "react-icons/tb";
 import { useAuthStore } from "../store/authStore";
-import { useMutation } from "@tanstack/react-query";
 import { axiosInstance } from "../config/axios";
 import CustomLoader from "./Loader";
 import toast from "react-hot-toast";
 import { useState } from "react";
 import { IoMdArrowDropdown } from "react-icons/io";
+import { useBusinessStore } from "../store/businessStore";
+import { RiMenu3Fill } from "react-icons/ri";
 
 export const container = {
   hidden: { opacity: 0 },
@@ -40,7 +39,9 @@ export const dashboardLinksItems = {
 
 const Sidebar = () => {
   const navigate = useNavigate();
-  const { user, setUser } = useAuthStore();
+  // const [sidebarShrink, setSidebarShrink] = useState(false);
+  const { setUser } = useAuthStore();
+  const { business } = useBusinessStore();
   const [currentLink, setCurrentLink] = useState("");
 
   const mutation = {
@@ -65,7 +66,7 @@ const Sidebar = () => {
             translateX: 0,
             filter: "blur(0)",
           }}
-          className="sticky top-0 z-10 text-md text-white font-semibold flex items-center gap-3 w-full px-5 py-3 bg-white/10 backdrop-blur-md"
+          className="sticky  top-0 z-10 text-md text-white font-semibold flex items-center justify-between gap-3 w-full px-5 py-3 bg-white/10 backdrop-blur-md"
         >
           {/* <img
             src={ByaparLogo}
@@ -74,10 +75,16 @@ const Sidebar = () => {
             width={100}
           /> */}
           Byapar
+          {/* <button
+            className="cursor-pointer"
+            onClick={() => setSidebarShrink((prev) => !prev)}
+          >
+            <RiMenu3Fill />
+          </button> */}
         </motion.h1>
 
         {/* business details */}
-        <div className="flex flex-col gap-3 px-5 py-3 items-center border-b border-b-zinc-800">
+        <div className="flex gap-3 px-5 py-3 items-center border-b border-b-zinc-800">
           <div className="avatar avatar-sm">
             <div className="w-9 rounded-full">
               <img
@@ -87,7 +94,9 @@ const Sidebar = () => {
             </div>
           </div>
           <p className="font-medium text-xs">
-            {user?.email || "Business name"}
+            {business?.companyEmail ||
+              business?.businessName ||
+              "Business name"}
           </p>
         </div>
 
@@ -113,7 +122,7 @@ const Sidebar = () => {
                       to={`/dashboard/${field.label.toLowerCase()}`}
                       onClick={() => setCurrentLink(field?.label)}
                       className={({ isActive }) =>
-                        `flex items-center  justify-between text-xs font-medium cursor-pointer py-2 pl-[13.5px] w-full transition-all duration-200 ease-in-out
+                        `flex items-center  justify-between text-xs font-medium cursor-pointer py-2 pl-[13.5px] w-full transition-all duration-200 ease-in-out  
                 ${
                   isActive
                     ? "bg-[var(--primary-btn)]/10 text-[var(--primary-btn)] border-l-2 scale-105"
@@ -121,11 +130,11 @@ const Sidebar = () => {
                 }`
                       }
                     >
-                      <div className="flex items-center gap-6">
+                      <div className="flex items-center gap-6 ">
                         <span className="transition-all duration-200 group-hover:-translate-x-2">
                           {field.icon}
                         </span>
-                        {field.label}
+                        <span className>{field.label}</span>
                       </div>
                       <IoMdArrowDropdown className="mr-4" />
                     </NavLink>

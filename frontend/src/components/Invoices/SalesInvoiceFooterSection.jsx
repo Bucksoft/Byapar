@@ -8,6 +8,9 @@ const SalesInvoiceFooterSection = ({ data, setData, title }) => {
   const [charges, setCharges] = useState(false);
   const [discount, setDiscount] = useState(false);
   const [selectCheckBox, setSelectCheckBox] = useState(false);
+  const [markAsPaid, setMarkedAsPaid] = useState(false);
+
+  
 
   return (
     <div className="grid grid-cols-2 w-full ">
@@ -53,7 +56,6 @@ const SalesInvoiceFooterSection = ({ data, setData, title }) => {
         </div>
 
         {/* add term & condition */}
-
         <div className="border-b border-b-zinc-300 py-2">
           <span
             onClick={() => setTermCondition(true)}
@@ -264,12 +266,18 @@ const SalesInvoiceFooterSection = ({ data, setData, title }) => {
           <div className="p-2 border-b border-b-zinc-300 pb-2">
             <div className="flex justify-end p-2 pr-5 space-x-2">
               <span className="text-xs">Mark as fully paid</span>
-              <input type="checkbox" className="checkbox checkbox-sm" />
+              <input
+                type="checkbox"
+                className="checkbox checkbox-sm"
+                onChange={(e) => setMarkedAsPaid(e.target.checked)}
+              />
             </div>
             <div className="text-xs text-[var(--badge)] flex justify-between items-center">
               <span>Balance Amount</span>
               <span className="mr-4">
-                {data?.items?.length > 0 ? (
+                {markAsPaid ? (
+                  data.balanceAmount === 0
+                ) : data?.items?.length > 0 ? (
                   <>
                     {"₹" + Number(data?.balanceAmount).toLocaleString("en-IN")}
                   </>

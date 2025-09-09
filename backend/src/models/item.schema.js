@@ -82,6 +82,14 @@ const itemSchema = new mongoose.Schema(
       type: String,
       trim: true,
     },
+    businessId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Business",
+    },
+    clientId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "UserCredential",
+    },
     fileURLs: [
       {
         type: String,

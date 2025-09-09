@@ -19,10 +19,8 @@ const SalesInvoiceItemTable = ({ data, setData }) => {
     item?.itemName.toLowerCase().includes(searchItemQuery.toLowerCase())
   );
 
-  // Handle gst type change for a single item
   const handleSetGstTaxRateType = (e, itemId) => {
     const { value } = e.target;
-
     setAddedItems((prevItems) =>
       prevItems.map((item) =>
         item._id === itemId ? { ...item, gstTaxRateType: value } : item
@@ -43,7 +41,7 @@ const SalesInvoiceItemTable = ({ data, setData }) => {
           ? {
               ...item,
               discountPercent: percent,
-              discountAmount: discountAmount.toFixed(2), // auto-calc
+              discountAmount: discountAmount.toFixed(2),
             }
           : item;
       })
@@ -63,7 +61,7 @@ const SalesInvoiceItemTable = ({ data, setData }) => {
           ? {
               ...item,
               discountAmount: amount,
-              discountPercent: discountPercent.toFixed(2), // auto-calc
+              discountPercent: discountPercent.toFixed(2),
             }
           : item;
       })
@@ -88,10 +86,8 @@ const SalesInvoiceItemTable = ({ data, setData }) => {
       let finalPrice = 0;
 
       if (item?.gstTaxRateType === "without tax") {
-        // Base price is direct price
         basePrice = price;
 
-        // Apply discounts
         if (item?.discountPercent) {
           basePrice -= (basePrice * item.discountPercent) / 100;
         } else if (item?.discountAmount) {
@@ -100,14 +96,11 @@ const SalesInvoiceItemTable = ({ data, setData }) => {
 
         basePrice = Math.max(basePrice, 0);
 
-        // GST after discount
         gstAmount = (basePrice * gstRate) / 100;
         finalPrice = basePrice + gstAmount;
       } else {
-        // Price includes GST already
         basePrice = price * (100 / (100 + gstRate));
 
-        // Apply discounts on base
         if (item?.discountPercent) {
           basePrice -= (basePrice * item.discountPercent) / 100;
         } else if (item?.discountAmount) {
@@ -175,13 +168,16 @@ const SalesInvoiceItemTable = ({ data, setData }) => {
     }));
   }, [addedItems, quantities]);
 
-  // THIS USE EFFECT IS FOR SALES RETURN FOR FETCHING ALL THE ITEMS OF THAT PARTICULAR INVOICE
+  // THIS USE EFFECT CALCULATES
   useEffect(() => {
-    const invoice = invoices.filter(
+    const invoice = invoices.find(
       (invoice) => invoice?._id === data?.invoiceId
     );
-    setData((prev) => ({ ...prev, items: invoice[0]?.items }));
-  }, [data?.invoiceId]);
+
+    if (invoice) {
+      setData((prev) => ({ ...invoice, invoiceId: invoice?._id }));
+    }
+  }, [data?.invoiceId, invoices]);
 
   return (
     <>
@@ -234,13 +230,13 @@ const SalesInvoiceItemTable = ({ data, setData }) => {
           <span className="border-t border-l p-2 border-[var(--primary-border)]">
             <input
               className="input input-xs bg-zinc-100 text-right"
-              value={addedItem?.quantity || ""}
-              onChange={(e) =>
-                handleUpdateQuantity(
-                  parseInt(e.target.value) || 0,
-                  addedItem._id
-                )
-              }
+              value={addedItem?.quantity}
+              // onChange={() =>
+              //   setQuantities((prev) => ({
+              //     ...prev,
+              //     [addedItem._id]: Math.max((prev[addedItem._id] || 0) - 1, 0),
+              //   }))
+              // }
             />
           </span>
 
@@ -258,11 +254,12 @@ const SalesInvoiceItemTable = ({ data, setData }) => {
             {/* Discount % */}
             <input
               type="text"
+              min={0}
               className="input input-xs bg-zinc-100 text-right"
-              value={addedItem?.discountPercent || ""}
+              value={addedItem?.discountPercent ?? 0}
               onChange={(e) =>
                 handleSetDiscountPercent(
-                  parseFloat(e.target.value) || 0,
+                  parseFloat(e.target.value) ?? 0,
                   addedItem._id
                 )
               }
@@ -513,14 +510,13 @@ const SalesInvoiceItemTable = ({ data, setData }) => {
           SUBTOTAL
         </span>
         <span className="border-t border-r border-b p-2 border-[var(--primary-border)] ">
-          ₹ 0
+          ₹ {Number(data?.taxableAmount || 0).toLocaleString("en-IN")}
         </span>
         <span className="border-t border-b p-2 border-[var(--primary-border)]">
-          ₹ {Number(data.taxSubTotal || 0).toLocaleString("en-IN")}
+          ₹ {Number(data?.taxSubTotal || 0).toLocaleString("en-IN")}
         </span>
-
         <span className="border p-2 border-[var(--primary-border)] ">
-          ₹ {Number(data.amountSubTotal || 0).toLocaleString("en-IN")}
+          ₹ {Number(data?.amountSubTotal || 0).toLocaleString("en-IN")}
         </span>
       </div>
     </>

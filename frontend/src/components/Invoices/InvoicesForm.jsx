@@ -8,11 +8,15 @@ import SalesInvoicePartyDetailsSection from "./SalesInvoicePartyDetailsSection";
 import SalesInvoiceItemTable from "./SalesInvoiceItemTable";
 import SalesInvoiceFooterSection from "./SalesInvoiceFooterSection";
 import { queryClient } from "../../main";
+import { useBusinessStore } from "../../store/businessStore";
 
-const InvoicesForm = ({ title, party, setParty, invoices }) => {
+const InvoicesForm = ({ title, party, setParty }) => {
+  const { business } = useBusinessStore();
   const invoiceData = {
     paymentTerms: 0,
     dueDate: new Date(Date.now()),
+    validFor: 0,
+    validityDate: new Date(Date.now()),
     salesInvoiceDate: new Date(Date.now()),
     salesInvoiceNumber: 1,
     partyName: party?.partyName || "",
@@ -26,7 +30,7 @@ const InvoicesForm = ({ title, party, setParty, invoices }) => {
     cgst: "",
     notes: "",
     termsAndCondition: "",
-    invoiceId:""
+    invoiceId: "",
   };
 
   const navigate = useNavigate();
@@ -36,28 +40,26 @@ const InvoicesForm = ({ title, party, setParty, invoices }) => {
   const mutation = useMutation({
     mutationFn: async (data) => {
       if (!party) {
-        toast.error("Please select a party");
-        return;
+        throw new Error("Please select a party");
       }
       if (data.items.length <= 0) {
-        toast.error("Please add at least 1 item");
-        return;
+        throw new Error("Please add at least 1 item");
       }
 
       // Dynamically decide endpoint based on title
       let endpoint = "";
       switch (title) {
         case "Quotation":
-          endpoint = "/quotation";
+          endpoint = `/quotation/${business?._id}`;
           break;
         case "Sales Invoice":
-          endpoint = "/sales-invoice";
+          endpoint = `/sales-invoice/${business?._id}`;
           break;
         case "Purchase Invoice":
-          endpoint = "/purchase-invoice";
+          endpoint = `/purchase-invoice/${business?._id}`;
           break;
         case "Sales Return":
-          endpoint = "/sales-return";
+          endpoint = `/sales-return/${business?._id}`;
           break;
         default:
           toast.error("Invalid invoice type");
@@ -72,7 +74,7 @@ const InvoicesForm = ({ title, party, setParty, invoices }) => {
     },
 
     onSuccess: (data) => {
-      toast.success(data.msg);
+      toast.success(data?.msg);
       queryClient.invalidateQueries({ queryKey: ["invoices"] });
 
       // Navigate dynamically based on invoice type
@@ -86,7 +88,7 @@ const InvoicesForm = ({ title, party, setParty, invoices }) => {
     },
 
     onError: (err) => {
-      toast.error(err.response?.data?.msg || "Something went wrong");
+      toast.error(err?.response?.data?.msg || "Something went wrong");
     },
   });
 

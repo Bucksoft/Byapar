@@ -98,6 +98,7 @@ export async function createPaymentIn(req, res) {
       partyId: party._id,
       notes,
       paymentInNumber,
+      businessId: req.params?.id,
       settledInvoices: req.body.settledInvoices,
     });
 
@@ -122,7 +123,9 @@ export async function createPaymentIn(req, res) {
 
 export async function getAllPaymentInDetails(req, res) {
   try {
-    const paymentIns = await PaymentIn.find();
+    const paymentIns = await PaymentIn.find({
+      businessId: req.params.id,
+    });
     if (!paymentIns) {
       return res
         .status(400)

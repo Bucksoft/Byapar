@@ -13,11 +13,13 @@ import toast from "react-hot-toast";
 import { queryClient } from "../../main";
 import { useItemStore } from "../../store/itemStore";
 import CustomLoader from "../../components/Loader";
+import { useBusinessStore } from "../../store/businessStore";
 
 const DashboardItemsSidebar = () => {
   const navigate = useNavigate();
   const [itemToBeEdited, setItemToBeEdited] = useState();
   const { state } = useLocation();
+  const { business } = useBusinessStore();
   const { setItem, items } = useItemStore();
   const [currentField, setCurrentField] = useState("Basic Details");
 
@@ -43,6 +45,7 @@ const DashboardItemsSidebar = () => {
     asOfDate: new Date(Date.now()),
     description: "",
     godown: "",
+    businessId: business?._id,
     fileURLs: [""],
   };
   const [data, setData] = useState(initialFormState);
@@ -63,7 +66,7 @@ const DashboardItemsSidebar = () => {
   // create new item mutation
   const mutation = useMutation({
     mutationFn: async (data) => {
-      const res = await axiosInstance.post("/item", { data });
+      const res = await axiosInstance.post(`/item/${business?._id}`, { data });
       return res.data;
     },
     onSuccess: (data) => {

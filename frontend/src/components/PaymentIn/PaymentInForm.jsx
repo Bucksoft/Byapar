@@ -5,15 +5,17 @@ import { useEffect, useRef, useState } from "react";
 import { useInvoiceStore } from "../../store/invoicesStore";
 import { LiaRupeeSignSolid } from "react-icons/lia";
 import { useMutation } from "@tanstack/react-query";
-import { axiosInstance } from "../../config/axios";
 import CustomLoader from "../../components/Loader";
 import toast from "react-hot-toast";
+import { useBusinessStore } from "../../store/businessStore";
+import { axiosInstance } from "../../config/axios";
 
 const PaymentInForm = () => {
   const [settledInvoices, setSettledInvoices] = useState({});
   const navigate = useNavigate();
-  const { parties } = usePartyStore();
+  const { parties, setParty } = usePartyStore();
   const { invoices } = useInvoiceStore();
+  const { business } = useBusinessStore();
   const [selectedParty, setSelectedParty] = useState();
   const [totalInvoiceAmount, setTotalInvoiceAmount] = useState(0);
   const [allInvoices, setAllInvoices] = useState([]);
@@ -71,33 +73,33 @@ const PaymentInForm = () => {
   }, [data.paymentAmount, allInvoices]);
 
   // handling actual form submission
+
   const mutation = useMutation({
     mutationFn: async (data) => {
-      if (data.paymentAmount <= 0) {
-        toast.error("Please enter a payment amount");
+      if (!selectedParty) {
+        throw new Error("Please select a party");
+      }
+      if (data?.paymentAmount <= 0) {
         paymentAmountRef.current.style.outlineColor = "red";
         paymentAmountRef.current.style.borderColor = "red";
         paymentAmountRef.current.focus();
-        return;
+        throw new Error("Please enter a payment amount");
       }
-      if (!selectedParty) {
-        toast.error("Please enter a payment amount");
-        return;
-      }
-
-      console.log(data);
-      // const res = await axiosInstance.post("/payment-in", data);
-      // return res.data;
+      const res = await axiosInstance.post(
+        `/payment-in/${business?._id}`,
+        data
+      );
+      return res.data;
     },
     onSuccess: (data) => {
       if (data.success) {
         toast.success(data.msg);
       }
       setParty(data);
-      queryClient.invalidateQueries({ queryKey: ["payment", "invoices"] });
+      queryClient.invalidateQueries({ queryKey: ["paymentIns", "invoices"] });
     },
     onError: (err) => {
-      toast.error(err.response.data.msg || err.response.data.err);
+      toast.error(err?.response?.data?.msg || err?.message);
     },
   });
 
@@ -133,9 +135,9 @@ const PaymentInForm = () => {
             <button className="btn btn-soft btn-sm mr-2">Cancel</button>
             <button
               className={`btn btn-sm bg-[var(--primary-btn)] ${
-                mutation.isPending && ""
+                mutation?.isPending && ""
               } `}
-              disabled={mutation.isPending}
+              disabled={mutation?.isPending}
               onClick={() => mutation.mutate(data)}
             >
               {mutation.isPending ? (
@@ -202,7 +204,7 @@ const PaymentInForm = () => {
             <div className="flex items-center justify-center gap-3 ">
               <div className="flex flex-col w-full">
                 <label className="text-zinc-500">Payment Date</label>
-                <input type="date" className="input input-sm mt-2 " />
+                <input type="date" className="input input-sm mt-2" />
               </div>
               <div className="flex flex-col w-full">
                 <label className="text-zinc-500">Payment Mode</label>

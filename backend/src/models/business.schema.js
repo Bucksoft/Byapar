@@ -49,7 +49,6 @@ const businessSchema = new mongoose.Schema({
   },
   panNumber: {
     type: String,
-    required: [true, "PAN number is required"],
   },
   TDS: {
     type: Boolean,
@@ -68,6 +67,11 @@ const businessSchema = new mongoose.Schema({
   clientId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "UserCredential",
+  },
+  status: {
+    type: String,
+    enum: ["active", "inactive"],
+    default: "inactive",
   },
 });
 

@@ -10,6 +10,7 @@ import { usePartyStore } from "../store/partyStore";
 import { queryClient } from "../main";
 import { motion } from "framer-motion";
 import { useBusinessStore } from "../store/businessStore";
+import BankAccountPopup from "../components/BankAccountPopup";
 
 const DashboardAddPartyPage = () => {
   const navigate = useNavigate();
@@ -34,9 +35,8 @@ const DashboardAddPartyPage = () => {
     creditPeriod: null,
     creditLimit: null,
     pincode: "",
+    businessId: business?._id,
   });
-
-  console.log("CURRENT BUSINESS", business);
 
   // handling the input field changes
   const handleInputChange = (e) => {
@@ -288,7 +288,7 @@ const DashboardAddPartyPage = () => {
                 Party Category
               </label>
 
-              <details className="dropdown mt-1">
+              <details className="dropdown mt-1 z-10">
                 <summary className="select select-sm">Party Category</summary>
                 <ul className="menu dropdown-content bg-base-100 rounded-box  w-52 p-2 shadow-sm">
                   <button
@@ -498,9 +498,7 @@ const DashboardAddPartyPage = () => {
         <section className="flex flex-col py-16 items-center justify-center bg-white gap-4 text-xs">
           <Landmark size={30} />
           <p>Add party bank information to manage transactions</p>
-          <button className="btn btn-ghost text-[var(--primary-btn)] ">
-            + Add Bank Account
-          </button>
+          <BankAccountPopup partyName={data?.partyName} />
         </section>
         {addCategoryPopup && (
           <>
@@ -528,6 +526,7 @@ const DashboardAddPartyPage = () => {
                   placeholder="Ex: Electronics"
                   disabled={mutation.isPending}
                   value={data.categoryName}
+                  name="categoryName"
                   onChange={handleInputChange}
                 />
 

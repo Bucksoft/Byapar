@@ -17,12 +17,14 @@ import { BsTrash3 } from "react-icons/bs";
 import { useInvoiceStore } from "../store/invoicesStore";
 import { useEffect, useState } from "react";
 import toast from "react-hot-toast";
+import { useBusinessStore } from "../store/businessStore";
 
 const DashboardSalesPage = () => {
   const { setInvoices } = useInvoiceStore();
   const [showDeletePopup, setShowDeletePopup] = useState(false);
   const [invoiceId, setInvoiceId] = useState();
   const [searchQuery, setSearchQuery] = useState("");
+  const { business } = useBusinessStore();
   const navigate = useNavigate();
 
   // to get all the invoices
@@ -33,7 +35,7 @@ const DashboardSalesPage = () => {
   } = useQuery({
     queryKey: ["invoices"],
     queryFn: async () => {
-      const res = await axiosInstance.get("/sales-invoice");
+      const res = await axiosInstance.get(`/sales-invoice/${business?._id}`);
       return res.data?.invoices;
     },
   });

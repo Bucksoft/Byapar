@@ -10,7 +10,7 @@ export const queryClient = new QueryClient();
 createRoot(document.getElementById("root")).render(
   <QueryClientProvider client={queryClient}>
     <BrowserRouter>
-      <Toaster position="top-right" />
+      <Toaster position="top-left" />
       <App />
     </BrowserRouter>
   </QueryClientProvider>

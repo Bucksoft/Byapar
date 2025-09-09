@@ -21,9 +21,11 @@ import CustomLoader from "../components/Loader";
 import { usePartyStore } from "../store/partyStore";
 import toast from "react-hot-toast";
 import { queryClient } from "../main.jsx";
+import { useBusinessStore } from "../store/businessStore.js";
 
 const DashboardPartiesPage = () => {
   const [searchQuery, setSearchQuery] = useState("");
+  const { business } = useBusinessStore();
   const { setParties } = usePartyStore();
   const navigate = useNavigate();
 
@@ -39,11 +41,11 @@ const DashboardPartiesPage = () => {
     },
   });
 
-  // FETCHING ALL PARTIES
+  // FETCHING ALL PARTIES OF A PARTICULAR BUSINESS
   const { isLoading, data } = useQuery({
     queryKey: ["parties"],
     queryFn: async () => {
-      const res = await axiosInstance.get("/parties/all");
+      const res = await axiosInstance.get(`/parties/all/${business?._id}`);
       setParties(res.data);
       return res.data;
     },

@@ -3,7 +3,6 @@ import { Item } from "../models/item.schema.js";
 
 export async function createItem(req, res) {
   try {
-    console.log("REQUEST BODY ", req.body.data);
     // get and parse the data
     const parsedData = itemSchema.safeParse(req.body.data);
     if (!parsedData.success) {
@@ -28,8 +27,11 @@ export async function createItem(req, res) {
     }
 
     // create a new item
-    console.log("PARSED DATA ", parsedData);
-    const newItem = await Item.create(parsedData.data);
+    const newItem = await Item.create({
+      ...parsedData.data,
+      businessId: req.params?.id,
+      clientId: req.user?.id,
+    });
 
     // return success response
     return res
@@ -128,7 +130,7 @@ export async function getItem(req, res) {
 
 export async function getAllItems(req, res) {
   try {
-    const items = await Item.find();
+    const items = await Item.find({ businessId: req.params?.id });
     if (!items) {
       return res.status(400).json({ success: true, msg: "Item not found" });
     }

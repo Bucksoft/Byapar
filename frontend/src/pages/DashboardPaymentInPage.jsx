@@ -10,16 +10,18 @@ import { SquarePen, Trash2 } from "lucide-react";
 import CustomLoader from "../components/Loader";
 import { useNavigate } from "react-router-dom";
 import { usePaymentInStore } from "../store/paymentInStore";
+import { useBusinessStore } from "../store/businessStore";
 
 const DashboardPaymentInPage = () => {
   const [page, setPage] = useState("");
   const navigate = useNavigate();
   const { setPaymentIns } = usePaymentInStore();
+  const { business } = useBusinessStore();
 
   const { isLoading, data: paymentIns } = useQuery({
     queryKey: ["paymentIns"],
     queryFn: async () => {
-      const res = await axiosInstance.get("/payment-in");
+      const res = await axiosInstance.get(`/payment-in/all/${business?._id}`);
       setPaymentIns(res.data.paymentIns);
       return res.data.paymentIns;
     },
@@ -63,7 +65,9 @@ const DashboardPaymentInPage = () => {
                     >
                       <td>{paymentIn?.paymentDate.split("T")[0]}</td>
                       <td>{paymentIn?.paymentInNumber || "-"}</td>
-                      <td className="text-center">{paymentIn?.partyName || "-"}</td>
+                      <td className="text-center">
+                        {paymentIn?.partyName || "-"}
+                      </td>
                       <td>
                         <div className="flex items-center justify-end">
                           <LiaRupeeSignSolid />

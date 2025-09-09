@@ -33,7 +33,11 @@ export async function createParty(req, res) {
     }
 
     // 4. STORE DATA IN DATABASE
-    const party = await Party.create(req.body);
+    const party = await Party.create({
+      ...validaionResult.data,
+      businessId: req.body?.businessId,
+      clientId: req.user?.id,
+    });
     // ------> FAILED TO STORE DATA IN DATABASE
     if (!party) {
       return res
@@ -54,8 +58,10 @@ export async function createParty(req, res) {
 // get All parties
 export async function getAllParties(req, res) {
   try {
-    // FETCH THE DETAILS OF THE PARTIES
-    const parties = await Party.find();
+    // FETCH THE BUSINESS ID
+    const id = req.params?.id;
+    // FETCH THE DETAILS OF THE PARTIES OF A PARTICULAR BUSINESS
+    const parties = await Party.find({ businessId: id });
     //  GIVE A PROPER RESPONSE IF THERE ARE NO PARTIES
     if (!parties) {
       return res.status(400).json({ success: false, msg: "Parties not found" });

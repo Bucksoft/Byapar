@@ -19,7 +19,8 @@ const SalesInvoice = () => {
   // THIS IS THE QUERY TO GET THE INVOICE BASED ON ID
   const { isLoading, data: invoice } = useQuery({
     queryFn: async () => {
-      const res = await axiosInstance.get(`/sales-invoice/${id}`);
+      const res = await axiosInstance.get(`/sales-invoice/invoice/${id}`);
+      console.log(res);
       return res.data?.invoice;
     },
   });

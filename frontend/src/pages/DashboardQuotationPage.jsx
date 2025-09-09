@@ -5,13 +5,14 @@ import { useQuery } from "@tanstack/react-query";
 import { axiosInstance } from "../config/axios";
 import CustomLoader from "../components/Loader";
 import { LiaRupeeSignSolid } from "react-icons/lia";
+import { useBusinessStore } from "../store/businessStore";
 
 const DashboardQuotationPage = () => {
+  const { business } = useBusinessStore();
   const { isLoading, data: quotations = [] } = useQuery({
     queryKey: ["quotations"],
     queryFn: async () => {
-      const res = await axiosInstance.get(`/quotation`);
-      // Ensure we always return an array
+      const res = await axiosInstance.get(`/quotation/all/${business?._id}`);
       return Array.isArray(res.data.quotations) ? res.data.quotations : [];
     },
   });
@@ -30,7 +31,7 @@ const DashboardQuotationPage = () => {
           {/* table */}
           <div className="mt-5 h-80 rounded-md mx-4">
             {isLoading ? (
-              <div className="flex items-center">
+              <div className="flex justify-center py-16">
                 <CustomLoader text={"Loading..."} />
               </div>
             ) : quotations.length > 0 ? (

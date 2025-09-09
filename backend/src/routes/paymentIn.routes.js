@@ -8,8 +8,8 @@ import {
 import { isAuth } from "../middleware/auth.middleware.js";
 
 const router = express.Router();
-router.post("/", isAuth, createPaymentIn);
-router.get("/", isAuth, getAllPaymentInDetails);
+router.get("/all/:id", isAuth, getAllPaymentInDetails);
+router.post("/:id", isAuth, createPaymentIn);
 router.get("/:id", isAuth, getSinglePaymentInDetail);
 router.delete("/:id", isAuth, deletePaymentIn);
 

@@ -38,6 +38,8 @@ export async function createQuotation(req, res) {
       ...data,
       quotationNumber: data?.salesInvoiceNumber,
       quotationDate: data?.salesInvoiceDate,
+      businessId: req.params?.id,
+      clientId: req.user?.id,
     });
 
     if (!quotation) {
@@ -84,7 +86,9 @@ export async function getQuotationById(req, res) {
 
 export async function getAllQuotations(req, res) {
   try {
-    const quotations = await Quotation.find().populate("partyId");
+    const quotations = await Quotation.find({
+      businessId: req.params?.id,
+    }).populate("partyId");
     if (!quotations) {
       return res
         .status(400)

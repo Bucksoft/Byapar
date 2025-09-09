@@ -38,6 +38,14 @@ const salesInvoiceSchema = new mongoose.Schema(
     pendingAmount: {
       type: Number,
     },
+    businessId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Business",
+    },
+    clientId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "UserCredential",
+    },
     status: {
       type: String,
       enum: ["paid", "unpaid"],

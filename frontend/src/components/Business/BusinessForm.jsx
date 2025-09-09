@@ -499,6 +499,7 @@ const BusinessForm = () => {
                 onChange={handleInputChange}
                 className="select select-sm "
               >
+                <option className="hidden">Retailer</option>
                 <option>Retailer</option>
                 <option>Wholesaler</option>
                 <option>Distributor</option>
@@ -521,6 +522,9 @@ const BusinessForm = () => {
                 onChange={handleInputChange}
                 className="select select-sm mt-[15.5px]"
               >
+                <option className="hidden">
+                  Accounting and Financial Services
+                </option>
                 <option>Accounting and Financial Services</option>
                 <option>Agriculture</option>
                 <option>Automobile</option>
@@ -549,6 +553,7 @@ const BusinessForm = () => {
               onChange={handleInputChange}
               className="select select-sm "
             >
+              <option className="hidden">Private Limited Company</option>
               <option>Private Limited Company</option>
               <option>Public Limited Company</option>
               <option>Partnerships Films</option>

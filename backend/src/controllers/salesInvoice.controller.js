@@ -36,6 +36,8 @@ export async function createSalesInvoice(req, res) {
 
     const salesInvoice = await SalesInvoice.create({
       partyId: party?._id,
+      businessId: req.params?.id,
+      clientId: req.user?.id,
       ...data,
     });
 
@@ -59,7 +61,7 @@ export async function createSalesInvoice(req, res) {
 
 export async function getAllInvoices(req, res) {
   try {
-    const invoices = await SalesInvoice.find()
+    const invoices = await SalesInvoice.find({ businessId: req.params?.id })
       .populate("partyId")
       .sort("salesInvoiceDate");
     if (!invoices) {

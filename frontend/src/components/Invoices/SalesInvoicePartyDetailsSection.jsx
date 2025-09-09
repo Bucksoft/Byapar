@@ -20,7 +20,7 @@ const SalesInvoicePartyDetailsSection = ({
   const [showPartyInvoicePopup, setShowPartyInvoicePopup] = useState(false);
 
   const { parties } = usePartyStore();
-  const { invoices } = useInvoiceStore();
+  const { invoices } = useInvoiceStore(); // FOR SALES RETURN
 
   const searchedParties = parties?.filter((party) =>
     party?.partyName.toLowerCase().includes(searchPartyQuery.toLowerCase())
@@ -99,7 +99,10 @@ const SalesInvoicePartyDetailsSection = ({
         <div className="border-t border-r border-zinc-300 ">
           <div className="bg-red flex items-center justify-between p-2 border-b border-b-zinc-300">
             <span className="text-xs">
-              Ship {title === "Sales Return" ? "From" : "To"}
+              Ship{" "}
+              {title === "Sales Return" || title === "Credit Note"
+                ? "From"
+                : "To"}
             </span>
             <button className="btn btn-xs text-xxs border">
               Change Shipping Address
@@ -167,7 +170,8 @@ const SalesInvoicePartyDetailsSection = ({
                       className="text-gray-500 absolute top-0 right-[57px]"
                     />
                   </div>
-                  <div className="px-2 bg-pink-400 py-4 flex space-x-2 border border-dashed w-fit m-2 rounded-md">
+                  <div className="px-2 py-4 flex space-x-2 border border-dashed w-fit m-2 rounded-md ">
+                    {/* Payment Terms */}
                     <div>
                       <p className="text-xs pb-2">Payment Terms: </p>
                       <div className="relative rounded-sm">
@@ -175,20 +179,29 @@ const SalesInvoicePartyDetailsSection = ({
                           type="number"
                           placeholder="0"
                           value={data.paymentTerms}
-                          onChange={(e) =>
+                          onChange={(e) => {
+                            const days = Number(e.target.value);
+
+                            // calculate new due date = today + days
+                            const newDate = new Date();
+                            newDate.setDate(newDate.getDate() + days);
+
                             setData((prev) => ({
                               ...prev,
-                              paymentTerms: Number(e.target.value),
-                            }))
-                          }
+                              paymentTerms: days,
+                              dueDate: newDate.toISOString().split("T")[0], // yyyy-mm-dd format
+                            }));
+                          }}
                           name="paymentTerms"
                           className="input input-xs w-30"
                         />
-                        <span className="text-xs absolute z-50 left-[84px] top-1 bg-zinc-200">
+                        <span className="text-xs absolute z-50 left-21 top-1 bg-zinc-200 ">
                           Days
                         </span>
                       </div>
                     </div>
+
+                    {/* Due Date */}
                     <div>
                       <p className="text-xs pb-2">Due Date: </p>
                       <input
@@ -196,7 +209,12 @@ const SalesInvoicePartyDetailsSection = ({
                         value={
                           data.dueDate || new Date().toISOString().split("T")[0]
                         }
-                        onChange={handleInputChange}
+                        onChange={(e) =>
+                          setData((prev) => ({
+                            ...prev,
+                            dueDate: e.target.value,
+                          }))
+                        }
                         name="dueDate"
                         className="input input-xs border-none bg-zinc-200 w-30"
                       />
@@ -206,8 +224,60 @@ const SalesInvoicePartyDetailsSection = ({
               )}
             </>
           ) : title === "Quotation" ? (
-            <>{/* Validity date code comes here */}</>
-          ) : title === "Sales Return" ? (
+            <>
+              {" "}
+              <div className="px-2 py-4 flex space-x-2 border border-dashed w-fit m-2 rounded-md ">
+                {/* Valid For */}
+                <div>
+                  <p className="text-xs pb-2">Valid For: </p>
+                  <div className="relative rounded-sm">
+                    <input
+                      type="number"
+                      placeholder="0"
+                      value={data?.validFor}
+                      onChange={(e) => {
+                        const days = Number(e.target.value);
+
+                        const newDate = new Date();
+                        newDate.setDate(newDate.getDate() + days);
+
+                        setData((prev) => ({
+                          ...prev,
+                          validFor: days,
+                          validityDate: newDate.toISOString().split("T")[0], // yyyy-mm-dd format
+                        }));
+                      }}
+                      name="validFor"
+                      className="input input-xs w-30"
+                    />
+                    <span className="text-xs absolute z-50 left-21 top-1 bg-zinc-200 ">
+                      Days
+                    </span>
+                  </div>
+                </div>
+
+                {/* Validity Date */}
+                <div>
+                  <p className="text-xs pb-2">Validity Date: </p>
+                  <input
+                    type="date"
+                    value={
+                      data?.validityDate ||
+                      new Date().toISOString().split("T")[0]
+                    }
+                    onChange={(e) =>
+                      setData((prev) => ({
+                        ...prev,
+                        validityDate: e.target.value,
+                      }))
+                    }
+                    name="validityDate"
+                    className="input input-xs border-none bg-zinc-200 w-30"
+                  />
+                </div>
+              </div>
+            </>
+          ) : title === "Sales Return" || title === "Credit Note" ? (
             <>
               <div className="px-2 flex flex-col w-full relative">
                 <small>

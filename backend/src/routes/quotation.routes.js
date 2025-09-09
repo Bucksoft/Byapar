@@ -8,8 +8,8 @@ import {
 
 const router = express.Router();
 
-router.route("/").post(isAuth, createQuotation);
+router.route("/:id").post(isAuth, createQuotation);
 router.route("/:id").get(isAuth, getQuotationById);
-router.route("/").get(isAuth, getAllQuotations);
+router.route("/all/:id").get(isAuth, getAllQuotations);
 
 export default router;

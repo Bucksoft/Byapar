@@ -166,3 +166,56 @@ export async function deleteBusiness(req, res) {
       .json({ success: false, msg: "Internal server error" });
   }
 }
+
+export async function getAllBusinesses(req, res) {
+  try {
+    const businesses = await Business.find({
+      clientId: req?.user?.id,
+    });
+    if (!businesses) {
+      return res
+        .status(400)
+        .json({ success: false, msg: "Businesses not found" });
+    }
+    return res.status(200).json({ success: true, businesses });
+  } catch (error) {
+    console.log("Error in getting my businesses details", error);
+    return res
+      .status(500)
+      .json({ success: false, msg: "Internal server error" });
+  }
+}
+
+export async function markBusinessAsActive(req, res) {
+  try {
+    const { id, status } = req.body;
+    if (!id) {
+      return res
+        .status(400)
+        .json({ success: false, msg: "Please provide business ID" });
+    }
+
+    // QUERY TO MARK THE STATUS OF THE BUSINESS AS ACTIVE AND REST AS INACTIVE
+    await Business.updateMany({}, { status: "inactive" });
+    const updatedBusiness = await Business.findByIdAndUpdate(
+      id,
+      {
+        status: status || "active",
+      },
+      { new: true }
+    );
+    if (!updatedBusiness) {
+      return res
+        .status(400)
+        .json({ success: false, msg: "Failed to mark as active" });
+    }
+    return res
+      .status(200)
+      .json({ success: true, msg: "Set as active", updatedBusiness });
+  } catch (error) {
+    console.log("Error in setting active business", error);
+    return res
+      .status(500)
+      .json({ success: false, msg: "Internal server error" });
+  }
+}

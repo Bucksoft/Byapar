@@ -1,0 +1,195 @@
+import { useMutation, useQuery } from "@tanstack/react-query";
+import { axiosInstance } from "../config/axios";
+import CustomLoader from "../components/Loader";
+import { useBusinessStore } from "../store/businessStore";
+import { IoBusinessSharp, IoLocationSharp } from "react-icons/io5";
+import { IoMdCheckmarkCircleOutline } from "react-icons/io";
+import { BiTrash } from "react-icons/bi";
+import { PenSquare, Plus } from "lucide-react";
+import { useNavigate } from "react-router-dom";
+import toast from "react-hot-toast";
+import { useState } from "react";
+
+const DashboardMyBusinesses = () => {
+  const {
+    setBusinesses,
+    setBusiness,
+    business: currentlyActiveBusiness,
+  } = useBusinessStore();
+  const [activeBusinessId, setActiveBusinessId] = useState();
+
+  const navigate = useNavigate();
+  const { isLoading, data: businesses } = useQuery({
+    queryKey: ["business"],
+    queryFn: async () => {
+      const res = await axiosInstance.get("/business");
+      console.log(res);
+      setBusinesses(res.data?.businesses);
+      return res.data?.businesses;
+    },
+  });
+
+  // handle active business
+  const mutation = useMutation({
+    mutationFn: async (data) => {
+      const res = await axiosInstance.patch("/business/active", data);
+      setBusiness(res.data?.updatedBusiness);
+      return res.data;
+    },
+    onSuccess: (data) => {
+      toast.success(data?.msg);
+    },
+  });
+
+  return (
+    <main className="h-full p-2">
+      <div className="h-full w-full bg-white rounded-lg p-3">
+        <div className="flex items-center justify-between">
+          <h1 className="font-semibold">My Businesses</h1>
+          <button
+            onClick={() => navigate("/dashboard/business")}
+            className="btn btn-sm bg-[var(--primary-btn)]"
+          >
+            {" "}
+            <Plus size={15} /> Create new business
+          </button>
+        </div>
+
+        {/* Businesses Cards */}
+        {isLoading ? (
+          <div className="w-full flex justify-center py-16">
+            <CustomLoader text={"Loading..."} />
+          </div>
+        ) : (
+          <section className="grid grid-cols-3 gap-3 py-8">
+            {businesses &&
+              businesses.map((business) => (
+                <div
+                  key={business?._id}
+                  className="card w-96 bg-base-100 card-md shadow-lg border-l-4 border-l-info"
+                >
+                  <div className="card-body">
+                    <div className="flex items-center gap-3">
+                      {/* Business Logo */}
+                      {/* <img src={business?.logo} alt="logo" loading="lazy" /> */}
+                      <span className="bg-success/10 p-3 rounded-md">
+                        <IoBusinessSharp size={16} className="text-success" />
+                      </span>
+
+                      <div className="leading-4 flex-1">
+                        <h2 className="card-title">{business?.businessName}</h2>
+                        <small className="text-zinc-500">
+                          {business?.businessRegType}
+                        </small>
+                      </div>
+
+                      <div className="badge badge-soft badge-xs badge-warning">
+                        {business?.businessType}
+                      </div>
+                    </div>
+
+                    {/* Displaying city and state */}
+                    <p className="flex items-center gap-1 mt-2 text-zinc-700 text-xs">
+                      <IoLocationSharp />
+                      {business?.city}, {business?.state}
+                    </p>
+
+                    {/* Business Details */}
+                    <h3 className="text-zinc-700 font-semibold mt-3">
+                      Business Details :
+                    </h3>
+                    <div className="grid grid-cols-2 gap-2 min-h-[120px]">
+                      <p className="text-xs mt-1 p-2 bg-white border border-zinc-200 rounded-lg inset-shadow-2xs shadow-lg hover:scale-105 transition-all">
+                        <span className="text-zinc-500 font-medium">
+                          Company email
+                        </span>
+                        <br /> {business?.companyEmail}
+                      </p>
+
+                      <p className="text-xs mt-1 p-2 bg-white border border-zinc-200 rounded-lg inset-shadow-2xs shadow-lg hover:scale-105 transition-all">
+                        <span className="text-zinc-500 font-medium">
+                          Company Phone number
+                        </span>
+                        <br /> {business?.companyPhoneNo}
+                      </p>
+
+                      {/* GST number */}
+                      <p className="text-xs mt-1 p-2 bg-white border border-zinc-200 rounded-lg inset-shadow-2xs shadow-lg hover:scale-105 transition-all">
+                        {business?.gstNumber ? (
+                          <>
+                            <span className="text-zinc-500 font-medium">
+                              GST number
+                            </span>
+                            <br /> {business?.gstNumber}
+                          </>
+                        ) : (
+                          <span className="text-zinc-400 italic">
+                            GST number not available
+                          </span>
+                        )}
+                      </p>
+
+                      {/* PAN number */}
+                      <p className="text-xs mt-1 p-2 bg-white border border-zinc-200 rounded-lg inset-shadow-2xs shadow-lg hover:scale-105 transition-all">
+                        {business?.panNumber ? (
+                          <>
+                            <span className="text-zinc-500 font-medium">
+                              PAN number
+                            </span>
+                            <br /> {business?.panNumber}
+                          </>
+                        ) : (
+                          <span className="text-zinc-400 italic">
+                            PAN number not available
+                          </span>
+                        )}
+                      </p>
+                    </div>
+
+                    {/* Actions */}
+                    <div className="justify-end card-actions mt-5">
+                      <button className="btn btn-success btn-soft btn-xs">
+                        <PenSquare size={15} /> Edit
+                      </button>
+                      <button className="btn btn-error btn-soft btn-xs">
+                        <BiTrash size={15} /> Delete
+                      </button>
+                      <button
+                        onClick={() => {
+                          setActiveBusinessId(business?._id);
+                          mutation.mutate({
+                            id: business?._id,
+                            status: "active",
+                          });
+                        }}
+                        className={`btn btn-info  btn-xs ${
+                          currentlyActiveBusiness?._id === business?._id
+                            ? ""
+                            : "btn-soft"
+                        }  `}
+                        disabled={mutation?.isPending}
+                      >
+                        {mutation?.isPending &&
+                        business?._id === activeBusinessId ? (
+                          <CustomLoader text={"Loading..."} />
+                        ) : (
+                          <>
+                            <IoMdCheckmarkCircleOutline size={15} />
+                            {currentlyActiveBusiness?._id === business?._id
+                              ? "Active"
+                              : "Mark as active"}
+                          </>
+                        )}
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              ))}
+          </section>
+        )}
+      </div>
+    </main>
+  );
+};
+
+export default DashboardMyBusinesses;

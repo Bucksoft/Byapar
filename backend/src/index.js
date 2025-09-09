@@ -10,6 +10,7 @@ import itemRoutes from "./routes/item.route.js";
 import salesRoutes from "./routes/salesInvoice.routes.js";
 import pdfRoutes from "./routes/pdf.routes.js";
 import quotationRoutes from "./routes/quotation.routes.js";
+import salesReturnRoutes from "./routes/salesReturn.routes.js";
 import { loginViaGoogleCallback } from "./controllers/user.controller.js";
 import cookieParser from "cookie-parser";
 import path from "path";
@@ -40,6 +41,7 @@ app.use("/api/v1/payment-in", paymentInRoutes);
 app.use("/api/v1/sales-invoice", salesRoutes);
 app.use("/api/v1/generate-pdf", pdfRoutes);
 app.use("/api/v1/quotation", quotationRoutes);
+app.use("/api/v1/sales-return", salesReturnRoutes);
 
 // const __dirname = path.resolve();
 // app.use(express.static(path.join(__dirname, "../frontend/dist")));
