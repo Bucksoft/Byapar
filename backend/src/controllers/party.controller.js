@@ -24,37 +24,15 @@ export async function createParty(req, res) {
       });
     }
 
-    const { email, GSTIN, PANno } = data;
+    const { partyName, PANno } = data;
 
-    // 3. CHECK IF PARTY ALREADY EXISTS BY EMAIL
-    const partyExists = await Party.findOne({ email });
+    // 3. CHECK IF PARTY ALREADY EXISTS BY PARTY NAME
+    const partyExists = await Party.findOne({ partyName });
     if (partyExists) {
       return res.status(400).json({
         success: false,
-        msg: `Party with email "${email}" already exists`,
+        msg: `Party already exists. Please provide another name`,
       });
-    }
-
-    // 4. CHECK IF GSTIN already exists
-    if (GSTIN) {
-      const gstinExists = await Party.findOne({ GSTIN });
-      if (gstinExists) {
-        return res.status(400).json({
-          success: false,
-          msg: `GSTIN "${GSTIN}" already exists`,
-        });
-      }
-    }
-
-    // 5. CHECK IF PAN already exists
-    if (PANno) {
-      const panExists = await Party.findOne({ PANno });
-      if (panExists) {
-        return res.status(400).json({
-          success: false,
-          msg: `PAN "${PANno}" already exists`,
-        });
-      }
     }
 
     // 6. STORE DATA IN DATABASE
