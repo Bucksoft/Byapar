@@ -7,8 +7,6 @@ const salesInvoiceSchema = new mongoose.Schema(
     salesInvoiceDate: { type: Date, default: Date.now },
     paymentTerms: { type: Number },
     dueDate: { type: Date, default: Date.now },
-
-    // items can have ANY shape (arbitrary fields allowed)
     items: [
       {
         type: mongoose.Schema.Types.Mixed,
@@ -16,7 +14,6 @@ const salesInvoiceSchema = new mongoose.Schema(
         required: true,
       },
     ],
-
     amountSubTotal: { type: Number, required: true },
     discountSubtotal: { type: Number, default: 0 },
     discountAmount: { type: Number, default: 0 },
@@ -27,7 +24,6 @@ const salesInvoiceSchema = new mongoose.Schema(
     cgst: String,
     totalAmount: { type: Number, required: true },
     balanceAmount: { type: Number, required: true },
-
     partyId: { type: mongoose.Schema.Types.ObjectId, ref: "Party" },
     notes: { type: String, default: "" },
     termsAndCondition: { type: String, default: "" },
@@ -48,7 +44,7 @@ const salesInvoiceSchema = new mongoose.Schema(
     },
     status: {
       type: String,
-      enum: ["paid", "unpaid"],
+      enum: ["paid", "unpaid", "draft", "partially paid", "cancelled"],
       default: "unpaid",
     },
   },

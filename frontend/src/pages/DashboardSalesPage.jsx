@@ -48,6 +48,7 @@ const DashboardSalesPage = () => {
     },
     onSuccess: (data) => {
       toast.success(data?.msg);
+      document.getElementById("my_modal_2").close();
       queryClient.invalidateQueries({ queryKey: ["invoices"] });
     },
   });
@@ -192,9 +193,9 @@ const DashboardSalesPage = () => {
                 {(searchedInvoices || invoices).map((invoice) => (
                   <tr
                     key={invoice?._id}
-                    onClick={() =>
-                      navigate(`/dashboard/sales-invoice/${invoice?._id}`)
-                    }
+                    onClick={(e) => {
+                      navigate(`/dashboard/sales-invoice/${invoice?._id}`);
+                    }}
                     className="cursor-pointer"
                   >
                     <td>{invoice?.salesInvoiceDate.split("T")[0]}</td>
@@ -216,18 +217,20 @@ const DashboardSalesPage = () => {
                         Unpaid
                       </p>
                     </td>
-                    <td>
+                    <td onClick={(e) => e.stopPropagation()}>
                       <div className="dropdown dropdown-end">
                         <div
                           tabIndex={0}
                           role="button"
                           className="btn m-1 btn-xs"
+                          onClick={(e) => e.stopPropagation()}
                         >
                           <EllipsisVertical size={13} />
                         </div>
                         <ul
                           tabIndex={0}
                           className="dropdown-content menu bg-base-100 rounded-box z-10 w-52 p-2 shadow-sm"
+                          onClick={(e) => e.stopPropagation()}
                         >
                           <li>
                             <a>

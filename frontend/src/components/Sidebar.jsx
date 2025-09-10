@@ -93,11 +93,16 @@ const Sidebar = () => {
               />
             </div>
           </div>
-          <p className="font-medium text-xs">
-            {business?.companyEmail ||
-              business?.businessName ||
-              "Business name"}
-          </p>
+          <div>
+            <p className="font-medium text-sm">
+              {business?.companyEmail ||
+                business?.businessName ||
+                "Business name"}
+            </p>
+            <small className="text-xs text-neutral-500">
+              {business?.companyPhoneNo}
+            </small>
+          </div>
         </div>
 
         <div className="py-2 border-b border-zinc-800">

@@ -10,8 +10,6 @@ const SalesInvoiceFooterSection = ({ data, setData, title }) => {
   const [selectCheckBox, setSelectCheckBox] = useState(false);
   const [markAsPaid, setMarkedAsPaid] = useState(false);
 
-  
-
   return (
     <div className="grid grid-cols-2 w-full ">
       {/* left grid part */}
@@ -232,18 +230,18 @@ const SalesInvoiceFooterSection = ({ data, setData, title }) => {
             {!selectCheckBox && (
               <div className="relative">
                 <select
-                  defaultValue="Discount After Tax"
-                  className="select w-fit select-xs"
+                  defaultValue=""
+                  className="select w-fit select-xs bg-zinc-100"
                 >
                   <option>+Add</option>
                   <option>-Reduce</option>
                 </select>
-                <span className="absolute top-0 right-44 z-90 px-1 pt-1 text-xs">
+                <span className="absolute top-[1px] right-51 z-90 px-1 pt-1 text-xs">
                   ₹
                 </span>
                 <input
                   type="text"
-                  className="input input-xs border-none w-fit text-xs bg-zinc-200 mr-2 items-center px-5"
+                  className="input input-xs  w-fit text-xs  mr-2 items-center px-5"
                 />
               </div>
             )}

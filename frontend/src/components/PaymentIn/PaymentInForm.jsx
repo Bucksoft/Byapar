@@ -9,6 +9,7 @@ import CustomLoader from "../../components/Loader";
 import toast from "react-hot-toast";
 import { useBusinessStore } from "../../store/businessStore";
 import { axiosInstance } from "../../config/axios";
+import { queryClient } from "../../main";
 
 const PaymentInForm = () => {
   const [settledInvoices, setSettledInvoices] = useState({});
@@ -92,9 +93,7 @@ const PaymentInForm = () => {
       return res.data;
     },
     onSuccess: (data) => {
-      if (data.success) {
-        toast.success(data.msg);
-      }
+      toast.success(data.msg);
       setParty(data);
       queryClient.invalidateQueries({ queryKey: ["paymentIns", "invoices"] });
     },

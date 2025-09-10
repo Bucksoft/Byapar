@@ -32,10 +32,10 @@ export async function createQuotation(req, res) {
         msg: "Invoice already exists with this invoice number",
       });
     }
-
+    const { salesInvoiceNumber, salesInvoiceDate, ...cleanData } = data;
     const quotation = await Quotation.create({
       partyId: party?._id,
-      ...data,
+      ...cleanData,
       quotationNumber: data?.salesInvoiceNumber,
       quotationDate: data?.salesInvoiceDate,
       businessId: req.params?.id,
@@ -87,7 +87,14 @@ export async function getQuotationById(req, res) {
 export async function getAllQuotations(req, res) {
   try {
     const quotations = await Quotation.find({
-      businessId: req.params?.id,
+      $and: [
+        {
+          businessId: req.params?.id,
+        },
+        {
+          clientId: req.user?.id,
+        },
+      ],
     }).populate("partyId");
     if (!quotations) {
       return res

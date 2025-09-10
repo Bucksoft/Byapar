@@ -142,28 +142,37 @@ export async function deleteBusiness(req, res) {
   try {
     const { id } = req.params;
     if (!id) {
-      return res
-        .status(400)
-        .json({ success: false, msg: "Please provide business ID" });
+      return res.status(400).json({
+        success: false,
+        msg: "Please provide business ID",
+      });
     }
 
-    // FIND THE BUSINESS BASED ON THE ID AND DELETE IT
-    const business = await Business.findByIdAndDelete(id);
+    const business = await Business.findOneAndDelete({
+      _id: id,
+      clientId: req.user?.id,
+    });
+
     if (!business) {
-      return res
-        .status(400)
-        .json({ success: false, msg: "Business could not be deleted" });
+      return res.status(404).json({
+        success: false,
+        msg: "Business not found or you don't have permission to delete it",
+      });
     }
 
-    // RETURN SUCCESS RESPONSE
-    return res
-      .status(200)
-      .json({ success: true, msg: "Business deleted", business });
+    // SUCCESS RESPONSE
+    return res.status(200).json({
+      success: true,
+      msg: "Business deleted successfully",
+      business,
+    });
   } catch (error) {
     console.log("Error in deleting business details", error);
-    return res
-      .status(500)
-      .json({ success: false, msg: "Internal server error" });
+    return res.status(500).json({
+      success: false,
+      msg: "Internal server error",
+      error: error.message,
+    });
   }
 }
 

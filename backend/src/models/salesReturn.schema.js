@@ -42,10 +42,23 @@ const salesReturnSchema = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: "Business",
     },
+    clientId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "UserCredential",
+    },
     status: {
       type: String,
-      enum: ["paid", "unpaid"],
-      default: "unpaid",
+      enum: [
+        "draft",
+        "approved",
+        "partially settled",
+        "settled",
+        "cancelled",
+        "refunded",
+        "unpaid",
+        "paid",
+      ],
+      default: "refunded",
     },
     invoiceId: {
       type: mongoose.Schema.Types.ObjectId,

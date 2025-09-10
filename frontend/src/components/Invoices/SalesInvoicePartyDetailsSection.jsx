@@ -12,6 +12,7 @@ const SalesInvoicePartyDetailsSection = ({
   setData,
   party,
   setParty,
+  invoiceNoRef,
 }) => {
   const [searchPartyQuery, setSearchPartyQuery] = useState("");
   const [invoiceSearchQuery, setInvoiceSearchQuery] = useState("");
@@ -126,6 +127,7 @@ const SalesInvoicePartyDetailsSection = ({
                 type="number"
                 placeholder="1"
                 value={data?.salesInvoiceNumber}
+                ref={invoiceNoRef}
                 name="salesInvoiceNumber"
                 onChange={(e) =>
                   setData((prev) => ({
@@ -140,7 +142,13 @@ const SalesInvoicePartyDetailsSection = ({
               <p className="text-xs pb-2 ">{title} Date: </p>
               <input
                 type="date"
-                value={data.salesInvoiceDate}
+                value={
+                  data?.salesInvoiceDate
+                    ? new Date(data.salesInvoiceDate)
+                        .toISOString()
+                        .split("T")[0]
+                    : new Date().toISOString().split("T")[0] // today's date
+                }
                 onChange={handleInputChange}
                 name="salesInvoiceDate"
                 className="input input-xs border-none bg-zinc-200 w-30"

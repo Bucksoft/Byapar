@@ -11,23 +11,24 @@ import toast from "react-hot-toast";
 import { queryClient } from "../../main";
 import CustomLoader from "../Loader";
 
-const QuotationInvoice = () => {
+const SalesReturn = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const [invoiceIdToDownload, setInvoiceIdToDownload] = useState("invoice");
 
   // THIS IS THE QUERY TO GET THE INVOICE BASED ON ID
-  const { isLoading, data: quotation } = useQuery({
+  const { isLoading, data: saleReturn } = useQuery({
     queryFn: async () => {
-      const res = await axiosInstance.get(`/quotation/${id}`);
-      return res.data?.quotation;
+      const res = await axiosInstance.get(`/sales-return/return/${id}`);
+      console.log(res);
+      return res.data?.saleReturn;
     },
   });
 
   // THIS IS THE MUTATION TO DELETE THE INVOICE
   const mutation = useMutation({
     mutationFn: async (invoiceId) => {
-      const res = await axiosInstance.delete(`/quotation/${invoiceId}`);
+      const res = await axiosInstance.delete(`/sales-return/${invoiceId}`);
       return res.data;
     },
     onSuccess: (data) => {
@@ -43,12 +44,14 @@ const QuotationInvoice = () => {
         <header className="flex items-center justify-between">
           <div className="flex items-center gap-3">
             <ArrowLeft onClick={() => navigate(-1)} />
-            <h1 className="font-medium">Quotation </h1>
-            <div className="badge badge-success badge-soft">
-              {quotation?.status}
-            </div>
+            <h1 className="font-medium">Sales Return</h1>
+            <div className="badge badge-secondary badge-soft">Refunded</div>
           </div>
           <div className="flex items-center gap-3">
+            <button className="btn btn-sm">
+              <GiProfit />
+              Profit Details
+            </button>
             <div className="dropdown dropdown-end">
               <div tabIndex={0} role="button" className="btn btn-sm">
                 <EllipsisVertical size={14} />
@@ -66,7 +69,9 @@ const QuotationInvoice = () => {
                 <li>
                   <button>Duplicate</button>
                 </li>
-
+                <li>
+                  <button>Issue Credit Note</button>
+                </li>
                 <li
                   onClick={() => mutation.mutate(id)}
                   className="text-[var(--error-text-color)]"
@@ -103,31 +108,31 @@ const QuotationInvoice = () => {
           </div>
 
           <div className="flex items-center gap-2">
-            <button className="btn btn-sm btn-info">
-              <TbFileInvoice /> Convert to Invoice
+            <button className="btn btn-sm btn-soft btn-info">
+              Generate E-way Bill
+            </button>
+            <button className="btn btn-sm btn-soft btn-info">
+              <TbFileInvoice /> Generate e-Invoice
             </button>
           </div>
         </section>
 
-        {/* Invoice template */}
-        <section className="mt-3 bg-orange-50 flex justify-center py-1 overflow-y-scroll flex-1">
-          {isLoading ? (
-            <CustomLoader text={"Loading..."} />
-          ) : (
-            <section className="mt-3 flex justify-center py-1 overflow-y-scroll flex-1">
-              {/* Invoice template */}
-              <InvoiceTemplate
-                color={"orange"}
-                invoice={quotation}
-                type="Quotation"
-                setInvoiceIdToDownload={setInvoiceIdToDownload}
-              />
-            </section>
-          )}
-        </section>
+        {isLoading ? (
+          <CustomLoader text={"Loading..."} />
+        ) : (
+          <section className="mt-3 bg-zinc-100 flex justify-center py-1 overflow-y-scroll flex-1">
+            {/* Invoice template */}
+            <InvoiceTemplate
+              type={"Sales Return"}
+              color={"green"}
+              invoice={saleReturn}
+              setInvoiceIdToDownload={setInvoiceIdToDownload}
+            />
+          </section>
+        )}
       </div>
     </main>
   );
 };
 
-export default QuotationInvoice;
+export default SalesReturn;

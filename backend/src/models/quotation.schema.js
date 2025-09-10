@@ -42,7 +42,7 @@ const quotationSchema = new mongoose.Schema(
     },
     status: {
       type: String,
-      enum: ["open", "close"],
+      enum: ["draft", "open", "accepted", "rejected", "converted", "expired"],
       default: "open",
     },
     type: {

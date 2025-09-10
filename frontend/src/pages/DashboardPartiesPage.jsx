@@ -192,7 +192,10 @@ const DashboardPartiesPage = () => {
                     <td>{party?.mobileNumber}</td>
                     <td>{party?.partyType}</td>
                     <td>₹ {party?.openingBalance}</td>
-                    <td className="flex items-center gap-2 justify-end">
+                    <td
+                      onClick={(e) => e.stopPropagation()}
+                      className="flex items-center gap-2 justify-end"
+                    >
                       <Link to={`/dashboard/edit-party/${party?._id}`}>
                         <SquarePen size={14} className="cursor-pointer" />{" "}
                       </Link>

@@ -63,9 +63,10 @@ import DashboardCreatePurchaseOrder from "./pages/Purchases/DashboardCreatePurch
 import DashboardPaymentInDetails from "./pages/DashboardPaymentInDetails";
 import DashboardCreateCreditNoteInvoicePage from "./pages/DashboardCreateCreditNoteInvoicePage";
 import DashboardMyBusinesses from "./pages/DashboardMyBusinesses";
+import SalesReturn from "./components/Invoices/SalesReturn";
 
 function App() {
-  const { user, setUser } = useAuthStore();
+  const { setUser } = useAuthStore();
   const { isLoading } = useQuery({
     queryFn: async () => {
       const res = await axiosInstance.get("/user/me");
@@ -78,7 +79,7 @@ function App() {
   //   return (
   //     <div className="h-screen w-full flex items-center justify-center">
   //       <CustomLoader text={"Loading...."} />
-  //     </div>
+  //     </div>-9
   //   );
 
   // }
@@ -224,6 +225,8 @@ function App() {
             path="/dashboard/sales-return"
             element={<DashboardSalesReturnPage />}
           />
+
+          <Route path="/dashboard/sales-return/:id" element={<SalesReturn />} />
 
           <Route
             path="/dashboard/credit-note"

@@ -2,7 +2,13 @@ import { Calendar, ChevronDown, Keyboard, Search } from "lucide-react";
 import { TbCoinRupee } from "react-icons/tb";
 import { useNavigate } from "react-router-dom";
 
-const SalesNavigationMenus = ({ title, btnText, selectText, setPage }) => {
+const SalesNavigationMenus = ({
+  title,
+  btnText,
+  selectText,
+  setPage,
+  setSearchedQuery,
+}) => {
   const navigate = useNavigate();
 
   return (
@@ -24,7 +30,12 @@ const SalesNavigationMenus = ({ title, btnText, selectText, setPage }) => {
           <div className="">
             <label className="input input-sm">
               <Search size={16} className="" />
-              <input type="search" required placeholder="Search" />
+              <input
+                type="search"
+                required
+                placeholder="Search by invoice number"
+                onChange={(e) => setSearchedQuery(e.target.value)}
+              />
             </label>
           </div>
           {/* calender */}

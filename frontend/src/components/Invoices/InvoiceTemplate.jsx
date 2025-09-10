@@ -1,16 +1,10 @@
 import { BsTelephone } from "react-icons/bs";
 import { useBusinessStore } from "../../store/businessStore";
 import { LiaRupeeSignSolid } from "react-icons/lia";
-import { numberToWords } from "../../../helpers/numToWords";
 import { useEffect, useRef } from "react";
+import converter from "number-to-words";
 
-const InvoiceTemplate = ({
-  color,
-  textColor,
-  title,
-  invoice,
-  setInvoiceIdToDownload,
-}) => {
+const InvoiceTemplate = ({ type, color, invoice, setInvoiceIdToDownload }) => {
   const { business } = useBusinessStore();
   const invoiceIdToDownload = useRef();
 
@@ -33,53 +27,97 @@ const InvoiceTemplate = ({
       <div
         ref={invoiceIdToDownload}
         id="invoice"
-        className="max-w-3xl h-screen bg-white mx-auto p-4 border "
+        className="max-w-3xl h-screen bg-white mx-auto p-4 shadow-lg shadow-zinc-500"
       >
         {/* Party name */}
         <div className="flex items-center justify-between">
           <h2 className="font-semibold text-xl">{business?.businessName}</h2>
-          <h1 className="uppercase">Tax Invoice</h1>
+          <h1 className="uppercase">
+            {type === "Sales Return"
+              ? "Sales Return"
+              : type === "Sales Invoice"
+              ? "Sales Invoice"
+              : type === "Quotation"
+              ? "Quotation"
+              : ""}
+          </h1>
         </div>
-
         <div
           style={{
             color: "#3f3f46",
           }}
           className="mt-5 flex gap-2 items-center  text-sm"
         >
-          <BsTelephone className="text-info" />
+          <span
+            style={{
+              color: color,
+            }}
+          >
+            <BsTelephone />
+          </span>
           {business?.companyPhoneNo}
         </div>
-
-        <span className="divider" />
-
+        <span className="divider divider-neutral" />
         {/* Displaying invoice information like invoice date and invoice number */}
-        <section className="flex items-center gap-10 text-xs">
+        <section className="flex items-center gap-10 text-xs  px-3">
           <div>
             <p
               style={{
-                color: "#00bafe",
+                color: color,
               }}
               className="font-semibold"
             >
-              Invoice No.
+              {type === "Sales Return"
+                ? "Sales Return No."
+                : type === "Sales Invoice"
+                ? "Invoice No."
+                : type === "Quotation"
+                ? "Quotation No."
+                : ""}
             </p>
-            <span>{invoice?.salesInvoiceNumber}</span>
+            <span>
+              {type === "Sales Return"
+                ? invoice?.salesReturnNumber
+                : type === "Sales Invoice"
+                ? invoice?.salesInvoiceNumber
+                : type === "Quotation"
+                ? invoice?.quotationNumber
+                : ""}
+            </span>
           </div>
           <div>
             <p
               style={{
-                color: "#00bafe",
+                color: color,
               }}
               className="font-semibold "
             >
-              Invoice Date
+              {type === "Sales Return"
+                ? "Sales Return Date"
+                : type === "Sales Invoice"
+                ? "Sales Invoice Date"
+                : type === "Quotation"
+                ? "Quotation Date"
+                : ""}
             </p>
-            <span>{invoice?.salesInvoiceDate?.split("T")[0]}</span>
+            <span>
+              {type === "Sales Return"
+                ? invoice?.salesReturnDate?.split("T")[0]
+                : type === "Sales Invoice"
+                ? invoice?.salesInvoiceDate?.split("T")[0]
+                : type === "Quotation"
+                ? invoice?.quotationDate?.split("T")[0]
+                : ""}
+            </span>
           </div>
         </section>
 
-        <span className="divider" />
+        <span
+          className={`divider divider-neutral`}
+          style={{
+            color: color,
+          }}
+        />
 
         {/* Party Details */}
         <section className="text-sm">
@@ -92,20 +130,14 @@ const InvoiceTemplate = ({
             </span>
           </p>
         </section>
-
         {/* Items Table */}
         <div className="overflow-x-auto">
-          <table
-            style={{
-              borderColor: "#e4e4e7",
-            }}
-            className="table table-xs mt-5 w-full border "
-          >
+          <table className="table table-xs mt-5 w-full  ">
             {/* head */}
             <thead>
               <tr
                 style={{
-                  backgroundColor: "#f4f4f5",
+                  backgroundColor: color,
                 }}
               >
                 <th>No</th>
@@ -118,7 +150,7 @@ const InvoiceTemplate = ({
             </thead>
             <tbody>
               {invoice?.items?.map((item, index) => (
-                <tr key={index} className="">
+                <tr key={index}>
                   <td>{index + 1}</td>
                   <td>{item?.itemName}</td>
                   <td>{item?.quantity}</td>
@@ -150,10 +182,10 @@ const InvoiceTemplate = ({
               {/* Subtotal row */}
               <tr
                 style={{
-                  borderColor: "#d4d4d8",
-                  backgroundColor: "#fafafa",
+                  borderColor: color,
+                  backgroundColor: "#e1e1e3",
                 }}
-                className="font-semibold border-t"
+                className="font-semibold "
               >
                 <td></td>
                 <td>Subtotal</td>
@@ -195,20 +227,22 @@ const InvoiceTemplate = ({
           </table>
 
           {/* Footer section */}
-          <div className="divider" />
-          <section className="grid grid-cols-2 text-xs mt-16">
+          <div className="divider divider-neutral" />
+          <section className="grid grid-cols-2 text-xs mt-3">
             <div className="mt-4">
               {invoice?.termsAndCondition && (
                 <div>
-                  <h4 className="font-medium">Terms & Conditions</h4>
-                  <span>{invoice?.termsAndCondition}</span>
+                  <h4 className="font-semibold">Terms & Conditions</h4>
+                  <p className="whitespace-pre-line">
+                    {invoice?.termsAndCondition}
+                  </p>
                 </div>
               )}
             </div>
-            <div className="mt-4">
+            <div className="mt-4 ">
               <div className="flex items-center justify-between">
                 <p>Taxable Amount</p>
-                <span className="flex items-center">
+                <span className="flex items-center ">
                   <LiaRupeeSignSolid />
                   {Number(invoice?.taxableAmount).toLocaleString("en-IN")}
                 </span>
@@ -227,7 +261,12 @@ const InvoiceTemplate = ({
                   {invoice?.sgst}
                 </span>
               </div>
-              <div className="h-[0.5px] my-3 w-full bg-info" />
+              <div
+                className="h-[0.5px] my-3 w-full "
+                style={{
+                  backgroundColor: color,
+                }}
+              />
               <div
                 style={{
                   color: "#52525c",
@@ -235,18 +274,25 @@ const InvoiceTemplate = ({
                 className="flex items-center justify-between font-semibold text-lg "
               >
                 <p>Total Amount</p>
-                <span>{total.toLocaleString("en-IN")}</span>
+                <span className="flex items-center">
+                  <LiaRupeeSignSolid />
+                  {Math.round(total).toLocaleString("en-IN")}
+                </span>
               </div>
-              <div className="h-[0.5px] my-3 w-full bg-info" />
+              <div
+                className="h-[0.5px] my-3 w-full "
+                style={{
+                  backgroundColor: color,
+                }}
+              />
               <div
                 style={{
                   color: "#52525c",
                 }}
-                className="flex items-center justify-between  text-xs "
+                className="flex items-center justify-between text-xs "
               >
                 <p>Received Amount</p>
                 <span className="flex items-center">
-                  {" "}
                   <LiaRupeeSignSolid /> {total.toLocaleString("en-IN")}
                 </span>
               </div>
@@ -271,7 +317,7 @@ const InvoiceTemplate = ({
                 <p className="font-semibold">Total Amount(in words)</p>
                 <span className="flex items-center">
                   {" "}
-                  {numberToWords(total)}
+                  {converter.toWords(total)}
                 </span>
               </div>
             </div>

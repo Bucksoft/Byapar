@@ -176,11 +176,11 @@ export async function loginViaGoogleCallback(req, res) {
       }
     );
 
-    const accessToken = tokenRes.data.access_token;
+    const token = tokenRes.data.access_token;
     const userRes = await axios.get(
       "https://www.googleapis.com/oauth2/v2/userinfo",
       {
-        headers: { Authorization: `Bearer ${accessToken}` },
+        headers: { Authorization: `Bearer ${token}` },
       }
     );
 
@@ -198,20 +198,32 @@ export async function loginViaGoogleCallback(req, res) {
       await user.save();
     }
 
-    const token = jwt.sign(
-      {
-        id: user._id,
-        email: user.email,
-      },
+    // generate jwt token
+    const accessToken = jwt.sign(
+      { id: user._id, email: userRes.data.email },
       process.env.JWT_SECRET,
-      { expiresIn: "1h" }
+      {
+        expiresIn: "15m",
+      }
     );
-
-    res.cookie("token", token, {
+    const refreshToken = jwt.sign(
+      { id: user._id, email: userRes.data.email },
+      process.env.JWT_SECRET,
+      {
+        expiresIn: "7d",
+      }
+    );
+    res.cookie("accessToken", accessToken, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
       sameSite: process.env.NODE_ENV === "production" ? "None" : "Lax",
-      maxAge: 60 * 60 * 1000,
+      maxAge: 15 * 60 * 1000,
+    });
+    res.cookie("refreshToken", refreshToken, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: process.env.NODE_ENV === "production" ? "None" : "Lax",
+      maxAge: 7 * 24 * 60 * 60 * 1000,
     });
 
     res.redirect(`${process.env.FRONTEND_URI}/dashboard`);

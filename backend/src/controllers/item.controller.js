@@ -130,7 +130,9 @@ export async function getItem(req, res) {
 
 export async function getAllItems(req, res) {
   try {
-    const items = await Item.find({ businessId: req.params?.id });
+    const items = await Item.find({
+      $and: [{ businessId: req.params?.id }, { clientId: req.user?.id }],
+    });
     if (!items) {
       return res.status(400).json({ success: true, msg: "Item not found" });
     }

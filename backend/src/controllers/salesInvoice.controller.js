@@ -1,6 +1,7 @@
 import { salesInvoiceSchema } from "../config/validation.js";
 import SalesInvoice from "../models/salesInvoiceSchema.js";
 import Party from "../models/party.schema.js";
+import { Item } from "../models/item.schema.js";
 
 export async function createSalesInvoice(req, res) {
   try {
@@ -34,6 +35,24 @@ export async function createSalesInvoice(req, res) {
       });
     }
 
+    for (const soldItem of data?.items) {
+      const item = await Item.findById(soldItem?._id);
+      if (!item) {
+        return res
+          .status(400)
+          .json({ success: false, msg: `Item not found : ${item?.itemName}` });
+      }
+      if (item?.currentStock < soldItem.quantity) {
+        return res.status(400).json({
+          success: false,
+          msg: `Insufficient stock for ${item?.itemName}`,
+        });
+      }
+      await Item.findByIdAndUpdate(soldItem?._id, {
+        $inc: { currentStock: -soldItem?.quantity },
+      });
+    }
+
     const salesInvoice = await SalesInvoice.create({
       partyId: party?._id,
       businessId: req.params?.id,
@@ -61,7 +80,9 @@ export async function createSalesInvoice(req, res) {
 
 export async function getAllInvoices(req, res) {
   try {
-    const invoices = await SalesInvoice.find({ businessId: req.params?.id })
+    const invoices = await SalesInvoice.find({
+      $and: [{ businessId: req.params?.id, clientId: req.user?.id }],
+    })
       .populate("partyId")
       .sort("salesInvoiceDate");
     if (!invoices) {
@@ -84,7 +105,10 @@ export async function deleteInvoice(req, res) {
         .status(400)
         .json({ success: false, msg: "Please provide invoice id" });
     }
-    const deletedInvoice = await SalesInvoice.findByIdAndDelete(id);
+    const deletedInvoice = await SalesInvoice.findByIdAndDelete({
+      _id: id,
+      clientId: req.user?.id,
+    });
     if (!deletedInvoice) {
       return res
         .status(400)

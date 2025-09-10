@@ -23,7 +23,6 @@ const DashboardMyBusinesses = () => {
     queryKey: ["business"],
     queryFn: async () => {
       const res = await axiosInstance.get("/business");
-      console.log(res);
       setBusinesses(res.data?.businesses);
       return res.data?.businesses;
     },

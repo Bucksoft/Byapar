@@ -124,7 +124,14 @@ export async function createPaymentIn(req, res) {
 export async function getAllPaymentInDetails(req, res) {
   try {
     const paymentIns = await PaymentIn.find({
-      businessId: req.params.id,
+      $and: [
+        {
+          businessId: req.params?.id,
+        },
+        {
+          clientId: req.user?.id,
+        },
+      ],
     });
     if (!paymentIns) {
       return res

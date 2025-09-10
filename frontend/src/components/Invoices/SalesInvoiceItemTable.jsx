@@ -67,7 +67,6 @@ const SalesInvoiceItemTable = ({ data, setData }) => {
       })
     );
   };
-
   useEffect(() => {
     if (!addedItems?.length) return;
 
@@ -77,90 +76,71 @@ const SalesInvoiceItemTable = ({ data, setData }) => {
     };
 
     const updatedItems = addedItems.map((item) => {
-      const qty = quantities[item._id] || 0;
+      const qty = quantities[item._id] || 1;
       const gstRate = getGSTPercentage(item?.gstTaxRate);
-      const price = Number(item?.salesPrice) || 0;
+      const salesPrice = Number(item?.salesPrice) || 0;
 
       let basePrice = 0;
-      let gstAmount = 0;
-      let finalPrice = 0;
-
       if (item?.gstTaxRateType === "without tax") {
-        basePrice = price;
-
-        if (item?.discountPercent) {
-          basePrice -= (basePrice * item.discountPercent) / 100;
-        } else if (item?.discountAmount) {
-          basePrice -= item.discountAmount;
-        }
-
-        basePrice = Math.max(basePrice, 0);
-
-        gstAmount = (basePrice * gstRate) / 100;
-        finalPrice = basePrice + gstAmount;
+        basePrice = salesPrice;
       } else {
-        basePrice = price * (100 / (100 + gstRate));
-
-        if (item?.discountPercent) {
-          basePrice -= (basePrice * item.discountPercent) / 100;
-        } else if (item?.discountAmount) {
-          basePrice -= item.discountAmount;
-        }
-
-        basePrice = Math.max(basePrice, 0);
-
-        gstAmount = (basePrice * gstRate) / 100;
-        finalPrice = basePrice + gstAmount;
+        basePrice = salesPrice * (100 / (100 + gstRate));
       }
+
+      let discountAmount = 0;
+      if (item?.discountPercent) {
+        discountAmount = (basePrice * item.discountPercent) / 100;
+      } else if (item?.discountAmount) {
+        discountAmount = Number(item.discountAmount);
+      }
+      discountAmount = Math.min(discountAmount, basePrice); // avoid negative
+
+      const discountedBase = basePrice - discountAmount;
+
+      const gstAmount = (discountedBase * gstRate) / 100;
+
+      const finalPrice = discountedBase + gstAmount;
 
       const totalAmount = finalPrice * qty;
 
       return {
         ...item,
         quantity: qty,
-        basePrice: basePrice.toFixed(2),
-        gstAmount: gstAmount.toFixed(2),
-        finalPrice: finalPrice.toFixed(2),
-        totalAmount: totalAmount.toFixed(2),
+        salesPrice,
+        basePrice: basePrice.toFixed(2), // show in Price/item column
+        discountAmount: discountAmount.toFixed(2), // show in discount column
+        gstAmount: gstAmount.toFixed(2), // show in tax column
+        finalPrice: finalPrice.toFixed(2), // per unit final
+        totalAmount: totalAmount.toFixed(2), // qty * final
       };
     });
 
-    // Totals
+    // subtotal and totals
     const amountSubtotal = updatedItems.reduce(
       (acc, item) => acc + Number(item?.totalAmount || 0),
       0
     );
 
-    const taxSubtotal = updatedItems.reduce(
-      (acc, item) => acc + Number(item?.gstAmount || 0) * item.quantity,
-      0
-    );
-
     const totalTaxableAmount = updatedItems.reduce(
-      (acc, item) => acc + Number(item?.basePrice || 0) * item.quantity,
+      (acc, item) => acc + (Number(item?.basePrice) || 0) * item.quantity,
       0
     );
 
     const totalGstAmount = updatedItems.reduce(
-      (acc, item) => acc + Number(item?.gstAmount || 0) * item.quantity,
+      (acc, item) => acc + (Number(item?.gstAmount) || 0) * item.quantity,
       0
     );
 
-    const cgst = Number((totalGstAmount / 2).toFixed(2)).toLocaleString(
-      "en-IN"
-    );
-    const sgst = Number((totalGstAmount / 2).toFixed(2)).toLocaleString(
-      "en-IN"
-    );
-
+    const cgst = Number((totalGstAmount / 2).toFixed(2));
+    const sgst = Number((totalGstAmount / 2).toFixed(2));
     const balanceAmount = totalTaxableAmount + totalGstAmount;
 
     setData((prev) => ({
       ...prev,
       items: updatedItems,
       amountSubTotal: parseFloat(amountSubtotal.toFixed(2)),
-      taxSubTotal: parseFloat(taxSubtotal.toFixed(2)),
       taxableAmount: parseFloat(totalTaxableAmount.toFixed(2)),
+      totalGstAmount: parseFloat(totalGstAmount.toFixed(2)),
       cgst,
       sgst,
       totalAmount: parseFloat(amountSubtotal.toFixed(2)),
@@ -229,14 +209,17 @@ const SalesInvoiceItemTable = ({ data, setData }) => {
           {/* Quantity */}
           <span className="border-t border-l p-2 border-[var(--primary-border)]">
             <input
-              className="input input-xs bg-zinc-100 text-right"
-              value={addedItem?.quantity}
-              // onChange={() =>
-              //   setQuantities((prev) => ({
-              //     ...prev,
-              //     [addedItem._id]: Math.max((prev[addedItem._id] || 0) - 1, 0),
-              //   }))
-              // }
+              type="number"
+              min={0}
+              value={quantities[addedItem._id] || 0}
+              onChange={(e) =>
+                setQuantities((prev) => ({
+                  ...prev,
+                  [addedItem._id]: Number(e.target.value),
+                }))
+              }
+              placeholder="0"
+              className="input input-xs bg-zinc-100 text-right w-full"
             />
           </span>
 
@@ -253,22 +236,23 @@ const SalesInvoiceItemTable = ({ data, setData }) => {
           <span className="border-l relative border-t p-2 border-[var(--primary-border)]">
             {/* Discount % */}
             <input
-              type="text"
+              type="number"
               min={0}
+              max={100}
               className="input input-xs bg-zinc-100 text-right"
               value={addedItem?.discountPercent ?? 0}
-              onChange={(e) =>
-                handleSetDiscountPercent(
-                  parseFloat(e.target.value) ?? 0,
-                  addedItem._id
-                )
-              }
+              onChange={(e) => {
+                const val = parseFloat(e.target.value);
+                handleSetDiscountPercent(isNaN(val) ? 0 : val, addedItem._id);
+              }}
             />
+
             <Percent size={10} className="absolute top-[14.3px] left-3 z-10" />
 
             {/* Discount Amount */}
             <input
-              type="text"
+              type="number"
+              min={0}
               className="input input-xs bg-zinc-100 text-right mt-1"
               value={addedItem?.discountAmount || ""}
               onChange={(e) =>

@@ -9,9 +9,13 @@ import SalesInvoiceItemTable from "./SalesInvoiceItemTable";
 import SalesInvoiceFooterSection from "./SalesInvoiceFooterSection";
 import { queryClient } from "../../main";
 import { useBusinessStore } from "../../store/businessStore";
+import { useRef } from "react";
+import CustomLoader from "../Loader";
+import { BsFillSaveFill } from "react-icons/bs";
 
 const InvoicesForm = ({ title, party, setParty }) => {
   const { business } = useBusinessStore();
+  const invoiceNoRef = useRef();
   const invoiceData = {
     paymentTerms: 0,
     dueDate: new Date(Date.now()),
@@ -77,18 +81,28 @@ const InvoicesForm = ({ title, party, setParty }) => {
       toast.success(data?.msg);
       queryClient.invalidateQueries({ queryKey: ["invoices"] });
 
-      // Navigate dynamically based on invoice type
       if (data?.quotation?._id) {
         navigate(`/dashboard/quotations/${data?.quotation?._id}`);
       } else if (data?.salesInvoice?._id) {
         navigate(`/dashboard/sales-invoice/${data?.salesInvoice?._id}`);
       } else if (data?.purchaseInvoice?._id) {
         navigate(`/dashboard/purchase-invoice/${data?.purchaseInvoice?._id}`);
+      } else if (data?.salesReturn?._id) {
+        navigate(`/dashboard/sales-return/${data?.salesReturn?._id}`);
       }
     },
 
     onError: (err) => {
-      toast.error(err?.response?.data?.msg || "Something went wrong");
+      toast.error(
+        err?.response?.data?.msg || err?.message || "Something went wrong"
+      );
+      if (
+        err.response.data.msg ===
+        "Invoice already exists with this invoice number"
+      ) {
+        invoiceNoRef.current.focus();
+        invoiceNoRef.current.style.outline = "1px solid red";
+      }
     },
   });
 
@@ -104,9 +118,18 @@ const InvoicesForm = ({ title, party, setParty }) => {
           <button className="btn btn-sm">Settings</button>
           <button
             onClick={() => mutation.mutate(data)}
+            disabled={mutation?.isPending}
             className="btn bg-[var(--primary-btn)] btn-sm"
           >
-            Save {title}
+            {mutation.isPending ? (
+              <CustomLoader text={"Saving..."} />
+            ) : (
+              <>
+                {" "}
+                <BsFillSaveFill />
+                Save {title}
+              </>
+            )}
           </button>
         </div>
       </header>
@@ -119,6 +142,7 @@ const InvoicesForm = ({ title, party, setParty }) => {
         party={party}
         setParty={setParty}
         title={title}
+        invoiceNoRef={invoiceNoRef}
       />
       {/* Upper section of invoice form invoice number, dates , party name details etc ends here ---------------------------------------*/}
 

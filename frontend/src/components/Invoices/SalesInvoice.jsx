@@ -123,8 +123,9 @@ const SalesInvoice = () => {
           <section className="mt-3 bg-sky-50 flex justify-center py-1 overflow-y-scroll flex-1">
             {/* Invoice template */}
             <InvoiceTemplate
-              color={"green"}
+              color={"#568F87"}
               invoice={invoice}
+              type={"Sales Invoice"}
               setInvoiceIdToDownload={setInvoiceIdToDownload}
             />
           </section>

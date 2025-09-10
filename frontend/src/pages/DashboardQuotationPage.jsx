@@ -6,9 +6,12 @@ import { axiosInstance } from "../config/axios";
 import CustomLoader from "../components/Loader";
 import { LiaRupeeSignSolid } from "react-icons/lia";
 import { useBusinessStore } from "../store/businessStore";
+import { useState } from "react";
 
 const DashboardQuotationPage = () => {
   const { business } = useBusinessStore();
+  const [searchQuery, setSearchQuery] = useState("");
+
   const { isLoading, data: quotations = [] } = useQuery({
     queryKey: ["quotations"],
     queryFn: async () => {
@@ -16,6 +19,10 @@ const DashboardQuotationPage = () => {
       return Array.isArray(res.data.quotations) ? res.data.quotations : [];
     },
   });
+
+  const searchedQuotations = quotations?.filter(
+    (quotation) => quotation?.quotationNumber === Number(searchQuery)
+  );
 
   return (
     <main className="h-screen w-full flex">
@@ -26,6 +33,7 @@ const DashboardQuotationPage = () => {
             title={"Quotation / Estimate"}
             btnText={"Quotation"}
             selectText={"quotation"}
+            setSearchedQuery={setSearchQuery}
           />
 
           {/* table */}
@@ -48,27 +56,41 @@ const DashboardQuotationPage = () => {
                   </tr>
                 </thead>
                 <tbody>
-                  {quotations.map((quotation) => (
-                    <tr key={quotation._id}>
-                      <td>{quotation?.quotationDate?.split("T")[0]}</td>
-                      <td>{quotation?.quotationNumber}</td>
-                      <td>{quotation?.partyId?.partyName}</td>
-                      <td>-</td>
-                      <td>
-                        <div className="flex items-center">
-                          <LiaRupeeSignSolid />
-                          {Number(quotation?.totalAmount || 0).toLocaleString(
-                            "en-IN"
-                          )}
-                        </div>
-                      </td>
-                      <td>
-                        <div className="badge badge-accent">
-                          {quotation?.status}
-                        </div>
+                  {(searchQuery ? searchedQuotations : quotations)?.length >
+                  0 ? (
+                    (searchQuery ? searchedQuotations : quotations).map(
+                      (quotation) => (
+                        <tr key={quotation._id}>
+                          <td>{quotation?.quotationDate?.split("T")[0]}</td>
+                          <td>{quotation?.quotationNumber}</td>
+                          <td>{quotation?.partyId?.partyName}</td>
+                          <td>-</td>
+                          <td>
+                            <div className="flex items-center">
+                              <LiaRupeeSignSolid />
+                              {Number(
+                                quotation?.totalAmount || 0
+                              ).toLocaleString("en-IN")}
+                            </div>
+                          </td>
+                          <td>
+                            <div className="badge badge-accent">
+                              {quotation?.status}
+                            </div>
+                          </td>
+                        </tr>
+                      )
+                    )
+                  ) : (
+                    <tr>
+                      <td
+                        colSpan="8"
+                        className="text-center text-zinc-400 py-6"
+                      >
+                        No data found
                       </td>
                     </tr>
-                  ))}
+                  )}
                 </tbody>
               </table>
             ) : (
