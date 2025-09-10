@@ -11,7 +11,6 @@ const partySchema = new mongoose.Schema(
     },
     email: {
       type: String,
-      unique: true,
     },
     openingBalance: {
       type: Number,
