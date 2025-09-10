@@ -227,7 +227,7 @@ const SalesInvoiceFooterSection = ({ data, setData, title }) => {
               />
               <span className="text-xs">Auto Round Off</span>
             </div>
-            {!selectCheckBox && (
+            {/* {!selectCheckBox && (
               <div className="relative">
                 <select
                   defaultValue=""
@@ -244,7 +244,7 @@ const SalesInvoiceFooterSection = ({ data, setData, title }) => {
                   className="input input-xs  w-fit text-xs  mr-2 items-center px-5"
                 />
               </div>
-            )}
+            )} */}
           </div>
           <div className="p-2 flex justify-between">
             <span className="text-sm font-semibold">Total Amount</span>

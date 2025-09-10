@@ -8,11 +8,9 @@ const partySchema = new mongoose.Schema(
     },
     mobileNumber: {
       type: String,
-      required: [true, "Mobile number is required"],
     },
     email: {
       type: String,
-      required: [true, "Email is required"],
       unique: true,
     },
     openingBalance: {
@@ -26,12 +24,10 @@ const partySchema = new mongoose.Schema(
     },
     GSTIN: {
       type: String,
-      required: true,
       unique: true,
     },
     PANno: {
       type: String,
-      required: true,
       unique: true,
     },
     partyType: {
@@ -41,15 +37,12 @@ const partySchema = new mongoose.Schema(
     },
     categoryName: {
       type: String,
-      required: true,
     },
     state: {
       type: String,
-      required: true,
     },
     city: {
       type: String,
-      required: true,
     },
     billingAddress: {
       type: String,
@@ -57,15 +50,14 @@ const partySchema = new mongoose.Schema(
     },
     shippingAddress: {
       type: String,
-      required: true,
     },
     creditPeriod: {
       type: Number,
-      required: true,
+      default: 0,
     },
     creditLimit: {
       type: Number,
-      required: true,
+      default: 0,
     },
     clientId: {
       type: mongoose.Schema.Types.ObjectId,
@@ -82,7 +74,6 @@ const partySchema = new mongoose.Schema(
     },
     pincode: {
       type: String,
-      required: true,
     },
     flag: {
       type: String,
