@@ -168,72 +168,75 @@ const DashboardPartiesPage = () => {
               </thead>
               <tbody className="text-center">
                 {/* row 1 */}
-                {parties.map((party) => (
-                  <motion.tr
-                    className="cursor-pointer"
-                    onClick={() => navigate(party?._id)}
-                    key={party._id}
-                    initial={{
-                      opacity: 0,
-                      scaleY: 0,
-                    }}
-                    animate={{
-                      opacity: 1,
-                      scaleY: 1,
-                    }}
-                    transition={{
-                      ease: "easeInOut",
-                      duration: 0.2,
-                      delay: 0.2,
-                    }}
-                  >
-                    <td className="text-left">{party?.partyName}</td>
-                    <td>{party?.categoryName}</td>
-                    <td>{party?.mobileNumber}</td>
-                    <td>{party?.partyType}</td>
-                    <td>₹ {party?.openingBalance}</td>
-                    <td
-                      onClick={(e) => e.stopPropagation()}
-                      className="flex items-center gap-2 justify-end"
+                {parties &&
+                  parties?.map((party) => (
+                    <motion.tr
+                      className="cursor-pointer"
+                      onClick={() => navigate(party?._id)}
+                      key={party._id}
+                      initial={{
+                        opacity: 0,
+                        scaleY: 0,
+                      }}
+                      animate={{
+                        opacity: 1,
+                        scaleY: 1,
+                      }}
+                      transition={{
+                        ease: "easeInOut",
+                        duration: 0.2,
+                        delay: 0.2,
+                      }}
                     >
-                      <Link to={`/dashboard/edit-party/${party?._id}`}>
-                        <SquarePen size={14} className="cursor-pointer" />{" "}
-                      </Link>
-                      <button
-                        onClick={() =>
-                          document.getElementById("my_modal_3").showModal()
-                        }
+                      <td className="text-left">{party?.partyName || "-"}</td>
+                      <td>{party?.categoryName || "-"}</td>
+                      <td>{party?.mobileNumber || "-"}</td>
+                      <td>{party?.partyType || "-"}</td>
+                      <td>₹ {party?.openingBalance || 0}</td>
+                      <td
+                        onClick={(e) => e.stopPropagation()}
+                        className="flex items-center gap-2 justify-end"
                       >
-                        <Trash2
-                          size={14}
-                          className="text-[var(--error-text-color)] cursor-pointer"
-                        />
-                      </button>
-                      <dialog id="my_modal_3" className="modal">
-                        <div className="modal-box">
-                          <form method="dialog">
-                            <button className="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">
-                              ✕
-                            </button>
-                          </form>
-                          <h3 className="font-bold text-lg">Are you sure ?</h3>
-                          <p className="py-4">
-                            This action cannot be undone. All values associated
-                            with this field will be lost.
-                          </p>
-                          <div className="w-full grid place-items-end">
-                            <button
-                              onClick={() => mutation.mutate(party?._id)}
-                              className="btn btn-sm bg-[var(--error-text-color)] text-[var(--primary-text-color)]"
-                            >
-                              Delete
-                            </button>
+                        <Link to={`/dashboard/edit-party/${party?._id}`}>
+                          <SquarePen size={14} className="cursor-pointer" />{" "}
+                        </Link>
+                        <button
+                          onClick={() =>
+                            document.getElementById("my_modal_3").showModal()
+                          }
+                        >
+                          <Trash2
+                            size={14}
+                            className="text-[var(--error-text-color)] cursor-pointer"
+                          />
+                        </button>
+                        <dialog id="my_modal_3" className="modal">
+                          <div className="modal-box">
+                            <form method="dialog">
+                              <button className="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">
+                                ✕
+                              </button>
+                            </form>
+                            <h3 className="font-bold text-lg">
+                              Are you sure ?
+                            </h3>
+                            <p className="py-4">
+                              This action cannot be undone. All values
+                              associated with this field will be lost.
+                            </p>
+                            <div className="w-full grid place-items-end">
+                              <button
+                                onClick={() => mutation.mutate(party?._id)}
+                                className="btn btn-sm bg-[var(--error-text-color)] text-[var(--primary-text-color)]"
+                              >
+                                Delete
+                              </button>
+                            </div>
                           </div>
-                        </div>
-                      </dialog>
-                    </td>
-                  </motion.tr>
-                ))}
+                        </dialog>
+                      </td>
+                    </motion.tr>
+                  ))}
               </tbody>
             </table>
           </motion.div>

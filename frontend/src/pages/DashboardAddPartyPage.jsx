@@ -32,8 +32,8 @@ const DashboardAddPartyPage = () => {
     city: "",
     billingAddress: "",
     shippingAddress: "",
-    creditPeriod: null,
-    creditLimit: null,
+    creditPeriod: 0,
+    creditLimit: 0,
     pincode: "",
     businessId: business?._id,
   });

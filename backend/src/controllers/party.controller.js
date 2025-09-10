@@ -24,7 +24,7 @@ export async function createParty(req, res) {
       });
     }
 
-    const { partyName, PANno } = data;
+    const { partyName } = data;
 
     // 3. CHECK IF PARTY ALREADY EXISTS BY PARTY NAME
     const partyExists = await Party.findOne({ partyName });
@@ -57,13 +57,13 @@ export async function createParty(req, res) {
     });
   } catch (error) {
     console.log("ERROR IN CREATING PARTY:", error);
-
+    
     // Handle duplicate key errors from MongoDB
     if (error.code === 11000) {
       const field = Object.keys(error.keyValue)[0]; // GSTIN or PAN
       return res.status(400).json({
         success: false,
-        msg: `${field} "${error.keyValue[field]}" already exists`,
+        msg: `${field} "${error.keyValue[field]}"already exists`,
       });
     }
 

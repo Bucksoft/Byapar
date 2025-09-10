@@ -24,11 +24,9 @@ const partySchema = new mongoose.Schema(
     },
     GSTIN: {
       type: String,
-      unique: true,
     },
     PANno: {
       type: String,
-      unique: true,
     },
     partyType: {
       type: String,
