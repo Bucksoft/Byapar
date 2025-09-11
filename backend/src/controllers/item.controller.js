@@ -171,3 +171,24 @@ export async function updateItem(req, res) {
       .json({ success: false, msg: "Internal Server Error" });
   }
 }
+
+export async function updateStock(req, res) {
+  try {
+    const data = req.body?.data;
+    const item = await Item.findOne({ itemName: data?.activeItem?.name });
+    if (!item) {
+      return res.status(400).json({ success: false, msg: "Item not found" });
+    }
+
+    item.currentStock = data?.activeItem?.updatedStock;
+    item.stockUpdationDate = data?.stockUpdationDate;
+    item.remarks = data?.remarks;
+    await item.save();
+
+    return res.status(200).json({ msg: "Stock updated" });
+  } catch (error) {
+    return res
+      .status(500)
+      .json({ success: false, msg: "Internal Server Error" });
+  }
+}

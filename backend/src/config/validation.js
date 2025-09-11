@@ -18,78 +18,115 @@ export const partySchema = z.object({
       "Party name can only contain letters, numbers, spaces, and . - &"
     ),
 
-  // mobileNumber: z
-  //   .string()
-  //   .regex(
-  //     /^[6-9]\d{9}$/,
-  //     "Mobile number must be a valid 10-digit Indian mobile number"
-  //   ),
+  mobileNumber: z
+    .string()
+    .optional()
+    .refine((val) => !val || /^[6-9]\d{9}$/.test(val), {
+      message: "Mobile number must be a valid 10-digit Indian mobile number",
+    }),
 
-  // email: z.email("Invalid email address"),
+  email: z
+    .string()
+    .optional()
+    .refine((val) => !val || /\S+@\S+\.\S+/.test(val), {
+      message: "Invalid email address",
+    }),
 
-  // openingBalance: z.number().default(0),
+  openingBalance: z.number().optional().default(0),
 
-  // openingBalanceStatus: z
-  //   .enum(["To Collect", "To Pay"], {
-  //     errorMap: () => ({
-  //       message: "Opening balance status must be either To Collect or To Pay",
-  //     }),
-  //   })
-  //   .default("To Collect"),
+  openingBalanceStatus: z
+    .enum(["To Collect", "To Pay"], {
+      errorMap: () => ({
+        message: "Opening balance status must be either To Collect or To Pay",
+      }),
+    })
+    .optional()
+    .default("To Collect"),
 
-  // GSTIN: z
-  //   .string()
-  //   .regex(
-  //     /^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}Z[0-9A-Z]{1}$/,
-  //     "Invalid GSTIN format"
-  //   ),
+  GSTIN: z
+    .string()
+    .optional()
+    .refine(
+      (val) =>
+        !val ||
+        /^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}Z[0-9A-Z]{1}$/.test(val),
+      { message: "Invalid GSTIN format" }
+    ),
 
-  // PANno: z.string().regex(/^[A-Z]{5}[0-9]{4}[A-Z]{1}$/, "Invalid PAN number"),
+  PANno: z.preprocess(
+    (val) => (val === "" ? undefined : val),
+    z
+      .string()
+      .optional()
+      .refine((val) => !val || /^[A-Z]{5}[0-9]{4}[A-Z]{1}$/.test(val), {
+        message: "Invalid PAN number",
+      })
+  ),
 
-  // partyType: z.enum(["Customer", "Supplier"]).default("Customer"),
+  partyType: z.preprocess(
+    (val) => (val === "" ? undefined : val),
+    z.enum(["Customer", "Supplier"]).optional().default("Customer")
+  ),
 
-  // categoryName: z
-  //   .string()
-  //   .min(3, "Category name must be at least 3 characters long")
-  //   .max(50, "Category name must be at most 50 characters long"),
+  categoryName: z
+    .string()
+    .optional()
+    .refine((val) => !val || (val.length >= 3 && val.length <= 50), {
+      message:
+        "Category name must be between 3 and 50 characters long if provided",
+    }),
 
-  // state: z
-  //   .string()
-  //   .min(2, "State name must be at least 2 characters long")
-  //   .regex(/^[a-zA-Z\s]+$/, "State name can only contain letters and spaces"),
+  state: z
+    .string()
+    .optional()
+    .refine((val) => !val || (/^[a-zA-Z\s]+$/.test(val) && val.length >= 2), {
+      message: "State name must be at least 2 characters and letters only",
+    }),
 
-  // city: z
-  //   .string()
-  //   .min(2, "City name must be at least 2 characters long")
-  //   .regex(/^[a-zA-Z\s]+$/, "City name can only contain letters and spaces"),
+  city: z
+    .string()
+    .optional()
+    .refine((val) => !val || (/^[a-zA-Z\s]+$/.test(val) && val.length >= 2), {
+      message: "City name must be at least 2 characters and letters only",
+    }),
 
   billingAddress: z
     .string()
     .min(10, "Billing address must be at least 10 characters long")
     .max(200, "Billing address must be at most 200 characters long"),
 
-  // shippingAddress: z
-  //   .string()
-  //   .min(10, "Shipping address must be at least 10 characters long")
-  //   .max(200, "Shipping address must be at most 200 characters long"),
+  shippingAddress: z
+    .string()
+    .optional()
+    .refine((val) => !val || (val.length >= 10 && val.length <= 200), {
+      message: "Shipping address must be 10–200 characters long if provided",
+    }),
 
-  // creditPeriod: z
-  //   .number("Credit period must be a number")
-  //   .int("Credit period must be an integer")
-  //   .min(0, "Credit period cannot be negative")
-  //   .max(365, "Credit period cannot exceed 365 days"),
+  creditPeriod: z.preprocess(
+    (val) => (val === "" ? undefined : Number(val)),
+    z
+      .number({ invalid_type_error: "Credit period must be a number" })
+      .int("Credit period must be an integer")
+      .min(0, "Credit period cannot be negative")
+      .max(365, "Credit period cannot exceed 365 days")
+      .optional()
+  ),
 
-  // creditLimit: z
-  //   .number("Credit limit must be a number")
-  //   .min(0, "Credit limit cannot be negative")
-  //   .max(10000000, "Credit limit too high"),
+  creditLimit: z.preprocess(
+    (val) => (val === "" ? undefined : Number(val)),
+    z
+      .number({ invalid_type_error: "Credit limit must be a number" })
+      .min(0, "Credit limit cannot be negative")
+      .max(10000000, "Credit limit too high")
+      .optional()
+  ),
 
-  // pincode: z
-  //   .string()
-  //   .regex(
-  //     /^[1-9][0-9]{5}$/,
-  //     "Pincode must be a valid 6-digit Indian postal code"
-  //   ),
+  pincode: z
+    .string()
+    .optional()
+    .refine((val) => !val || /^[1-9][0-9]{5}$/.test(val), {
+      message: "Pincode must be a valid 6-digit Indian postal code",
+    }),
 
   status: z.enum(["active", "inactive"]).default("active"),
 });
@@ -169,45 +206,50 @@ export const businessSchema = z.object({
 });
 
 export const bankAccountSchema = z.object({
-  accountName: z.string().min(1, "Account name is required"),
+  accountName: z.string().optional(),
 
-  openingBalance: z.number().optional(0),
-
-  asOfDate: z.preprocess(
-    (arg) =>
-      typeof arg === "string" || arg instanceof Date ? new Date(arg) : arg,
-    z.date({
-      required_error: "As of date is required",
-      invalid_type_error: "Invalid date format",
-    })
+  openingBalance: z.preprocess(
+    (val) => (val === "" || val === undefined ? undefined : Number(val)),
+    z.number().optional().default(0)
   ),
+
+  // asOfDate: z.preprocess(
+  //   (arg) =>
+  //     !arg || arg === ""
+  //       ? undefined
+  //       : typeof arg === "string" || arg instanceof Date
+  //       ? new Date(arg)
+  //       : arg,
+  //   z
+  //     .date({
+  //       required_error: "As of date is required",
+  //       invalid_type_error: "Invalid date format",
+  //     })
+  //     .optional()
+  // ),
 
   bankAccountNumber: z
     .string()
-    .regex(/^\d{9,18}$/, "Bank account number must be 9–18 digits"),
+    .optional()
+    .refine((val) => !val || /^\d{9,18}$/.test(val), {
+      message: "Bank account number must be 9–18 digits",
+    }),
 
-  ifscCode: z
+  IFSCCode: z
     .string()
-    .regex(/^[A-Z]{4}0[A-Z0-9]{6}$/, "Invalid IFSC code format"),
+    .optional()
+    .refine((val) => !val || /^[A-Z]{4}0[A-Z0-9]{6}$/.test(val), {
+      message: "Invalid IFSC code format",
+    }),
 
-  bankAndBranchName: z.string().min(1, "Bank name & Branch name are required"),
-
-  accountHolderName: z.string().min(1, "Account holder name is required"),
-
+  bankAndBranchName: z.string().optional(),
+  accountHoldersName: z.string().optional(),
   upiId: z
     .string()
-    .regex(/^[\w.-]{2,256}@[a-zA-Z]{2,64}$/, "Invalid UPI ID format")
-    .optional(),
-
-  partyId: z
-    .string()
-    .regex(/^[0-9a-fA-F]{24}$/, "Invalid Party ID")
-    .optional(),
-
-  clientId: z
-    .string()
-    .regex(/^[0-9a-fA-F]{24}$/, "Invalid Client ID")
-    .optional(),
+    .optional()
+    .refine((val) => !val || /^[\w.-]{2,256}@[a-zA-Z]{2,64}$/.test(val), {
+      message: "Invalid UPI ID format",
+    }),
 });
 
 export const paymentInSchema = z.object({

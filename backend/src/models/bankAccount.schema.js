@@ -3,7 +3,6 @@ import mongoose from "mongoose";
 export const bankAccountSchema = new mongoose.Schema({
   accountName: {
     type: String,
-    required: [true, "Account name is required"],
   },
   openingBalance: {
     type: Number,
@@ -11,13 +10,12 @@ export const bankAccountSchema = new mongoose.Schema({
   },
   paymentAsOfDate: {
     type: Date,
-    required: true,
   },
   bankAccountNumber: {
-    type: Number,
+    type: String,
     required: [true, "Bank account number is required"],
   },
-  ifscCode: {
+  IFSCCode: {
     type: String,
     required: [true, "IFSC code is required"],
   },
@@ -25,7 +23,7 @@ export const bankAccountSchema = new mongoose.Schema({
     type: String,
     required: [true, "Bank name & Branch name are required"],
   },
-  accountHolderName: {
+  accountHoldersName: {
     type: String,
     required: [true, "Account holder name is required"],
   },
@@ -40,6 +38,11 @@ export const bankAccountSchema = new mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: "UserCredential",
   },
+  businessId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Business",
+  },
 });
 
-export const BankAccount = mongoose.model("BankAccount", bankAccountSchema);
+const BankAccount = mongoose.model("BankAccount", bankAccountSchema);
+export default BankAccount;

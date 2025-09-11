@@ -1,9 +1,14 @@
-import { partySchema } from "../config/validation.js";
+import { bankAccountSchema, partySchema } from "../config/validation.js";
 import Party from "../models/party.schema.js";
+import BankAccount from "../models/bankAccount.schema.js";
+
+import mongoose from "mongoose";
 
 export async function createParty(req, res) {
+  const session = await mongoose.startSession();
+  session.startTransaction();
+
   try {
-    // 1. GET THE DATA FROM THE FRONTEND
     const data = req.body;
 
     if (!data) {
@@ -13,21 +18,44 @@ export async function createParty(req, res) {
       });
     }
 
-    // 2. VALIDATION
+    // 1. PARTY VALIDATION
     const validationResult = partySchema.safeParse(data);
     if (!validationResult.success) {
-      const validationError = validationResult.error.format();
       return res.status(422).json({
         success: false,
         msg: "Validation failed",
-        validationError,
+        validationError: validationResult.error.format(),
+      });
+    }
+
+    // 2. BANK ACCOUNT VALIDATION
+    const {
+      bankAccountNumber,
+      IFSCCode,
+      bankAndBranchName,
+      accountHoldersName,
+      upiId,
+    } = data;
+
+    const bankValidationResult = bankAccountSchema.safeParse({
+      bankAccountNumber,
+      IFSCCode,
+      bankAndBranchName,
+      accountHoldersName,
+      upiId,
+    });
+    if (!bankValidationResult.success) {
+      return res.status(422).json({
+        success: false,
+        msg: "Validation failed",
+        validationError: bankValidationResult.error.format(),
       });
     }
 
     const { partyName } = data;
 
-    // 3. CHECK IF PARTY ALREADY EXISTS BY PARTY NAME
-    const partyExists = await Party.findOne({ partyName });
+    // 3. CHECK IF PARTY ALREADY EXISTS
+    const partyExists = await Party.findOne({ partyName }).session(session);
     if (partyExists) {
       return res.status(400).json({
         success: false,
@@ -35,35 +63,53 @@ export async function createParty(req, res) {
       });
     }
 
-    // 6. STORE DATA IN DATABASE
-    const party = await Party.create({
-      ...validationResult.data,
-      businessId: req.body?.businessId,
-      clientId: req.user?.id,
-    });
+    // 4. CREATE PARTY
+    const party = await Party.create(
+      [
+        {
+          ...validationResult.data,
+          businessId: req.body?.businessId,
+          clientId: req.user?.id,
+        },
+      ],
+      { session }
+    );
 
-    if (!party) {
-      return res.status(422).json({
-        success: false,
-        msg: "Failed to create party",
-      });
-    }
+    const partyData = party[0];
 
-    // 7. SUCCESS RESPONSE
+    // 5. CREATE BANK ACCOUNT with partyId
+    const bankAccount = await BankAccount.create(
+      [
+        {
+          ...bankValidationResult.data,
+          clientId: req.user?.id,
+          businessId: req.body?.businessId,
+          partyId: partyData._id,
+        },
+      ],
+      { session }
+    );
+
+    await session.commitTransaction();
+    session.endSession();
+
     return res.status(201).json({
       success: true,
       msg: "Party created successfully",
-      party,
+      party: partyData,
+      bankAccount: bankAccount[0],
     });
   } catch (error) {
+    await session.abortTransaction();
+    session.endSession();
+
     console.log("ERROR IN CREATING PARTY:", error);
-    
-    // Handle duplicate key errors from MongoDB
+
     if (error.code === 11000) {
-      const field = Object.keys(error.keyValue)[0]; // GSTIN or PAN
+      const field = Object.keys(error.keyValue)[0];
       return res.status(400).json({
         success: false,
-        msg: `${field} "${error.keyValue[field]}"already exists`,
+        msg: `${field} "${error.keyValue[field]}" already exists`,
       });
     }
 

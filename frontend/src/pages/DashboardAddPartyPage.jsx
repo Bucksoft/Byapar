@@ -14,6 +14,7 @@ import BankAccountPopup from "../components/BankAccountPopup";
 
 const DashboardAddPartyPage = () => {
   const navigate = useNavigate();
+  const [isAddedBankInfo, setIsAddedBankInfo] = useState(false);
   const { setParty } = usePartyStore();
   const [addCategoryPopup, setAddCategoryPopup] = useState(false);
   const { business } = useBusinessStore();
@@ -36,17 +37,20 @@ const DashboardAddPartyPage = () => {
     creditLimit: 0,
     pincode: "",
     businessId: business?._id,
+    bankAccountNumber: "",
+    IFSCCode: "",
+    accountHoldersName: "",
+    bankAndBranchName: "",
+    upiId: "",
   });
 
   // handling the input field changes
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-
     if (name === "state") {
       const stateInfo = statesAndCities.find((s) => s.state === value);
       setCities(stateInfo ? stateInfo.cities : []);
     }
-
     setData((prev) => ({
       ...prev,
       [name]: value,
@@ -62,6 +66,7 @@ const DashboardAddPartyPage = () => {
     onSuccess: (data) => {
       toast.success("Party created");
       setParty(data);
+      navigate("/dashboard/parties");
       queryClient.invalidateQueries({ queryKey: ["parties"] });
     },
     onError: (err) => {
@@ -495,11 +500,96 @@ const DashboardAddPartyPage = () => {
 
         <h3 className="p-3 text-sm text-zinc-500">Party Bank Account</h3>
 
-        <section className="flex flex-col py-16 items-center justify-center bg-white gap-4 text-xs">
-          <Landmark size={30} />
-          <p>Add party bank information to manage transactions</p>
-          <BankAccountPopup partyName={data?.partyName} />
-        </section>
+        {isAddedBankInfo ? (
+          <div className="flex flex-col items-center justify-center gap-4 py-16 px-5">
+            <section className="w-full grid grid-cols-5 gap-5">
+              <div className=" flex flex-col border rounded-lg border-[var(--gray-text)]/20 p-2 shadow-md  bg-white">
+                <p className="font-medium text-sm">Account Holder's Name</p>
+                <span className="text-[var(--gray-text)]">
+                  {data?.accountHoldersName}
+                </span>
+                <small className="text-[var(--error-text-color)]">
+                  {
+                    mutation?.error?.response?.data?.validationError
+                      ?.accountHoldersName?._errors[0]
+                  }
+                </small>
+              </div>
+
+              <div className="flex flex-col border rounded-lg border-[var(--gray-text)]/20 p-2 shadow-md bg-white">
+                <p className="font-medium text-sm">Bank Account Number</p>
+                <span className="text-[var(--gray-text)]">
+                  {data?.bankAccountNumber}
+                </span>
+                <small className="text-[var(--error-text-color)]">
+                  {
+                    mutation?.error?.response?.data?.validationError
+                      ?.bankAccountNumber?._errors[0]
+                  }
+                </small>
+              </div>
+
+              <div className="flex flex-col  border rounded-lg border-[var(--gray-text)]/20 p-2 shadow-md bg-white">
+                <p className="font-medium text-sm">IFSC Code</p>
+                <span className="text-[var(--gray-text)]">
+                  {data?.IFSCCode}
+                </span>
+                <small className="text-[var(--error-text-color)]">
+                  {
+                    mutation?.error?.response?.data?.validationError?.IFSCCode
+                      ?._errors[0]
+                  }
+                </small>
+              </div>
+
+              <div className="flex flex-col border rounded-lg border-[var(--gray-text)]/20 p-2 shadow-md bg-white">
+                <p className="font-medium text-sm">Bank & Branch Name</p>
+                <span className="text-[var(--gray-text)]">
+                  {data?.accountHoldersName}
+                </span>
+                <small className="text-[var(--error-text-color)]">
+                  {
+                    mutation?.error?.response?.data?.validationError
+                      ?.accountHoldersName?._errors[0]
+                  }
+                </small>
+              </div>
+
+              <div className="flex flex-col border rounded-lg border-[var(--gray-text)]/20 p-2 shadow-md bg-white">
+                <p className="font-medium text-sm">UPI Id</p>
+                <span className="text-[var(--gray-text)]">{data?.upiId}</span>
+                <small className="text-[var(--error-text-color)]">
+                  {
+                    mutation?.error?.response?.data?.validationError?.upiId
+                      ?._errors[0]
+                  }
+                </small>
+              </div>
+            </section>
+            <BankAccountPopup
+              partyName={data?.partyName}
+              setData={setData}
+              data={data}
+              handleInputChange={handleInputChange}
+              setIsAddedBankInfo={setIsAddedBankInfo}
+              mutation={mutation}
+            />
+          </div>
+        ) : (
+          <section className="flex flex-col py-16 items-center justify-center bg-white gap-4 text-xs">
+            <Landmark size={30} />
+            <p>Add party bank information to manage transactions</p>
+            {/* Bank Account Popup */}
+            <BankAccountPopup
+              partyName={data?.partyName}
+              setData={setData}
+              data={data}
+              handleInputChange={handleInputChange}
+              setIsAddedBankInfo={setIsAddedBankInfo}
+            />
+          </section>
+        )}
+
         {addCategoryPopup && (
           <>
             <div className="fixed inset-0 z-100 flex items-center justify-center bg-black/40 backdrop-blur-sm">

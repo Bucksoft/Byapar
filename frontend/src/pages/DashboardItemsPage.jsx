@@ -38,9 +38,8 @@ const DashboardItemsPage = () => {
   useEffect(() => {
     if (isSuccess && items) {
       setItems(items);
-      queryClient.invalidateQueries({ queryKey: ["items"] });
     }
-  }, [isSuccess, items]);
+  }, [isSuccess]);
 
   const searchedItems = items?.filter((item) =>
     item?.itemName.toLowerCase().includes(searchQuery.toLowerCase())

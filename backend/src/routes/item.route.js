@@ -5,11 +5,13 @@ import {
   deleteSingleItem,
   getAllItems,
   updateItem,
+  updateStock,
 } from "../controllers/item.controller.js";
 import { isAuth } from "../middleware/auth.middleware.js";
 
 const router = express.Router();
 
+router.route("/stock").patch(isAuth, updateStock);
 router.route("/:id").post(isAuth, createItem);
 router.route("/all/:id").get(isAuth, getAllItems);
 router.route("/").delete(isAuth, deleteItem);

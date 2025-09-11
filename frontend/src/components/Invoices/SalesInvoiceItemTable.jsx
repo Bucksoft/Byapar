@@ -388,7 +388,7 @@ const SalesInvoiceItemTable = ({ data, setData }) => {
                               ) || "-"}
                             </td>
                             <td>-</td>
-                            <td>{item?.openingStock || "-"}</td>
+                            <td>{item?.currentStock || "-"}</td>
                             <td>
                               {showCounterId === item?._id ? (
                                 <div className="flex justify-center">
