@@ -57,7 +57,14 @@ const DashboardPaymentInDetails = () => {
             </p>
           </div>
           <div className="flex items-center gap-2">
-            <button className="btn btn-sm">
+            <button
+              onClick={() =>
+                navigate(`/dashboard/parties/create-payment-in`, {
+                  state: { id: id },
+                })
+              }
+              className="btn btn-sm"
+            >
               <SquarePen size={15} />
               Edit
             </button>

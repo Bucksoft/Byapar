@@ -212,3 +212,31 @@ export async function deletePaymentIn(req, res) {
       .json({ success: false, msg: "Internal Server Error" });
   }
 }
+
+export async function updatePaymentIn(req, res) {
+  try {
+    const businessId = new mongoose.Types.ObjectId(req.params.businessId);
+    const paymentInId = new mongoose.Types.ObjectId(req.params.id);
+    const existingPaymentIn = await PaymentIn.findOne({
+      businessId: businessId,
+      _id: paymentInId,
+    });
+    if (!existingPaymentIn) {
+      return res.status(400).json({ msg: "Payment In doesn't exists" });
+    }
+    const data = req.body;
+    const updatedPaymentIn = await PaymentIn.findByIdAndUpdate(
+      { _id: paymentInId },
+      data,
+      { new: true }
+    );
+    return res
+      .status(200)
+      .json({ msg: "Updated successfully", updatedPaymentIn });
+  } catch (error) {
+    console.error("ERROR IN UPDATING PAYMENT IN DETAILS :", error);
+    return res
+      .status(500)
+      .json({ success: false, msg: "Internal Server Error" });
+  }
+}

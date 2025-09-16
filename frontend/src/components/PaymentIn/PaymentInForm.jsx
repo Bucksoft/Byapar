@@ -1,5 +1,5 @@
 import { ArrowLeft } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { usePartyStore } from "../../store/partyStore";
 import { useEffect, useRef, useState } from "react";
 import { useInvoiceStore } from "../../store/invoicesStore";
@@ -11,6 +11,7 @@ import { useBusinessStore } from "../../store/businessStore";
 import { axiosInstance } from "../../config/axios";
 import { queryClient } from "../../main";
 import { usePurchaseInvoiceStore } from "../../store/purchaseInvoiceStore";
+import { usePaymentInStore } from "../../store/paymentInStore";
 
 const PaymentInForm = () => {
   const [settledInvoices, setSettledInvoices] = useState({});
@@ -18,10 +19,14 @@ const PaymentInForm = () => {
   const { parties, setParty } = usePartyStore();
   const { invoices } = useInvoiceStore();
   const { business } = useBusinessStore();
+  const { paymentIns } = usePaymentInStore();
   const [selectedParty, setSelectedParty] = useState();
+  const [paymentInToEdit, setPaymentInToEdit] = useState();
   const [totalInvoiceAmount, setTotalInvoiceAmount] = useState(0);
   const [allInvoices, setAllInvoices] = useState([]);
   const paymentAmountRef = useRef();
+  const location = useLocation();
+
   const [data, setData] = useState({
     partyName: "",
     paymentAmount: 0,
@@ -74,6 +79,32 @@ const PaymentInForm = () => {
     setData((prev) => ({ ...prev, settledInvoices: newSettled }));
   }, [data.paymentAmount, allInvoices]);
 
+  // Edit payment in useEffect
+  useEffect(() => {
+    if (!location?.state?.id || !paymentIns?.length) return;
+
+    const paymentIn = paymentIns.find((p) => p?._id === location.state.id);
+
+    if (paymentIn) {
+      setPaymentInToEdit(paymentIn);
+
+      // Fill all state values into data
+      setSelectedParty(paymentIn?.partyName);
+      setData((prev) => ({
+        ...prev,
+        partyName: paymentIn.partyName || "",
+        paymentAmount: Number(paymentIn.paymentAmount) || 0,
+        paymentDate: paymentIn.paymentDate
+          ? new Date(paymentIn.paymentDate)
+          : new Date(Date.now()),
+        paymentMode: paymentIn.paymentMode || "cash",
+        paymentInNumber: paymentIn.paymentInNumber || 1,
+        notes: paymentIn.notes || "",
+        settledInvoices: paymentIn.settledInvoices || {},
+      }));
+    }
+  }, [location?.state?.id, paymentIns]);
+
   // handling actual form submission
   const mutation = useMutation({
     mutationFn: async (data) => {
@@ -86,17 +117,23 @@ const PaymentInForm = () => {
         paymentAmountRef.current.focus();
         throw new Error("Please enter a payment amount");
       }
-      const res = await axiosInstance.post(
-        `/payment-in/${business?._id}`,
-        data
-      );
+      let res;
+
+      if (paymentInToEdit?._id) {
+        res = await axiosInstance.patch(
+          `/payment-in/${business?._id}/${paymentInToEdit._id}`,
+          data
+        );
+      } else {
+        res = await axiosInstance.post(`/payment-in/${business?._id}`, data);
+      }
 
       return res.data;
     },
     onSuccess: (data) => {
       toast.success(data.msg || "Payment In recorded successfully");
       setParty(data);
-      navigate(-1);
+      navigate("/dashboard/payment-in");
       queryClient.invalidateQueries({ queryKey: ["paymentIns", "invoices"] });
     },
     onError: (err) => {
@@ -122,6 +159,11 @@ const PaymentInForm = () => {
     },
     { totalPending: 0, totalSettled: 0 }
   );
+
+  const formatDateForInput = (date) => {
+    if (!date) return "";
+    return new Date(date).toISOString().split("T")[0];
+  };
 
   return (
     <main className="h-full w-full p-2 ">
@@ -213,7 +255,7 @@ const PaymentInForm = () => {
                 <input
                   type="date"
                   className="input input-sm mt-2"
-                  value={data?.paymentDate}
+                  value={formatDateForInput(data?.paymentDate)}
                   onChange={(e) =>
                     setData((prev) => ({
                       ...prev,
