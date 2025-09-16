@@ -128,7 +128,8 @@ const SalesInvoiceFooterSection = ({ data, setData, title }) => {
                 </span>
                 <input
                   type="number"
-                  placeholder=""
+                  placeholder="0"
+                  disabled={data.additionalChargeReason.length === 0}
                   value={data?.additionalChargeAmount}
                   onChange={(e) =>
                     setData((prev) => ({
@@ -140,7 +141,11 @@ const SalesInvoiceFooterSection = ({ data, setData, title }) => {
                 />
                 <select
                   defaultValue="No Tax Applicable"
-                  value={data?.additionalChargeTax}
+                  value={
+                    data.additionalChargeReason.length > 0
+                      ? data?.additionalChargeTax
+                      : 0
+                  }
                   onChange={(e) =>
                     setData((prev) => ({
                       ...prev,

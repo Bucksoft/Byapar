@@ -138,6 +138,8 @@ const SalesInvoicePartyDetailsSection = ({
             </p>
           </div>
         </div>
+
+        
         {/* third block */}
         <div className="border-t border-r border-zinc-300 pt-1 relative">
           {/* upper part */}

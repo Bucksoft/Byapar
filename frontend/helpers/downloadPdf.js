@@ -6,9 +6,25 @@ export const downloadPDF = async (id) => {
   try {
     const input = document.getElementById(id);
     const element = input.outerHTML;
+
+    const fullHTML = `
+      <!DOCTYPE html>
+      <html lang="en">
+        <head>
+          <meta charset="UTF-8" />
+          <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+          <!-- Tailwind CDN (or your built CSS path) -->
+          <script src="https://cdn.tailwindcss.com"></script>
+        </head>
+        <body>
+          ${element}
+        </body>
+      </html>
+    `;
+
     const response = await axiosInstance.post(
       "/generate-pdf",
-      { html: element },
+      { html: fullHTML },
       { responseType: "blob" }
     );
 

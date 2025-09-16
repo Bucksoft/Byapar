@@ -10,13 +10,21 @@ import CustomLoader from "../components/Loader";
 import { useNavigate } from "react-router-dom";
 import { usePaymentInStore } from "../store/paymentInStore";
 import { useBusinessStore } from "../store/businessStore";
+import dayjs from "dayjs";
+import isSameOrAfter from "dayjs/plugin/isSameOrAfter";
+import isSameOrBefore from "dayjs/plugin/isSameOrBefore";
+import isoWeek from "dayjs/plugin/isoWeek";
+
+dayjs.extend(isSameOrAfter);
+dayjs.extend(isSameOrBefore);
+dayjs.extend(isoWeek);
 
 const DashboardPaymentInPage = () => {
   const [page, setPage] = useState("");
   const navigate = useNavigate();
   const [searchedQuery, setSearchedQuery] = useState("");
   const { setPaymentIns } = usePaymentInStore();
-  const [filterDate, setFilterDate] = useState();
+  const [filterDate, setFilterDate] = useState("today");
   const { business } = useBusinessStore();
 
   const { isLoading, data: paymentIns } = useQuery({
@@ -28,18 +36,57 @@ const DashboardPaymentInPage = () => {
     },
   });
 
-  const filteredPaymentIns =
-    searchedQuery.trim() === ""
-      ? paymentIns
-      : paymentIns?.filter(
-          (paymentIn) =>
-            paymentIn?.paymentInNumber
-              ?.toLowerCase()
-              .includes(searchedQuery.toLowerCase()) ||
-            paymentIn?.partyName
-              ?.toLowerCase()
-              .includes(searchedQuery.toLowerCase())
-        );
+  const filteredPaymentIns = paymentIns?.filter((paymentIn) => {
+    // 1. Search query filter
+    if (searchedQuery.trim() !== "") {
+      const matchesSearch =
+        paymentIn?.paymentInNumber
+          ?.toLowerCase()
+          .includes(searchedQuery.toLowerCase()) ||
+        paymentIn?.partyName
+          ?.toLowerCase()
+          .includes(searchedQuery.toLowerCase());
+      if (!matchesSearch) return false;
+    }
+
+    // 2. Date filter
+    if (filterDate) {
+      const today = dayjs();
+      const paymentDate = dayjs(paymentIn?.paymentDate || paymentIn?.createdAt);
+
+      switch (filterDate) {
+        case "today":
+          if (!paymentDate.isSame(today, "day")) return false;
+          break;
+
+        case "yesterday":
+          if (!paymentDate.isSame(today.subtract(1, "day"), "day"))
+            return false;
+          break;
+
+        case "thisWeek":
+          if (
+            !paymentDate.isSameOrAfter(today.startOf("week")) ||
+            !paymentDate.isSameOrBefore(today.endOf("week"))
+          )
+            return false;
+          break;
+
+        case "lastWeek":
+          const lastWeekStart = today.subtract(1, "week").startOf("week");
+          const lastWeekEnd = today.subtract(1, "week").endOf("week");
+          if (
+            !paymentDate.isSameOrAfter(lastWeekStart) ||
+            !paymentDate.isSameOrBefore(lastWeekEnd)
+          )
+            return false;
+          break;
+        default:
+          break;
+      }
+    }
+    return true;
+  });
 
   return (
     <main className="h-full p-2">
