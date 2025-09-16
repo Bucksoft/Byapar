@@ -71,6 +71,7 @@ import DeliveryChallan from "./components/Invoices/DeliveryChallan";
 import ProformaInvoice from "./components/Invoices/ProformaInvoice";
 import PurchaseInvoice from "./components/Invoices/PurchaseInvoice";
 import DashboardPaymentOutDetails from "./pages/DashboardPaymentOutDetails";
+import DashboardUpdateInvoicesPage from "./pages/DashboardUpdateInvoicesPage";
 
 function App() {
   const { user, setUser } = useAuthStore();
@@ -116,6 +117,11 @@ function App() {
           <Route
             path="/dashboard/my-businesses"
             element={<DashboardMyBusinesses />}
+          />
+
+          <Route
+            path="/dashboard/update/:id"
+            element={<DashboardUpdateInvoicesPage />}
           />
 
           <Route

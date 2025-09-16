@@ -1,5 +1,5 @@
 import { ArrowLeft } from "lucide-react";
-import { useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useMutation } from "@tanstack/react-query";
 import { axiosInstance } from "../../config/axios";
@@ -13,7 +13,14 @@ import { useRef } from "react";
 import CustomLoader from "../Loader";
 import { BsFillSaveFill } from "react-icons/bs";
 
-const InvoicesForm = ({ title, party, setParty }) => {
+const InvoicesForm = ({
+  title,
+  party,
+  setParty,
+  type,
+  isEditing,
+  invoiceToUpdate,
+}) => {
   const { business } = useBusinessStore();
   // const { invoices } = useInvoiceStore();
   const invoiceNoRef = useRef();
@@ -47,17 +54,30 @@ const InvoicesForm = ({ title, party, setParty }) => {
   const [addedItems, setAddedItems] = useState([]);
   const [data, setData] = useState(invoiceData);
 
+  useEffect(() => {
+    if (isEditing && invoiceToUpdate) {
+      setData((prev) => ({
+        ...prev,
+        ...invoiceToUpdate,
+        partyName: invoiceToUpdate?.partyName || prev.partyName,
+      }));
+
+      setAddedItems(invoiceToUpdate?.items || []);
+    }
+  }, [isEditing, invoiceToUpdate]);
+
   const mutation = useMutation({
-    mutationFn: async (data) => {
+    mutationFn: async (formData) => {
       if (!party) {
         throw new Error("Please select a party");
       }
-      if (data.items.length <= 0) {
+      if (formData.items.length <= 0) {
         throw new Error("Please add at least 1 item");
       }
 
-      // Dynamically decide endpoint based on title
       let endpoint = "";
+      let method = isEditing ? "patch" : "post";
+
       switch (title) {
         case "Quotation":
           endpoint = `/quotation/${business?._id}`;
@@ -87,16 +107,30 @@ const InvoicesForm = ({ title, party, setParty }) => {
           toast.error("Invalid invoice type");
           return;
       }
-      const res = await axiosInstance.post(endpoint, {
-        ...data,
-        partyName: party?.partyName,
-      });
+
+      if (isEditing && invoiceToUpdate?._id) {
+        endpoint = `${endpoint}/${invoiceToUpdate._id}`;
+      }
+
+      let res;
+      if (method === "post") {
+        res = await axiosInstance.post(endpoint, {
+          ...formData,
+          partyName: party?.partyName,
+        });
+      } else {
+        res = await axiosInstance.patch(endpoint, {
+          ...formData,
+          partyName: party?.partyName,
+        });
+      }
+
       return res.data;
     },
-
     onSuccess: (data) => {
       toast.success(data?.msg);
       queryClient.invalidateQueries({ queryKey: ["invoices"] });
+
       if (data?.quotation?._id) {
         navigate(`/dashboard/quotations/${data?.quotation?._id}`);
       } else if (data?.salesInvoice?._id) {
@@ -107,19 +141,18 @@ const InvoicesForm = ({ title, party, setParty }) => {
         navigate(`/dashboard/sales-return/${data?.salesReturn?._id}`);
       } else if (data?.deliveryChallan?._id) {
         navigate(`/dashboard/delivery-challan/${data?.deliveryChallan?._id}`);
-      } else if (data?.proformInvoice?._id) {
-        navigate(`/dashboard/proforma-invoice/${data?.proformInvoice?._id}`);
-      } else if (data?.purchaseInvoice?._id) {
-        navigate(`/dashboard/purchase-invoice/${data?.purchaseInvoice?._id}`);
+      } else if (data?.proformaInvoice?._id) {
+        navigate(`/dashboard/proforma-invoice/${data?.proformaInvoice?._id}`);
+      } else if (data?.purchaseReturn?._id) {
+        navigate(`/dashboard/purchase-return/${data?.purchaseReturn?._id}`);
       }
     },
-
     onError: (err) => {
       toast.error(
         err?.response?.data?.msg || err?.message || "Something went wrong"
       );
       if (
-        err.response.data.msg ===
+        err.response?.data?.msg ===
         "Invoice already exists with this invoice number"
       ) {
         invoiceNoRef.current.focus();
@@ -128,13 +161,75 @@ const InvoicesForm = ({ title, party, setParty }) => {
     },
   });
 
+  // add near your other useState declarations
+  const [quantities, setQuantities] = useState({});
+
+  // --- normalize invoiceToUpdate when editing and seed addedItems + quantities + data ---
+  useEffect(() => {
+    if (isEditing && invoiceToUpdate) {
+      // Normalize items coming from backend (ensure numeric fields & quantity)
+      const normalizedItems = (invoiceToUpdate.items || []).map((it, idx) => {
+        const id = it._id || it.itemId || `item-${idx}`;
+        const qty = Number(it.quantity ?? it.qty ?? 1);
+        return {
+          ...it,
+          _id: id,
+          quantity: qty,
+          salesPrice: Number(it.salesPrice ?? it.rate ?? 0),
+          gstTaxRate: it.gstTaxRate ?? it.gstRate ?? "0%",
+          gstTaxRateType: it.gstTaxRateType ?? "with tax",
+          discountPercent: it.discountPercent ?? 0,
+          discountAmount: Number(it.discountAmount ?? 0),
+        };
+      });
+
+      // seed quantities map
+      const qtyMap = {};
+      normalizedItems.forEach((it) => {
+        qtyMap[it._id] = it.quantity;
+      });
+
+      setAddedItems(normalizedItems);
+      setQuantities(qtyMap);
+
+      // normalize top-level numeric fields as well before setting data
+      setData((prev) => ({
+        ...prev,
+        ...invoiceToUpdate,
+        partyName: invoiceToUpdate?.partyName ?? prev.partyName,
+        additionalChargeAmount: Number(
+          invoiceToUpdate?.additionalChargeAmount ??
+            prev.additionalChargeAmount ??
+            0
+        ),
+        additionalDiscountAmount: Number(
+          invoiceToUpdate?.additionalDiscountAmount ??
+            prev.additionalDiscountAmount ??
+            0
+        ),
+        additionalChargeTax:
+          invoiceToUpdate?.additionalChargeTax ?? prev.additionalChargeTax,
+        additionalDiscountType:
+          invoiceToUpdate?.additionalDiscountType ??
+          prev.additionalDiscountType,
+        items: normalizedItems,
+        balanceAmount: Number(
+          invoiceToUpdate?.balanceAmount ?? prev.balanceAmount ?? 0
+        ),
+      }));
+    }
+  }, [isEditing, invoiceToUpdate]);
+
   return (
     <main className="max-h-screen w-full">
       {/* navbar starts ----------------------------------------------------- */}
       <header className="p-2 w-full flex items-center justify-between ">
         <div className="flex items-center justify-center">
           <ArrowLeft size={18} onClick={() => navigate(-1)} />
-          <span className="pl-3">Create {title}</span>
+          <span className="pl-3">
+            {" "}
+            {isEditing ? `Update ${title}` : `Create ${title}`}{" "}
+          </span>
         </div>
         <div className="flex items-center justify-center gap-5">
           {/* <button className="btn btn-sm">Settings</button> */}
@@ -165,11 +260,17 @@ const InvoicesForm = ({ title, party, setParty }) => {
         setParty={setParty}
         title={title}
         invoiceNoRef={invoiceNoRef}
+        isEditing={isEditing}
       />
       {/* Upper section of invoice form invoice number, dates , party name details etc ends here ---------------------------------------*/}
 
       {/* This is the table where items are listed with their prices ----------------------------*/}
-      <SalesInvoiceItemTable title={title} data={data} setData={setData} />
+      <SalesInvoiceItemTable
+        title={title}
+        data={data}
+        setData={setData}
+        isEditing={isEditing}
+      />
 
       {/* bottom grid part */}
       <SalesInvoiceFooterSection
@@ -177,6 +278,7 @@ const InvoicesForm = ({ title, party, setParty }) => {
         setData={setData}
         addedItems={addedItems}
         title={title}
+        isEditing={isEditing}
       />
     </main>
   );

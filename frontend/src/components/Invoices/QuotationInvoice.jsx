@@ -1,4 +1,4 @@
-import { ArrowLeft, Download, EllipsisVertical } from "lucide-react";
+import { ArrowLeft, Download, EllipsisVertical, Trash2 } from "lucide-react";
 import { GiProfit } from "react-icons/gi";
 import { TbFileInvoice } from "react-icons/tb";
 import { useNavigate, useParams } from "react-router-dom";
@@ -14,6 +14,7 @@ import CustomLoader from "../Loader";
 const QuotationInvoice = () => {
   const { id } = useParams();
   const navigate = useNavigate();
+  const [quotationIdToDelete, setQuotationIdToDelete] = useState();
   const [invoiceIdToDownload, setInvoiceIdToDownload] = useState("invoice");
 
   // THIS IS THE QUERY TO GET THE INVOICE BASED ON ID
@@ -26,12 +27,15 @@ const QuotationInvoice = () => {
 
   // THIS IS THE MUTATION TO DELETE THE INVOICE
   const mutation = useMutation({
-    mutationFn: async (invoiceId) => {
-      const res = await axiosInstance.delete(`/quotation/${invoiceId}`);
+    mutationFn: async () => {
+      const res = await axiosInstance.delete(
+        `/quotation/${quotationIdToDelete}`
+      );
       return res.data;
     },
     onSuccess: (data) => {
       toast.success(data?.msg);
+      navigate(-1);
       queryClient.invalidateQueries({ queryKey: ["invoices"] });
     },
   });
@@ -58,7 +62,15 @@ const QuotationInvoice = () => {
                 className="dropdown-content menu bg-base-100 rounded-box z-1 w-52 p-2 shadow-sm"
               >
                 <li>
-                  <button>Edit</button>
+                  <button
+                    onClick={() =>
+                      navigate(
+                        `/dashboard/update/${quotation?._id}?type=quotation`
+                      )
+                    }
+                  >
+                    Edit
+                  </button>
                 </li>
                 {/* <li>
                   <button>Edit History</button>
@@ -66,12 +78,16 @@ const QuotationInvoice = () => {
                 <li>
                   <button>Duplicate</button>
                 </li> */}
-
-                <li
-                  onClick={() => mutation.mutate(id)}
-                  className="text-[var(--error-text-color)]"
-                >
-                  <button>Delete</button>
+                <li>
+                  <button
+                    onClick={() => {
+                      document.getElementById("my_modal_3").showModal();
+                      setQuotationIdToDelete(quotation?._id);
+                    }}
+                    className="text-error"
+                  >
+                    Delete
+                  </button>
                 </li>
               </ul>
             </div>
@@ -87,7 +103,7 @@ const QuotationInvoice = () => {
             >
               <Download size={15} /> Download PDF
             </button>
-            <select className="select select-sm">
+            {/* <select className="select select-sm">
               <option className="hidden">Print PDF</option>
               <option>Print PDF</option>
               <option>Print Thermal</option>
@@ -99,7 +115,7 @@ const QuotationInvoice = () => {
               <option className="hidden">Share</option>
               <option>Whatsapp</option>
               <option>SMS</option>
-            </select>
+            </select> */}
           </div>
 
           <div className="flex items-center gap-2">
@@ -126,6 +142,28 @@ const QuotationInvoice = () => {
           )}
         </section>
       </div>
+      <dialog id="my_modal_3" className="modal">
+        <div className="modal-box">
+          <form method="dialog">
+            <button className="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">
+              ✕
+            </button>
+          </form>
+          <h3 className="font-bold text-lg">Are you sure ?</h3>
+          <p className="py-4">
+            This action cannot be undone. All values associated with this field
+            will be lost.
+          </p>
+          <div className="w-full grid place-items-end">
+            <button
+              onClick={() => mutation.mutate()}
+              className="btn btn-sm bg-[var(--error-text-color)] text-[var(--primary-text-color)]"
+            >
+              Delete
+            </button>
+          </div>
+        </div>
+      </dialog>
     </main>
   );
 };

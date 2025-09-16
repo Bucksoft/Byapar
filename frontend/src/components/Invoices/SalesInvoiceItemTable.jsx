@@ -8,7 +8,7 @@ import { CircleX, Percent } from "lucide-react";
 import { useInvoiceStore } from "../../store/invoicesStore";
 import { usePurchaseInvoiceStore } from "../../store/purchaseInvoiceStore";
 
-const SalesInvoiceItemTable = ({ title, data, setData }) => {
+const SalesInvoiceItemTable = ({ title, data, setData, isEditing }) => {
   const [searchItemQuery, setSearchItemQuery] = useState("");
   const [showCounterId, setShowCounterId] = useState();
   const [addedItems, setAddedItems] = useState([]);
@@ -220,6 +220,7 @@ const SalesInvoiceItemTable = ({ title, data, setData }) => {
     data?.additionalChargeTax,
     data?.additionalDiscountAmount,
     data?.additionalDiscountType,
+    isEditing,
   ]);
 
   // THIS USE EFFECT CALCULATES
@@ -241,7 +242,7 @@ const SalesInvoiceItemTable = ({ title, data, setData }) => {
         setData((prev) => ({ ...invoice, invoiceId: invoice?._id }));
       }
     }
-  }, [data?.invoiceId, invoices]);
+  }, [data?.invoiceId, invoices, isEditing]);
 
   return (
     <>

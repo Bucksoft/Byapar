@@ -6,16 +6,21 @@ import { axiosInstance } from "../config/axios";
 import CustomLoader from "../components/Loader";
 import { LiaRupeeSignSolid } from "react-icons/lia";
 import { useBusinessStore } from "../store/businessStore";
+import { useQuotationStore } from "../store/quotationStore";
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 const DashboardQuotationPage = () => {
   const { business } = useBusinessStore();
+  const { setQuotations } = useQuotationStore();
   const [searchedQuery, setSearchedQuery] = useState("");
+  const navigate = useNavigate();
 
   const { isLoading, data: quotations = [] } = useQuery({
     queryKey: ["quotations"],
     queryFn: async () => {
       const res = await axiosInstance.get(`/quotation/all/${business?._id}`);
+      setQuotations(res.data.quotations);
       return Array.isArray(res.data.quotations) ? res.data.quotations : [];
     },
   });
@@ -60,7 +65,13 @@ const DashboardQuotationPage = () => {
                   0 ? (
                     (searchedQuery ? searchedQuotations : quotations).map(
                       (quotation) => (
-                        <tr key={quotation._id}>
+                        <tr
+                          key={quotation._id}
+                          onClick={() =>
+                            navigate(`/dashboard/quotations/${quotation?._id}`)
+                          }
+                          className="cursor-pointer"
+                        >
                           <td>{quotation?.quotationDate?.split("T")[0]}</td>
                           <td>{quotation?.quotationNumber}</td>
                           <td>{quotation?.partyId?.partyName}</td>
@@ -74,7 +85,7 @@ const DashboardQuotationPage = () => {
                             </div>
                           </td>
                           <td>
-                            <div className="badge badge-accent">
+                            <div className="badge badge-accent badge-soft">
                               {quotation?.status}
                             </div>
                           </td>

@@ -23,6 +23,7 @@ router.route("/").post(
 );
 router.route("/active").get(isAuth, getActiveBusiness);
 router.route("/active").patch(isAuth, markBusinessAsActive);
+
 router.route("/").get(isAuth, getAllBusinesses);
 router.route("/:id").patch(
   upload.fields([
