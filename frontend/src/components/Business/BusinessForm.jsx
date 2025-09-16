@@ -11,8 +11,9 @@ import toast from "react-hot-toast";
 import { Trash } from "lucide-react";
 import { useRef } from "react";
 import { useBusinessStore } from "../../store/businessStore";
+import { useNavigate } from "react-router-dom";
 
-const BusinessForm = () => {
+const BusinessForm = ({ businessToBeUpdated }) => {
   const [additionalInformation, setAdditionalInformation] = useState([{}]);
   const [additionalInfoKey, setAdditionalInfoKey] = useState("");
   const [additionalInfoValue, setAdditionalInfoValue] = useState("");
@@ -22,6 +23,7 @@ const BusinessForm = () => {
   const logoRef = useRef(null);
   const signatureRef = useRef(null);
   const { setBusiness } = useBusinessStore();
+  const navigate = useNavigate();
 
   const [data, setData] = useState({
     businessName: "",
@@ -40,6 +42,29 @@ const BusinessForm = () => {
     TCS: false,
     pincode: "",
   });
+
+  // THIS IS USED TO AUTOMATICALLY ADD ALL THE FIELDS FOR EDITING
+  useEffect(() => {
+    if (businessToBeUpdated) {
+      setData({
+        businessName: businessToBeUpdated.businessName || "",
+        businessType: businessToBeUpdated.businessType || "",
+        industryType: businessToBeUpdated.industryType || "",
+        companyPhoneNo: businessToBeUpdated.companyPhoneNo || "",
+        businessRegType: businessToBeUpdated.businessRegType || "",
+        companyEmail: businessToBeUpdated.companyEmail || "",
+        billingAddress: businessToBeUpdated.billingAddress || "",
+        state: businessToBeUpdated.state || "",
+        city: businessToBeUpdated.city || "",
+        gstRegistered: businessToBeUpdated.gstRegistered || false,
+        gstNumber: businessToBeUpdated.gstNumber || "",
+        panNumber: businessToBeUpdated.panNumber || "",
+        TDS: businessToBeUpdated.TDS || false,
+        TCS: businessToBeUpdated.TCS || false,
+        pincode: businessToBeUpdated.pincode || "",
+      });
+    }
+  }, [businessToBeUpdated]);
 
   // HANDLES THE LOGO CHANGE
   const handleLogoChange = (e) => {
@@ -75,6 +100,7 @@ const BusinessForm = () => {
     }));
   };
 
+  // CREATE BUSINESS
   const mutation = useMutation({
     mutationFn: async (formData) => {
       const res = await axiosInstance.post("/business", formData);
@@ -83,6 +109,26 @@ const BusinessForm = () => {
     onSuccess: (data) => {
       toast.success("Business created");
       queryClient.invalidateQueries({ queryKey: ["business"] });
+      setBusiness(data);
+    },
+    onError: (err) => {
+      toast.error(err.response?.data?.msg || err.response?.data?.err);
+    },
+  });
+
+  // UPDATE BUSINESS DETAILS
+  const updateMutation = useMutation({
+    mutationFn: async (formData) => {
+      const res = await axiosInstance.patch(
+        `/business/${businessToBeUpdated?._id}`,
+        formData
+      );
+      return res.data.business;
+    },
+    onSuccess: (data) => {
+      toast.success("Business details updated");
+      queryClient.invalidateQueries({ queryKey: ["business"] });
+      navigate("/dashboard/my-businesses");
       setBusiness(data);
     },
     onError: (err) => {
@@ -111,8 +157,11 @@ const BusinessForm = () => {
         JSON.stringify(additionalInformation)
       );
     }
-
-    mutation.mutate(formData);
+    if (businessToBeUpdated) {
+      updateMutation.mutate(formData);
+    } else {
+      mutation.mutate(formData);
+    }
   };
 
   return (
@@ -157,17 +206,31 @@ const BusinessForm = () => {
             Close Financial Year
           </button>
           <button className="btn btn-sm ">Cancel</button>
-          <button
-            onClick={handleSubmit}
-            disabled={mutation.isPending}
-            className="btn btn-sm bg-[var(--primary-btn)]"
-          >
-            {mutation.isPending ? (
-              <CustomLoader text={"Saving..."} />
-            ) : (
-              "Save Changes"
-            )}
-          </button>
+          {businessToBeUpdated ? (
+            <button
+              onClick={handleSubmit}
+              disabled={mutation.isPending}
+              className="btn btn-sm bg-[var(--primary-btn)]"
+            >
+              {updateMutation.isPending ? (
+                <CustomLoader text={"Saving..."} />
+              ) : (
+                "Update Changes"
+              )}
+            </button>
+          ) : (
+            <button
+              onClick={handleSubmit}
+              disabled={mutation.isPending}
+              className="btn btn-sm bg-[var(--primary-btn)]"
+            >
+              {mutation.isPending ? (
+                <CustomLoader text={"Saving..."} />
+              ) : (
+                "Save Changes"
+              )}
+            </button>
+          )}
         </div>
       </motion.header>
 

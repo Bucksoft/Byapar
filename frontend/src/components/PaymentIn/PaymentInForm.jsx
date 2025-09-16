@@ -10,6 +10,7 @@ import toast from "react-hot-toast";
 import { useBusinessStore } from "../../store/businessStore";
 import { axiosInstance } from "../../config/axios";
 import { queryClient } from "../../main";
+import { usePurchaseInvoiceStore } from "../../store/purchaseInvoiceStore";
 
 const PaymentInForm = () => {
   const [settledInvoices, setSettledInvoices] = useState({});
@@ -34,10 +35,10 @@ const PaymentInForm = () => {
   useEffect(() => {
     if (!parties || !invoices) return;
     const allInvoices = invoices.filter(
-      (invoice) => invoice.partyId?.partyName === selectedParty
+      (invoice) => invoice.partyName === selectedParty
     );
     setAllInvoices(allInvoices);
-    const totalAmount = allInvoices.reduce(
+    const totalAmount = invoices.reduce(
       (acc, item) => item?.totalAmount + acc,
       0
     );
@@ -74,7 +75,6 @@ const PaymentInForm = () => {
   }, [data.paymentAmount, allInvoices]);
 
   // handling actual form submission
-
   const mutation = useMutation({
     mutationFn: async (data) => {
       if (!selectedParty) {
@@ -90,11 +90,13 @@ const PaymentInForm = () => {
         `/payment-in/${business?._id}`,
         data
       );
+
       return res.data;
     },
     onSuccess: (data) => {
-      toast.success(data.msg);
+      toast.success(data.msg || "Payment In recorded successfully");
       setParty(data);
+      navigate(-1);
       queryClient.invalidateQueries({ queryKey: ["paymentIns", "invoices"] });
     },
     onError: (err) => {
@@ -122,7 +124,7 @@ const PaymentInForm = () => {
   );
 
   return (
-    <main className="h-full w-full p-2">
+    <main className="h-full w-full p-2 ">
       <div className="h-full w-full bg-white rounded-lg">
         {/* Header */}
         <header className="flex items-center justify-between p-2">
@@ -131,7 +133,12 @@ const PaymentInForm = () => {
             Payment In
           </div>
           <div>
-            <button className="btn btn-soft btn-sm mr-2">Cancel</button>
+            <button
+              onClick={() => navigate(-1)}
+              className="btn btn-soft btn-sm mr-2"
+            >
+              Cancel
+            </button>
             <button
               className={`btn btn-sm bg-[var(--primary-btn)] ${
                 mutation?.isPending && ""
@@ -203,7 +210,17 @@ const PaymentInForm = () => {
             <div className="flex items-center justify-center gap-3 ">
               <div className="flex flex-col w-full">
                 <label className="text-zinc-500">Payment Date</label>
-                <input type="date" className="input input-sm mt-2" />
+                <input
+                  type="date"
+                  className="input input-sm mt-2"
+                  value={data?.paymentDate}
+                  onChange={(e) =>
+                    setData((prev) => ({
+                      ...prev,
+                      paymentDate: e.target.value,
+                    }))
+                  }
+                />
               </div>
               <div className="flex flex-col w-full">
                 <label className="text-zinc-500">Payment Mode</label>

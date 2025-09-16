@@ -4,11 +4,12 @@ import CustomLoader from "../components/Loader";
 import { useBusinessStore } from "../store/businessStore";
 import { IoBusinessSharp, IoLocationSharp } from "react-icons/io5";
 import { IoMdCheckmarkCircleOutline } from "react-icons/io";
-import { BiTrash } from "react-icons/bi";
 import { PenSquare, Plus } from "lucide-react";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 import { useState } from "react";
+import { queryClient } from "../main";
+import { BsTrash3 } from "react-icons/bs";
 
 const DashboardMyBusinesses = () => {
   const {
@@ -37,6 +38,19 @@ const DashboardMyBusinesses = () => {
     },
     onSuccess: (data) => {
       toast.success(data?.msg);
+      queryClient.invalidateQueries({ queryKey: ["business"] });
+    },
+  });
+
+  // handle business deletion
+  const deleteMutation = useMutation({
+    mutationFn: async (id) => {
+      const res = await axiosInstance.delete(`/business/${id}`);
+      return res.data;
+    },
+    onSuccess: (data) => {
+      toast.success(data?.msg);
+      queryClient.invalidateQueries({ queryKey: ["business"] });
     },
   });
 
@@ -147,12 +161,49 @@ const DashboardMyBusinesses = () => {
 
                     {/* Actions */}
                     <div className="justify-end card-actions mt-5">
-                      <button className="btn btn-success btn-soft btn-xs">
+                      <button
+                        onClick={() =>
+                          navigate("/dashboard/business", {
+                            state: { businessId: business?._id },
+                          })
+                        }
+                        className="btn btn-success btn-soft btn-xs"
+                      >
                         <PenSquare size={15} /> Edit
                       </button>
-                      <button className="btn btn-error btn-soft btn-xs">
-                        <BiTrash size={15} /> Delete
+
+                      <button
+                        className="btn btn-xs btn-soft btn-error mr-2"
+                        onClick={() =>
+                          document.getElementById("my_modal_2").showModal()
+                        }
+                      >
+                        <BsTrash3 /> Delete
                       </button>
+                      <dialog id="my_modal_2" className="modal">
+                        <div className="modal-box">
+                          <h3 className="font-bold text-lg">
+                            Confirm Deletion
+                          </h3>
+                          <p className="py-4 text-sm">
+                            Are you sure you want to delete the selected
+                            item(s)? This action cannot be undone.
+                          </p>
+                          <div className="flex w-full">
+                            <button
+                              onClick={() =>
+                                deleteMutation.mutate(business?._id)
+                              }
+                              className="btn btn-sm btn-ghost  ml-auto text-[var(--error-text-color)]"
+                            >
+                              Delete
+                            </button>
+                          </div>
+                        </div>
+                        <form method="dialog" className="modal-backdrop">
+                          <button>close</button>
+                        </form>
+                      </dialog>
                       <button
                         onClick={() => {
                           setActiveBusinessId(business?._id);

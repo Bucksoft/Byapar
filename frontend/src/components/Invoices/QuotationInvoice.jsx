@@ -60,12 +60,12 @@ const QuotationInvoice = () => {
                 <li>
                   <button>Edit</button>
                 </li>
-                <li>
+                {/* <li>
                   <button>Edit History</button>
                 </li>
                 <li>
                   <button>Duplicate</button>
-                </li>
+                </li> */}
 
                 <li
                   onClick={() => mutation.mutate(id)}

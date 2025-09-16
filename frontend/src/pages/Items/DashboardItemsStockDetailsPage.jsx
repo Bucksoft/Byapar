@@ -6,6 +6,7 @@ import "react-day-picker/dist/style.css";
 
 const DashboardItemsStockDetailsPage = ({ data, setData }) => {
   const [showDatepicker, setShowDatepicker] = useState(false);
+  const [lowStockQuantityPopup, setLowStockQuantity] = useState(false);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -46,7 +47,7 @@ const DashboardItemsStockDetailsPage = ({ data, setData }) => {
             </div>
           </div>
 
-          <div className="flex flex-col">
+          {/* <div className="flex flex-col">
             <label className="text-xs text-gray-600">Measuring Unit</label>
             <select
               name="measuringUnit"
@@ -60,12 +61,12 @@ const DashboardItemsStockDetailsPage = ({ data, setData }) => {
                 </option>
               ))}
             </select>
-          </div>
+          </div> */}
 
-          <div className="flex items-center space-x-1 text-info text-xs">
+          {/* <div className="flex items-center space-x-1 text-info text-xs">
             <Plus size={16} />
             <span>Alternative Unit</span>
-          </div>
+          </div> */}
 
           <div className="flex flex-col">
             <label className="text-xs text-gray-600">Godowns</label>
@@ -82,7 +83,7 @@ const DashboardItemsStockDetailsPage = ({ data, setData }) => {
             </select>
           </div>
 
-          <div className="flex flex-col">
+          {/* <div className="flex flex-col">
             <label className="text-xs text-gray-600">Opening Stocks</label>
             <input
               name="openingStock"
@@ -97,13 +98,35 @@ const DashboardItemsStockDetailsPage = ({ data, setData }) => {
               placeholder="eg: 150"
               className="input input-sm"
             />
-          </div>
+          </div> */}
 
-          <div className="flex items-center space-x-1 text-info text-xs">
+          <div
+            onClick={() => setLowStockQuantity(!lowStockQuantityPopup)}
+            className="cursor-pointer flex items-center space-x-1 text-info text-xs"
+          >
             <Plus size={16} />
             <span>Enable low stock quantity warning</span>
             <Info size={16} />
           </div>
+
+          {lowStockQuantityPopup && (
+            <div className="flex flex-col gap-2 p-4 bg-zinc-100 rounded-md">
+              <label>Low Stock Quantity</label>
+              <input
+                type="number"
+                name="lowStockQuantity"
+                value={data.lowStockQuantity}
+                onChange={(e) =>
+                  setData((prev) => ({
+                    ...prev,
+                    lowStockQuantity: e.target.value,
+                  }))
+                }
+                placeholder="Enter low stock quantity"
+                className="input input-sm"
+              />
+            </div>
+          )}
         </div>
 
         {/* Right section */}

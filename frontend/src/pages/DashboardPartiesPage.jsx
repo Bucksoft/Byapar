@@ -16,7 +16,7 @@ import { container, dashboardLinksItems } from "../components/Sidebar";
 import { Link, useNavigate } from "react-router-dom";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { axiosInstance } from "../config/axios";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import CustomLoader from "../components/Loader";
 import { usePartyStore } from "../store/partyStore";
 import toast from "react-hot-toast";
@@ -27,6 +27,8 @@ const DashboardPartiesPage = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const { business } = useBusinessStore();
   const { setParties } = usePartyStore();
+  const [toCollect, setToCollect] = useState(0);
+  const [toPay, setToPay] = useState(0);
   const navigate = useNavigate();
 
   // DELETE PARTY
@@ -56,6 +58,22 @@ const DashboardPartiesPage = () => {
     item?.partyName.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
+  useEffect(() => {
+    // implementing to collect and to pay
+    if (!data) return;
+    let toCollect = 0;
+    let toPay = 0;
+    data.forEach((party) => {
+      if (party.partyType === "Customer") {
+        toCollect += party?.currentBalance || 0;
+      } else if (party.partyType === "Supplier") {
+        toPay += party?.currentBalance || 0;
+      }
+    });
+    setToCollect(toCollect);
+    setToPay(toPay);
+  }, [data]);
+
   if (isLoading) {
     return (
       <div className="h-screen w-full grid place-items-center">
@@ -80,17 +98,31 @@ const DashboardPartiesPage = () => {
             <motion.div
               variants={dashboardLinksItems}
               key={details.id}
-              className={`border rounded-md p-3 shadow-md border-${details.color} bg-${details.color}/10 hover:-translate-y-1 transition-all ease-in-out duration-200 cursor-pointer`}
+              style={{
+                borderColor: dashboardPartiesCardDetails[0].color,
+              }}
+              className={`border rounded-md p-3 shadow-md shadow-zinc-400 hover:-translate-y-1 hover:bg-emerald-100/10 transition-all ease-in-out duration-200 cursor-pointer`}
             >
-              <p className={`flex items-center gap-3 text-${details.color}`}>
-                {details.icon} {details.label}
+              <p
+                style={{
+                  color: dashboardPartiesCardDetails[0].color,
+                }}
+                className={`flex items-center gap-3`}
+              >
+                {details?.icon} {details?.label}
               </p>
               <span className="font-medium text-2xl flex items-center gap-2">
-                {details.label === "To Collect" && (
-                  <FaIndianRupeeSign size={15} />
+                {details?.label === "To Collect" && (
+                  <>
+                    <FaIndianRupeeSign size={15} /> {toCollect}
+                  </>
                 )}
-                {details.label === "To Pay" && <FaIndianRupeeSign size={15} />}
-                {details.label === "All Parties" && (
+                {details?.label === "To Pay" && (
+                  <>
+                    <FaIndianRupeeSign size={15} /> {toPay}
+                  </>
+                )}
+                {details?.label === "All Parties" && (
                   <span>{parties.length || 0}</span>
                 )}
                 {/* to collect and to pay data to be displayed yet. */}
@@ -157,12 +189,12 @@ const DashboardPartiesPage = () => {
             <table className="table text-xs ">
               {/* head */}
               <thead>
-                <tr>
+                <tr className="bg-zinc-100">
                   <th>Party Name</th>
                   <th className="text-center">Category</th>
                   <th className="text-center">Mobile Number</th>
                   <th className="text-center">Party type</th>
-                  <th className="text-center">Opening balance</th>
+                  <th className="text-center">Balance</th>
                   <th className="text-right">Action</th>
                 </tr>
               </thead>
@@ -192,7 +224,7 @@ const DashboardPartiesPage = () => {
                       <td>{party?.categoryName || "-"}</td>
                       <td>{party?.mobileNumber || "-"}</td>
                       <td>{party?.partyType || "-"}</td>
-                      <td>₹ {party?.openingBalance || 0}</td>
+                      <td>₹ {party?.currentBalance || 0}</td>
                       <td
                         onClick={(e) => e.stopPropagation()}
                         className="flex items-center gap-2 justify-end"
@@ -243,7 +275,7 @@ const DashboardPartiesPage = () => {
         }
 
         {/* Pagination */}
-        <div className="w-full flex justify-center my-5">
+        {/* <div className="w-full flex justify-center my-5">
           <div className="join">
             <button className="join-item btn btn-sm">
               <ChevronLeft size={15} />
@@ -253,9 +285,9 @@ const DashboardPartiesPage = () => {
               <ChevronRight size={15} />
             </button>
           </div>
-        </div>
+        </div> */}
 
-        <motion.div
+        {/* <motion.div
           initial={{
             opacity: 0,
             translateY: 100,
@@ -285,7 +317,7 @@ const DashboardPartiesPage = () => {
               Upload Excel
             </button>
           </div>
-        </motion.div>
+        </motion.div> */}
       </section>
     </main>
   );

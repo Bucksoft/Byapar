@@ -290,30 +290,49 @@ export const itemSchema = z.object({
 
   category: z.string().optional(),
 
+  // only required field
   itemName: z.string().min(1, "Item Name is required"),
+
+  SACCode: z.string().optional(),
+  serviceCode: z.string().optional(),
+
+  lowStockQuantity: z.string().optional(),
 
   showItemInOnlineStore: z.boolean().default(false).optional(),
 
-  salesPriceType: z.enum(["with tax", "without tax"]).default("with tax"),
-  purchasePriceType: z.enum(["with tax", "without tax"]).default("with tax"),
+  salesPriceType: z
+    .enum(["with tax", "without tax"])
+    .default("with tax")
+    .optional(),
+  purchasePriceType: z
+    .enum(["with tax", "without tax"])
+    .default("with tax")
+    .optional(),
 
   salesPrice: z
     .number({
-      required_error: "Sales price is required",
       invalid_type_error: "Sales price must be a number",
     })
-    .nonnegative("Sales price cannot be negative"),
+    .nonnegative("Sales price cannot be negative")
+    .optional(),
 
-  gstTaxRate: z.string().default("none"),
+  purchasePrice: z
+    .number({
+      invalid_type_error: "Purchase price must be a number",
+    })
+    .nonnegative("Purchase price cannot be negative")
+    .optional(),
+
+  gstTaxRate: z.string().default("none").optional(),
 
   measuringUnit: z.string().optional(),
 
   openingStock: z
     .number({
-      required_error: "Opening stock is required",
       invalid_type_error: "Opening stock must be a number",
     })
-    .nonnegative("Opening stock cannot be negative"),
+    .nonnegative("Opening stock cannot be negative")
+    .optional(),
 
   itemCode: z.string().optional(),
 
@@ -321,7 +340,10 @@ export const itemSchema = z.object({
 
   godown: z.string().optional(),
 
-  asOfDate: z.union([z.string(), z.date()]).default(() => new Date()),
+  asOfDate: z
+    .union([z.string(), z.date()])
+    .default(() => new Date())
+    .optional(),
 
   description: z.string().optional(),
 

@@ -55,7 +55,7 @@ const Sidebar = () => {
 
   return (
     <>
-      <section className="bg-[var(--sidebar-background)] text-white/70 shadow-md max-h-screen overflow-y-auto hide-scrollbar border border-zinc-200 relative">
+      <section className="h-screen bg-[var(--sidebar-background)] text-white/70 shadow-md max-h-screen overflow-y-auto hide-scrollbar border border-zinc-200 relative">
         {/* nav */}
         <motion.h1
           initial={{
@@ -201,7 +201,7 @@ const Sidebar = () => {
           </motion.div>
         </div>
 
-        <div className=" py-2 border-b border-zinc-800">
+        <div className="hidden  py-2 border-b border-zinc-800">
           <label className="pl-4 font-semibold text-xs text-[var(--primary-btn)]">
             ACCOUNTING SOLUTIONS
           </label>
@@ -235,7 +235,7 @@ const Sidebar = () => {
           </motion.div>
         </div>
 
-        <div className=" py-2 border-b border-zinc-800">
+        <div className="hidden py-2 border-b border-zinc-800">
           <label className=" pl-4 font-semibold text-xs text-[var(--primary-btn)]">
             SETTINGS
           </label>
@@ -269,7 +269,7 @@ const Sidebar = () => {
           </motion.div>
         </div>
 
-        <div className="py-2 pb-8 border-b border-zinc-800">
+        <div className="hidden  py-2 pb-8 border-b border-zinc-800">
           <label className=" pl-4 font-semibold text-xs text-[var(--primary-btn)]">
             BUSINESS TOOLS
           </label>

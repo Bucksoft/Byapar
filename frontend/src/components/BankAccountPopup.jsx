@@ -36,7 +36,7 @@ const BankAccountPopup = ({
                 <input
                   type="number"
                   name="bankAccountNumber"
-                  value={data.bankAccountNumber}
+                  value={data?.bankAccountNumber}
                   onChange={handleInputChange}
                   placeholder="ex-123456789"
                   className="border border-gray-200  rounded w-full p-1"
@@ -51,7 +51,7 @@ const BankAccountPopup = ({
                   type="text"
                   placeholder="ex-ICIC0001234"
                   name="IFSCCode"
-                  value={data.IFSCCode}
+                  value={data?.IFSCCode}
                   onChange={handleInputChange}
                   className="border border-gray-200  rounded w-full p-1"
                 />
@@ -62,7 +62,7 @@ const BankAccountPopup = ({
                   type="text"
                   placeholder="ex-ICICI Bank, Jharkhand"
                   name="bankAndBranchName"
-                  value={data.bankAndBranchName}
+                  value={data?.bankAndBranchName}
                   onChange={handleInputChange}
                   className="border border-gray-200  rounded w-full p-1"
                 />
@@ -75,7 +75,7 @@ const BankAccountPopup = ({
                 <input
                   type="text"
                   name="accountHoldersName"
-                  value={data.accountHoldersName}
+                  value={data?.accountHoldersName}
                   onChange={handleInputChange}
                   placeholder="ex-Manish"
                   className="border border-gray-200  rounded w-full p-1"
@@ -86,7 +86,7 @@ const BankAccountPopup = ({
                 <input
                   type="text"
                   name="upiId"
-                  value={data.upiId}
+                  value={data?.upiId}
                   onChange={handleInputChange}
                   placeholder="ex:manis@upi"
                   className="border border-gray-200  rounded w-full p-1"

@@ -1,5 +1,8 @@
 import { useEffect, useState } from "react";
-import { newItemsSidebarDetails } from "../../utils/constants";
+import {
+  newItemsSidebarDetails,
+  newServiceSidebarDetails,
+} from "../../utils/constants";
 import DashboardItemsBasicDetailPage from "./DashboardItemsBasicDetailPage";
 import DashboardItemsStockDetailsPage from "./DashboardItemsStockDetailsPage";
 import DashboardItemsPricingDetailsPage from "./DashboardItemsPricingDetailsPage";
@@ -14,6 +17,7 @@ import { queryClient } from "../../main";
 import { useItemStore } from "../../store/itemStore";
 import CustomLoader from "../../components/Loader";
 import { useBusinessStore } from "../../store/businessStore";
+import DashboardItemsSACCodePage from "./DashboardItemsSACCodePage";
 
 const DashboardItemsSidebar = () => {
   const navigate = useNavigate();
@@ -38,6 +42,9 @@ const DashboardItemsSidebar = () => {
     category: "",
     gstTaxRate: "",
     openingStock: 0,
+    serviceCode: "",
+    SACCode: "",
+    lowStockQuantity: 10,
     salesPriceType: "with tax",
     purchasePriceType: "with tax",
     itemCode: "",
@@ -77,8 +84,10 @@ const DashboardItemsSidebar = () => {
       navigate(`/dashboard/items`);
     },
     onError: (err) => {
+      console.log(err);
       toast.error(
         err?.response?.data?.validationError?.itemName._errors[0] ||
+          err?.response?.data?.msg ||
           "Something went wrong"
       );
     },
@@ -132,26 +141,53 @@ const DashboardItemsSidebar = () => {
               }}
               className="w-3/15 p-2 m-3 rounded-md"
             >
-              <div className="flex items-center shadow-lg rounded-md flex-col p-3 h-full bg-white">
-                {newItemsSidebarDetails?.map((item) => (
-                  <div
-                    onClick={() => handleSidebar(item?.title)}
-                    key={item.id}
-                    className={`my-2 cursor-pointer rounded-md w-full transition-all ease-in duration-150 h-10 flex items-center font-normal text-gray-600 hover:bg-info/10 ${
-                      item.title === currentField && "text-info bg-info/10"
-                    }`}
-                  >
-                    <button
-                      className={` ${
-                        item.title === currentField && "text-info"
-                      } flex gap-2 ml-5`}
+              {data?.itemType === "product" ? (
+                <div className="flex items-center shadow-lg rounded-md flex-col p-3 h-full bg-white">
+                  {newItemsSidebarDetails?.map((item) => (
+                    <div
+                      onClick={() => handleSidebar(item?.title)}
+                      key={item.id}
+                      className={`my-2 cursor-pointer rounded-md w-full transition-all ease-in duration-150 h-10 flex items-center font-normal text-gray-600 hover:bg-info/10 ${
+                        item.title === currentField && "text-info bg-info/10"
+                      }`}
                     >
-                      {item?.icon}
-                      {item.title}
-                    </button>
-                  </div>
-                ))}
-              </div>
+                      {data.itemType === "product" && (
+                        <button
+                          className={` ${
+                            item.title === currentField && "text-info"
+                          } flex gap-2 ml-5`}
+                        >
+                          {item?.icon}
+                          {item.title}
+                        </button>
+                      )}
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <div className="flex items-center shadow-lg rounded-md flex-col p-3 h-full bg-white">
+                  {newServiceSidebarDetails?.map((item) => (
+                    <div
+                      onClick={() => handleSidebar(item?.title)}
+                      key={item.id}
+                      className={`my-2 cursor-pointer rounded-md w-full transition-all ease-in duration-150 h-10 flex items-center font-normal text-gray-600 hover:bg-info/10 ${
+                        item.title === currentField && "text-info bg-info/10"
+                      }`}
+                    >
+                      {
+                        <button
+                          className={` ${
+                            item.title === currentField && "text-info"
+                          } flex gap-2 ml-5`}
+                        >
+                          {item?.icon}
+                          {item.title}
+                        </button>
+                      }
+                    </div>
+                  ))}
+                </div>
+              )}
             </motion.div>
 
             {/* Main Component */}
@@ -191,8 +227,10 @@ const DashboardItemsSidebar = () => {
                     />
                   ) : currentField === "Party Wise Prices" ? (
                     <DashboardItemsPartyWisePricesPage />
+                  ) : currentField === "Other Details" ? (
+                    <DashboardItemsSACCodePage data={data} setData={setData} />
                   ) : (
-                    <DashboardItemsCustomFieldsPage />
+                    ""
                   )}
                 </div>
               </div>

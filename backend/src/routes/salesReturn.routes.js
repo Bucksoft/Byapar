@@ -9,9 +9,9 @@ import {
 
 const router = express.Router();
 
+router.route("/return/:id").get(isAuth, getSaleReturnById);
 router.route("/:id").post(isAuth, createSalesReturn);
 router.route("/:id").get(isAuth, getAllSalesReturn);
 router.route("/:id").delete(isAuth, deleteSaleReturn);
-router.route("/return/:id").get(isAuth, getSaleReturnById);
 
 export default router;

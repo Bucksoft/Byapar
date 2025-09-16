@@ -11,8 +11,6 @@ import { useMutation, useQuery } from "@tanstack/react-query";
 import { axiosInstance } from "../config/axios";
 import CustomLoader from "../components/Loader";
 import { LiaRupeeSignSolid } from "react-icons/lia";
-import { MdOutlineHistory } from "react-icons/md";
-import { BiDuplicate } from "react-icons/bi";
 import { BsTrash3 } from "react-icons/bs";
 import { useInvoiceStore } from "../store/invoicesStore";
 import { useEffect, useState } from "react";
@@ -74,47 +72,80 @@ const DashboardSalesPage = () => {
     <main className="h-full p-2 ">
       <div className="h-full w-full flex flex-col bg-white rounded-lg p-3">
         <DashboardNavbar title={"Sales Invoice"} isReport={"true"} />
-
         <motion.div
           variants={container}
           initial="hidden"
           animate="show"
           className="grid grid-cols-3 gap-2"
         >
-          {dashboardSaledCardsDetails?.map((details) => (
-            <motion.div
-              variants={dashboardLinksItems}
-              key={details.id}
-              style={{
-                borderColor: `${details.color}`,
-                // backgroundColor: `${details.color}`,
-              }}
-              className={`border mt-5 rounded-md p-3  shadow-md hover:-translate-y-1 transition-all ease-in-out duration-200 cursor-pointer`}
-            >
-              <p
-                style={{
-                  color: `${details.color}`,
-                }}
-                className={`flex items-center gap-3 `}
-              >
-                {details.icon} {details.label}
-              </p>
-              <span className="font-medium text-2xl flex items-center gap-2">
-                {<FaIndianRupeeSign size={15} />}
-                {details.label === "Total Sales" && invoices
-                  ? Number(
-                      invoices
-                        .reduce(
-                          (acc, invoice) =>
-                            acc + Number(invoice?.totalAmount || 0),
-                          0
-                        )
-                        .toFixed(2)
-                    ).toLocaleString("en-IN")
-                  : 0}
-              </span>
-            </motion.div>
-          ))}
+          {/* TOTAL SALES */}
+          <div
+            className={`border border-[#84994F] shadow-zinc-500 mt-5 rounded-md p-3  shadow-md hover:-translate-y-1 transition-all ease-in-out duration-200 cursor-pointer`}
+          >
+            <p className={`flex items-center gap-3 text-[#84994F]`}>
+              <FaFileInvoice />
+              Total Sales
+            </p>
+            <span className="font-medium text-2xl flex items-center gap-2">
+              <FaIndianRupeeSign size={15} />
+              {invoices
+                ? Number(
+                    invoices
+                      .reduce(
+                        (acc, invoice) =>
+                          acc + Number(invoice?.totalAmount || 0),
+                        0
+                      )
+                      .toFixed(2)
+                  ).toLocaleString("en-IN")
+                : 0}
+            </span>
+          </div>
+
+          {/* PAID */}
+          <div
+            className={`border border-[#84994F] mt-5 shadow-zinc-500 rounded-md p-3  shadow-md hover:-translate-y-1 transition-all ease-in-out duration-200 cursor-pointer`}
+          >
+            <p className={`flex items-center gap-3 text-[#84994F]`}>
+              <FaFileInvoice />
+              Paid
+            </p>
+            <span className="font-medium text-2xl flex items-center gap-2">
+              <FaIndianRupeeSign size={15} />
+              {invoices
+                ? Number(
+                    invoices.reduce(
+                      (sum, invoice) => sum + (invoice.settledAmount || 0),
+                      0
+                    )
+                  ).toLocaleString("en-IN")
+                : 0}
+            </span>
+          </div>
+
+          {/* UNPAID */}
+          <div
+            className={`border border-[#84994F] shadow-zinc-500 mt-5 rounded-md p-3  shadow-md hover:-translate-y-1 transition-all ease-in-out duration-200 cursor-pointer`}
+          >
+            <p className={`flex items-center gap-3 text-[#84994F]`}>
+              <FaFileInvoice />
+              Unpaid
+            </p>
+            <span className="font-medium text-2xl flex items-center gap-2">
+              <FaIndianRupeeSign size={15} />
+              {invoices
+                ? Number(
+                    invoices.reduce(
+                      (sum, invoice) =>
+                        sum +
+                        (invoice.pendingAmount ??
+                          invoice.totalAmount - (invoice.settledAmount || 0)),
+                      0
+                    )
+                  ).toLocaleString("en-IN")
+                : 0}
+            </span>
+          </div>
         </motion.div>
 
         <motion.div
@@ -211,10 +242,12 @@ const DashboardSalesPage = () => {
                         className={`badge badge-soft badge-sm ${
                           invoice?.status === "unpaid"
                             ? "badge-error"
+                            : invoice?.status === "partially paid"
+                            ? "badge-secondary"
                             : "badge-success"
-                        }  `}
+                        }`}
                       >
-                        Unpaid
+                        {invoice?.status}
                       </p>
                     </td>
                     <td onClick={(e) => e.stopPropagation()}>
@@ -237,7 +270,7 @@ const DashboardSalesPage = () => {
                               <FaRegEdit /> Edit
                             </a>
                           </li>
-                          <li>
+                          {/* <li>
                             <a>
                               <MdOutlineHistory />
                               Edit History
@@ -248,7 +281,7 @@ const DashboardSalesPage = () => {
                               <BiDuplicate />
                               Duplicate
                             </a>
-                          </li>
+                          </li> */}
                           <li>
                             <a
                               onClick={() => {

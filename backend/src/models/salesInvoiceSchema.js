@@ -27,6 +27,23 @@ const salesInvoiceSchema = new mongoose.Schema(
     partyId: { type: mongoose.Schema.Types.ObjectId, ref: "Party" },
     notes: { type: String, default: "" },
     termsAndCondition: { type: String, default: "" },
+    additionalChargeReason: {
+      type: String,
+    },
+    additionalChargeAmount: {
+      type: Number,
+    },
+    additionalChargeTax: {
+      type: String,
+    },
+    additionalDiscountType: {
+      type: String,
+      enum: ["after tax", "before tax"],
+      default: "after tax",
+    },
+    additionalDiscountAmount: {
+      type: Number,
+    },
     settledAmount: {
       type: Number,
       default: 0,

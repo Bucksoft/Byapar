@@ -16,6 +16,7 @@ import { FaRegCircleUser, FaRegFileLines } from "react-icons/fa6";
 import { MdMenuBook } from "react-icons/md";
 import { TbBuildingWarehouse, TbReportAnalytics } from "react-icons/tb";
 import { LuFileUser } from "react-icons/lu";
+import { CgDetailsMore } from "react-icons/cg";
 
 export const badges = [
   {
@@ -100,16 +101,43 @@ export const newItemsSidebarDetails = [
     icon: <ReceiptIndianRupee size={18} />,
     title: "Pricing Details",
   },
+  // {
+  //   id: 4,
+  //   icon: <ReceiptIndianRupee size={18} />,
+  //   title: "Party Wise Prices",
+  // },
+  // {
+  //   id: 5,
+  //   icon: <StretchHorizontal size={18} />,
+  //   title: "Custom Fields",
+  // },
+];
+export const newServiceSidebarDetails = [
   {
-    id: 4,
-    icon: <ReceiptIndianRupee size={18} />,
-    title: "Party Wise Prices",
+    id: 1,
+    icon: <FileBox size={18} />,
+    title: "Basic Details",
   },
   {
-    id: 5,
-    icon: <StretchHorizontal size={18} />,
-    title: "Custom Fields",
+    id: 2,
+    icon: <CgDetailsMore size={18} />,
+    title: "Other Details",
   },
+  // {
+  //   id: 3,
+  //   icon: <ReceiptIndianRupee size={18} />,
+  //   title: "Pricing Details",
+  // },
+  // {
+  //   id: 4,
+  //   icon: <ReceiptIndianRupee size={18} />,
+  //   title: "Party Wise Prices",
+  // },
+  // {
+  //   id: 5,
+  //   icon: <StretchHorizontal size={18} />,
+  //   title: "Custom Fields",
+  // },
 ];
 
 export const pricingPlans = [

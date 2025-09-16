@@ -5,16 +5,28 @@ import itemstocksummary from "../assets/itemstocksummary.png";
 import { useNavigate } from "react-router-dom";
 import { useItemStore } from "../store/itemStore";
 import ItemsList from "../components/Items/ItemsList";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 const DashboardStockValuePage = () => {
   const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState("");
+  const [stockValue, setStockValue] = useState(0);
   const { items } = useItemStore();
 
   const searchedItems = items?.filter((item) =>
     item?.itemName.toLowerCase().includes(searchQuery.toLowerCase())
   );
+
+  useEffect(() => {
+    const products = items.filter((item) => item?.itemType === "product");
+    const stockValue = products.reduce(
+      (acc, product) =>
+        acc + (product?.purchasePrice || 0) * (product?.currentStock || 0),
+      0
+    );
+
+    setStockValue(stockValue);
+  }, [items]);
 
   return (
     <main className="flex p-2 shadow-2xs h-full gap-2 bg-[var(--primary-text-color)]">
@@ -67,7 +79,7 @@ const DashboardStockValuePage = () => {
             </div>
             <div className="p-2 border border-gray-200 flex justify-between">
               <p className="text-gray-600 text-base font-medium">
-                Total Stock Value: 0
+                Total Stock Value: {Number(stockValue).toLocaleString("en-IN")}
               </p>
             </div>
             {items ? (

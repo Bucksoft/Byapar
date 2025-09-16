@@ -1,5 +1,6 @@
 import { businessSchema } from "../config/validation.js";
 import { Business } from "../models/business.schema.js";
+import { UserCredential } from "../models/user.schema.js";
 
 // CREATE BUSINESS API
 export async function createBusiness(req, res) {
@@ -88,7 +89,7 @@ export async function updateBusiness(req, res) {
     const updatedBusiness = await Business.findByIdAndUpdate(id, req.body, {
       new: true,
     });
-    if (!updateBusiness) {
+    if (!updatedBusiness) {
       return res
         .status(400)
         .json({ success: false, msg: "Business could not be updated" });
@@ -97,7 +98,11 @@ export async function updateBusiness(req, res) {
     // RETURN SUCCESS RESPONSE
     return res
       .status(200)
-      .json({ success: true, msg: "Business details updated", updateBusiness });
+      .json({
+        success: true,
+        msg: "Business details updated",
+        updatedBusiness,
+      });
   } catch (error) {
     console.log("Error in updating business details", error);
     return res
@@ -205,24 +210,69 @@ export async function markBusinessAsActive(req, res) {
     }
 
     // QUERY TO MARK THE STATUS OF THE BUSINESS AS ACTIVE AND REST AS INACTIVE
-    await Business.updateMany({}, { status: "inactive" });
-    const updatedBusiness = await Business.findByIdAndUpdate(
-      id,
-      {
-        status: status || "active",
-      },
-      { new: true }
-    );
-    if (!updatedBusiness) {
+    const updatedUserWithActiveBusinessId =
+      await UserCredential.findByIdAndUpdate(
+        req.user?.id,
+        {
+          activeBusinessId: id,
+        },
+        { new: true }
+      );
+    if (!updatedUserWithActiveBusinessId) {
       return res
         .status(400)
         .json({ success: false, msg: "Failed to mark as active" });
     }
-    return res
-      .status(200)
-      .json({ success: true, msg: "Set as active", updatedBusiness });
+
+    await Business.updateMany(
+      {
+        clientId: req.user.id,
+      },
+      { $set: { status: "inactive" } }
+    );
+
+    const updatedBusiness = await Business.findOneAndUpdate(
+      {
+        _id: id,
+        clientId: req.user?.id,
+      },
+      { $set: { status: status || "active" } },
+      { new: true }
+    );
+
+    if (!updatedBusiness) {
+      return res.status(404).json({
+        success: false,
+        msg: "Business not found ",
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      msg: "Set as active",
+      updatedBusiness,
+      updatedUser: updatedUserWithActiveBusinessId,
+    });
   } catch (error) {
     console.log("Error in setting active business", error);
+    return res
+      .status(500)
+      .json({ success: false, msg: "Internal server error" });
+  }
+}
+
+export async function getActiveBusiness(req, res) {
+  try {
+    const clientId = req.user?.id;
+    const activeBusiness = await UserCredential.findById(clientId).populate(
+      "activeBusinessId"
+    );
+    if (!activeBusiness) {
+      return res.status(400).json({ success: false, msg: "Not found" });
+    }
+    return res.status(200).json({ success: true, activeBusiness });
+  } catch (error) {
+    console.log("Error in getting active business", error);
     return res
       .status(500)
       .json({ success: false, msg: "Internal server error" });

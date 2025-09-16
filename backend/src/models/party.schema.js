@@ -32,6 +32,30 @@ const partySchema = new mongoose.Schema(
       enum: ["Customer", "Supplier"],
       default: "Customer",
     },
+    currentBalance: {
+      type: Number,
+      default: 0,
+    },
+    totalInvoices: {
+      type: Number,
+      default: 0,
+    },
+    totalPayments: {
+      type: Number,
+      default: 0,
+    },
+    totalReturns: {
+      type: Number,
+      default: 0,
+    },
+    totalCredits: {
+      type: Number,
+      default: 0,
+    },
+    totalDebits: {
+      type: Number,
+      default: 0,
+    },
     categoryName: {
       type: String,
     },

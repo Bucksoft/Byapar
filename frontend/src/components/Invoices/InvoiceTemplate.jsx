@@ -39,6 +39,12 @@ const InvoiceTemplate = ({ type, color, invoice, setInvoiceIdToDownload }) => {
               ? "Sales Invoice"
               : type === "Quotation"
               ? "Quotation"
+              : type === "Delivery Challan"
+              ? "Delivery Challan"
+              : type === "Proforma Invoice"
+              ? "Proforma Invoice"
+              : type === "Purchase Invoice"
+              ? "Purchase Invoice"
               : ""}
           </h1>
         </div>
@@ -70,9 +76,15 @@ const InvoiceTemplate = ({ type, color, invoice, setInvoiceIdToDownload }) => {
               {type === "Sales Return"
                 ? "Sales Return No."
                 : type === "Sales Invoice"
-                ? "Invoice No."
+                ? "Sales Invoice No."
                 : type === "Quotation"
                 ? "Quotation No."
+                : type === "Delivery Challan"
+                ? "Delivery Challan No."
+                : type === "Proforma Invoice"
+                ? "Proforma Invoice No."
+                : type === "Purchase Invoice"
+                ? "Purchase Invoice No."
                 : ""}
             </p>
             <span>
@@ -82,6 +94,12 @@ const InvoiceTemplate = ({ type, color, invoice, setInvoiceIdToDownload }) => {
                 ? invoice?.salesInvoiceNumber
                 : type === "Quotation"
                 ? invoice?.quotationNumber
+                : type === "Delivery Challan"
+                ? invoice?.deliveryChallanNumber
+                : type === "Proforma Invoice"
+                ? invoice?.proformaInvoiceNumber
+                : type === "Purchase Invoice"
+                ? invoice?.purchaseInvoiceNumber
                 : ""}
             </span>
           </div>
@@ -98,6 +116,12 @@ const InvoiceTemplate = ({ type, color, invoice, setInvoiceIdToDownload }) => {
                 ? "Sales Invoice Date"
                 : type === "Quotation"
                 ? "Quotation Date"
+                : type === "Delivery Challan"
+                ? "Delivery Challan Date"
+                : type === "Proforma Invoice"
+                ? "Proforma Invoice Date"
+                : type === "Purchase Invoice"
+                ? "Purchase Invoice Date"
                 : ""}
             </p>
             <span>
@@ -107,6 +131,37 @@ const InvoiceTemplate = ({ type, color, invoice, setInvoiceIdToDownload }) => {
                 ? invoice?.salesInvoiceDate?.split("T")[0]
                 : type === "Quotation"
                 ? invoice?.quotationDate?.split("T")[0]
+                : type === "Delivery Challan"
+                ? invoice?.deliveryChallanDate?.split("T")[0]
+                : type === "Proforma Invoice"
+                ? invoice?.proformaInvoiceDate?.split("T")[0]
+                : type === "Purchase Invoice"
+                ? invoice?.purchaseInvoiceDate?.split("T")[0]
+                : ""}
+            </span>
+          </div>
+          <div>
+            <p
+              style={{
+                color: color,
+              }}
+              className="font-semibold "
+            >
+              {type === "Quotation" ? "Expiry Date" : "Due Date"}
+            </p>
+            <span>
+              {type === "Sales Return"
+                ? invoice?.salesReturnDate?.split("T")[0]
+                : type === "Sales Invoice"
+                ? invoice?.dueDate?.split("T")[0]
+                : type === "Quotation"
+                ? invoice?.validityDate?.split("T")[0]
+                : type === "Delivery Challan"
+                ? invoice?.deliveryChallanDate?.split("T")[0]
+                : type === "Proforma Invoice"
+                ? invoice?.proformaInvoiceDate?.split("T")[0]
+                : type === "Purchase Invoice"
+                ? invoice?.purchaseInvoiceDate?.split("T")[0]
                 : ""}
             </span>
           </div>
@@ -121,8 +176,11 @@ const InvoiceTemplate = ({ type, color, invoice, setInvoiceIdToDownload }) => {
 
         {/* Party Details */}
         <section className="text-sm">
-          <h3 className="font-semibold">Bill To</h3>
-          <p>{invoice?.partyId?.partyName}</p>
+          <h3 className="font-medium">BILL TO</h3>
+          <p className="font-bold">{invoice?.partyId?.partyName}</p>
+          <p className="text-sm text-zinc-700">
+            {invoice?.partyId?.billingAddress}
+          </p>
           <p className="font-semibold">
             Mobile{" "}
             <span className="font-normal">
@@ -261,6 +319,16 @@ const InvoiceTemplate = ({ type, color, invoice, setInvoiceIdToDownload }) => {
                   {invoice?.sgst}
                 </span>
               </div>
+              {invoice?.additionalChargeAmount > 0 && (
+                <div className="flex items-center justify-between">
+                  <p>{invoice?.additionalChargeReason}</p>
+                  <span className="flex items-center">
+                    <LiaRupeeSignSolid />
+                    {invoice?.additionalChargeAmount}
+                  </span>
+                </div>
+              )}
+
               <div
                 className="h-[0.5px] my-3 w-full "
                 style={{
@@ -276,7 +344,7 @@ const InvoiceTemplate = ({ type, color, invoice, setInvoiceIdToDownload }) => {
                 <p>Total Amount</p>
                 <span className="flex items-center">
                   <LiaRupeeSignSolid />
-                  {Math.round(total).toLocaleString("en-IN")}
+                  {Math.round(invoice?.totalAmount).toLocaleString("en-IN")}
                 </span>
               </div>
               <div
@@ -285,7 +353,7 @@ const InvoiceTemplate = ({ type, color, invoice, setInvoiceIdToDownload }) => {
                   backgroundColor: color,
                 }}
               />
-              <div
+              {/* <div
                 style={{
                   color: "#52525c",
                 }}
@@ -293,7 +361,8 @@ const InvoiceTemplate = ({ type, color, invoice, setInvoiceIdToDownload }) => {
               >
                 <p>Received Amount</p>
                 <span className="flex items-center">
-                  <LiaRupeeSignSolid /> {total.toLocaleString("en-IN")}
+                  <LiaRupeeSignSolid />{" "}
+                  {invoice?.totalAmount.toLocaleString("en-IN")}
                 </span>
               </div>
               <div
@@ -307,7 +376,7 @@ const InvoiceTemplate = ({ type, color, invoice, setInvoiceIdToDownload }) => {
                   {" "}
                   <LiaRupeeSignSolid /> {0}
                 </span>
-              </div>
+              </div> */}
               <div
                 style={{
                   color: "#52525c",
@@ -317,7 +386,7 @@ const InvoiceTemplate = ({ type, color, invoice, setInvoiceIdToDownload }) => {
                 <p className="font-semibold">Total Amount(in words)</p>
                 <span className="flex items-center">
                   {" "}
-                  {converter.toWords(total)}
+                  {converter.toWords(total).toUpperCase()}
                 </span>
               </div>
             </div>

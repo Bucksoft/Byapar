@@ -6,7 +6,6 @@ import PaymentInForm from "../components/PaymentIn/PaymentInForm";
 import { useQuery } from "@tanstack/react-query";
 import { axiosInstance } from "../config/axios";
 import { LiaRupeeSignSolid } from "react-icons/lia";
-import { SquarePen, Trash2 } from "lucide-react";
 import CustomLoader from "../components/Loader";
 import { useNavigate } from "react-router-dom";
 import { usePaymentInStore } from "../store/paymentInStore";
@@ -15,7 +14,9 @@ import { useBusinessStore } from "../store/businessStore";
 const DashboardPaymentInPage = () => {
   const [page, setPage] = useState("");
   const navigate = useNavigate();
+  const [searchedQuery, setSearchedQuery] = useState("");
   const { setPaymentIns } = usePaymentInStore();
+  const [filterDate, setFilterDate] = useState();
   const { business } = useBusinessStore();
 
   const { isLoading, data: paymentIns } = useQuery({
@@ -27,6 +28,19 @@ const DashboardPaymentInPage = () => {
     },
   });
 
+  const filteredPaymentIns =
+    searchedQuery.trim() === ""
+      ? paymentIns
+      : paymentIns?.filter(
+          (paymentIn) =>
+            paymentIn?.paymentInNumber
+              ?.toLowerCase()
+              .includes(searchedQuery.toLowerCase()) ||
+            paymentIn?.partyName
+              ?.toLowerCase()
+              .includes(searchedQuery.toLowerCase())
+        );
+
   return (
     <main className="h-full p-2">
       {page === "Payment In" ? (
@@ -36,8 +50,11 @@ const DashboardPaymentInPage = () => {
           <DashboardNavbar title={"Payment In"} />
           <SalesNavigationMenus
             btnText={"Payment In"}
+            title={"Payment In"}
             selectText={"btn"}
             setPage={setPage}
+            setSearchedQuery={setSearchedQuery}
+            setFilterDate={setFilterDate}
           />
 
           <div className=" mt-5 h-80 rounded-md mx-4 ">
@@ -45,8 +62,8 @@ const DashboardPaymentInPage = () => {
               <div className="w-full flex justify-center py-16">
                 <CustomLoader text={"Loading..."} />
               </div>
-            ) : paymentIns?.length > 0 ? (
-              <table className="table ">
+            ) : filteredPaymentIns?.length > 0 ? (
+              <table className="table">
                 <thead>
                   <tr className="text-xs bg-zinc-100">
                     <th>Date</th>
@@ -56,8 +73,9 @@ const DashboardPaymentInPage = () => {
                   </tr>
                 </thead>
                 <tbody>
-                  {paymentIns?.map((paymentIn) => (
+                  {filteredPaymentIns?.map((paymentIn) => (
                     <tr
+                      key={paymentIn?._id}
                       onClick={() =>
                         navigate(`/dashboard/payment-in/${paymentIn?._id}`)
                       }
@@ -83,9 +101,7 @@ const DashboardPaymentInPage = () => {
             ) : (
               <div className="w-full flex items-center justify-center py-20 flex-col gap-3 text-zinc-400">
                 <FaFileInvoice size={40} />
-                <span className="text-sm">
-                  No transactions matching the current filter
-                </span>
+                <span className="text-sm">No Payment Ins found</span>
               </div>
             )}
           </div>

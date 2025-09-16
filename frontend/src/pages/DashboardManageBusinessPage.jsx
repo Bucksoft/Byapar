@@ -1,20 +1,32 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import tally from "../assets/tally.jpg";
 import store from "../assets/store.jpg";
 import { FaFileSignature } from "react-icons/fa6";
 import { PiRectangleBold } from "react-icons/pi";
 import { RxCross2 } from "react-icons/rx";
 import BusinessForm from "../components/Business/BusinessForm";
+import { useLocation } from "react-router-dom";
+import { useBusinessStore } from "../store/businessStore";
 
 const DashboardManageBusinessPage = () => {
   const [showPopup, setShowPopup] = useState(false);
+  const [editableBusiness, setEditableBusiness] = useState();
+  const { state } = useLocation();
+  const { businesses } = useBusinessStore();
+
+  useEffect(() => {
+    const business = businesses.filter(
+      (business) => business?._id === state?.businessId
+    );
+    setEditableBusiness(business[0]);
+  }, [state]);
 
   return (
     <main className="">
       <div className=" flex max-h-screen overflow-y-scroll bg-white  relative p-2 border border-gray-200 shadow-2xs  ">
         <div className="w-full ">
           {/* main section */}
-          <BusinessForm />
+          <BusinessForm businessToBeUpdated={editableBusiness} />
 
           {/* right sidebar end */}
 

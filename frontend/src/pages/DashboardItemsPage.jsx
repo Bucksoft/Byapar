@@ -4,23 +4,26 @@ import { FaIndianRupeeSign } from "react-icons/fa6";
 import { LuPackageSearch } from "react-icons/lu";
 import no_items from "../assets/no_items.jpg";
 import { PiMicrosoftExcelLogoFill } from "react-icons/pi";
-import { dashboardItemsCardDetails } from "../lib/dashboardItemCards";
 import { motion } from "framer-motion";
-import { container, dashboardLinksItems } from "../components/Sidebar";
+import { container } from "../components/Sidebar";
 import { Link, useNavigate } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
 import { axiosInstance } from "../config/axios";
-import { queryClient } from "../main";
 import CustomLoader from "../components/Loader";
 import { useItemStore } from "../store/itemStore";
 import { useEffect, useState } from "react";
 import ItemsList from "../components/Items/ItemsList";
 import { useBusinessStore } from "../store/businessStore";
+import { AiOutlineStock } from "react-icons/ai";
+import { BsFillBoxSeamFill } from "react-icons/bs";
 
 const DashboardItemsPage = () => {
   const navigate = useNavigate();
   const { setItems } = useItemStore();
   const { business } = useBusinessStore();
+  const [lowStockItems, setLowStockItems] = useState(0);
+  const [stockValue, setStockValue] = useState(0);
+  const [showLowStock, setShowLowStock] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
 
   const {
@@ -37,13 +40,46 @@ const DashboardItemsPage = () => {
 
   useEffect(() => {
     if (isSuccess && items) {
+      const products = items.filter((item) => item?.itemType === "product");
+      const totalInventoryValue = products.reduce(
+        (acc, product) =>
+          acc + (product?.purchasePrice || 0) * (product?.currentStock || 0),
+        0
+      );
+      // 15000000
+      const totalUnits = products.reduce(
+        (acc, product) => acc + (product?.currentStock || 0),
+        0
+      );
+      // 500
+      const wacPerUnit = totalUnits > 0 ? totalInventoryValue / totalUnits : 0;
+      const stockValue = wacPerUnit * totalUnits;
+      const lowStockProducts = products.filter(
+        (product) =>
+          typeof product?.lowStockQuantity === "number" &&
+          product?.currentStock < product?.lowStockQuantity
+      );
+      setStockValue(stockValue);
+      setLowStockItems(lowStockProducts.length);
       setItems(items);
     }
-  }, [isSuccess]);
+  }, [isSuccess, items]);
 
-  const searchedItems = items?.filter((item) =>
-    item?.itemName.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  const searchedItems = items
+    ?.filter((item) =>
+      item?.itemName.toLowerCase().includes(searchQuery.toLowerCase())
+    )
+
+    ?.filter((item) => {
+      if (showLowStock) {
+        return (
+          item?.itemType === "product" &&
+          typeof item?.lowStockQuantity === "number" &&
+          item?.currentStock < item?.lowStockQuantity
+        );
+      }
+      return true;
+    });
 
   return (
     <main className="h-full p-2">
@@ -56,7 +92,7 @@ const DashboardItemsPage = () => {
           animate="show"
           className="grid grid-cols-2 gap-2 "
         >
-          {dashboardItemsCardDetails?.map((details) => (
+          {/* {dashboardItemsCardDetails?.map((details) => (
             <motion.div
               onClick={() =>
                 navigate(`/dashboard/reports?type=${details.label}`)
@@ -75,7 +111,34 @@ const DashboardItemsPage = () => {
                 1
               </span>
             </motion.div>
-          ))}
+          ))} */}
+
+          <div
+            onClick={() => navigate(`/dashboard/reports?type=Stock Value`)}
+            className={`border rounded-md p-3 mt-5 bg-error/10 border-error shadow-md  hover:-translate-y-1 transition-all ease-in-out duration-200 cursor-pointer`}
+          >
+            <p className={`flex items-center gap-3`}>
+              {" "}
+              <AiOutlineStock /> Stock Value
+            </p>
+            <span className="font-medium text-2xl flex gap-2 items-center">
+              <FaIndianRupeeSign size={14} />
+              {Number(stockValue).toLocaleString("en-IN")}
+            </span>
+          </div>
+
+          <div
+            onClick={() => navigate(`/dashboard/reports?type=Low Stock`)}
+            className={`border rounded-md p-3 mt-5 border-warning bg-warning/10 shadow-md hover:-translate-y-1 transition-all ease-in-out duration-200 cursor-pointer`}
+          >
+            <p className={`flex items-center gap-3`}>
+              {" "}
+              <BsFillBoxSeamFill /> Low Stock
+            </p>
+            <span className="font-medium text-2xl flex gap-2 items-center">
+              {lowStockItems}
+            </span>
+          </div>
         </motion.section>
 
         <motion.div
@@ -104,8 +167,12 @@ const DashboardItemsPage = () => {
                 onChange={(e) => setSearchQuery(e.target.value)}
               />
             </label>
-            <button className="btn btn-ghost btn-sm ">
-              <LuPackageSearch className="flex items-center" /> Show Low Stock
+            <button
+              onClick={() => setShowLowStock(!showLowStock)}
+              className="btn btn-ghost btn-sm "
+            >
+              <LuPackageSearch className="flex items-center" /> Show{" "}
+              {!showLowStock ? "Low Stock" : "All Items"}
             </button>
           </div>
 
@@ -128,7 +195,7 @@ const DashboardItemsPage = () => {
             {items ? (
               <>
                 {/* Component to render List items */}
-                <ItemsList items={searchedItems} />
+                <ItemsList items={searchedItems} showLowStock={showLowStock} />
               </>
             ) : (
               <motion.div

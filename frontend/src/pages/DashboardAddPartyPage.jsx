@@ -1,7 +1,7 @@
 import { ArrowLeft, IndianRupee, Landmark, Settings } from "lucide-react";
 import { statesAndCities } from "../utils/constants";
 import { useState } from "react";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { axiosInstance } from "../config/axios";
 import toast from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
@@ -11,6 +11,7 @@ import { queryClient } from "../main";
 import { motion } from "framer-motion";
 import { useBusinessStore } from "../store/businessStore";
 import BankAccountPopup from "../components/BankAccountPopup";
+import { useCategoryStore } from "../store/categoryStore";
 
 const DashboardAddPartyPage = () => {
   const navigate = useNavigate();
@@ -43,6 +44,7 @@ const DashboardAddPartyPage = () => {
     bankAndBranchName: "",
     upiId: "",
   });
+  const { setCategories } = useCategoryStore();
 
   // handling the input field changes
   const handleInputChange = (e) => {
@@ -56,6 +58,16 @@ const DashboardAddPartyPage = () => {
       [name]: value,
     }));
   };
+
+  // get all categories
+  const { data: categories } = useQuery({
+    queryKey: ["category"],
+    queryFn: async () => {
+      const res = await axiosInstance.get("/category");
+      setCategories(res.data);
+      return res.data;
+    },
+  });
 
   // handling actual form submission
   const mutation = useMutation({
@@ -294,8 +306,25 @@ const DashboardAddPartyPage = () => {
               </label>
 
               <details className="dropdown mt-1 z-10">
-                <summary className="select select-sm">Party Category</summary>
+                <summary className="select select-sm">
+                  {data.categoryName || "Party Category"}
+                </summary>
                 <ul className="menu dropdown-content bg-base-100 rounded-box  w-52 p-2 shadow-sm">
+                  {categories?.map((category) => (
+                    <li
+                      onClick={(e) => {
+                        setData((prev) => ({
+                          ...prev,
+                          categoryName: e.target.innerHTML,
+                        }));
+                        setAddCategoryPopup(false);
+                      }}
+                      className="text-xs hover:bg-zinc-100 p-2 cursor-pointer"
+                    >
+                      {category?.categoryName}
+                    </li>
+                  ))}
+
                   <button
                     onClick={() => setAddCategoryPopup(true)}
                     className="btn btn-sm btn-dash btn-info mt-2"

@@ -64,16 +64,36 @@ import DashboardPaymentInDetails from "./pages/DashboardPaymentInDetails";
 import DashboardCreateCreditNoteInvoicePage from "./pages/DashboardCreateCreditNoteInvoicePage";
 import DashboardMyBusinesses from "./pages/DashboardMyBusinesses";
 import SalesReturn from "./components/Invoices/SalesReturn";
+import { useBusinessStore } from "./store/businessStore";
+import { useEffect } from "react";
+import DashboardCreateChallanPage from "./pages/DashboardCreateChallanPage";
+import DeliveryChallan from "./components/Invoices/DeliveryChallan";
+import ProformaInvoice from "./components/Invoices/ProformaInvoice";
+import PurchaseInvoice from "./components/Invoices/PurchaseInvoice";
+import DashboardPaymentOutDetails from "./pages/DashboardPaymentOutDetails";
 
 function App() {
-  const { setUser } = useAuthStore();
-  const { isLoading } = useQuery({
+  const { user, setUser } = useAuthStore();
+  const { setBusiness } = useBusinessStore();
+
+  const {
+    data: userData,
+    isSuccess,
+    isLoading,
+  } = useQuery({
+    queryKey: ["user"],
     queryFn: async () => {
       const res = await axiosInstance.get("/user/me");
       setUser(res.data?.user);
-      return res.data;
+      return res.data?.user;
     },
   });
+
+  useEffect(() => {
+    if (isSuccess && userData) {
+      setBusiness(userData.activeBusinessId || null);
+    }
+  }, [isSuccess, userData, setBusiness]);
 
   // if (isLoading) {
   //   return (
@@ -124,6 +144,11 @@ function App() {
           />
 
           <Route
+            path="/dashboard/purchase-invoice/:id"
+            element={<PurchaseInvoice />}
+          />
+
+          <Route
             path="/dashboard/sales-invoice/:id"
             element={<SalesInvoice />}
           />
@@ -159,6 +184,12 @@ function App() {
             path="/dashboard/payment-out"
             element={<DashboardPaymentOutPage />}
           />
+
+          <Route
+            path="/dashboard/payment-out/:id"
+            element={<DashboardPaymentOutDetails />}
+          />
+
           <Route
             path="/dashboard/parties/create-payment-out"
             element={<DashboardCreatePaymentOutPage />}
@@ -244,8 +275,23 @@ function App() {
           />
 
           <Route
+            path="/dashboard/delivery-challan/:id"
+            element={<DeliveryChallan />}
+          />
+
+          <Route
+            path="/dashboard/parties/create-delivery-challan"
+            element={<DashboardCreateChallanPage />}
+          />
+
+          <Route
             path="/dashboard/proforma"
             element={<DashboardProformaPage />}
+          />
+
+          <Route
+            path="/dashboard/proforma-invoice/:id"
+            element={<ProformaInvoice />}
           />
 
           <Route

@@ -15,6 +15,7 @@ import { BsFillSaveFill } from "react-icons/bs";
 
 const InvoicesForm = ({ title, party, setParty }) => {
   const { business } = useBusinessStore();
+  // const { invoices } = useInvoiceStore();
   const invoiceNoRef = useRef();
   const invoiceData = {
     paymentTerms: 0,
@@ -35,6 +36,11 @@ const InvoicesForm = ({ title, party, setParty }) => {
     notes: "",
     termsAndCondition: "",
     invoiceId: "",
+    additionalChargeReason: "",
+    additionalChargeAmount: 0,
+    additionalChargeTax: "",
+    additionalDiscountType: "after tax",
+    additionalDiscountAmount: 0,
   };
 
   const navigate = useNavigate();
@@ -65,11 +71,22 @@ const InvoicesForm = ({ title, party, setParty }) => {
         case "Sales Return":
           endpoint = `/sales-return/${business?._id}`;
           break;
+        case "Credit Note":
+          endpoint = `/credit-note/${business?._id}`;
+          break;
+        case "Delivery Challan":
+          endpoint = `/delivery-challan/${business?._id}`;
+          break;
+        case "Proforma Invoice":
+          endpoint = `/proforma-invoice/${business?._id}`;
+          break;
+        case "Purchase Return":
+          endpoint = `/purchase-return/${business?._id}`;
+          break;
         default:
           toast.error("Invalid invoice type");
           return;
       }
-
       const res = await axiosInstance.post(endpoint, {
         ...data,
         partyName: party?.partyName,
@@ -80,7 +97,6 @@ const InvoicesForm = ({ title, party, setParty }) => {
     onSuccess: (data) => {
       toast.success(data?.msg);
       queryClient.invalidateQueries({ queryKey: ["invoices"] });
-
       if (data?.quotation?._id) {
         navigate(`/dashboard/quotations/${data?.quotation?._id}`);
       } else if (data?.salesInvoice?._id) {
@@ -89,6 +105,12 @@ const InvoicesForm = ({ title, party, setParty }) => {
         navigate(`/dashboard/purchase-invoice/${data?.purchaseInvoice?._id}`);
       } else if (data?.salesReturn?._id) {
         navigate(`/dashboard/sales-return/${data?.salesReturn?._id}`);
+      } else if (data?.deliveryChallan?._id) {
+        navigate(`/dashboard/delivery-challan/${data?.deliveryChallan?._id}`);
+      } else if (data?.proformInvoice?._id) {
+        navigate(`/dashboard/proforma-invoice/${data?.proformInvoice?._id}`);
+      } else if (data?.purchaseInvoice?._id) {
+        navigate(`/dashboard/purchase-invoice/${data?.purchaseInvoice?._id}`);
       }
     },
 
@@ -115,11 +137,11 @@ const InvoicesForm = ({ title, party, setParty }) => {
           <span className="pl-3">Create {title}</span>
         </div>
         <div className="flex items-center justify-center gap-5">
-          <button className="btn btn-sm">Settings</button>
+          {/* <button className="btn btn-sm">Settings</button> */}
           <button
             onClick={() => mutation.mutate(data)}
             disabled={mutation?.isPending}
-            className="btn bg-[var(--primary-btn)] btn-sm"
+            className="btn bg-[var(--primary-btn)] btn-sm hover:bg-[var(--primary-btn)]/80"
           >
             {mutation.isPending ? (
               <CustomLoader text={"Saving..."} />
@@ -147,7 +169,7 @@ const InvoicesForm = ({ title, party, setParty }) => {
       {/* Upper section of invoice form invoice number, dates , party name details etc ends here ---------------------------------------*/}
 
       {/* This is the table where items are listed with their prices ----------------------------*/}
-      <SalesInvoiceItemTable data={data} setData={setData} />
+      <SalesInvoiceItemTable title={title} data={data} setData={setData} />
 
       {/* bottom grid part */}
       <SalesInvoiceFooterSection

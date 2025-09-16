@@ -2,9 +2,11 @@ import { ChevronDown, IndianRupee, Search } from "lucide-react";
 import { gstRates, uomList } from "../../utils/constants";
 import { useState } from "react";
 import { motion } from "framer-motion";
+import { useCategoryStore } from "../../store/categoryStore";
 
 const DashboardItemsBasicDetailPage = ({ data, setData, err }) => {
   const [showAddCategoryPopup, setShowAddCategoryPopup] = useState(false);
+  const { categories } = useCategoryStore();
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -50,7 +52,15 @@ const DashboardItemsBasicDetailPage = ({ data, setData, err }) => {
 
         <div className=" flex flex-col mt-5">
           <p className="text-xs text-gray-600">
-            Item Name <span className="text-red-500">*</span>{" "}
+            {data.itemType === "product" ? (
+              <>
+                Item Name <span className="text-red-500">*</span>{" "}
+              </>
+            ) : (
+              <>
+                Service Name <span className="text-red-500">*</span>
+              </>
+            )}
           </p>
           <div className="">
             <input
@@ -153,6 +163,20 @@ const DashboardItemsBasicDetailPage = ({ data, setData, err }) => {
                 tabIndex={0}
                 className="dropdown-content menu bg-base-100 rounded-box z-1 w-52 p-2 shadow-xs text-gray-600"
               >
+                {categories &&
+                  categories.map((category) => (
+                    <li
+                      onClick={(e) =>
+                        setData((prev) => ({
+                          ...prev,
+                          category: e.target.innerHTML,
+                        }))
+                      }
+                      className="p-2 hover:bg-zinc-100 mb-1 cursor-pointer rounded-md"
+                    >
+                      {category?.categoryName}
+                    </li>
+                  ))}
                 {/* Open the modal using document.getElementById('ID').showModal() method */}
                 <button
                   className="btn btn-dash btn-sm btn-info"
@@ -203,24 +227,45 @@ const DashboardItemsBasicDetailPage = ({ data, setData, err }) => {
           </div>
         </div>
 
-        <div className="flex flex-col mt-5">
-          <span className="text-xs text-gray-600">Opening Stocks</span>
-          <div className="">
-            <input
-              name="openingStock"
-              value={data.openingStock}
-              onChange={(e) =>
-                setData((prev) => ({
-                  ...prev,
-                  openingStock: Number(e.target.value),
-                }))
-              }
-              type="number"
-              placeholder="eg: 150 PCS"
-              className="px-2 w-full border border-[var(--primary-border)] rounded-xs h-8 text-xs text-gray-600"
-            />
+        {data?.itemType === "product" ? (
+          <div className="flex flex-col mt-5">
+            <span className="text-xs text-gray-600">Opening Stocks</span>
+            <div className="">
+              <input
+                name="openingStock"
+                value={data.openingStock}
+                onChange={(e) =>
+                  setData((prev) => ({
+                    ...prev,
+                    openingStock: Number(e.target.value),
+                  }))
+                }
+                type="number"
+                placeholder="eg: 150 PCS"
+                className="px-2 w-full border border-[var(--primary-border)] rounded-xs h-8 text-xs text-gray-600"
+              />
+            </div>
           </div>
-        </div>
+        ) : (
+          <div className="flex flex-col mt-5">
+            <span className="text-xs text-gray-600">Service Code</span>
+            <div className="">
+              <input
+                name="serviceCode"
+                value={data.serviceCode}
+                onChange={(e) =>
+                  setData((prev) => ({
+                    ...prev,
+                    serviceCode: e.target.value,
+                  }))
+                }
+                type="text"
+                placeholder="Enter Service Code"
+                className="px-2 w-full border border-[var(--primary-border)] rounded-xs h-8 text-xs text-gray-600"
+              />
+            </div>
+          </div>
+        )}
       </div>
       {showAddCategoryPopup && (
         <div className="fixed inset-0 z-200 flex items-center justify-center bg-black/40 backdrop-blur-sm">

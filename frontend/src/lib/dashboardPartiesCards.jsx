@@ -7,7 +7,7 @@ export const dashboardPartiesCardDetails = [
     icon: <BsPeopleFill />,
     label: "All Parties",
     value: "1",
-    color: "warning",
+    color: "#4FB7B3",
   },
   {
     id: 2,
@@ -21,6 +21,6 @@ export const dashboardPartiesCardDetails = [
     icon: <BadgeIndianRupee size={14} />,
     label: "To Pay",
     value: "1",
-    color: "primary",
+    color: "secondary",
   },
 ];

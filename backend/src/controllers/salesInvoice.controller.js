@@ -5,8 +5,8 @@ import { Item } from "../models/item.schema.js";
 
 export async function createSalesInvoice(req, res) {
   try {
-    const validatedResult = salesInvoiceSchema.safeParse(req.body);
     const data = req.body;
+    const validatedResult = salesInvoiceSchema.safeParse(req.body);
     if (!validatedResult.success) {
       const validationError = validatedResult.error.format();
       return res
@@ -35,6 +35,7 @@ export async function createSalesInvoice(req, res) {
       });
     }
 
+    // SALES INVOICE MEIN STOCK KAM HOTA HAI, AGR PRODUCT HAI TO WRNA SERVICE KE CASE MEIN NHI HOTA
     for (const soldItem of data?.items) {
       const item = await Item.findById(soldItem?._id);
       if (!item) {
@@ -59,6 +60,14 @@ export async function createSalesInvoice(req, res) {
       clientId: req.user?.id,
       ...data,
     });
+
+    party.currentBalance =
+      (party.currentBalance || 0) + salesInvoice.balanceAmount;
+    // party.totalSales = (party.totalSales || 0) + salesInvoice.balanceAmount;
+    party.totalDebits = (party.totalDebits || 0) + salesInvoice.balanceAmount;
+    party.totalInvoices =
+      (party.totalInvoices || 0) + salesInvoice.balanceAmount;
+    await party.save();
 
     if (!salesInvoice) {
       return res

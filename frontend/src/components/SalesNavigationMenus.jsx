@@ -8,6 +8,7 @@ const SalesNavigationMenus = ({
   selectText,
   setPage,
   setSearchedQuery,
+  setFilterDate,
 }) => {
   const navigate = useNavigate();
 
@@ -25,50 +26,36 @@ const SalesNavigationMenus = ({
       )}
 
       <div className="flex justify-between mx-5 mt-5">
-        <div className="flex gap-3">
+        <div
+          className={`flex gap-3 ${title === "Payment In" ? "w-3/6" : ""}   `}
+        >
           {/* search box */}
-          <div className="">
+          <div className={` ${title === "Payment In" ? "w-full" : ""}  `}>
             <label className="input input-sm">
               <Search size={16} className="" />
               <input
                 type="search"
                 required
-                placeholder="Search by invoice number"
+                placeholder={
+                  title === "Payment In"
+                    ? "Search by payment in number or party name"
+                    : "Search"
+                }
                 onChange={(e) => setSearchedQuery(e.target.value)}
               />
             </label>
           </div>
           {/* calender */}
-          <div className="dropdown dropdown-center w-50">
-            <div
-              tabIndex={0}
-              role="button"
-              className="bg-white flex items-center justify-between btn btn-wide btn-sm w-full text-xs font-medium"
-            >
-              <div className="flex items-center gap-2">
-                <Calendar size={16} className="" />
-                <span className="">Last 365 days</span>
-              </div>
-              <ChevronDown size={16} className="" />
-            </div>
-            <ul
-              tabIndex={0}
-              className="dropdown-content menu bg-base-100 rounded-box z-1 w-52 p-2 shadow-sm  "
-            >
-              <li>
-                <a>Today</a>
-              </li>
-              <li>
-                <a>Yesterday</a>
-              </li>
-              <li>
-                <a>This week</a>
-              </li>
-              <li>
-                <a>Last week</a>
-              </li>
-            </ul>
-          </div>
+          <select className="select select-sm">
+            {/* <option value="today" className="hidden">
+              Today
+            </option> */}
+            <option value="today">Today</option>
+            <option value="yesterday">Yesterday</option>
+            <option value="this week">This week</option>
+            <option value="last week">Last week</option>
+          </select>
+
           {/* create quotation optional */}
           {(title === "Quotation / Estimate" ||
             title === "Proforma Invoice" ||

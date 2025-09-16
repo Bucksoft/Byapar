@@ -103,7 +103,7 @@ const SalesInvoiceFooterSection = ({ data, setData, title }) => {
         <div>
           {charges && (
             <div className="px-2">
-              <div className="flex justify-end  relative">
+              <div className="flex justify-end relative">
                 <IoCloseCircle
                   size={20}
                   onClick={() => setCharges(false)}
@@ -113,6 +113,13 @@ const SalesInvoiceFooterSection = ({ data, setData, title }) => {
               <div className=" relative">
                 <input
                   type="text"
+                  value={data?.additionalChargeReason}
+                  onChange={(e) =>
+                    setData((prev) => ({
+                      ...prev,
+                      additionalChargeReason: e.target.value,
+                    }))
+                  }
                   placeholder="Enter charge (ex. Transport Charge)"
                   className="input input-xs border-none text-xs bg-zinc-200"
                 />
@@ -120,15 +127,32 @@ const SalesInvoiceFooterSection = ({ data, setData, title }) => {
                   ₹
                 </span>
                 <input
-                  type="text"
+                  type="number"
                   placeholder=""
+                  value={data?.additionalChargeAmount}
+                  onChange={(e) =>
+                    setData((prev) => ({
+                      ...prev,
+                      additionalChargeAmount: Number(e.target.value),
+                    }))
+                  }
                   className="input input-xs  text-xs bg-zinc-200 w-20 absolute top-0 right-41"
                 />
                 <select
                   defaultValue="No Tax Applicable"
+                  value={data?.additionalChargeTax}
+                  onChange={(e) =>
+                    setData((prev) => ({
+                      ...prev,
+                      additionalChargeTax: e.target.value,
+                    }))
+                  }
                   className="select select-xs absolute top-0 right-5 w-fit"
                 >
                   <option>No Tax Applicable</option>
+                  {data?.items.map((item) => (
+                    <option key={item?._id}>{item?.gstTaxRate}</option>
+                  ))}
                 </select>
               </div>
             </div>
@@ -185,23 +209,40 @@ const SalesInvoiceFooterSection = ({ data, setData, title }) => {
               <div className="flex justify-between items-center">
                 <div>
                   <select
-                    defaultValue="Discount After Tax"
+                    // defaultValue="Discount After Tax"
                     className="select w-fit select-xs"
+                    value={data?.additionalDiscountType}
+                    onChange={(e) =>
+                      setData((prev) => ({
+                        ...prev,
+                        additionalDiscountType: e.target.value,
+                      }))
+                    }
                   >
-                    <option>Discount After Tax</option>
-                    <option>Discount Before Tax</option>
+                    <option value={"after tax"} className="hidden">
+                      Discount After Tax
+                    </option>
+                    <option value={"after tax"}>Discount After Tax</option>
+                    <option value={"before tax"}>Discount Before Tax</option>
                   </select>
                 </div>
                 <div className="flex space-x-1 relative">
-                  <span className="absolute top-0 right-98 z-60 px-1 pt-1 text-xs">
+                  <span className="absolute top-0 right-47 z-60 px-1 pt-1 text-xs">
                     %
                   </span>
                   <input
                     type="text"
-                    placeholder=""
+                    placeholder="0"
+                    value={data?.additionalDiscountAmount}
+                    onChange={(e) =>
+                      setData((prev) => ({
+                        ...prev,
+                        additionalDiscountAmount: Number(e.target.value) || 0,
+                      }))
+                    }
                     className="input input-xs border-none w-fit text-xs bg-zinc-200 items-center px-5"
                   />
-                  <span>/</span>
+                  {/* <span>/</span>
                   <span className="absolute top-0 right-51 z-70 px-1 pt-1 text-xs">
                     ₹
                   </span>
@@ -209,7 +250,7 @@ const SalesInvoiceFooterSection = ({ data, setData, title }) => {
                     type="text"
                     placeholder=""
                     className="input input-xs border-none w-fit text-xs bg-zinc-200 mr-10 items-center px-5 "
-                  />
+                  /> */}
                 </div>
               </div>
             </div>
@@ -249,7 +290,7 @@ const SalesInvoiceFooterSection = ({ data, setData, title }) => {
           <div className="p-2 flex justify-between">
             <span className="text-sm font-semibold">Total Amount</span>
             {data?.items?.length > 0 ? (
-              <>₹ {Number(data?.totalAmount).toLocaleString("en-IN")}</>
+              <>₹ {Number(data?.balanceAmount).toLocaleString("en-IN")}</>
             ) : (
               <input
                 type="text"
@@ -288,7 +329,7 @@ const SalesInvoiceFooterSection = ({ data, setData, title }) => {
         )}
 
         {/* add signature */}
-        <div className="p-2 flex flex-col items-end mr-2">
+        {/* <div className="p-2 flex flex-col items-end mr-2">
           <p className="text-xs pb-2">
             Authorized signatory for{" "}
             <span className="font-bold"> Business Name</span>
@@ -296,7 +337,7 @@ const SalesInvoiceFooterSection = ({ data, setData, title }) => {
           <div className="border border-dashed w-fit p-10 text-info">
             +Add Signature
           </div>
-        </div>
+        </div> */}
       </div>
     </div>
   );

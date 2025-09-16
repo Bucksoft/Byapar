@@ -88,6 +88,7 @@ const PartyEditPage = () => {
     },
     onSuccess: () => {
       toast.success("Party updated");
+      navigate("/dashboard/parties");
       queryClient.invalidateQueries({ queryKey: ["parties"] });
     },
     onError: (err) => {

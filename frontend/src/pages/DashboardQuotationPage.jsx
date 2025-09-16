@@ -10,7 +10,7 @@ import { useState } from "react";
 
 const DashboardQuotationPage = () => {
   const { business } = useBusinessStore();
-  const [searchQuery, setSearchQuery] = useState("");
+  const [searchedQuery, setSearchedQuery] = useState("");
 
   const { isLoading, data: quotations = [] } = useQuery({
     queryKey: ["quotations"],
@@ -21,7 +21,7 @@ const DashboardQuotationPage = () => {
   });
 
   const searchedQuotations = quotations?.filter(
-    (quotation) => quotation?.quotationNumber === Number(searchQuery)
+    (quotation) => quotation?.quotationNumber === Number(searchedQuery)
   );
 
   return (
@@ -33,7 +33,7 @@ const DashboardQuotationPage = () => {
             title={"Quotation / Estimate"}
             btnText={"Quotation"}
             selectText={"quotation"}
-            setSearchedQuery={setSearchQuery}
+            setSearchedQuery={setSearchedQuery}
           />
 
           {/* table */}
@@ -56,9 +56,9 @@ const DashboardQuotationPage = () => {
                   </tr>
                 </thead>
                 <tbody>
-                  {(searchQuery ? searchedQuotations : quotations)?.length >
+                  {(searchedQuery ? searchedQuotations : quotations)?.length >
                   0 ? (
-                    (searchQuery ? searchedQuotations : quotations).map(
+                    (searchedQuery ? searchedQuotations : quotations).map(
                       (quotation) => (
                         <tr key={quotation._id}>
                           <td>{quotation?.quotationDate?.split("T")[0]}</td>

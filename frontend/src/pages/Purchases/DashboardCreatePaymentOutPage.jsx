@@ -1,29 +1,134 @@
 import { ArrowLeft } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { usePartyStore } from "../../store/partyStore";
-import { useEffect, useState } from "react";
-import { useInvoiceStore } from "../../store/invoicesStore";
+import { useEffect, useRef, useState } from "react";
 import { LiaRupeeSignSolid } from "react-icons/lia";
+import { usePurchaseInvoiceStore } from "../../store/purchaseInvoiceStore";
+import { useMutation } from "@tanstack/react-query";
+import toast from "react-hot-toast";
+import { queryClient } from "../../main";
+import { axiosInstance } from "../../config/axios";
+import { useBusinessStore } from "../../store/businessStore";
+import CustomLoader from "../../components/Loader";
 
 const DashboardCreatePaymentOutPage = () => {
   const navigate = useNavigate();
+  const [settledInvoices, setSettledInvoices] = useState({});
+  const { business } = useBusinessStore();
   const { parties } = usePartyStore();
-  const { invoices } = useInvoiceStore();
+  const { purchaseInvoices } = usePurchaseInvoiceStore();
   const [selectedParty, setSelectedParty] = useState();
   const [totalInvoiceAmount, setTotalInvoiceAmount] = useState(0);
+  const [allInvoices, setAllInvoices] = useState([]);
+  const paymentAmountRef = useRef();
+
+  const [data, setData] = useState({
+    partyName: "",
+    paymentAmount: 0,
+    paymentDate: new Date(Date.now()),
+    paymentMode: "cash",
+    paymentOutNumber: 1,
+    notes: "",
+    settledInvoices: {},
+  });
+
+  // handling actual form submission
+  const mutation = useMutation({
+    mutationFn: async (data) => {
+      if (!selectedParty) {
+        throw new Error("Please select a party");
+      }
+      if (data?.paymentAmount <= 0) {
+        paymentAmountRef.current.style.outlineColor = "red";
+        paymentAmountRef.current.style.borderColor = "red";
+        paymentAmountRef.current.focus();
+        throw new Error("Please enter a payment amount");
+      }
+      const res = await axiosInstance.post(
+        `/payment-out/${business?._id}`,
+        data
+      );
+      return res.data;
+    },
+    onSuccess: (data) => {
+      toast.success(data.msg);
+      setParty(data);
+      navigate("/dashboard/payment-out");
+      queryClient.invalidateQueries({
+        queryKey: ["paymentOuts", "purchaseInvoices"],
+      });
+    },
+    onError: (err) => {
+      toast.error(err?.response?.data?.msg || err?.message);
+    },
+  });
 
   useEffect(() => {
-    if (!parties || !invoices) return;
-    const allInvoices = invoices.filter(
-      (invoice) => invoice.partyId?.partyName === selectedParty
+    if (!parties || !purchaseInvoices) return;
+    const allInvoices = purchaseInvoices.filter(
+      (invoice) =>
+        invoice?.partyName.toLowerCase() === selectedParty?.toLowerCase()
     );
-    console.log(allInvoices);
+    setAllInvoices(allInvoices);
     const totalAmount = allInvoices.reduce(
       (acc, item) => item?.totalAmount + acc,
       0
     );
     setTotalInvoiceAmount(totalAmount);
   }, [selectedParty]);
+
+  useEffect(() => {
+    if (!allInvoices.length) return;
+
+    let remainingPayment = data.paymentAmount;
+    const newSettled = {};
+
+    // Sort invoices by oldest first
+    const sorted = [...allInvoices].sort(
+      (a, b) =>
+        new Date(a.salesInvoiceDate).getTime() -
+        new Date(b.salesInvoiceDate).getTime()
+    );
+
+    sorted.forEach((invoice) => {
+      const alreadySettled = invoice?.settledAmount || 0;
+      const pending = Math.max(invoice.totalAmount - alreadySettled, 0);
+      if (remainingPayment > 0 && pending > 0) {
+        const settleAmount = Math.min(pending, remainingPayment);
+        newSettled[invoice._id] = settleAmount;
+        remainingPayment -= settleAmount;
+      } else {
+        newSettled[invoice._id] = 0;
+      }
+    });
+
+    setSettledInvoices(newSettled);
+
+    setData((prev) => ({
+      ...prev,
+      settledInvoices: newSettled,
+      partyName: allInvoices[0]?.partyName || prev.partyName,
+    }));
+  }, [data.paymentAmount, allInvoices]);
+
+  // THIS FUNCTION IS USED FOR CALCULATING TOTAL VALUES
+  const totals = allInvoices.reduce(
+    (acc, invoice) => {
+      const alreadySettled = invoice?.settledAmount || 0;
+      const currentSettled = settledInvoices[invoice?._id] || 0;
+
+      const pending = Math.max(
+        invoice?.totalAmount - (alreadySettled + currentSettled),
+        0
+      );
+
+      acc.totalPending += pending;
+      acc.totalSettled += alreadySettled + currentSettled;
+
+      return acc;
+    },
+    { totalPending: 0, totalSettled: 0 }
+  );
 
   return (
     <main className="h-full w-full p-2">
@@ -36,7 +141,19 @@ const DashboardCreatePaymentOutPage = () => {
           </div>
           <div>
             <button className="btn btn-soft btn-sm mr-2">Cancel</button>
-            <button className="btn btn-sm bg-[var(--primary-btn)]">Save</button>
+            <button
+              className={`btn btn-sm bg-[var(--primary-btn)] ${
+                mutation?.isPending && ""
+              } `}
+              disabled={mutation?.isPending}
+              onClick={() => mutation.mutate(data)}
+            >
+              {mutation.isPending ? (
+                <CustomLoader text={"Saving..."} />
+              ) : (
+                <>Save</>
+              )}
+            </button>
           </div>
         </header>
 
@@ -68,11 +185,19 @@ const DashboardCreatePaymentOutPage = () => {
               </p>
             )}
 
-            <label className="text-zinc-500 ">Party Amount</label>
+            <label className="text-zinc-500 ">Payment Amount</label>
             <br />
             <input
               type="number"
               placeholder="0"
+              ref={paymentAmountRef}
+              value={data.paymentAmount}
+              onChange={(e) =>
+                setData((prev) => ({
+                  ...prev,
+                  paymentAmount: Number(e.target.value),
+                }))
+              }
               className="input input-sm w-full mt-2"
             />
           </div>
@@ -82,7 +207,17 @@ const DashboardCreatePaymentOutPage = () => {
             <div className="flex items-center justify-center gap-3 ">
               <div className="flex flex-col w-full">
                 <label className="text-zinc-500">Payment Date</label>
-                <input type="date" className="input input-sm mt-2 " />
+                <input
+                  type="date"
+                  className="input input-sm mt-2 "
+                  value={data?.paymentDate}
+                  onChange={(e) =>
+                    setData((prev) => ({
+                      ...prev,
+                      paymentDate: e.target.value,
+                    }))
+                  }
+                />
               </div>
               <div className="flex flex-col w-full">
                 <label className="text-zinc-500">Payment Mode</label>
@@ -101,6 +236,14 @@ const DashboardCreatePaymentOutPage = () => {
                   type="text"
                   className="input input-sm mt-2"
                   placeholder="1"
+                  name="paymentInNumber"
+                  value={data?.paymentOutNumber}
+                  onChange={(e) =>
+                    setData((prev) => ({
+                      ...prev,
+                      paymentInNumber: e.target.value,
+                    }))
+                  }
                 />
               </div>
             </div>
@@ -110,9 +253,116 @@ const DashboardCreatePaymentOutPage = () => {
               <textarea
                 className="textarea mt-3 w-full"
                 placeholder="Enter notes"
+                value={data.notes}
+                onChange={(e) =>
+                  setData((prev) => ({ ...prev, notes: e.target.value }))
+                }
               />
             </div>
           </div>
+        </section>
+
+        {/* PARTY's INVOICE DETAILS */}
+        <section className="m-4">
+          {allInvoices.length > 0 && (
+            <div className="overflow-x-auto border border-zinc-300 rounded-lg">
+              <p className="p-4 font-medium">Settle invoices</p>
+              <table className="table w-full ">
+                {/* head */}
+                <thead>
+                  <tr className="bg-[var(--primary-background)] ">
+                    <th className="w-10"></th>
+                    <th>Date</th>
+                    <th>Due Date</th>
+                    <th>Invoice Number</th>
+                    <th>Invoice Amount</th>
+                    <th>Pending Amount</th>
+                    <th className="text-right">Amount Settled</th>
+                  </tr>
+                </thead>
+
+                <tbody>
+                  {[...allInvoices]
+                    .sort(
+                      (a, b) =>
+                        new Date(a.salesInvoiceDate).getTime() -
+                        new Date(b.salesInvoiceDate).getTime()
+                    )
+                    .map((invoice) => {
+                      const alreadySettled = invoice?.settledAmount || 0;
+                      const currentSettled = settledInvoices[invoice?._id] || 0;
+                      const pending = Math.max(
+                        invoice?.totalAmount -
+                          (alreadySettled + currentSettled),
+                        0
+                      );
+
+                      return (
+                        <tr key={invoice?._id} className="hover:bg-gray-50">
+                          {/* Checkbox → mark as fully settled if pending is 0 */}
+                          <td className="px-2 py-2">
+                            <input
+                              type="checkbox"
+                              checked={pending === 0}
+                              className="checkbox checkbox-sm checkbox-info"
+                              readOnly
+                            />
+                          </td>
+
+                          <td>{invoice?.purchaseInvoiceDate.split("T")[0]}</td>
+                          <td>{invoice?.dueDate.split("T")[0]}</td>
+                          <td>{invoice?.purchaseInvoiceNumber}</td>
+
+                          {/* Invoice Amount */}
+                          <td>
+                            <span className="inline-flex items-center gap-1">
+                              <LiaRupeeSignSolid className="text-gray-600" />
+                              {Number(invoice?.totalAmount).toLocaleString(
+                                "en-IN"
+                              )}
+                            </span>
+                          </td>
+
+                          {/* Pending Amount */}
+                          <td>
+                            <span className="inline-flex items-center gap-1">
+                              <LiaRupeeSignSolid />
+                              {pending.toLocaleString("en-IN")}
+                            </span>
+                          </td>
+
+                          {/* Amount Settled (previous + current) */}
+                          <td className="inline-flex items-center gap-1 justify-end w-full">
+                            <LiaRupeeSignSolid />
+                            {Number(
+                              alreadySettled + currentSettled
+                            ).toLocaleString("en-IN")}
+                          </td>
+                        </tr>
+                      );
+                    })}
+                </tbody>
+              </table>
+              {/* total amount */}
+              <div className="p-4 font-medium  flex justify-between border-t border-zinc-300">
+                <h2>Total</h2>
+                <div className="flex items-center  w-3/9 justify-between">
+                  <span className="flex items-center ">
+                    <LiaRupeeSignSolid />
+                    {/*  pending amount ka total */}
+                    {totals?.totalPending.toLocaleString("en-IN")}
+                  </span>
+
+                  {/* Settled amount ka total */}
+                  <span className="flex items-center ">
+                    <LiaRupeeSignSolid />
+                    {/*  pending amount ka total */}
+                    {totals?.totalSettled.toLocaleString("en-IN")}
+                  </span>
+                </div>
+              </div>
+            </div>
+          )}
         </section>
       </section>
     </main>

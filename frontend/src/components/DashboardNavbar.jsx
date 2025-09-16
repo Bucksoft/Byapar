@@ -70,12 +70,12 @@ const DashboardNavbar = ({ title, isReport }) => {
           )}
         </div>
 
-        <button className="btn btn-square btn-sm bg-transparent group">
+        {/* <button className="btn btn-square btn-sm bg-transparent group">
           <IoSettingsOutline
             size={15}
             className="group-hover:rotate-360 transition ease-in-out duration-300 group-hover:scale-105  "
           />
-        </button>
+        </button> */}
       </div>
     </motion.div>
   );

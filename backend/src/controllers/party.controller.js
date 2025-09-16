@@ -1,6 +1,7 @@
 import { bankAccountSchema, partySchema } from "../config/validation.js";
 import Party from "../models/party.schema.js";
 import BankAccount from "../models/bankAccount.schema.js";
+import Category from "../models/category.schema.js";
 
 import mongoose from "mongoose";
 
@@ -10,25 +11,33 @@ export async function createParty(req, res) {
 
   try {
     const data = req.body;
+    const { categoryName } = req.body;
+
+    if (categoryName.length > 0) {
+      const existingCategory = await Category.findOne({ categoryName });
+      if (!existingCategory) {
+        await Category.create({
+          categoryName,
+        });
+      }
+    }
 
     if (!data) {
       return res.status(400).json({
         success: false,
-        msg: "Please enter all the fields",
+        msg: "Request body is missing",
       });
     }
 
-    // 1. PARTY VALIDATION
     const validationResult = partySchema.safeParse(data);
     if (!validationResult.success) {
       return res.status(422).json({
         success: false,
-        msg: "Validation failed",
+        msg: "Party validation failed",
         validationError: validationResult.error.format(),
       });
     }
 
-    // 2. BANK ACCOUNT VALIDATION
     const {
       bankAccountNumber,
       IFSCCode,
@@ -37,58 +46,74 @@ export async function createParty(req, res) {
       upiId,
     } = data;
 
-    const bankValidationResult = bankAccountSchema.safeParse({
-      bankAccountNumber,
-      IFSCCode,
-      bankAndBranchName,
-      accountHoldersName,
-      upiId,
-    });
-    if (!bankValidationResult.success) {
-      return res.status(422).json({
-        success: false,
-        msg: "Validation failed",
-        validationError: bankValidationResult.error.format(),
+    let bankValidationResult = { success: true };
+    if (
+      bankAccountNumber ||
+      IFSCCode ||
+      bankAndBranchName ||
+      accountHoldersName ||
+      upiId
+    ) {
+      bankValidationResult = bankAccountSchema.safeParse({
+        bankAccountNumber,
+        IFSCCode,
+        bankAndBranchName,
+        accountHoldersName,
+        upiId,
       });
+
+      if (!bankValidationResult.success) {
+        return res.status(422).json({
+          success: false,
+          msg: "Bank account validation failed",
+          validationError: bankValidationResult.error.format(),
+        });
+      }
     }
 
-    const { partyName } = data;
+    const { partyName } = validationResult.data;
 
-    // 3. CHECK IF PARTY ALREADY EXISTS
-    const partyExists = await Party.findOne({ partyName }).session(session);
+    const partyExists = await Party.findOne({
+      partyName,
+      businessId: req.body?.businessId,
+    }).session(session);
+
     if (partyExists) {
       return res.status(400).json({
         success: false,
-        msg: `Party already exists. Please provide another name`,
+        msg: `Party "${partyName}" already exists in this business`,
       });
     }
 
-    // 4. CREATE PARTY
-    const party = await Party.create(
-      [
-        {
-          ...validationResult.data,
-          businessId: req.body?.businessId,
-          clientId: req.user?.id,
-        },
-      ],
-      { session }
-    );
+    const partyDoc = {
+      ...validationResult.data,
+      businessId: req.body?.businessId,
+      clientId: req.user?.id,
+    };
 
+    partyDoc.currentBalance = validationResult.data.openingBalance || 0;
+
+    const party = await Party.create([partyDoc], { session });
     const partyData = party[0];
 
-    // 5. CREATE BANK ACCOUNT with partyId
-    const bankAccount = await BankAccount.create(
-      [
-        {
-          ...bankValidationResult.data,
-          clientId: req.user?.id,
-          businessId: req.body?.businessId,
-          partyId: partyData._id,
-        },
-      ],
-      { session }
-    );
+    let bankAccount = null;
+    if (
+      bankValidationResult.success &&
+      bankValidationResult.data?.bankAccountNumber
+    ) {
+      bankAccount = await BankAccount.create(
+        [
+          {
+            ...bankValidationResult.data,
+            clientId: req.user?.id,
+            businessId: req.body?.businessId,
+            partyId: partyData._id,
+          },
+        ],
+        { session }
+      );
+      bankAccount = bankAccount[0];
+    }
 
     await session.commitTransaction();
     session.endSession();
@@ -97,19 +122,19 @@ export async function createParty(req, res) {
       success: true,
       msg: "Party created successfully",
       party: partyData,
-      bankAccount: bankAccount[0],
+      bankAccount,
     });
   } catch (error) {
     await session.abortTransaction();
     session.endSession();
 
-    console.log("ERROR IN CREATING PARTY:", error);
+    console.error("ERROR IN CREATING PARTY:", error);
 
     if (error.code === 11000) {
       const field = Object.keys(error.keyValue)[0];
       return res.status(400).json({
         success: false,
-        msg: `${field} "${error.keyValue[field]}" already exists`,
+        msg: `Duplicate value: ${field} "${error.keyValue[field]}" already exists`,
       });
     }
 

@@ -20,7 +20,6 @@ const SalesInvoice = () => {
   const { isLoading, data: invoice } = useQuery({
     queryFn: async () => {
       const res = await axiosInstance.get(`/sales-invoice/invoice/${id}`);
-      console.log(res);
       return res.data?.invoice;
     },
   });
@@ -45,7 +44,9 @@ const SalesInvoice = () => {
           <div className="flex items-center gap-3">
             <ArrowLeft onClick={() => navigate(-1)} />
             <h1 className="font-medium">Sales Invoice</h1>
-            <div className="badge badge-success badge-soft">Paid</div>
+            <div className="badge badge-success badge-soft">
+              {invoice?.status}
+            </div>
           </div>
           <div className="flex items-center gap-3">
             <button className="btn btn-sm">

@@ -17,6 +17,12 @@ const itemSchema = new mongoose.Schema(
       required: [true, "Item name is required"],
       trim: true,
     },
+    serviceCode: {
+      type: String,
+    },
+    SACCode: {
+      type: String,
+    },
     showItemInOnlineStore: {
       type: Boolean,
       default: false,
@@ -32,6 +38,10 @@ const itemSchema = new mongoose.Schema(
       default: "with tax",
     },
     salesPrice: {
+      type: Number,
+      min: [0, "Sales price cannot be negative"],
+    },
+    purchasePrice: {
       type: Number,
       min: [0, "Sales price cannot be negative"],
     },
@@ -91,7 +101,7 @@ const itemSchema = new mongoose.Schema(
     remarks: {
       type: String,
     },
-    minimumStock: {
+    lowStockQuantity: {
       type: Number,
       default: 10,
     },

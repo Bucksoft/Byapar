@@ -205,12 +205,12 @@ export const settingLinks = [
     label: "Account",
     link: "account",
   },
-  {
-    id: 2,
-    icon: <BiSolidBriefcaseAlt2 size={16} />,
-    label: "Manage Business",
-    link: "business",
-  },
+  // {
+  //   id: 2,
+  //   icon: <BiSolidBriefcaseAlt2 size={16} />,
+  //   label: "Manage Business",
+  //   link: "business",
+  // },
   {
     id: 3,
     icon: <IoColorPaletteSharp size={16} />,

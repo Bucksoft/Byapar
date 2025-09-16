@@ -256,7 +256,6 @@ export async function refreshToken(req, res) {
       sameSite: process.env.NODE_ENV === "production" ? "None" : "Lax",
       maxAge: 15 * 60 * 1000,
     });
-
     return res.json({ status: "Success", msg: "Access token refreshed" });
   });
 }
@@ -265,7 +264,7 @@ export async function refreshToken(req, res) {
 export async function getUserCredential(req, res) {
   try {
     const id = req.user?.id;
-    const user = await UserCredential.findById(id);
+    const user = await UserCredential.findById(id).populate("activeBusinessId");
     if (!user) {
       return res.status(400).json({ success: false, msg: "User not found" });
     }

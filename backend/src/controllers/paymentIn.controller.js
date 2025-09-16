@@ -1,8 +1,12 @@
+import mongoose from "mongoose";
 import Party from "../models/party.schema.js";
 import SalesInvoice from "../models/salesInvoiceSchema.js";
 import { PaymentIn } from "../models/paymentIn.schema.js";
 
 export async function createPaymentIn(req, res) {
+  const session = await mongoose.startSession();
+  session.startTransaction();
+
   try {
     const {
       partyName,
@@ -11,38 +15,39 @@ export async function createPaymentIn(req, res) {
       paymentMode,
       notes,
       paymentInNumber,
+      settledInvoices,
     } = req.body;
-    // 1. Find party
-    const party = await Party.findOne({ partyName });
+
+    const party = await Party.findOne({ partyName }).session(session);
     if (!party) {
-      return res.status(404).json({ message: "Party not found" });
+      await session.abortTransaction();
+      session.endSession();
+      return res.status(404).json({ success: false, msg: "Party not found" });
     }
 
-    const existingPaymentInNumber = await PaymentIn.findOne({
+    const existingPaymentIn = await PaymentIn.findOne({
       paymentInNumber,
-    });
-    if (existingPaymentInNumber) {
+    }).session(session);
+    if (existingPaymentIn) {
+      await session.abortTransaction();
+      session.endSession();
       return res
         .status(400)
         .json({ success: false, msg: "Payment In number already exists" });
     }
-    console.log(existingPaymentInNumber);
 
-    // 2. Fetch those invoice which are going to be settled, sorted oldest first
-    const invoiceIds = Object.keys(req.body.settledInvoices);
+    const invoiceIds = Object.keys(settledInvoices || {});
     const invoices = await SalesInvoice.find({
       partyId: party._id,
-      _id: { $in: invoiceIds }, // filter only those invoice IDs
-    }).sort({ salesInvoiceDate: 1 });
-
-    // 2. Fetch invoices which are going to be settled, sorted oldest first
+      _id: { $in: invoiceIds },
+    })
+      .sort({ salesInvoiceDate: 1 })
+      .session(session);
 
     let updatedSettledInvoices = [];
 
     for (const invoice of invoices) {
-      const settleAmount =
-        req.body.settledInvoices[invoice._id.toString()] || 0;
-
+      const settleAmount = settledInvoices[invoice._id.toString()] || 0;
       const currentSettled = invoice.settledAmount || 0;
       const pending =
         invoice.pendingAmount ?? invoice.totalAmount - currentSettled;
@@ -73,8 +78,9 @@ export async function createPaymentIn(req, res) {
 
       invoice.settledAmount = currentSettled + appliedSettlement;
       invoice.pendingAmount = invoice.totalAmount - invoice.settledAmount;
+      invoice.status = invoice.pendingAmount <= 0 ? "paid" : "partially paid";
 
-      await invoice.save();
+      await invoice.save({ session });
 
       updatedSettledInvoices.push({
         invoiceId: invoice._id,
@@ -82,38 +88,45 @@ export async function createPaymentIn(req, res) {
         settledAmount: invoice.settledAmount,
         pendingAmount: invoice.pendingAmount,
         status:
-          appliedSettlement < settleAmount
-            ? "Partially Settled (Excess Ignored)"
-            : "Settled",
+          appliedSettlement < settleAmount ? "Partially Settled" : "Settled",
       });
     }
 
-    // 4. Save PaymentIn
-    const paymentIn = new PaymentIn({
-      partyName,
-      paymentAmount,
-      paymentDate: paymentDate || new Date(),
-      paymentMode,
-      clientId: req.user.id,
-      partyId: party._id,
-      notes,
-      paymentInNumber,
-      businessId: req.params?.id,
-      settledInvoices: req.body.settledInvoices,
-    });
+    const paymentIn = await PaymentIn.create(
+      [
+        {
+          partyName,
+          paymentAmount,
+          paymentDate: paymentDate || new Date(),
+          paymentMode,
+          clientId: req.user.id,
+          partyId: party._id,
+          notes,
+          paymentInNumber,
+          businessId: req.params?.id,
+          settledInvoices,
+        },
+      ],
+      { session }
+    );
 
-    await paymentIn.save();
+    party.currentBalance = (party.currentBalance || 0) - paymentAmount;
+    party.totalCredits = (party.totalCredits || 0) + paymentAmount;
 
-    // 6. Send response
-    res.status(201).json({
+    await party.save({ session });
+    await session.commitTransaction();
+    session.endSession();
+
+    return res.status(201).json({
       success: true,
-      msg: "Payment recorded successfully",
-      paymentIn,
-      // settledInvoices,
+      msg: "Payment In recorded successfully",
+      paymentIn: paymentIn[0],
       updatedSettledInvoices,
-      paymentIn,
     });
   } catch (error) {
+    await session.abortTransaction();
+    session.endSession();
+
     console.error("ERROR IN CREATING PAYMENT IN:", error);
     return res
       .status(500)

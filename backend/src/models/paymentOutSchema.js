@@ -1,0 +1,46 @@
+import mongoose from "mongoose";
+
+const paymentOutSchema = new mongoose.Schema({
+  partyName: {
+    type: String,
+    required: [true, "Party name is required"],
+  },
+  paymentOutNumber: {
+    type: String,
+    required: true,
+    unique: true,
+  },
+  paymentAmount: {
+    type: Number,
+    required: [true, "Payment Amount is required"],
+  },
+  paymentDate: {
+    type: String,
+  },
+  paymentMode: {
+    type: String,
+    default: "cash",
+  },
+  bankAccount: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "BankAccount",
+  },
+  partyId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Party",
+  },
+  clientId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "UserCredential",
+  },
+  businessId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Business",
+  },
+  notes: {
+    type: String,
+  },
+  settledInvoices: [{}],
+});
+
+export const PaymentOut = mongoose.model("PaymentOut", paymentOutSchema);

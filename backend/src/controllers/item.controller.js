@@ -3,40 +3,46 @@ import { Item } from "../models/item.schema.js";
 
 export async function createItem(req, res) {
   try {
-    // get and parse the data
     const parsedData = itemSchema.safeParse(req.body.data);
     if (!parsedData.success) {
-      const validationError = parsedData.error.format();
-      return res
-        .status(422)
-        .json({ success: false, msg: "Validation failed", validationError });
+      return res.status(422).json({
+        success: false,
+        msg: "Validation failed",
+        validationError: parsedData.error.format(),
+      });
     }
 
-    // check for existing item
-    const existingItem = await Item.findOne({
-      $or: [
-        { itemCode: parsedData.itemCode },
-        { itemName: parsedData.itemName },
-      ],
-    });
+    const itemData = parsedData.data;
 
+    const existingItem = await Item.findOne({
+      itemName: itemData.itemName,
+      businessId: req.params?.id,
+    });
     if (existingItem) {
       return res
         .status(400)
-        .json({ success: false, msg: "Item already exist" });
+        .json({ success: false, msg: "Item already exists" });
     }
 
-    // create a new item
+    if (itemData.purchasePrice) {
+      itemData.purchasePrice = Number(itemData.purchasePrice);
+    }
+    if (itemData.lowStockQuantity) {
+      itemData.lowStockQuantity = Number(itemData.lowStockQuantity);
+    }
+
     const newItem = await Item.create({
-      ...parsedData.data,
+      ...itemData,
       businessId: req.params?.id,
       clientId: req.user?.id,
+      currentStock: itemData.openingStock || 0,
     });
 
-    // return success response
-    return res
-      .status(201)
-      .json({ success: true, msg: "Item created", newItem });
+    return res.status(201).json({
+      success: true,
+      msg: "Item created successfully",
+      item: newItem,
+    });
   } catch (error) {
     console.error("Error in creating item", error);
     return res

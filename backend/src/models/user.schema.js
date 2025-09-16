@@ -49,6 +49,10 @@ export const userCredentialSchema = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: "UserRole",
     },
+    activeBusinessId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Business",
+    },
   },
   { timestamps: true }
 );
