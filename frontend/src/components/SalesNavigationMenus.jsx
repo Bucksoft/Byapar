@@ -46,10 +46,13 @@ const SalesNavigationMenus = ({
             </label>
           </div>
           {/* calender */}
-          <select className="select select-sm">
-            {/* <option value="today" className="hidden">
+          <select
+            className="select select-sm"
+            onChange={(e) => setFilterDate(e.target.value)}
+          >
+            <option value="today" className="hidden">
               Today
-            </option> */}
+            </option>
             <option value="today">Today</option>
             <option value="yesterday">Yesterday</option>
             <option value="this week">This week</option>

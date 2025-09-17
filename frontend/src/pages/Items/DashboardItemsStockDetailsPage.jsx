@@ -1,12 +1,11 @@
-import React, { useState } from "react";
 import { Plus, Info, UploadCloud } from "lucide-react";
-import { uomList } from "../../utils/constants";
-import { DayPicker } from "react-day-picker";
 import "react-day-picker/dist/style.css";
+import { useInvoiceStore } from "../../store/invoicesStore";
+import { useEffect, useState } from "react";
 
 const DashboardItemsStockDetailsPage = ({ data, setData }) => {
-  const [showDatepicker, setShowDatepicker] = useState(false);
   const [lowStockQuantityPopup, setLowStockQuantity] = useState(false);
+  const { invoices } = useInvoiceStore();
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -16,14 +15,14 @@ const DashboardItemsStockDetailsPage = ({ data, setData }) => {
     }));
   };
 
-  const formatDate = (date) => {
-    if (!date) return "";
-    if (typeof date === "string") return date;
-    if (date instanceof Date && !isNaN(date)) {
-      return date.toISOString().split("T")[0];
-    }
-    return "";
-  };
+  // const formatDate = (date) => {
+  //   if (!date) return "";
+  //   if (typeof date === "string") return date;
+  //   if (date instanceof Date && !isNaN(date)) {
+  //     return date.toISOString().split("T")[0];
+  //   }
+  //   return "";
+  // };
 
   return (
     <main className="p-6">

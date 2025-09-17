@@ -1,10 +1,17 @@
-import { ChevronDown, Download, MessageSquare, Printer, Share } from "lucide-react";
+import {
+  ChevronDown,
+  Download,
+  MessageSquare,
+  Printer,
+  Share,
+} from "lucide-react";
 import { BsWhatsapp } from "react-icons/bs";
+import { CiNoWaitingSign } from "react-icons/ci";
 
 const PartyLedgerStatement = ({ party }) => {
   return (
     <section>
-      <div>
+      {/* <div>
         <button className="btn btn-sm w-1/8">
           {" "}
           <Download size={14} /> Download
@@ -16,7 +23,7 @@ const PartyLedgerStatement = ({ party }) => {
         <button
           className="btn btn-sm ml-2 w-1/8"
           popoverTarget="popover-1"
-          style={{ anchorName: "--anchor-1" } /* as React.CSSProperties */}
+          style={{ anchorName: "--anchor-1" }}
         >
           <Share size={14} />
           Share
@@ -27,7 +34,7 @@ const PartyLedgerStatement = ({ party }) => {
           className="dropdown menu w-52 rounded-box bg-base-100 shadow-sm"
           popover="auto"
           id="popover-1"
-          style={{ positionAnchor: "--anchor-1" } /* as React.CSSProperties */}
+          style={{ positionAnchor: "--anchor-1" }}
         >
           <li>
             <a>
@@ -42,9 +49,9 @@ const PartyLedgerStatement = ({ party }) => {
             </a>
           </li>
         </ul>
-      </div>
+      </div> */}
 
-      <div className="h-full border rounded-md mt-4 border-zinc-200 p-5">
+      {/* <div className="h-full border rounded-md mt-4 border-zinc-200 p-5">
         <div className="flex items-center justify-between">
           <div>
             <h1 className="font-semibold">Business Name</h1>
@@ -69,7 +76,7 @@ const PartyLedgerStatement = ({ party }) => {
         </div>
         <div className="overflow-x-auto mt-5 rounded-box border border-base-content/5 bg-base-100">
           <table className="table text-xs ">
-            {/* head */}
+           
             <thead>
               <tr className="bg-zinc-200">
                 <th>Date</th>
@@ -83,7 +90,7 @@ const PartyLedgerStatement = ({ party }) => {
               </tr>
             </thead>
             <tbody>
-              {/* row 1 */}
+    
               <tr>
                 <th></th>
                 <td>Opening Balance</td>
@@ -97,7 +104,11 @@ const PartyLedgerStatement = ({ party }) => {
             </tbody>
           </table>
         </div>
-      </div>
+      </div> */}
+
+      <h1 className="w-full flex items-center justify-center flex-col gap-2 text-zinc-500">
+        This feature will be available soon{" "}
+      </h1>
     </section>
   );
 };

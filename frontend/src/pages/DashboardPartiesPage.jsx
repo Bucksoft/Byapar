@@ -123,7 +123,7 @@ const DashboardPartiesPage = () => {
                   </>
                 )}
                 {details?.label === "All Parties" && (
-                  <span>{parties.length || 0}</span>
+                  <span>{parties?.length || 0}</span>
                 )}
                 {/* to collect and to pay data to be displayed yet. */}
               </span>

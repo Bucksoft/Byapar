@@ -100,6 +100,12 @@ const partySchema = new mongoose.Schema(
       type: String,
       default: "",
     },
+    transactions: [
+      {
+        type: String,
+        id: mongoose.Schema.Types.ObjectId,
+      },
+    ],
   },
   { timestamps: true }
 );

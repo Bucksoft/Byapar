@@ -40,6 +40,10 @@ const paymentInSchema = new mongoose.Schema({
   notes: {
     type: String,
   },
+  type: {
+    type: String,
+    default: "payment in",
+  },
   settledInvoices: [{}],
 });
 

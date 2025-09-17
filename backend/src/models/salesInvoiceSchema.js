@@ -59,6 +59,10 @@ const salesInvoiceSchema = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: "UserCredential",
     },
+    type: {
+      type: String,
+      default: "sales invoice",
+    },
     status: {
       type: String,
       enum: ["paid", "unpaid", "draft", "partially paid", "cancelled"],

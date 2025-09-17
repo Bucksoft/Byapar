@@ -35,9 +35,9 @@ const DashboardPage = () => {
             >
               <span className="font-semibold text-lg">Dashboard</span>
               <div className="flex items-center gap-3">
-                <button className="btn btn-sm btn-soft bg-[var(--primary-btn)]">
+                {/* <button className="btn btn-sm btn-soft bg-[var(--primary-btn)]">
                   <MessageCircle size={15} /> Chat
-                </button>
+                </button> */}
 
                 <Menu className="md:hidden block" />
               </div>

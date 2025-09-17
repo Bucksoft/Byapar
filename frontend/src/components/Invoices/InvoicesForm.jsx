@@ -1,5 +1,5 @@
 import { ArrowLeft } from "lucide-react";
-import { useCallback, useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useMutation } from "@tanstack/react-query";
 import { axiosInstance } from "../../config/axios";
@@ -12,6 +12,8 @@ import { useBusinessStore } from "../../store/businessStore";
 import { useRef } from "react";
 import CustomLoader from "../Loader";
 import { BsFillSaveFill } from "react-icons/bs";
+import { useInvoiceStore } from "../../store/invoicesStore";
+import { useQuotationStore } from "../../store/quotationStore";
 
 const InvoicesForm = ({
   title,
@@ -22,7 +24,10 @@ const InvoicesForm = ({
   invoiceToUpdate,
 }) => {
   const { business } = useBusinessStore();
-  // const { invoices } = useInvoiceStore();
+  const { invoices } = useInvoiceStore();
+  const { quotations } = useQuotationStore();
+  const [quantities, setQuantities] = useState({});
+
   const invoiceNoRef = useRef();
   const invoiceData = {
     paymentTerms: 0,
@@ -30,7 +35,12 @@ const InvoicesForm = ({
     validFor: 0,
     validityDate: new Date(Date.now()),
     salesInvoiceDate: new Date(Date.now()),
-    salesInvoiceNumber: 1,
+    salesInvoiceNumber:
+      title === "Sales Invoice"
+        ? invoices?.length + 1
+        : title === "Quotation"
+        ? quotations.length + 1
+        : 1,
     partyName: party?.partyName || "",
     items: [],
     discountSubtotal: 0,
@@ -161,10 +171,6 @@ const InvoicesForm = ({
     },
   });
 
-  // add near your other useState declarations
-  const [quantities, setQuantities] = useState({});
-
-  // --- normalize invoiceToUpdate when editing and seed addedItems + quantities + data ---
   useEffect(() => {
     if (isEditing && invoiceToUpdate) {
       // Normalize items coming from backend (ensure numeric fields & quantity)
@@ -251,8 +257,6 @@ const InvoicesForm = ({
         </div>
       </header>
       {/* navbar ends ----------------------------------------------------- */}
-
-      {/* Upper section of invoice form invoice number, dates , party name details etc */}
       <SalesInvoicePartyDetailsSection
         data={data}
         setData={setData}
@@ -262,9 +266,7 @@ const InvoicesForm = ({
         invoiceNoRef={invoiceNoRef}
         isEditing={isEditing}
       />
-      {/* Upper section of invoice form invoice number, dates , party name details etc ends here ---------------------------------------*/}
 
-      {/* This is the table where items are listed with their prices ----------------------------*/}
       <SalesInvoiceItemTable
         title={title}
         data={data}

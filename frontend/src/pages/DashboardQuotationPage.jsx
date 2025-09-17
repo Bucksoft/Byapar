@@ -9,11 +9,18 @@ import { useBusinessStore } from "../store/businessStore";
 import { useQuotationStore } from "../store/quotationStore";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import dayjs from "dayjs";
+import isoWeek from "dayjs/plugin/isoWeek";
+import isBetween from "dayjs/plugin/isBetween";
+
+dayjs.extend(isoWeek);
+dayjs.extend(isBetween);
 
 const DashboardQuotationPage = () => {
   const { business } = useBusinessStore();
   const { setQuotations } = useQuotationStore();
   const [searchedQuery, setSearchedQuery] = useState("");
+  const [filterDate, setFilterDate] = useState("today");
   const navigate = useNavigate();
 
   const { isLoading, data: quotations = [] } = useQuery({
@@ -25,9 +32,39 @@ const DashboardQuotationPage = () => {
     },
   });
 
-  const searchedQuotations = quotations?.filter(
-    (quotation) => quotation?.quotationNumber === Number(searchedQuery)
-  );
+  const searchedQuotations = quotations?.filter((quotation) => {
+    // Text search
+    if (searchedQuery.trim()) {
+      const query = searchedQuery.toLowerCase();
+      const matchesText =
+        quotation?.quotationNumber?.toString().toLowerCase().includes(query) ||
+        quotation?.partyName?.toLowerCase().includes(query);
+      if (!matchesText) return false;
+    }
+
+    const quotationDate = dayjs(
+      quotation?.quotationDate || quotation?.createdAt
+    );
+    switch (filterDate) {
+      case "today":
+        return quotationDate.isSame(dayjs(), "day");
+      case "yesterday":
+        return quotationDate.isSame(dayjs().subtract(1, "day"), "day");
+      case "thisWeek":
+        return quotationDate.isBetween(
+          dayjs().startOf("isoWeek"),
+          dayjs().endOf("isoWeek"),
+          null,
+          "[]"
+        );
+      case "lastWeek":
+        const startLastWeek = dayjs().subtract(1, "week").startOf("isoWeek");
+        const endLastWeek = dayjs().subtract(1, "week").endOf("isoWeek");
+        return quotationDate.isBetween(startLastWeek, endLastWeek, null, "[]");
+      default:
+        return true;
+    }
+  });
 
   return (
     <main className="h-screen w-full flex">
@@ -39,6 +76,7 @@ const DashboardQuotationPage = () => {
             btnText={"Quotation"}
             selectText={"quotation"}
             setSearchedQuery={setSearchedQuery}
+            setFilterDate={setFilterDate}
           />
 
           {/* table */}

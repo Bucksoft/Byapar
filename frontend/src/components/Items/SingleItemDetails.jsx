@@ -20,7 +20,7 @@ const SingleItemDetails = ({ item }) => {
             <span className="text-zinc-500 ">Category</span>
             <p>{item?.category || "-"}</p>
             <span className="text-zinc-500 ">Low Stock Quantity</span>
-            <p>{item?.category || "-"}</p>
+            <p>{item?.lowStockQuantity || "-"}</p>
           </div>
         </div>
       </section>

@@ -37,27 +37,33 @@ export async function createSalesInvoice(req, res) {
 
     // SALES INVOICE MEIN STOCK KAM HOTA HAI, AGR PRODUCT HAI TO WRNA SERVICE KE CASE MEIN NHI HOTA
     for (const soldItem of data?.items) {
-      const item = await Item.findById(soldItem?._id);
-      if (!item) {
-        return res
-          .status(400)
-          .json({ success: false, msg: `Item not found : ${item?.itemName}` });
-      }
-      if (item?.currentStock < soldItem.quantity) {
-        return res.status(400).json({
-          success: false,
-          msg: `Insufficient stock for ${item?.itemName}`,
+      if (soldItem.itemType === "product") {
+        const item = await Item.findById(soldItem?._id);
+        if (!item) {
+          return res
+            .status(400)
+            .json({
+              success: false,
+              msg: `Item not found : ${item?.itemName}`,
+            });
+        }
+        if (item?.currentStock < soldItem.quantity) {
+          return res.status(400).json({
+            success: false,
+            msg: `Insufficient stock for ${item?.itemName}`,
+          });
+        }
+        await Item.findByIdAndUpdate(soldItem?._id, {
+          $inc: { currentStock: -soldItem?.quantity },
         });
       }
-      await Item.findByIdAndUpdate(soldItem?._id, {
-        $inc: { currentStock: -soldItem?.quantity },
-      });
     }
 
     const salesInvoice = await SalesInvoice.create({
       partyId: party?._id,
       businessId: req.params?.id,
       clientId: req.user?.id,
+      type: "sales invoice",
       ...data,
     });
 

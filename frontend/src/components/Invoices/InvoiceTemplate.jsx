@@ -9,7 +9,7 @@ const InvoiceTemplate = ({ type, color, invoice, setInvoiceIdToDownload }) => {
   const invoiceIdToDownload = useRef();
 
   useEffect(() => {
-    setInvoiceIdToDownload(invoiceIdToDownload.current.id);
+    setInvoiceIdToDownload(invoiceIdToDownload?.current?.id);
   }, [invoiceIdToDownload]);
 
   const parseAmount = (val) => {
@@ -23,16 +23,31 @@ const InvoiceTemplate = ({ type, color, invoice, setInvoiceIdToDownload }) => {
     parseAmount(invoice?.sgst);
 
   return (
-    <main className="flex w-full h-screen">
+    <main style={{ display: "flex", width: "100%", height: "100vh" }}>
       <div
         ref={invoiceIdToDownload}
         id="invoice"
-        className="max-w-3xl h-screen bg-white mx-auto p-4 shadow-lg shadow-zinc-500"
+        style={{
+          maxWidth: "800px",
+          height: "100%",
+          backgroundColor: "#fff",
+          margin: "auto",
+          padding: "16px",
+          // boxShadow: "0 4px 12px rgba(0,0,0,0.2)",
+        }}
       >
-        {/* Party name */}
-        <div className="flex items-center justify-between">
-          <h2 className="font-semibold text-xl">{business?.businessName}</h2>
-          <h1 className="uppercase">
+        {/* Header */}
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "space-between",
+            alignItems: "center",
+          }}
+        >
+          <h2 style={{ fontWeight: 600, fontSize: "20px" }}>
+            {business?.businessName}
+          </h2>
+          <h1 style={{ textTransform: "uppercase", fontSize: "18px" }}>
             {type === "Sales Return"
               ? "Sales Return"
               : type === "Sales Invoice"
@@ -48,31 +63,37 @@ const InvoiceTemplate = ({ type, color, invoice, setInvoiceIdToDownload }) => {
               : ""}
           </h1>
         </div>
+
+        {/* Phone */}
         <div
           style={{
+            marginTop: "16px",
+            display: "flex",
+            alignItems: "center",
+            gap: "8px",
+            fontSize: "14px",
             color: "#3f3f46",
           }}
-          className="mt-5 flex gap-2 items-center  text-sm"
         >
-          <span
-            style={{
-              color: color,
-            }}
-          >
+          <span style={{ color: color }}>
             <BsTelephone />
           </span>
           {business?.companyPhoneNo}
         </div>
-        <span className="divider divider-neutral" />
-        {/* Displaying invoice information like invoice date and invoice number */}
-        <section className="flex items-center gap-10 text-xs  px-3">
+
+        <hr style={{ margin: "16px 0", borderColor: "#d4d4d8" }} />
+
+        {/* Invoice details */}
+        <section
+          style={{
+            display: "flex",
+            gap: "40px",
+            fontSize: "12px",
+            padding: "0 12px",
+          }}
+        >
           <div>
-            <p
-              style={{
-                color: color,
-              }}
-              className="font-semibold"
-            >
+            <p style={{ color: color, fontWeight: "600" }}>
               {type === "Sales Return"
                 ? "Sales Return No."
                 : type === "Sales Invoice"
@@ -103,13 +124,9 @@ const InvoiceTemplate = ({ type, color, invoice, setInvoiceIdToDownload }) => {
                 : ""}
             </span>
           </div>
+
           <div>
-            <p
-              style={{
-                color: color,
-              }}
-              className="font-semibold "
-            >
+            <p style={{ color: color, fontWeight: "600" }}>
               {type === "Sales Return"
                 ? "Sales Return Date"
                 : type === "Sales Invoice"
@@ -140,13 +157,9 @@ const InvoiceTemplate = ({ type, color, invoice, setInvoiceIdToDownload }) => {
                 : ""}
             </span>
           </div>
+
           <div>
-            <p
-              style={{
-                color: color,
-              }}
-              className="font-semibold "
-            >
+            <p style={{ color: color, fontWeight: "600" }}>
               {type === "Quotation" ? "Expiry Date" : "Due Date"}
             </p>
             <span>
@@ -167,65 +180,68 @@ const InvoiceTemplate = ({ type, color, invoice, setInvoiceIdToDownload }) => {
           </div>
         </section>
 
-        <span
-          className={`divider divider-neutral`}
-          style={{
-            color: color,
-          }}
-        />
+        <hr style={{ margin: "16px 0", borderColor: "#d4d4d8" }} />
 
-        {/* Party Details */}
-        <section className="text-sm">
-          <h3 className="font-medium">BILL TO</h3>
-          <p className="font-bold">{invoice?.partyId?.partyName}</p>
-          <p className="text-sm text-zinc-700">
+        {/* Bill to */}
+        <section style={{ fontSize: "14px" }}>
+          <h3 style={{ fontWeight: 500 }}>BILL TO</h3>
+          <p style={{ fontWeight: "bold" }}>{invoice?.partyId?.partyName}</p>
+          <p style={{ fontSize: "14px", color: "#3f3f46" }}>
             {invoice?.partyId?.billingAddress}
           </p>
-          <p className="font-semibold">
+          <p style={{ fontWeight: 600 }}>
             Mobile{" "}
-            <span className="font-normal">
+            <span style={{ fontWeight: "normal" }}>
               {invoice?.partyId?.mobileNumber}
             </span>
           </p>
         </section>
-        {/* Items Table */}
-        <div className="overflow-x-auto">
-          <table className="table table-xs mt-5 w-full  ">
-            {/* head */}
+
+        {/* Items table */}
+        <div style={{ overflowX: "auto", marginTop: "16px" }}>
+          <table
+            style={{
+              width: "100%",
+              borderCollapse: "collapse",
+              fontSize: "12px",
+            }}
+          >
             <thead>
-              <tr
-                style={{
-                  backgroundColor: color,
-                }}
-              >
-                <th>No</th>
-                <th>Items</th>
-                <th>Qty.</th>
-                <th>Rate</th>
-                <th>Tax</th>
-                <th className="text-right">Total</th>
+              <tr style={{ backgroundColor: color, color: "#fff" }}>
+                <th style={{ padding: "8px", textAlign: "left" }}>No</th>
+                <th style={{ padding: "8px", textAlign: "left" }}>Items</th>
+                <th style={{ padding: "8px", textAlign: "left" }}>Qty.</th>
+                <th style={{ padding: "8px", textAlign: "left" }}>Rate</th>
+                <th style={{ padding: "8px", textAlign: "left" }}>Tax</th>
+                <th style={{ padding: "8px", textAlign: "right" }}>Total</th>
               </tr>
             </thead>
             <tbody>
               {invoice?.items?.map((item, index) => (
                 <tr key={index}>
-                  <td>{index + 1}</td>
-                  <td>{item?.itemName}</td>
-                  <td>{item?.quantity}</td>
-                  <td>
-                    <div className="flex items-center">
+                  <td style={{ padding: "6px" }}>{index + 1}</td>
+                  <td style={{ padding: "6px" }}>{item?.itemName}</td>
+                  <td style={{ padding: "6px" }}>{item?.quantity}</td>
+                  <td style={{ padding: "6px" }}>
+                    <div style={{ display: "flex", alignItems: "center" }}>
                       <LiaRupeeSignSolid />
                       {Number(item?.basePrice || 0).toLocaleString("en-IN")}
                     </div>
                   </td>
-                  <td>
-                    <div className="flex items-center">
+                  <td style={{ padding: "6px" }}>
+                    <div style={{ display: "flex", alignItems: "center" }}>
                       <LiaRupeeSignSolid />
                       {Number(item?.gstAmount || 0).toLocaleString("en-IN")}
                     </div>
                   </td>
-                  <td>
-                    <div className="flex items-center justify-end">
+                  <td style={{ padding: "6px" }}>
+                    <div
+                      style={{
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "flex-end",
+                      }}
+                    >
                       <LiaRupeeSignSolid />
                       {(
                         Number(item?.quantity || 0) *
@@ -238,24 +254,18 @@ const InvoiceTemplate = ({ type, color, invoice, setInvoiceIdToDownload }) => {
               ))}
 
               {/* Subtotal row */}
-              <tr
-                style={{
-                  borderColor: color,
-                  backgroundColor: "#e1e1e3",
-                }}
-                className="font-semibold "
-              >
+              <tr style={{ backgroundColor: "#e1e1e3", fontWeight: 600 }}>
                 <td></td>
-                <td>Subtotal</td>
-                <td>
+                <td style={{ padding: "6px" }}>Subtotal</td>
+                <td style={{ padding: "6px" }}>
                   {invoice?.items?.reduce(
                     (acc, item) => acc + (Number(item?.quantity) || 0),
                     0
                   )}
                 </td>
                 <td></td>
-                <td>
-                  <div className="flex items-center">
+                <td style={{ padding: "6px" }}>
+                  <div style={{ display: "flex", alignItems: "center" }}>
                     <LiaRupeeSignSolid />
                     {invoice?.items
                       ?.reduce(
@@ -265,8 +275,14 @@ const InvoiceTemplate = ({ type, color, invoice, setInvoiceIdToDownload }) => {
                       .toLocaleString("en-IN")}
                   </div>
                 </td>
-                <td>
-                  <div className="flex items-center justify-end">
+                <td style={{ padding: "6px" }}>
+                  <div
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "flex-end",
+                    }}
+                  >
                     <LiaRupeeSignSolid />
                     {invoice?.items
                       ?.reduce(
@@ -284,45 +300,54 @@ const InvoiceTemplate = ({ type, color, invoice, setInvoiceIdToDownload }) => {
             </tbody>
           </table>
 
-          {/* Footer section */}
-          <div className="divider divider-neutral" />
-          <section className="grid grid-cols-2 text-xs mt-3">
-            <div className="mt-4">
+          {/* Footer */}
+          <hr style={{ margin: "16px 0", borderColor: "#d4d4d8" }} />
+          <section
+            style={{
+              display: "grid",
+              gridTemplateColumns: "1fr 1fr",
+              fontSize: "12px",
+            }}
+          >
+            <div style={{ marginTop: "12px" }}>
               {invoice?.termsAndCondition && (
                 <div>
-                  <h4 className="font-semibold">Terms & Conditions</h4>
-                  <p className="whitespace-pre-line">
+                  <h4 style={{ fontWeight: 600 }}>Terms & Conditions</h4>
+                  <p style={{ whiteSpace: "pre-line" }}>
                     {invoice?.termsAndCondition}
                   </p>
                 </div>
               )}
             </div>
-            <div className="mt-4 ">
-              <div className="flex items-center justify-between">
+            <div style={{ marginTop: "12px" }}>
+              <div style={{ display: "flex", justifyContent: "space-between" }}>
                 <p>Taxable Amount</p>
-                <span className="flex items-center ">
+                <span style={{ display: "flex", alignItems: "center" }}>
                   <LiaRupeeSignSolid />
                   {Number(invoice?.taxableAmount).toLocaleString("en-IN")}
                 </span>
               </div>
-              <div className="flex items-center justify-between">
+              <div style={{ display: "flex", justifyContent: "space-between" }}>
                 <p>CGST </p>
-                <span className="flex items-center">
+                <span style={{ display: "flex", alignItems: "center" }}>
                   <LiaRupeeSignSolid />
                   {invoice?.cgst}
                 </span>
               </div>
-              <div className="flex items-center justify-between">
+              <div style={{ display: "flex", justifyContent: "space-between" }}>
                 <p>SGST</p>
-                <span className="flex items-center">
+                <span style={{ display: "flex", alignItems: "center" }}>
                   <LiaRupeeSignSolid />
                   {invoice?.sgst}
                 </span>
               </div>
+
               {invoice?.additionalChargeAmount > 0 && (
-                <div className="flex items-center justify-between">
+                <div
+                  style={{ display: "flex", justifyContent: "space-between" }}
+                >
                   <p>{invoice?.additionalChargeReason}</p>
-                  <span className="flex items-center">
+                  <span style={{ display: "flex", alignItems: "center" }}>
                     <LiaRupeeSignSolid />
                     {invoice?.additionalChargeAmount}
                   </span>
@@ -330,64 +355,44 @@ const InvoiceTemplate = ({ type, color, invoice, setInvoiceIdToDownload }) => {
               )}
 
               <div
-                className="h-[0.5px] my-3 w-full "
                 style={{
+                  height: "1px",
+                  margin: "12px 0",
                   backgroundColor: color,
                 }}
               />
               <div
                 style={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  fontWeight: "600",
+                  fontSize: "16px",
                   color: "#52525c",
                 }}
-                className="flex items-center justify-between font-semibold text-lg "
               >
                 <p>Total Amount</p>
-                <span className="flex items-center">
+                <span style={{ display: "flex", alignItems: "center" }}>
                   <LiaRupeeSignSolid />
                   {Math.round(invoice?.totalAmount).toLocaleString("en-IN")}
                 </span>
               </div>
               <div
-                className="h-[0.5px] my-3 w-full "
                 style={{
+                  height: "1px",
+                  margin: "12px 0",
                   backgroundColor: color,
                 }}
               />
-              {/* <div
-                style={{
-                  color: "#52525c",
-                }}
-                className="flex items-center justify-between text-xs "
-              >
-                <p>Received Amount</p>
-                <span className="flex items-center">
-                  <LiaRupeeSignSolid />{" "}
-                  {invoice?.totalAmount.toLocaleString("en-IN")}
-                </span>
-              </div>
+
               <div
                 style={{
+                  marginTop: "16px",
+                  fontSize: "12px",
                   color: "#52525c",
                 }}
-                className="flex font-semibold items-center justify-between  text-xs "
               >
-                <p>Balance</p>
-                <span className="flex items-center">
-                  {" "}
-                  <LiaRupeeSignSolid /> {0}
-                </span>
-              </div> */}
-              <div
-                style={{
-                  color: "#52525c",
-                }}
-                className="flex flex-col mt-5  items-start justify-between text-xs "
-              >
-                <p className="font-semibold">Total Amount(in words)</p>
-                <span className="flex items-center">
-                  {" "}
-                  {converter.toWords(total).toUpperCase()}
-                </span>
+                <p style={{ fontWeight: 600 }}>Total Amount (in words)</p>
+                <span>{converter.toWords(total).toUpperCase()}</span>
               </div>
             </div>
           </section>

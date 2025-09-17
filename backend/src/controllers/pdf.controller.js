@@ -12,11 +12,45 @@ export async function generatePdf(req, res) {
     });
 
     const page = await browser.newPage();
-    await page.setContent(html, { waitUntil: "networkidle0" });
+
+    // Wrap user HTML into a full HTML document
+    const finalHtml = `
+      <!DOCTYPE html>
+      <html>
+        <head>
+          <meta charset="utf-8" />
+          <title>Invoice</title>
+          <style>
+            @page {
+              size: A4;
+              margin: 10mm;
+            }
+            body {
+              font-family: Arial, sans-serif;
+              margin: 0;
+              padding: 0;
+            }
+            .invoice-container {
+              width: 100%;
+              max-width: 1000px;
+              margin: auto;
+            }
+          </style>
+        </head>
+        <body>
+          <div class="invoice-container">
+            ${html}
+          </div>
+        </body>
+      </html>
+    `;
+
+    await page.setContent(finalHtml, { waitUntil: "networkidle0" });
 
     const pdfBuffer = await page.pdf({
       format: "A4",
       printBackground: true,
+      preferCSSPageSize: true,
     });
 
     await browser.close();

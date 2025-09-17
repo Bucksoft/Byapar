@@ -1,7 +1,20 @@
 import { FaFilePdf } from "react-icons/fa6";
 import { dateRanges } from "../../utils/constants";
+import { useInvoiceStore } from "../../store/invoicesStore";
+import { useEffect } from "react";
+import { useState } from "react";
 
 const SingleItemStockDetails = ({ item }) => {
+  const { invoices } = useInvoiceStore();
+  const [invoicesWithItem, setInvoicesWithItem] = useState([]);
+
+  useEffect(() => {
+    const invoiceWithItem = invoices.filter((invoice) =>
+      invoice?.items?.filter((i) => i?.itemName === item?.itemName)
+    );
+    setInvoicesWithItem([...invoiceWithItem]);
+  }, [item, invoices]);
+
   return (
     <main className="px-5 py-4">
       <header className="w-full flex justify-between">
@@ -30,7 +43,17 @@ const SingleItemStockDetails = ({ item }) => {
           </thead>
           <tbody>
             {
-                // To be written
+              // To be written
+              invoicesWithItem &&
+                invoicesWithItem.map((invoice) => (
+                  <tr>
+                    <td>{invoice?.salesInvoiceDate.split("T")[0] || "-"}</td>
+                    <td>{invoice?.type || "-"}</td>
+                    <td>-</td>
+                    <td>{invoice?.salesInvoiceNumber || "-"}</td>
+                    <td>-</td>
+                  </tr>
+                ))
             }
           </tbody>
         </table>

@@ -18,6 +18,7 @@ const DashboardPartyPage = () => {
   const [selectedMenu, setSelectedMenu] = useState("transactions");
   const { invoices } = useInvoiceStore();
   const [partyInvoices, setPartyInvoices] = useState();
+  const [filter, setFilter] = useState("all_transactions");
 
   function handleSelectedMenu(menu) {
     setSelectedMenu(menu.toLowerCase());
@@ -31,7 +32,7 @@ const DashboardPartyPage = () => {
   });
 
   useEffect(() => {
-    const partyInvoices = invoices.filter(
+    const partyInvoices = invoices?.filter(
       (invoice) => invoice?.partyId?._id === id
     );
     setPartyInvoices(partyInvoices);
@@ -51,6 +52,8 @@ const DashboardPartyPage = () => {
       navigate("/dashboard/parties/sales-return", { state: { id: id } });
     }
   };
+
+  console.log(filter);
 
   return (
     <main className="h-full p-2">
@@ -110,36 +113,43 @@ const DashboardPartyPage = () => {
 
         <section className="flex flex-col">
           <fieldset className="fieldset">
-            <select className="select select-sm w-1/5 my-4">
+            <select
+              value={filter}
+              onChange={(e) => setFilter(e.target.value)}
+              className="select select-sm w-1/5 my-4"
+            >
               <option disabled hidden>
                 Select Transaction Type
               </option>
               <option value="sales_invoice">Sales</option>
-              <option value="quotation">Purchase</option>
-              <option value="proforma_invoice">Payment In</option>
-              <option value="sales_return">Payment Out</option>
-              <option value="sales_return">Quotation</option>
+              <option value="payment_in">Payment In</option>
+              <option value="payment_out">Payment Out</option>
+              <option value="quotation">Quotation</option>
               <option value="sales_return">Sales Return</option>
-              <option value="sales_return">Purchase Return</option>
-              <option value="sales_return">Credit Note</option>
-              <option value="sales_return">Debit Note</option>
-              <option value="sales_return">All Transactions</option>
+              <option value="purchase_return">Purchase Return</option>
+              <option value="credit_note">Credit Note</option>
+              <option value="debit_note">Debit Note</option>
+              <option value="all_transactions">All Transactions</option>
             </select>
           </fieldset>
         </section>
 
         {selectedMenu === "transactions" && (
-          <PartyTransactions party={party} partyInvoices={partyInvoices} />
+          <PartyTransactions
+            party={party}
+            partyInvoices={partyInvoices}
+            filter={filter}
+          />
         )}
 
         {selectedMenu === "profile" && <PartyProfile party={party} />}
 
         {selectedMenu === "ledger (statement)" && (
-          <PartyLedgerStatement party={party} />
+          <PartyLedgerStatement party={party} filter={filter} />
         )}
 
         {selectedMenu === "item wise report" && (
-          <PartyItemWiseReport party={party} />
+          <PartyItemWiseReport party={party} filter={filter} />
         )}
       </div>
     </main>

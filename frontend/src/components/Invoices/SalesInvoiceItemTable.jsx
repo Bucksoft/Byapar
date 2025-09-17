@@ -70,6 +70,7 @@ const SalesInvoiceItemTable = ({ title, data, setData, isEditing }) => {
     );
   };
 
+  // MAIN CALCULATION HERE 👇👇👇
   useEffect(() => {
     if (!addedItems?.length) return;
 
@@ -78,25 +79,34 @@ const SalesInvoiceItemTable = ({ title, data, setData, isEditing }) => {
       return match ? parseFloat(match[1]) : 0;
     };
 
-    // Initial item calculations
     let updatedItems = addedItems.map((item) => {
       const qty = quantities[item._id] || 1;
       const salesPrice = Number(item.salesPrice) || 0;
       const gstRate = getGSTPercentage(item.gstTaxRate);
 
-      let basePrice =
+      // Step 1: Get Base Price (without tax)
+      const basePrice =
         item.gstTaxRateType === "without tax"
           ? salesPrice
           : salesPrice * (100 / (100 + gstRate));
 
-      let discountAmount = item.discountPercent
-        ? (basePrice * item.discountPercent) / 100
-        : Number(item.discountAmount || 0);
-      discountAmount = Math.min(discountAmount, basePrice);
+      // Step 2: Discount (either % or fixed amount)
+      let discountAmount = 0;
+      if (item.discountPercent) {
+        discountAmount = ((basePrice * item.discountPercent) / 100) * qty;
+      } else if (item.discountAmount) {
+        discountAmount = Number(item.discountAmount);
+      }
+      discountAmount = Math.min(discountAmount, basePrice * qty);
 
-      const discountedBase = basePrice - discountAmount;
-      const gstAmount = (discountedBase * gstRate) / 100;
-      const finalPrice = discountedBase + gstAmount;
+      // Step 3: Taxable Value after discount
+      const taxableValue = basePrice * qty - discountAmount;
+
+      // Step 4: GST
+      const gstAmount = (taxableValue * gstRate) / 100;
+
+      // Step 5: Final Amount
+      const finalAmount = taxableValue + gstAmount;
 
       return {
         ...item,
@@ -104,26 +114,30 @@ const SalesInvoiceItemTable = ({ title, data, setData, isEditing }) => {
         basePrice: basePrice.toFixed(2),
         discountAmount: discountAmount.toFixed(2),
         gstAmount: gstAmount.toFixed(2),
-        finalPrice: finalPrice.toFixed(2),
-        totalAmount: (finalPrice * qty).toFixed(2),
+        taxableValue: taxableValue.toFixed(2),
+        totalAmount: finalAmount.toFixed(2), // per item total
       };
     });
 
-    // Calculate totals from items
+    // === Totals ===
     let totalTaxableAmount = updatedItems.reduce(
-      (acc, item) => acc + Number(item.basePrice) * item.quantity,
+      (acc, item) => acc + Number(item?.taxableValue),
       0
     );
     let totalGstAmount = updatedItems.reduce(
-      (acc, item) => acc + Number(item.gstAmount) * item.quantity,
+      (acc, item) => acc + Number(item?.gstAmount),
       0
     );
     let totalAmount = updatedItems.reduce(
-      (acc, item) => acc + Number(item.totalAmount),
+      (acc, item) => acc + Number(item?.totalAmount),
+      0
+    );
+    let discountTotal = updatedItems.reduce(
+      (acc, item) => acc + Number(item?.discountAmount),
       0
     );
 
-    // Add additional charge
+    // === Additional Charges (with GST) ===
     const additionalChargeAmount = Number(data?.additionalChargeAmount || 0);
     if (additionalChargeAmount > 0) {
       const additionalChargeTaxRate = getGSTPercentage(
@@ -131,85 +145,50 @@ const SalesInvoiceItemTable = ({ title, data, setData, isEditing }) => {
       );
       const additionalChargeTaxAmount =
         (additionalChargeAmount * additionalChargeTaxRate) / 100;
-      totalAmount += additionalChargeAmount + additionalChargeTaxAmount;
+      totalTaxableAmount += additionalChargeAmount;
       totalGstAmount += additionalChargeTaxAmount;
+      totalAmount += additionalChargeAmount + additionalChargeTaxAmount;
     }
 
-    // Initialize balanceAmount
+    // === Additional Discount (Before Tax) ===
+    const addlDiscountPercent = Number(data?.additionalDiscountAmount || 0);
     let balanceAmount = totalAmount;
 
-    const addlDiscountPercent = Number(data?.additionalDiscountAmount || 0);
-
-    // Before-tax discount: recalc each item
     if (
       addlDiscountPercent > 0 &&
       data?.additionalDiscountType === "before tax"
     ) {
-      updatedItems = updatedItems.map((item) => {
-        const basePrice = Number(item.basePrice);
-        const gstRate = getGSTPercentage(item.gstTaxRate);
-        const discountAmount = (basePrice * addlDiscountPercent) / 100;
-        const discountedBase = basePrice - discountAmount;
-        const gstAmount = (discountedBase * gstRate) / 100;
-        const finalPrice = discountedBase + gstAmount;
-        return {
-          ...item,
-          discountAmount: discountAmount.toFixed(2),
-          gstAmount: gstAmount.toFixed(2),
-          finalPrice: finalPrice.toFixed(2),
-          totalAmount: (finalPrice * item.quantity).toFixed(2),
-        };
-      });
+      const discountValue = (totalTaxableAmount * addlDiscountPercent) / 100;
+      totalTaxableAmount -= discountValue;
 
-      // Recalculate totals after before-tax discount
-      totalTaxableAmount = updatedItems.reduce(
-        (acc, item) => acc + Number(item.basePrice) * item.quantity,
-        0
-      );
-      totalGstAmount = updatedItems.reduce(
-        (acc, item) => acc + Number(item.gstAmount) * item.quantity,
-        0
-      );
-      totalAmount = updatedItems.reduce(
-        (acc, item) => acc + Number(item.totalAmount),
-        0
-      );
-
-      // Add additional charge after recalculation
-      if (additionalChargeAmount > 0) {
-        const additionalChargeTaxRate = getGSTPercentage(
-          data?.additionalChargeTax
-        );
-        const additionalChargeTaxAmount =
-          (additionalChargeAmount * additionalChargeTaxRate) / 100;
-        totalAmount += additionalChargeAmount + additionalChargeTaxAmount;
-        totalGstAmount += additionalChargeTaxAmount;
-      }
+      // Recalculate GST after discount
+      totalGstAmount = (totalTaxableAmount * getGSTPercentage("18%")) / 100; // 👈 replace with dynamic GST logic if mixed
+      totalAmount = totalTaxableAmount + totalGstAmount;
 
       balanceAmount = totalAmount;
     }
 
-    // After-tax discount: adjust balance only
+    // === Additional Discount (After Tax) ===
     if (
       addlDiscountPercent > 0 &&
       data?.additionalDiscountType === "after tax"
     ) {
-      const discountAmount = (balanceAmount * addlDiscountPercent) / 100;
-      balanceAmount -= discountAmount;
+      const discountValue = (totalAmount * addlDiscountPercent) / 100;
+      balanceAmount -= discountValue;
     }
 
     const cgst = Number((totalGstAmount / 2).toFixed(2));
     const sgst = Number((totalGstAmount / 2).toFixed(2));
 
-    // Update state
+    // === Update state ===
     setData((prev) => ({
       ...prev,
       items: updatedItems,
-      amountSubTotal: parseFloat(totalAmount.toFixed(2)), // sum of items + additional charge
+      amountSubTotal: parseFloat(totalAmount.toFixed(2)),
       taxableAmount: parseFloat(totalTaxableAmount.toFixed(2)),
       totalGstAmount: parseFloat(totalGstAmount.toFixed(2)),
-      totalAmount: parseFloat(totalAmount.toFixed(2)), // UI: Total Amount column
-      balanceAmount: parseFloat(balanceAmount.toFixed(2)), // UI: Balance column after discount
+      totalAmount: parseFloat(totalAmount.toFixed(2)), // before final discounts
+      balanceAmount: parseFloat(balanceAmount.toFixed(2)), // final payable
       cgst: String(cgst),
       sgst: String(sgst),
     }));
@@ -579,7 +558,11 @@ const SalesInvoiceItemTable = ({ title, data, setData, isEditing }) => {
           SUBTOTAL
         </span>
         <span className="border-t border-r border-b p-2 border-[var(--primary-border)] ">
-          ₹ {Number(data?.taxableAmount || 0).toLocaleString("en-IN")}
+          ₹{" "}
+          {data?.items.reduce(
+            (acc, item) => acc + Number(item?.discountAmount),
+            0
+          )}
         </span>
         <span className="border-t border-b p-2 border-[var(--primary-border)]">
           ₹ {Number(data?.totalGstAmount || 0).toLocaleString("en-IN")}
