@@ -41,9 +41,6 @@ export async function createSalesReturn(req, res) {
       return res.status(400).json()
     }
 
-
-
-
     for (const returnedItem of data?.items) {
       const item = await Item.findById(returnedItem?._id);
       if (!item) {

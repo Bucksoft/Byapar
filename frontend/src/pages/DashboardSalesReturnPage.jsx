@@ -94,7 +94,7 @@ const DashboardSalesReturnPage = () => {
                           navigate(`/dashboard/sales-return/${saleReturn?._id}`)
                         }
                         key={saleReturn?._id}
-                        className="cursor-pointer"
+                        className="cursor-pointer hover:bg-zinc-50"
                       >
                         <td>{(saleReturn?.salesReturnDate).split("T")[0]}</td>
                         <td>{saleReturn?.salesReturnNumber}</td>
@@ -136,7 +136,7 @@ const DashboardSalesReturnPage = () => {
                                   <FaRegEdit /> Edit
                                 </a>
                               </li>
-                              <li>
+                              {/* <li>
                                 <a>
                                   <MdOutlineHistory />
                                   Edit History
@@ -147,7 +147,7 @@ const DashboardSalesReturnPage = () => {
                                   <BiDuplicate />
                                   Duplicate
                                 </a>
-                              </li>
+                              </li> */}
                               <li>
                                 <a
                                   onClick={() => {

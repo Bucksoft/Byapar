@@ -1,17 +1,17 @@
 import { FaFileInvoice } from "react-icons/fa";
 import DashboardNavbar from "../components/DashboardNavbar";
-import SalesNavigationMenus from "../components/SalesNavigationMenus";
-import { useQuery } from "@tanstack/react-query";
-import { axiosInstance } from "../config/axios";
 import CustomLoader from "../components/Loader";
 import { LiaRupeeSignSolid } from "react-icons/lia";
 import { useBusinessStore } from "../store/businessStore";
 import { useQuotationStore } from "../store/quotationStore";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { useQuery } from "@tanstack/react-query";
+import { axiosInstance } from "../config/axios";
 import dayjs from "dayjs";
 import isoWeek from "dayjs/plugin/isoWeek";
 import isBetween from "dayjs/plugin/isBetween";
+import { ChevronDown, Search } from "lucide-react";
 
 dayjs.extend(isoWeek);
 dayjs.extend(isBetween);
@@ -20,74 +20,143 @@ const DashboardQuotationPage = () => {
   const { business } = useBusinessStore();
   const { setQuotations } = useQuotationStore();
   const [searchedQuery, setSearchedQuery] = useState("");
-  const [filterDate, setFilterDate] = useState("today");
+  const [filterDate, setFilterDate] = useState("");
   const navigate = useNavigate();
 
   const { isLoading, data: quotations = [] } = useQuery({
-    queryKey: ["quotations"],
+    queryKey: ["quotations", business?._id],
     queryFn: async () => {
       const res = await axiosInstance.get(`/quotation/all/${business?._id}`);
       setQuotations(res.data.quotations);
       return Array.isArray(res.data.quotations) ? res.data.quotations : [];
     },
+    enabled: !!business?._id,
   });
 
-  const searchedQuotations = quotations?.filter((quotation) => {
-    // Text search
+  // ✅ Apply both search + date filter here
+  const filteredQuotations = quotations.filter((quotation) => {
+    const quotationDate = dayjs(
+      quotation?.quotationDate || quotation?.createdAt
+    );
+
+    // --- Date filter ---
+    switch (filterDate) {
+      case "today":
+        if (!quotationDate.isSame(dayjs(), "day")) return false;
+        break;
+      case "yesterday":
+        if (!quotationDate.isSame(dayjs().subtract(1, "day"), "day"))
+          return false;
+        break;
+      case "thisWeek":
+        if (
+          !quotationDate.isBetween(
+            dayjs().startOf("isoWeek"),
+            dayjs().endOf("isoWeek"),
+            null,
+            "[]"
+          )
+        )
+          return false;
+        break;
+      case "lastWeek":
+        const startLastWeek = dayjs().subtract(1, "week").startOf("isoWeek");
+        const endLastWeek = dayjs().subtract(1, "week").endOf("isoWeek");
+        if (!quotationDate.isBetween(startLastWeek, endLastWeek, null, "[]"))
+          return false;
+        break;
+      default:
+        break;
+    }
+
+    // --- Search filter ---
     if (searchedQuery.trim()) {
       const query = searchedQuery.toLowerCase();
       const matchesText =
         quotation?.quotationNumber?.toString().toLowerCase().includes(query) ||
-        quotation?.partyName?.toLowerCase().includes(query);
-      if (!matchesText) return false;
+        quotation?.partyId?.partyName?.toLowerCase().includes(query);
+      return matchesText;
     }
 
-    const quotationDate = dayjs(
-      quotation?.quotationDate || quotation?.createdAt
-    );
-    switch (filterDate) {
-      case "today":
-        return quotationDate.isSame(dayjs(), "day");
-      case "yesterday":
-        return quotationDate.isSame(dayjs().subtract(1, "day"), "day");
-      case "thisWeek":
-        return quotationDate.isBetween(
-          dayjs().startOf("isoWeek"),
-          dayjs().endOf("isoWeek"),
-          null,
-          "[]"
-        );
-      case "lastWeek":
-        const startLastWeek = dayjs().subtract(1, "week").startOf("isoWeek");
-        const endLastWeek = dayjs().subtract(1, "week").endOf("isoWeek");
-        return quotationDate.isBetween(startLastWeek, endLastWeek, null, "[]");
-      default:
-        return true;
-    }
+    return true;
   });
 
   return (
     <main className="h-screen w-full flex">
-      <section className="h-full w-full bg-gray-100 p-2 ">
+      <section className="h-full w-full bg-gray-100 p-2">
         <div className="border border-zinc-300 h-full rounded-md bg-white p-3">
           <DashboardNavbar title={"Quotation / Estimate"} />
-          <SalesNavigationMenus
-            title={"Quotation / Estimate"}
-            btnText={"Quotation"}
-            selectText={"quotation"}
-            setSearchedQuery={setSearchedQuery}
-            setFilterDate={setFilterDate}
-          />
 
-          {/* table */}
-          <div className="mt-5 h-80 rounded-md mx-4">
+          {/* Top controls */}
+          <div className="flex gap-3 px-4 py-5 items-center justify-between">
+            <div className="flex gap-5 w-full">
+              {/* search box */}
+              <label className="input input-sm flex items-center gap-2">
+                <Search size={16} />
+                <input
+                  type="search"
+                  placeholder="Search"
+                  value={searchedQuery}
+                  onChange={(e) => setSearchedQuery(e.target.value)}
+                  className="w-full"
+                />
+              </label>
+
+              {/* date filter */}
+              <select
+                className="select select-sm"
+                value={filterDate}
+                onChange={(e) => setFilterDate(e.target.value)}
+              >
+                <option value="today">Today</option>
+                <option value="yesterday">Yesterday</option>
+                <option value="thisWeek">This week</option>
+                <option value="lastWeek">Last week</option>
+              </select>
+
+              {/* dropdown (optional) */}
+              <div className="dropdown dropdown-center w-60">
+                <div
+                  tabIndex={0}
+                  role="button"
+                  className="bg-white btn btn-wide w-full btn-sm text-xs font-medium flex items-center justify-between"
+                >
+                  <span className="text-zinc-400">Show Open Quotation</span>
+                  <ChevronDown size={16} className="text-zinc-400" />
+                </div>
+                <ul
+                  tabIndex={0}
+                  className="dropdown-content menu bg-base-100 rounded-box z-1 w-52 p-2 shadow-sm text-zinc-400"
+                >
+                  <li>
+                    <a>Show All Quotation</a>
+                  </li>
+                  <li>
+                    <a>Show Open Quotation</a>
+                  </li>
+                  <li>
+                    <a>Show Closed Quotation</a>
+                  </li>
+                </ul>
+              </div>
+            </div>
+
+            <button
+              onClick={() => navigate(`/dashboard/parties/create-quotation`)}
+              className="btn bg-[var(--primary-btn)] btn-sm text-zinc-700"
+            >
+              Create Quotation
+            </button>
+          </div>
+
+          {/* Table */}
+          <div className="mt-5 h-80 rounded-md mx-4 overflow-auto">
             {isLoading ? (
               <div className="flex justify-center py-16">
                 <CustomLoader text={"Loading..."} />
               </div>
-            ) : quotations.length > 0 ? (
+            ) : filteredQuotations.length > 0 ? (
               <table className="table">
-                {/* head */}
                 <thead>
                   <tr className="text-xs bg-gray-100">
                     <th className="w-60">Date</th>
@@ -99,47 +168,33 @@ const DashboardQuotationPage = () => {
                   </tr>
                 </thead>
                 <tbody>
-                  {(searchedQuery ? searchedQuotations : quotations)?.length >
-                  0 ? (
-                    (searchedQuery ? searchedQuotations : quotations).map(
-                      (quotation) => (
-                        <tr
-                          key={quotation._id}
-                          onClick={() =>
-                            navigate(`/dashboard/quotations/${quotation?._id}`)
-                          }
-                          className="cursor-pointer"
-                        >
-                          <td>{quotation?.quotationDate?.split("T")[0]}</td>
-                          <td>{quotation?.quotationNumber}</td>
-                          <td>{quotation?.partyId?.partyName}</td>
-                          <td>-</td>
-                          <td>
-                            <div className="flex items-center">
-                              <LiaRupeeSignSolid />
-                              {Number(
-                                quotation?.totalAmount || 0
-                              ).toLocaleString("en-IN")}
-                            </div>
-                          </td>
-                          <td>
-                            <div className="badge badge-accent badge-soft">
-                              {quotation?.status}
-                            </div>
-                          </td>
-                        </tr>
-                      )
-                    )
-                  ) : (
-                    <tr>
-                      <td
-                        colSpan="8"
-                        className="text-center text-zinc-400 py-6"
-                      >
-                        No data found
+                  {filteredQuotations.map((quotation) => (
+                    <tr
+                      key={quotation._id}
+                      onClick={() =>
+                        navigate(`/dashboard/quotations/${quotation?._id}`)
+                      }
+                      className="cursor-pointer hover:bg-zinc-50"
+                    >
+                      <td>{quotation?.quotationDate?.split("T")[0]}</td>
+                      <td>{quotation?.quotationNumber}</td>
+                      <td>{quotation?.partyId?.partyName}</td>
+                      <td>-</td>
+                      <td>
+                        <div className="flex items-center">
+                          <LiaRupeeSignSolid />
+                          {Number(quotation?.totalAmount || 0).toLocaleString(
+                            "en-IN"
+                          )}
+                        </div>
+                      </td>
+                      <td>
+                        <div className="badge badge-accent badge-soft">
+                          {quotation?.status}
+                        </div>
                       </td>
                     </tr>
-                  )}
+                  ))}
                 </tbody>
               </table>
             ) : (
