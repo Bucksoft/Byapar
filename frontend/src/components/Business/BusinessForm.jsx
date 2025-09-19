@@ -596,6 +596,57 @@ const BusinessForm = ({ businessToBeUpdated }) => {
                 <option>Boardband/ cable/ internet</option>
                 <option>Building Material and Construction</option>
                 <option>Cleaning and pest Control</option>
+                <option>Consulting</option>
+                <option>Dairy (Milk)</option>
+                <option>Doctor / Clinic / Hospital</option>
+                <option>Education-Schooling/Coaching</option>
+                <option>Electrical works</option>
+                <option>Electronics</option>
+                <option>Engineering</option>
+                <option>Event planning and management</option>
+                <option>FMCG</option>
+                <option>Fitness - Gym and Spa</option>
+                <option>Footwear</option>
+                <option>Fruits and Vegetables</option>
+                <option>Furniture</option>
+                <option>Garment/Clothing</option>
+                <option>General Store(Kirana)</option>
+                <option>Gift Shop</option>
+                <option>Hardware</option>
+                <option>Home services</option>
+                <option>Hotels and Hospitality</option>
+                <option>Information Technology</option>
+                <option>Interiors</option>
+                <option>Jewellery</option>
+                <option>Liquor</option>
+                <option>Machinery</option>
+                <option>Meat</option>
+                <option>Medical Devices</option>
+                <option>Medicine(Pharma)</option>
+                <option>Mobile and accessories</option>
+                <option>Oil And Gas</option>
+                <option>Opticals</option>
+                <option>Other services</option>
+                <option>Others</option>
+                <option>Packaging</option>
+                <option>Paints</option>
+                <option>Photography</option>
+                <option>Plywood</option>
+                <option>Printing</option>
+                <option>Real estate - Rentals and Lease</option>
+                <option>Restaurants/ Cafe/ Catering</option>
+                <option>Safety Equipments</option>
+                <option>Salon</option>
+                <option>Scrap</option>
+                <option>Service Centres</option>
+                <option>Sports Equipments</option>
+                <option>Stationery</option>
+                <option>Tailoring/ Boutique</option>
+                <option>Textiles</option>
+                <option>Tiles/Sanitary Ware</option>
+                <option>Tours and Travel</option>
+                <option>Transport and Logistics</option>
+                <option value="Utensils">Utensils</option>
               </select>
               <small className="text-xs text-[var(--error-text-color)] ">
                 {
