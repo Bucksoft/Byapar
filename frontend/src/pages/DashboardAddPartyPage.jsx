@@ -72,6 +72,11 @@ const DashboardAddPartyPage = () => {
   // handling actual form submission
   const mutation = useMutation({
     mutationFn: async (data) => {
+      if (!business) {
+        throw new Error(
+          "You don't have any active business yet, create one first"
+        );
+      }
       const res = await axiosInstance.post("/parties", data);
       return res.data.party;
     },
@@ -82,7 +87,9 @@ const DashboardAddPartyPage = () => {
       queryClient.invalidateQueries({ queryKey: ["parties"] });
     },
     onError: (err) => {
-      toast.error(err.response.data.msg || err.response.data.err);
+      toast.error(
+        err.response?.data?.msg || err.response?.data?.err || err.message
+      );
     },
   });
 

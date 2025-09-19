@@ -1,4 +1,5 @@
-import puppeteer from "puppeteer";
+import pdf from "html-pdf-node";
+
 export async function generatePdf(req, res) {
   try {
     const { html } = req.body;
@@ -6,14 +7,7 @@ export async function generatePdf(req, res) {
       return res.status(400).json({ error: "HTML is required" });
     }
 
-    const browser = await puppeteer.launch({
-      headless: "new",
-      args: ["--no-sandbox", "--disable-setuid-sandbox"],
-    });
-
-    const page = await browser.newPage();
-
-    // Wrap user HTML into a full HTML document
+    // Wrap HTML in a proper document
     const finalHtml = `
       <!DOCTYPE html>
       <html>
@@ -21,20 +15,9 @@ export async function generatePdf(req, res) {
           <meta charset="utf-8" />
           <title>Invoice</title>
           <style>
-            @page {
-              size: A4;
-              margin: 10mm;
-            }
-            body {
-              font-family: Arial, sans-serif;
-              margin: 0;
-              padding: 0;
-            }
-            .invoice-container {
-              width: 100%;
-              max-width: 1000px;
-              margin: auto;
-            }
+            @page { size: A4; margin: 10mm; }
+            body { font-family: Arial, sans-serif; margin: 0; padding: 0; }
+            .invoice-container { width: 100%; max-width: 1000px; margin: auto; }
           </style>
         </head>
         <body>
@@ -45,15 +28,13 @@ export async function generatePdf(req, res) {
       </html>
     `;
 
-    await page.setContent(finalHtml, { waitUntil: "networkidle0" });
+    const file = { content: finalHtml };
 
-    const pdfBuffer = await page.pdf({
+    // Generate PDF
+    const pdfBuffer = await pdf.generatePdf(file, {
       format: "A4",
       printBackground: true,
-      preferCSSPageSize: true,
     });
-
-    await browser.close();
 
     res.set({
       "Content-Type": "application/pdf",

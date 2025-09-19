@@ -26,6 +26,7 @@ export async function createSalesInvoice(req, res) {
 
     const existingInvoice = await SalesInvoice.findOne({
       salesInvoiceNumber: validatedResult.data?.salesInvoiceNumber,
+      businessId: req?.params?.id,
     });
 
     if (existingInvoice) {
@@ -40,12 +41,10 @@ export async function createSalesInvoice(req, res) {
       if (soldItem.itemType === "product") {
         const item = await Item.findById(soldItem?._id);
         if (!item) {
-          return res
-            .status(400)
-            .json({
-              success: false,
-              msg: `Item not found : ${item?.itemName}`,
-            });
+          return res.status(400).json({
+            success: false,
+            msg: `Item not found : ${item?.itemName}`,
+          });
         }
         if (item?.currentStock < soldItem.quantity) {
           return res.status(400).json({
@@ -73,6 +72,7 @@ export async function createSalesInvoice(req, res) {
     party.totalDebits = (party.totalDebits || 0) + salesInvoice.balanceAmount;
     party.totalInvoices =
       (party.totalInvoices || 0) + salesInvoice.balanceAmount;
+    party.totalCredits = (party.totalCredits || 0) - salesInvoice.balanceAmount;
     await party.save();
 
     if (!salesInvoice) {

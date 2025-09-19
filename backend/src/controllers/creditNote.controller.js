@@ -35,9 +35,41 @@ export async function createCreditNote(req, res) {
         msg: "Credit note already exists with this invoice number",
       });
     }
-    
 
-    return res.status(200).json({ msg: "Credit Note created", creditNote });
+    
+    const creditNote = await CreditNote.create({
+      partyId: party?._id,
+      clientId: req.user.id,
+      businessId: req.params.id,
+      creditNoteNumber: validatedResult.data.salesInvoiceNumber,
+      creditNoteDate: validatedResult.data.salesInvoiceDate,
+      ...cleanData,
+    });
+
+    if (!creditNote) {
+      return res
+        .status(400)
+        .json({ success: false, msg: "Failed to create credit note" });
+      }
+      
+    const hasInvoiceId =
+         req.body?.invoiceId &&
+         req.body.invoiceId.trim() !== "" &&
+         mongoose.isValidObjectId(req.body.invoiceId);
+    
+    let originalInvoice;
+    if(hasInvoiceId){
+      const invoiceId = new mongoose.Types.ObjectId(req.body.invoiceId);
+      originalInvoice = await SalesInvoice.findById(invoiceId)
+      originalInvoice.balanceAmount = originalInvoice?.balanceAmount - creditNote?.balanceAmount;
+    }
+
+    if(creditNote && creditNote.totalAmount >= 0){
+      party.balanceAmount = party?.balanceAmount - creditNote.totalAmount;
+    }
+
+
+    return res.status(200).json({ msg: "Credit Note created" });
   } catch (error) {
     console.log("Error in creating credit note", error);
     return res

@@ -7,7 +7,7 @@ const DashboardCreditNotePage = () => {
     <main className="h-full p-2">
       <div className="h-full w-full bg-white rounded-lg p-3">
         <DashboardNavbar title={"Credit Note"} />
-        <SalesNavigationMenus btnText={"Credit Note"} />
+        <SalesNavigationMenus btnText={"Credit Note"} title={"Credit Note"} />
         <div className=" mt-5 h-80 rounded-md mx-4 ">
           <table className="table ">
             {/* head */}

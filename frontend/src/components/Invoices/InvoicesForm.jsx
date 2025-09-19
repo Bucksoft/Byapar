@@ -78,6 +78,11 @@ const InvoicesForm = ({
 
   const mutation = useMutation({
     mutationFn: async (formData) => {
+      if (!business) {
+        throw new Error(
+          "You don't have any active business yet, create one first"
+        );
+      }
       if (!party) {
         throw new Error("Please select a party");
       }

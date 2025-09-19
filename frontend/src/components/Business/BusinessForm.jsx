@@ -108,6 +108,7 @@ const BusinessForm = ({ businessToBeUpdated }) => {
     },
     onSuccess: (data) => {
       toast.success("Business created");
+      navigate("/dashboard/my-businesses");
       queryClient.invalidateQueries({ queryKey: ["business"] });
       setBusiness(data);
     },

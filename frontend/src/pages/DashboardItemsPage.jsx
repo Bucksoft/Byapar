@@ -33,6 +33,9 @@ const DashboardItemsPage = () => {
   } = useQuery({
     queryKey: ["items"],
     queryFn: async () => {
+      if (!business) {
+        return;
+      }
       const res = await axiosInstance.get(`/item/all/${business?._id}`);
       return res.data?.items;
     },
@@ -214,15 +217,15 @@ const DashboardItemsPage = () => {
                 }}
                 className="flex items-center justify-center  flex-col"
               >
-                <img src={no_items} alt="no_items" width={250} />
-                <h3 className="font-semibold">Add all your Items at once!</h3>
+                <img src={no_items} alt="no_items" width={250} loading="lazy" />
+                <h3 className="font-semibold">Create Items!</h3>
                 <p className="text-zinc-500 text-xs">
                   For quicker and easier experience of creating sales invoices
                 </p>
-                <button className="btn btn-soft btn-sm mt-4 bg-[var(--primary-btn)]">
+                {/* <button className="btn btn-soft btn-sm mt-4 bg-[var(--primary-btn)]">
                   {" "}
-                  <PiMicrosoftExcelLogoFill size={15} /> Add Items with Excel
-                </button>
+                  <PiMicrosoftExcelLogoFill size={15} /> Add Items
+                </button> */}
               </motion.div>
             )}
           </>

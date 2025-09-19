@@ -1,5 +1,3 @@
-import jsPDF from "jspdf";
-import html2canvas from "html2canvas";
 import { axiosInstance } from "../src/config/axios";
 
 export const downloadPDF = async (id) => {

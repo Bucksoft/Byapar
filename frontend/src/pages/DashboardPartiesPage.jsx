@@ -47,16 +47,21 @@ const DashboardPartiesPage = () => {
   const { isLoading, data } = useQuery({
     queryKey: ["parties"],
     queryFn: async () => {
+      if (!business) {
+        return;
+      }
       const res = await axiosInstance.get(`/parties/all/${business?._id}`);
-      setParties(res.data);
-      return res.data;
+      setParties(res.data?.data);
+      return res.data?.data;
     },
   });
 
   // SEARCH FUNCTIONALITY
-  const parties = data?.filter((item) =>
-    item?.partyName.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  const parties =
+    data &&
+    data?.filter((item) =>
+      item?.partyName.toLowerCase().includes(searchQuery.toLowerCase())
+    );
 
   useEffect(() => {
     // implementing to collect and to pay
@@ -159,14 +164,16 @@ const DashboardPartiesPage = () => {
             </label>
           </div>
 
-          <div>
-            <Link
-              to={"/dashboard/add-party"}
-              className="btn btn-sm bg-[var(--primary-btn)]"
-            >
-              <Plus size={14} /> Create Party
-            </Link>
-          </div>
+          {parties && (
+            <div>
+              <Link
+                to={"/dashboard/add-party"}
+                className="btn btn-sm bg-[var(--primary-btn)]"
+              >
+                <Plus size={14} /> Create Party
+              </Link>
+            </div>
+          )}
         </motion.div>
 
         {/* parties information is displayed here */}
@@ -184,93 +191,134 @@ const DashboardPartiesPage = () => {
               ease: "easeInOut",
               duration: 0.2,
             }}
-            className="overflow-x-auto relative z-10 rounded-box border border-base-content/5 bg-base-100 mt-8 "
+            className="overflow-x-auto relative z-10 bg-base-100 mt-8 "
           >
-            <table className="table text-xs ">
-              {/* head */}
-              <thead>
-                <tr className="bg-zinc-100">
-                  <th>Party Name</th>
-                  <th className="text-center">Category</th>
-                  <th className="text-center">Mobile Number</th>
-                  <th className="text-center">Party type</th>
-                  <th className="text-center">Balance</th>
-                  <th className="text-right">Action</th>
-                </tr>
-              </thead>
-              <tbody className="text-center">
-                {/* row 1 */}
-                {parties &&
-                  parties?.map((party) => (
-                    <motion.tr
-                      className="cursor-pointer"
-                      onClick={() => navigate(party?._id)}
-                      key={party._id}
-                      initial={{
-                        opacity: 0,
-                        scaleY: 0,
-                      }}
-                      animate={{
-                        opacity: 1,
-                        scaleY: 1,
-                      }}
-                      transition={{
-                        ease: "easeInOut",
-                        duration: 0.2,
-                        delay: 0.2,
-                      }}
-                    >
-                      <td className="text-left">{party?.partyName || "-"}</td>
-                      <td>{party?.categoryName || "-"}</td>
-                      <td>{party?.mobileNumber || "-"}</td>
-                      <td>{party?.partyType || "-"}</td>
-                      <td>₹ {party?.currentBalance || 0}</td>
-                      <td
-                        onClick={(e) => e.stopPropagation()}
-                        className="flex items-center gap-2 justify-end"
+            {parties && (
+              <table className="table text-xs ">
+                {/* head */}
+                <thead>
+                  <tr className="bg-zinc-100">
+                    <th>Party Name</th>
+                    <th className="text-center">Category</th>
+                    <th className="text-center">Mobile Number</th>
+                    <th className="text-center">Party type</th>
+                    <th className="text-center">Balance</th>
+                    <th className="text-right">Action</th>
+                  </tr>
+                </thead>
+                <tbody className="text-center">
+                  {/* row 1 */}
+                  {parties &&
+                    parties?.map((party) => (
+                      <motion.tr
+                        className="cursor-pointer hover:bg-zinc-50"
+                        onClick={() => navigate(party?._id)}
+                        key={party._id}
+                        initial={{
+                          opacity: 0,
+                          scaleY: 0,
+                        }}
+                        animate={{
+                          opacity: 1,
+                          scaleY: 1,
+                        }}
+                        transition={{
+                          ease: "easeInOut",
+                          duration: 0.2,
+                          delay: 0.2,
+                        }}
                       >
-                        <Link to={`/dashboard/edit-party/${party?._id}`}>
-                          <SquarePen size={14} className="cursor-pointer" />{" "}
-                        </Link>
-                        <button
-                          onClick={() =>
-                            document.getElementById("my_modal_3").showModal()
-                          }
+                        <td className="text-left">{party?.partyName || "-"}</td>
+                        <td>{party?.categoryName || "-"}</td>
+                        <td>{party?.mobileNumber || "-"}</td>
+                        <td>{party?.partyType || "-"}</td>
+                        <td>₹ {party?.currentBalance || 0}</td>
+                        <td
+                          onClick={(e) => e.stopPropagation()}
+                          className="flex items-center gap-2 justify-end"
                         >
-                          <Trash2
-                            size={14}
-                            className="text-[var(--error-text-color)] cursor-pointer"
-                          />
-                        </button>
-                        <dialog id="my_modal_3" className="modal">
-                          <div className="modal-box">
-                            <form method="dialog">
-                              <button className="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">
-                                ✕
-                              </button>
-                            </form>
-                            <h3 className="font-bold text-lg">
-                              Are you sure ?
-                            </h3>
-                            <p className="py-4">
-                              This action cannot be undone. All values
-                              associated with this field will be lost.
-                            </p>
-                            <div className="w-full grid place-items-end">
-                              <button
-                                onClick={() => mutation.mutate(party?._id)}
-                                className="btn btn-sm bg-[var(--error-text-color)] text-[var(--primary-text-color)]"
-                              >
-                                Delete
-                              </button>
+                          <Link to={`/dashboard/edit-party/${party?._id}`}>
+                            <SquarePen size={14} className="cursor-pointer" />{" "}
+                          </Link>
+                          <button
+                            onClick={() =>
+                              document.getElementById("my_modal_3").showModal()
+                            }
+                          >
+                            <Trash2
+                              size={14}
+                              className="text-[var(--error-text-color)] cursor-pointer"
+                            />
+                          </button>
+                          <dialog id="my_modal_3" className="modal">
+                            <div className="modal-box">
+                              <form method="dialog">
+                                <button className="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">
+                                  ✕
+                                </button>
+                              </form>
+                              <h3 className="font-bold text-lg">
+                                Are you sure ?
+                              </h3>
+                              <p className="py-4">
+                                This action cannot be undone. All values
+                                associated with this field will be lost.
+                              </p>
+                              <div className="w-full grid place-items-end">
+                                <button
+                                  onClick={() => mutation.mutate(party?._id)}
+                                  className="btn btn-sm bg-[var(--error-text-color)] text-[var(--primary-text-color)]"
+                                >
+                                  Delete
+                                </button>
+                              </div>
                             </div>
-                          </div>
-                        </dialog>
-                      </td>
-                    </motion.tr>
-                  ))}
-              </tbody>
-            </table>
+                          </dialog>
+                        </td>
+                      </motion.tr>
+                    ))}
+                </tbody>
+              </table>
+            )}
+
+            {!parties && (
+              <div className=" w-full flex flex-col gap-3 items-center justify-center py-16">
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="48"
+                  height="48"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  stroke-width="2"
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  className="icon text-zinc-500 icon-tabler icons-tabler-outline icon-tabler-users-group"
+                >
+                  <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                  <path d="M10 13a2 2 0 1 0 4 0a2 2 0 0 0 -4 0" />
+                  <path d="M8 21v-1a2 2 0 0 1 2 -2h4a2 2 0 0 1 2 2v1" />
+                  <path d="M15 5a2 2 0 1 0 4 0a2 2 0 0 0 -4 0" />
+                  <path d="M17 10h2a2 2 0 0 1 2 2v1" />
+                  <path d="M5 5a2 2 0 1 0 4 0a2 2 0 0 0 -4 0" />
+                  <path d="M3 13v-1a2 2 0 0 1 2 -2h2" />
+                </svg>
+                <h1 className="text-lg text-zinc-500">
+                  You haven't created any party yet. Create one
+                </h1>
+
+                {!parties && (
+                  <div>
+                    <Link
+                      to={"/dashboard/add-party"}
+                      className="btn btn-sm bg-[var(--primary-btn)]"
+                    >
+                      <Plus size={14} /> Create Party
+                    </Link>
+                  </div>
+                )}
+              </div>
+            )}
           </motion.div>
         }
 

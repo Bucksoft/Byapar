@@ -27,6 +27,7 @@ export async function createSalesReturn(req, res) {
 
     const existingSalesReturn = await SalesReturn.findOne({
       salesReturnNumber: validatedResult.data?.salesInvoiceNumber,
+      businessId: req?.params?.id,
     });
     if (existingSalesReturn) {
       return res.status(400).json({
@@ -62,7 +63,7 @@ export async function createSalesReturn(req, res) {
       }
       itemsToProcess = data.items;
     }
-
+    // updating stock
     for (const returnedItem of itemsToProcess) {
       const item = await Item.findById(returnedItem?._id);
       if (!item) {
@@ -74,6 +75,22 @@ export async function createSalesReturn(req, res) {
 
       await Item.findByIdAndUpdate(returnedItem._id, {
         $inc: { currentStock: returnedItem.quantity },
+      });
+    }
+
+    // // updating sales invoice
+    const returnTotals = itemsToProcess.reduce((acc, item) => {
+      return acc + item?.quantity * item?.salesPrice;
+    }, 0);
+
+    if (hasInvoiceId && originalInvoice) {
+      const updatedBalance = originalInvoice?.balance - returnTotals;
+
+      await SalesInvoice.findByIdAndUpdate(originalInvoice._id, {
+        $set: {
+          balance: Math.max(0, updatedBalance),
+          status: updatedBalance <= 0 ? "paid" : "unpaid",
+        },
       });
     }
 
@@ -97,15 +114,24 @@ export async function createSalesReturn(req, res) {
       salesReturnPayload.invoiceId = req.body.invoiceId;
     }
 
-    // ✅ Create SalesReturn
     const salesReturn = await SalesReturn.create(salesReturnPayload);
-
     if (!salesReturn) {
       return res.status(400).json({
         success: false,
         msg: "Sales return could not be created",
       });
     }
+
+    const returnTotal = salesReturn?.balanceAmount || 0;
+
+    party.currentBalance = (party.currentBalance || 0) - returnTotal;
+
+    party.totalDebits = Math.max(0, (party.totalDebits || 0) - returnTotal);
+    party.totalInvoices = Math.max(0, (party.totalInvoices || 0) - returnTotal);
+
+    party.totalCredits = (party.totalCredits || 0) + returnTotal;
+
+    await party.save();
 
     return res.status(201).json({
       success: true,

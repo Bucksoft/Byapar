@@ -1,4 +1,4 @@
-import { ArrowLeft, Download, EllipsisVertical } from "lucide-react";
+import { ArrowLeft, Download, EllipsisVertical, Printer } from "lucide-react";
 import { GiProfit } from "react-icons/gi";
 import { TbFileInvoice } from "react-icons/tb";
 import { useNavigate, useParams } from "react-router-dom";
@@ -6,21 +6,22 @@ import InvoiceTemplate from "./InvoiceTemplate";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { axiosInstance } from "../../config/axios";
 import { downloadPDF } from "../../../helpers/downloadPdf";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import toast from "react-hot-toast";
 import { queryClient } from "../../main";
 import CustomLoader from "../Loader";
+import { handlePrint } from "../../../helpers/print";
 
 const SalesReturn = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const [invoiceIdToDownload, setInvoiceIdToDownload] = useState("invoice");
+  const printRef = useRef();
 
   // THIS IS THE QUERY TO GET THE INVOICE BASED ON ID
   const { isLoading, data: saleReturn } = useQuery({
     queryFn: async () => {
       const res = await axiosInstance.get(`/sales-return/return/${id}`);
-      console.log(res);
       return res.data?.saleReturn;
     },
   });
@@ -52,6 +53,19 @@ const SalesReturn = () => {
               <GiProfit />
               Profit Details
             </button> */}
+            <button
+              onClick={() => handlePrint(printRef)}
+              className="btn btn-sm btn-dash"
+            >
+              <Printer size={15} /> Print PDF
+            </button>
+            <button
+              onClick={() => downloadPDF(invoiceIdToDownload)}
+              className="btn btn-sm"
+            >
+              <Download size={15} /> Download PDF
+            </button>
+
             <div className="dropdown dropdown-end">
               <div tabIndex={0} role="button" className="btn btn-sm">
                 <EllipsisVertical size={14} />
@@ -90,13 +104,7 @@ const SalesReturn = () => {
 
         {/* Subheading */}
         <section className="flex items-center justify-between">
-          <div className="flex items-center gap-2 mt-7">
-            <button
-              onClick={() => downloadPDF(invoiceIdToDownload)}
-              className="btn btn-sm"
-            >
-              <Download size={15} /> Download PDF
-            </button>
+          <div className="flex items-center gap-2 ">
             {/* <select className="select select-sm">
               <option className="hidden">Print PDF</option>
               <option>Print PDF</option>
@@ -123,7 +131,9 @@ const SalesReturn = () => {
         </section>
 
         {isLoading ? (
-          <CustomLoader text={"Loading..."} />
+          <div className="w-full flex justify-center py-16">
+            <CustomLoader text={"Loading..."} />
+          </div>
         ) : (
           <section className="mt-3 bg-zinc-100 flex justify-center py-1 overflow-y-scroll flex-1">
             {/* Invoice template */}
@@ -132,6 +142,7 @@ const SalesReturn = () => {
               color={"green"}
               invoice={saleReturn}
               setInvoiceIdToDownload={setInvoiceIdToDownload}
+              printRef={printRef}
             />
           </section>
         )}

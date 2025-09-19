@@ -16,12 +16,14 @@ import { FaRegEdit } from "react-icons/fa";
 import toast from "react-hot-toast";
 import { queryClient } from "../main";
 import { useNavigate } from "react-router-dom";
+import dayjs from "dayjs";
 
 const DashboardSalesReturnPage = () => {
   const { business } = useBusinessStore();
   const { setSaleReturns } = useSalesReturnStore();
   const [searchedQuery, setSearchedQuery] = useState("");
   const [saleReturnId, setSaleReturnId] = useState();
+  const [filterDate, setFilterDate] = useState("");
   const navigate = useNavigate();
 
   // Mutation to delete a sale return
@@ -50,9 +52,58 @@ const DashboardSalesReturnPage = () => {
     },
   });
 
-  const searchedSaleReturns = salesReturn?.filter(
-    (saleReturn) => saleReturn?.salesReturnNumber === Number(searchedQuery)
-  );
+  const searchedSaleReturns = salesReturn?.filter((saleReturn) => {
+    if (searchedQuery.trim() !== "") {
+      const matchesSearch =
+        saleReturn?.salesReturnNumber
+          ?.toString()
+          ?.toLowerCase()
+          .includes(searchedQuery.toLowerCase()) ||
+        saleReturn?.partyName
+          ?.toLowerCase()
+          .includes(searchedQuery.toLowerCase());
+      if (!matchesSearch) return false;
+    }
+
+    if (filterDate) {
+      const today = dayjs();
+      const saleReturnDate = dayjs(
+        saleReturn?.salesReturnDate || saleReturn?.createdAt
+      );
+
+      switch (filterDate) {
+        case "today":
+          if (!saleReturnDate.isSame(today, "day")) return false;
+          break;
+
+        case "yesterday":
+          if (!saleReturnDate.isSame(today.subtract(1, "day"), "day"))
+            return false;
+          break;
+
+        case "thisWeek":
+          if (
+            !saleReturnDate.isSameOrAfter(today.startOf("week")) ||
+            !saleReturnDate.isSameOrBefore(today.endOf("week"))
+          )
+            return false;
+          break;
+
+        case "lastWeek":
+          const lastWeekStart = today.subtract(1, "week").startOf("week");
+          const lastWeekEnd = today.subtract(1, "week").endOf("week");
+          if (
+            !saleReturnDate.isSameOrAfter(lastWeekStart) ||
+            !saleReturnDate.isSameOrBefore(lastWeekEnd)
+          )
+            return false;
+          break;
+        default:
+          break;
+      }
+    }
+    return true;
+  });
 
   return (
     <main className="h-full p-2">
@@ -61,13 +112,15 @@ const DashboardSalesReturnPage = () => {
         <SalesNavigationMenus
           btnText={"Sales Return"}
           setSearchedQuery={setSearchedQuery}
+          setFilterDate={setFilterDate}
+          title={"Sales Return"}
         />
-        <div className=" mt-5 h-80 rounded-md mx-4 ">
+        <div className=" mt-5 h-80 rounded-md mx-4">
           {isLoading ? (
             <div className="w-full flex justify-center py-5">
               <CustomLoader text={"Loading..."} />
             </div>
-          ) : (
+          ) : searchedSaleReturns?.length > 0 ? (
             <table className="table">
               {/* head */}
               <thead>
@@ -85,58 +138,53 @@ const DashboardSalesReturnPage = () => {
                 </tr>
               </thead>
               <tbody>
-                {(searchedQuery ? searchedSaleReturns : salesReturn)?.length >
-                0 ? (
-                  (searchedQuery ? searchedSaleReturns : salesReturn).map(
-                    (saleReturn) => (
-                      <tr
-                        onClick={() =>
-                          navigate(`/dashboard/sales-return/${saleReturn?._id}`)
-                        }
-                        key={saleReturn?._id}
-                        className="cursor-pointer hover:bg-zinc-50"
-                      >
-                        <td>{(saleReturn?.salesReturnDate).split("T")[0]}</td>
-                        <td>{saleReturn?.salesReturnNumber}</td>
-                        <td>{saleReturn?.partyName}</td>
-                        <td>{saleReturn?.dueIn || "-"}</td>
-                        <td>
-                          {saleReturn?.invoiceId?.salesInvoiceNumber || "-"}
-                        </td>
-                        <td>
-                          <div className="flex items-center">
-                            <LiaRupeeSignSolid />
-                            {Number(saleReturn?.totalAmount).toLocaleString(
-                              "en-IN"
-                            ) || "-"}
-                          </div>
-                        </td>
-                        <td>
-                          <div className="badge badge-sm badge-secondary badge-soft">
-                            {saleReturn?.status}
-                          </div>
-                        </td>
-                        <td onClick={(e) => e.stopPropagation()}>
-                          <div className="dropdown dropdown-end">
-                            <div
-                              tabIndex={0}
-                              role="button"
-                              className="btn m-1 btn-xs"
-                              onClick={(e) => e.stopPropagation()}
-                            >
-                              <EllipsisVertical size={13} />
-                            </div>
-                            <ul
-                              tabIndex={0}
-                              className="dropdown-content menu bg-base-100 rounded-box z-10 w-52 p-2 shadow-sm"
-                              onClick={(e) => e.stopPropagation()}
-                            >
-                              <li>
-                                <a>
-                                  <FaRegEdit /> Edit
-                                </a>
-                              </li>
-                              {/* <li>
+                {searchedSaleReturns.map((saleReturn) => (
+                  <tr
+                    onClick={() =>
+                      navigate(`/dashboard/sales-return/${saleReturn?._id}`)
+                    }
+                    key={saleReturn?._id}
+                    className="cursor-pointer hover:bg-zinc-50"
+                  >
+                    <td>{(saleReturn?.salesReturnDate).split("T")[0]}</td>
+                    <td>{saleReturn?.salesReturnNumber}</td>
+                    <td>{saleReturn?.partyName}</td>
+                    <td>{saleReturn?.dueIn || "-"}</td>
+                    <td>{saleReturn?.invoiceId?.salesInvoiceNumber || "-"}</td>
+                    <td>
+                      <div className="flex items-center">
+                        <LiaRupeeSignSolid />
+                        {Number(saleReturn?.totalAmount).toLocaleString(
+                          "en-IN"
+                        ) || "-"}
+                      </div>
+                    </td>
+                    <td>
+                      <div className="badge badge-sm badge-secondary badge-soft">
+                        {saleReturn?.status}
+                      </div>
+                    </td>
+                    <td onClick={(e) => e.stopPropagation()}>
+                      <div className="dropdown dropdown-end">
+                        <div
+                          tabIndex={0}
+                          role="button"
+                          className="btn m-1 btn-xs"
+                          onClick={(e) => e.stopPropagation()}
+                        >
+                          <EllipsisVertical size={13} />
+                        </div>
+                        <ul
+                          tabIndex={0}
+                          className="dropdown-content menu bg-base-100 rounded-box z-10 w-52 p-2 shadow-sm"
+                          onClick={(e) => e.stopPropagation()}
+                        >
+                          <li>
+                            <a>
+                              <FaRegEdit /> Edit
+                            </a>
+                          </li>
+                          {/* <li>
                                 <a>
                                   <MdOutlineHistory />
                                   Edit History
@@ -148,35 +196,32 @@ const DashboardSalesReturnPage = () => {
                                   Duplicate
                                 </a>
                               </li> */}
-                              <li>
-                                <a
-                                  onClick={() => {
-                                    document
-                                      .getElementById("my_modal_2")
-                                      .showModal();
-                                    setSaleReturnId(saleReturn?._id);
-                                  }}
-                                  className="text-[var(--error-text-color)]"
-                                >
-                                  <BsTrash3 />
-                                  Delete
-                                </a>
-                              </li>
-                            </ul>
-                          </div>
-                        </td>
-                      </tr>
-                    )
-                  )
-                ) : (
-                  <tr>
-                    <td colSpan="8" className="text-center text-zinc-400 py-6">
-                      No data found
+                          <li>
+                            <a
+                              onClick={() => {
+                                document
+                                  .getElementById("my_modal_2")
+                                  .showModal();
+                                setSaleReturnId(saleReturn?._id);
+                              }}
+                              className="text-[var(--error-text-color)]"
+                            >
+                              <BsTrash3 />
+                              Delete
+                            </a>
+                          </li>
+                        </ul>
+                      </div>
                     </td>
                   </tr>
-                )}
+                ))}
               </tbody>
             </table>
+          ) : (
+            <div className="w-full flex items-center justify-center py-20 flex-col gap-3 text-zinc-400">
+              <FaFileInvoice size={40} />
+              <span className="text-sm">No Sales Return found</span>
+            </div>
           )}
           {!salesReturn && (
             <div className="w-full flex items-center justify-center py-20 flex-col gap-3 text-zinc-400">

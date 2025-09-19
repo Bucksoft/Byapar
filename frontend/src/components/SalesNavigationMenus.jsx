@@ -11,7 +11,6 @@ const SalesNavigationMenus = ({
   setFilterDate,
 }) => {
   const navigate = useNavigate();
-
   return (
     <main>
       {title === "Payment In" && (
@@ -27,10 +26,24 @@ const SalesNavigationMenus = ({
 
       <div className="flex justify-between mx-5 mt-5">
         <div
-          className={`flex gap-3 ${title === "Payment In" ? "w-3/6" : ""}   `}
+          className={`flex gap-3  ${
+            title === "Payment In" ||
+            title === "Sales Return" ||
+            title === "Credit Note"
+              ? "w-3/6"
+              : ""
+          }   `}
         >
           {/* search box */}
-          <div className={` ${title === "Payment In" ? "w-full" : ""}  `}>
+          <div
+            className={` ${
+              title === "Payment In" ||
+              title === "Sales Return" ||
+              title === "Credit Note"
+                ? "w-full"
+                : ""
+            }  `}
+          >
             <label className="input input-sm">
               <Search size={16} className="" />
               <input
