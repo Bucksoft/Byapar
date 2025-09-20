@@ -295,7 +295,13 @@ const SalesInvoiceFooterSection = ({ data, setData, title }) => {
           <div className="p-2 flex justify-between">
             <span className="text-sm font-semibold">Total Amount</span>
             {data?.items?.length > 0 ? (
-              <>₹ {Number(data?.totalAmount).toLocaleString("en-IN")}</>
+              <>
+                ₹{" "}
+                {(selectCheckBox
+                  ? Math.round(Number(data?.totalAmount))
+                  : Number(data?.totalAmount)
+                ).toLocaleString("en-IN")}
+              </>
             ) : (
               <input
                 type="text"

@@ -31,16 +31,14 @@ const DashboardSalesPage = () => {
     data: invoices,
     isSuccess,
   } = useQuery({
-    queryKey: ["invoices"],
+    queryKey: ["invoices", business?._id],
     queryFn: async () => {
-      if (!business) {
-        return;
-      }
-      const res = await axiosInstance.get(`/sales-invoice/${business?._id}`);
-      return res.data?.invoices;
+      if (!business) return [];
+      const res = await axiosInstance.get(`/sales-invoice/${business._id}`);
+      return res.data?.invoices || [];
     },
+    enabled: !!business,
   });
-
   // mutation to delete an invoice
   const mutation = useMutation({
     mutationFn: async () => {
@@ -51,6 +49,9 @@ const DashboardSalesPage = () => {
       toast.success(data?.msg);
       document.getElementById("my_modal_2").close();
       queryClient.invalidateQueries({ queryKey: ["invoices"] });
+    },
+    onError: (err) => {
+      toast.error(err.response.data.msg);
     },
   });
 
@@ -67,7 +68,10 @@ const DashboardSalesPage = () => {
             invoice?.partyId?.partyName
               ?.toLowerCase()
               .includes(searchQuery.toLowerCase()) ||
-            invoice?.salesInvoiceNumber === Number(searchQuery)
+            invoice?.salesInvoiceNumber
+              .toString()
+              .toLowerCase()
+              .includes(searchQuery.toString().toLowerCase())
         )
       : invoices;
 
@@ -210,7 +214,7 @@ const DashboardSalesPage = () => {
                   duration: 0.2,
                   delay: 0.3,
                 }}
-                className="table"
+                className="table table-zebra"
               >
                 {/* head */}
                 <thead>
@@ -225,8 +229,8 @@ const DashboardSalesPage = () => {
                   </tr>
                 </thead>
                 <tbody>
-                  {(searchedInvoices || invoices) &&
-                    (searchedInvoices || invoices).map((invoice) => (
+                  {searchedInvoices.length > 0 ? (
+                    searchedInvoices.map((invoice) => (
                       <tr
                         key={invoice?._id}
                         onClick={(e) => {
@@ -249,63 +253,72 @@ const DashboardSalesPage = () => {
                                 ? "badge-error"
                                 : invoice?.status === "partially paid"
                                 ? "badge-secondary"
+                                : invoice?.status === "cancelled"
+                                ? "badge-primary"
                                 : "badge-success"
                             }`}
                           >
                             {invoice?.status}
                           </p>
                         </td>
-                        <td onClick={(e) => e.stopPropagation()}>
-                          <div className="dropdown dropdown-end">
-                            <div
-                              tabIndex={0}
-                              role="button"
-                              className="btn m-1 btn-xs"
-                              onClick={(e) => e.stopPropagation()}
-                            >
-                              <EllipsisVertical size={13} />
+                        {invoice?.status !== "cancelled" ? (
+                          <td onClick={(e) => e.stopPropagation()}>
+                            <div className="dropdown dropdown-end">
+                              <div
+                                tabIndex={0}
+                                role="button"
+                                className="btn m-1 btn-xs"
+                                onClick={(e) => e.stopPropagation()}
+                              >
+                                <EllipsisVertical size={13} />
+                              </div>
+                              <ul
+                                tabIndex={0}
+                                className="dropdown-content menu bg-base-100 rounded-box z-10 w-52 p-2 shadow-sm"
+                                onClick={(e) => e.stopPropagation()}
+                              >
+                                <li>
+                                  <a>
+                                    <FaRegEdit /> Edit
+                                  </a>
+                                </li>
+                                <li>
+                                  <a
+                                    onClick={() => {
+                                      document
+                                        .getElementById("my_modal_2")
+                                        .showModal();
+                                      setInvoiceId(invoice?._id);
+                                    }}
+                                    className="text-[var(--error-text-color)]"
+                                  >
+                                    <BsTrash3 />
+                                    Delete
+                                  </a>
+                                </li>
+                              </ul>
                             </div>
-                            <ul
-                              tabIndex={0}
-                              className="dropdown-content menu bg-base-100 rounded-box z-10 w-52 p-2 shadow-sm"
-                              onClick={(e) => e.stopPropagation()}
-                            >
-                              <li>
-                                <a>
-                                  <FaRegEdit /> Edit
-                                </a>
-                              </li>
-                              {/* <li>
-                            <a>
-                              <MdOutlineHistory />
-                              Edit History
-                            </a>
-                          </li>
-                          <li>
-                            <a>
-                              <BiDuplicate />
-                              Duplicate
-                            </a>
-                          </li> */}
-                              <li>
-                                <a
-                                  onClick={() => {
-                                    document
-                                      .getElementById("my_modal_2")
-                                      .showModal();
-                                    setInvoiceId(invoice?._id);
-                                  }}
-                                  className="text-[var(--error-text-color)]"
-                                >
-                                  <BsTrash3 />
-                                  Delete
-                                </a>
-                              </li>
-                            </ul>
-                          </div>
-                        </td>
+                          </td>
+                        ) : (
+                          <td className="text-center">-</td>
+                        )}
                       </tr>
-                    ))}
+                    ))
+                  ) : (
+                    <tr>
+                      <td
+                        colSpan="7"
+                        className="text-center py-4 text-gray-500"
+                      >
+                        <div className="w-full flex items-center justify-center py-20 flex-col gap-3 text-zinc-400">
+                          <FaFileInvoice size={40} />
+                          <span className="text-sm">
+                            No transactions matching the current filter
+                          </span>
+                        </div>
+                      </td>
+                    </tr>
+                  )}
                 </tbody>
               </motion.table>
             )
@@ -320,9 +333,9 @@ const DashboardSalesPage = () => {
                 viewBox="0 0 24 24"
                 fill="none"
                 stroke="currentColor"
-                stroke-width="2"
-                stroke-linecap="round"
-                stroke-linejoin="round"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
                 className="icon text-zinc-500 icon-tabler icons-tabler-outline icon-tabler-receipt-rupee"
               >
                 <path stroke="none" d="M0 0h24v24H0z" fill="none" />
@@ -355,7 +368,7 @@ const DashboardSalesPage = () => {
             <div className="modal-box">
               <h3 className="font-bold text-lg">Confirm Deletion</h3>
               <p className="py-4 text-sm">
-                Are you sure you want to delete the selected item(s)? This
+                Are you sure you want to delete the selected invoice ? This
                 action cannot be undone.
               </p>
               <div className="flex w-full">

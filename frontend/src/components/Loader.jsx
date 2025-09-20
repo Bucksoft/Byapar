@@ -7,7 +7,7 @@ const CustomLoader = ({ text }) => {
           : "text-zinc-600"
       }  text-xs`}
     >
-      <span className="loading loading-dots loading-xs"></span> {text}
+      <span className="loading loading-dots loading-sm"></span> {text}
     </div>
   );
 };

@@ -101,6 +101,7 @@ const DashboardPaymentInPage = () => {
             selectText={"btn"}
             setPage={setPage}
             setSearchedQuery={setSearchedQuery}
+            filterDate={filterDate}
             setFilterDate={setFilterDate}
           />
 
@@ -110,9 +111,9 @@ const DashboardPaymentInPage = () => {
                 <CustomLoader text={"Loading..."} />
               </div>
             ) : filteredPaymentIns?.length > 0 ? (
-              <table className="table">
+              <table className="table table-zebra">
                 <thead>
-                  <tr className="text-xs bg-zinc-100">
+                  <tr className="text-xs bg-[var(--primary-background)]">
                     <th>Date</th>
                     <th>Payment Number</th>
                     <th className="text-center">Party Name</th>

@@ -33,10 +33,20 @@ const LoginPage = () => {
 
   return (
     <>
-      <main className="h-screen w-full md:p-16 bg-gradient-to-r from-[var(--gradient-from)] via-[var(--gradient-via)] to-[var(--gradient-to)] grid md:place-items-center relative">
-        <div className="border md:w-3/4  flex items-center justify-center border-white/10 bg-[var(--login-background)] backdrop-blur-3xl h-full md:rounded-xl shadow-lg overflow-hidden">
+      <div className="min-h-screen w-full relative bg-black flex items-center justify-center">
+        {/* Ocean Abyss Background with Top Glow */}
+        <div
+          className="absolute inset-0 z-0"
+          style={{
+            background:
+              "radial-gradient(ellipse 80% 60% at 50% 0%, rgba(6, 182, 212, 0.25), transparent 70%), #000000",
+          }}
+        />
+
+        {/* Your Content/Components */}
+        <div className="border md:w-3/4 flex items-center justify-center border-white/10 bg-[var(--login-background)]/90 backdrop-blur-3xl h-full md:rounded-xl shadow-lg overflow-hidden">
           {/* left section */}
-          <section className="md:w-1/2  h-full flex flex-col items-center mt-32 justify-start">
+          <section className="md:w-1/2 h-full flex flex-col items-center  justify-start">
             <div className="flex flex-col ">
               {/* <img
                 src={ByaparLogo}
@@ -46,9 +56,7 @@ const LoginPage = () => {
               /> */}
 
               <h1 className="font-semibold text-xl">Login / Register</h1>
-              <span className="text-sm">
-                Please enter your email down below
-              </span>
+              <span className="text-sm">Please enter your email</span>
               <div className="relative">
                 <input
                   type="text"
@@ -99,7 +107,12 @@ const LoginPage = () => {
           {/* right section */}
           <section className=" md:flex hidden w-1/2 h-full p-3  justify-end">
             <div className="rounded-lg overflow-hidden">
-              <img src={LoginImage} alt="Login_image" width={390} />
+              <img
+                src={LoginImage}
+                alt="Login_image"
+                width={390}
+                loading="lazy"
+              />
             </div>
           </section>
         </div>
@@ -123,7 +136,9 @@ const LoginPage = () => {
             <OtpInputForm email={email} />
           </motion.div>
         )}
-      </main>
+      </div>
+
+      {/* <main className="h-screen w-full md:p-16 bg-gradient-to-r from-[var(--gradient-from)] via-[var(--gradient-via)] to-[var(--gradient-to)] grid md:place-items-center relative"></main> */}
     </>
   );
 };

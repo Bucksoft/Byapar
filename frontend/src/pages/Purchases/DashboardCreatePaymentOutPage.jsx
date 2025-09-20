@@ -267,7 +267,7 @@ const DashboardCreatePaymentOutPage = () => {
           {allInvoices.length > 0 && (
             <div className="overflow-x-auto border border-zinc-300 rounded-lg">
               <p className="p-4 font-medium">Settle invoices</p>
-              <table className="table w-full ">
+              <table className="table w-full table-zebra">
                 {/* head */}
                 <thead>
                   <tr className="bg-[var(--primary-background)] ">

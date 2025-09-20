@@ -58,7 +58,7 @@ const DashboardDeliveryChallanPage = () => {
               <CustomLoader text={"Loading..."} />
             </div>
           ) : deliveryChallans ? (
-            <table className="table ">
+            <table className="table table-zebra">
               {/* head */}
               <thead>
                 <tr className="text-xs bg-zinc-100">

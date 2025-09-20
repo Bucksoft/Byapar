@@ -33,7 +33,7 @@ export async function createParty(req, res) {
     if (!validationResult.success) {
       return res.status(422).json({
         success: false,
-        msg: "Party validation failed",
+        msg: "Please fill all the details",
         validationError: validationResult.error.format(),
       });
     }

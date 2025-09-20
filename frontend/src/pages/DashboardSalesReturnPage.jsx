@@ -114,6 +114,7 @@ const DashboardSalesReturnPage = () => {
           setSearchedQuery={setSearchedQuery}
           setFilterDate={setFilterDate}
           title={"Sales Return"}
+          filterDate={filterDate}
         />
         <div className=" mt-5 h-80 rounded-md mx-4">
           {isLoading ? (
@@ -121,7 +122,7 @@ const DashboardSalesReturnPage = () => {
               <CustomLoader text={"Loading..."} />
             </div>
           ) : searchedSaleReturns?.length > 0 ? (
-            <table className="table">
+            <table className="table table-zebra">
               {/* head */}
               <thead>
                 <tr className="text-xs bg-zinc-100">

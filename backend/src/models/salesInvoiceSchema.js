@@ -68,6 +68,13 @@ const salesInvoiceSchema = new mongoose.Schema(
       enum: ["paid", "unpaid", "draft", "partially paid", "cancelled"],
       default: "unpaid",
     },
+    cancelledAt: {
+      type: Date,
+    },
+    cancelledBy: {
+      type: mongoose.Schema.Types.ObjectId,
+      red: "UserCredential",
+    },
   },
   {
     strict: false,

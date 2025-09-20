@@ -128,7 +128,7 @@ const DashboardExpenses = () => {
               }}
               className="overflow-x-auto border border-zinc-200 rounded-lg  mt-10 h-80 w-full"
             >
-              <table className="table ">
+              <table className="table table-zebra">
                 {/* head */}
                 <thead>
                   <tr className="bg-zinc-200">

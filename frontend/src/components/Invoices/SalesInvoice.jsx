@@ -41,7 +41,7 @@ const SalesInvoice = () => {
   });
 
   return (
-    <main className="p-2 h-screen ">
+    <main className="p-2 h-screen">
       <div className="h-full w-full bg-white rounded-lg p-4 flex flex-col">
         {/* Header */}
         <header className="flex items-center justify-between">
@@ -64,7 +64,7 @@ const SalesInvoice = () => {
               <Printer size={15} /> Print PDF
             </button>
             <button
-              onClick={() => downloadPDF(invoiceIdToDownload)}
+              onClick={() => downloadPDF(invoiceIdToDownload, "sales invoice")}
               className="btn btn-sm"
             >
               <Download size={15} /> Download PDF

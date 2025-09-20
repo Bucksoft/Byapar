@@ -337,7 +337,7 @@ const SalesInvoiceItemTable = ({ title, data, setData, isEditing }) => {
               readOnly
             />
             <small className="text-zinc-500 mt-1 text-xs text-nowrap">
-              ({addedItem?.gstTaxRate})
+              {addedItem?.gstTaxRate && <span>({addedItem?.gstTaxRate})</span>}
             </small>
             <select
               value={addedItem?.gstTaxRateType || "with tax"}
@@ -411,13 +411,13 @@ const SalesInvoiceItemTable = ({ title, data, setData, isEditing }) => {
                     value={searchItemQuery}
                     onChange={(e) => setSearchItemQuery(e.target.value)}
                   />
-                  <select
+                  {/* <select
                     defaultValue="Select Category"
                     className="select select-sm"
                   >
                     <option disabled={true}>Select Category</option>
                     <option>Crimson</option>
-                  </select>
+                  </select> */}
                   <Link
                     to={"/dashboard/items/basic-details"}
                     className="btn btn-dash btn-info btn-sm  w-1/2"
@@ -427,7 +427,7 @@ const SalesInvoiceItemTable = ({ title, data, setData, isEditing }) => {
                 </div>
 
                 <div className="overflow-x-auto mt-4  rounded-box border border-base-content/5 bg-base-100">
-                  <table className="table">
+                  <table className="table table-zebra">
                     {/* head */}
                     <thead>
                       <tr className="text-xs bg-zinc-100">
@@ -461,7 +461,7 @@ const SalesInvoiceItemTable = ({ title, data, setData, isEditing }) => {
                                       setQuantities((prev) => ({
                                         ...prev,
                                         [item._id]: Math.max(
-                                          (prev[item._id] || 0) - 1,
+                                          (prev[item._id] || 1) - 1,
                                           0
                                         ),
                                       }))
@@ -474,7 +474,7 @@ const SalesInvoiceItemTable = ({ title, data, setData, isEditing }) => {
                                   <input
                                     type="number"
                                     min={0}
-                                    value={quantities[item._id] || 0}
+                                    value={quantities[item._id] || 1}
                                     onChange={(e) =>
                                       setQuantities((prev) => ({
                                         ...prev,
@@ -489,7 +489,7 @@ const SalesInvoiceItemTable = ({ title, data, setData, isEditing }) => {
                                     onClick={() =>
                                       setQuantities((prev) => ({
                                         ...prev,
-                                        [item._id]: (prev[item._id] || 0) + 1,
+                                        [item._id]: (prev[item._id] || 1) + 1,
                                       }))
                                     }
                                     className="btn btn-xs btn-info"
@@ -505,7 +505,13 @@ const SalesInvoiceItemTable = ({ title, data, setData, isEditing }) => {
                                 </div>
                               ) : (
                                 <button
-                                  onClick={() => setShowCounterId(item?._id)}
+                                  onClick={() => {
+                                    setShowCounterId(item?._id);
+                                    setQuantities((prev) => ({
+                                      ...prev,
+                                      [item._id]: prev[item._id] ?? 1,
+                                    }));
+                                  }}
                                   className="btn btn-xs w-full "
                                 >
                                   Add

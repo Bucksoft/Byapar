@@ -80,7 +80,7 @@ const DashboardReportPage = () => {
                 duration: 0.2,
                 delay: 0.4,
               }}
-              className="table mt-8"
+              className="table table-zebra mt-8"
             >
               {/* head */}
               <thead>

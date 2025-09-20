@@ -175,7 +175,7 @@ const DashboardPurchasesPage = () => {
                   duration: 0.2,
                   delay: 0.3,
                 }}
-                className="table table-sm"
+                className="table table-sm table-zebra"
               >
                 {/* head */}
                 <thead>

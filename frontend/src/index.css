@@ -1,6 +1,7 @@
 @import url("https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap");
 @import "tailwindcss";
 @plugin "daisyui";
+@custom-variant print (@media print);
 
 body {
   font-family: "Inter", sans-serif;
@@ -44,4 +45,28 @@ input[type="number"]::-webkit-outer-spin-button {
 /* Firefox */
 input[type="number"] {
   -moz-appearance: textfield;
+}
+
+@media print {
+  body * {
+    visibility: hidden; /* hide everything */
+  }
+  .print-invoice,
+  .print-invoice * {
+    visibility: visible; /* only show invoice */
+  }
+  .print-invoice {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+    background: white;
+  }
+
+  /* Optional: Remove shadows, margins, etc. */
+  .invoice-content {
+    box-shadow: none !important;
+    margin: 0 !important;
+    padding: 16px !important;
+  }
 }

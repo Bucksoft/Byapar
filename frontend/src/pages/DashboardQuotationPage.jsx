@@ -21,6 +21,8 @@ const DashboardQuotationPage = () => {
   const { setQuotations } = useQuotationStore();
   const [searchedQuery, setSearchedQuery] = useState("");
   const [filterDate, setFilterDate] = useState("");
+  const [quotationType, setQuotationType] = useState("");
+
   const navigate = useNavigate();
 
   const { isLoading, data: quotations = [] } = useQuery({
@@ -77,8 +79,20 @@ const DashboardQuotationPage = () => {
       return matchesText;
     }
 
+    // FILTERING BASED ON QUOTATION TYPE
+    if (quotationType === "open" || quotationType === "closed") {
+      const matchesText = quotation?.status
+        ?.toLowerCase()
+        .includes(quotationType.toLowerCase());
+      return matchesText;
+    } else {
+      return quotation;
+    }
+
     return true;
   });
+
+  console.log(quotationType);
 
   return (
     <main className="h-screen w-full flex">
@@ -107,6 +121,9 @@ const DashboardQuotationPage = () => {
                 value={filterDate}
                 onChange={(e) => setFilterDate(e.target.value)}
               >
+                <option value="" disabled>
+                  --Select-Day--
+                </option>
                 <option value="today">Today</option>
                 <option value="yesterday">Yesterday</option>
                 <option value="thisWeek">This week</option>
@@ -114,30 +131,18 @@ const DashboardQuotationPage = () => {
               </select>
 
               {/* dropdown (optional) */}
-              <div className="dropdown dropdown-center w-60">
-                <div
-                  tabIndex={0}
-                  role="button"
-                  className="bg-white btn btn-wide w-full btn-sm text-xs font-medium flex items-center justify-between"
-                >
-                  <span className="text-zinc-400">Show Open Quotation</span>
-                  <ChevronDown size={16} className="text-zinc-400" />
-                </div>
-                <ul
-                  tabIndex={0}
-                  className="dropdown-content menu bg-base-100 rounded-box z-1 w-52 p-2 shadow-sm text-zinc-400"
-                >
-                  <li>
-                    <a>Show All Quotation</a>
-                  </li>
-                  <li>
-                    <a>Show Open Quotation</a>
-                  </li>
-                  <li>
-                    <a>Show Closed Quotation</a>
-                  </li>
-                </ul>
-              </div>
+              <select
+                className="select select-sm"
+                value={quotationType}
+                onChange={(e) => setQuotationType(e.target.value)}
+              >
+                <option value="" disabled>
+                  --Select-type--
+                </option>
+                <option value="open">Show Open Quotations</option>
+                <option value="closed">Show Closed Quotations</option>
+                <option value="all">Show All Quotations</option>
+              </select>
             </div>
 
             <button
@@ -149,15 +154,15 @@ const DashboardQuotationPage = () => {
           </div>
 
           {/* Table */}
-          <div className="mt-5 h-80 rounded-md mx-4 overflow-auto">
+          <div className="mt-5 h-80  mx-4 overflow-auto">
             {isLoading ? (
               <div className="flex justify-center py-16">
                 <CustomLoader text={"Loading..."} />
               </div>
             ) : filteredQuotations.length > 0 ? (
-              <table className="table">
+              <table className="table table-zebra">
                 <thead>
-                  <tr className="text-xs bg-gray-100">
+                  <tr className="text-xs bg-[var(--primary-background)] ">
                     <th className="w-60">Date</th>
                     <th className="w-60">Quotation Number</th>
                     <th className="w-60">Party Name</th>

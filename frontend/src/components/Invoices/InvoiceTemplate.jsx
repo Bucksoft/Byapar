@@ -32,6 +32,7 @@ const InvoiceTemplate = ({
     <main
       style={{ display: "flex", width: "100%", height: "100vh" }}
       ref={printRef}
+      className="print-invoice"
     >
       <div
         ref={invoiceIdToDownload}
@@ -44,6 +45,7 @@ const InvoiceTemplate = ({
           padding: "16px",
           // boxShadow: "0 4px 12px rgba(0,0,0,0.2)",
         }}
+        className="invoice-content"
       >
         {/* Header */}
         <div

@@ -1,84 +1,261 @@
-import React from "react";
 import { FaIndianRupeeSign } from "react-icons/fa6";
+import converter from "number-to-words";
 
-const PaymentIn = () => {
+const PaymentInTemplate = ({ data, id, printRef }) => {
+  const total =
+    data?.invoices &&
+    data?.invoices.reduce((acc, invoice) => acc + invoice?.settledAmount, 0);
   return (
-    <main className="p-10">
-      <div className="flex justify-between">
+    <main
+      id={id}
+      style={{ width: "100%", fontFamily: "Arial, sans-serif" }}
+      ref={printRef}
+    >
+      <div style={{ display: "flex", justifyContent: "space-between" }}>
         <div>
-          <span className="font-medium">Business Name</span>
+          <span style={{ fontWeight: 500 }}>Business Name</span>
         </div>
-        <div className="flex flex-col mr-20 gap-2">
-          <span className="font-medium py-2">Receipt Voucher</span>
-          <p className="text-sm">
-            Payment Number <span className="pl-9">1</span>
+        <div
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            marginRight: "80px",
+            gap: "8px",
+          }}
+        >
+          <span style={{ fontWeight: 500, padding: "8px 0" }}>
+            Receipt Voucher
+          </span>
+          <p
+            style={{
+              fontSize: "14px",
+              display: "flex",
+              justifyContent: "space-between",
+            }}
+          >
+            Payment Number <span>{data?.paymentIn?.paymentInNumber}</span>
           </p>
-          <p className="text-sm">
-            Payment Date: <span className="pl-14">16-09-2025</span>
+          <p
+            style={{
+              fontSize: "14px",
+              display: "flex",
+              justifyContent: "space-between",
+              gap: "64px",
+            }}
+          >
+            Payment Date:{" "}
+            <span>{data?.paymentIn?.paymentDate.split("T")[0]}</span>
           </p>
-          <p className="text-sm">
-            Payment Mode: <span className="pl-13">cash</span>
+          <p
+            style={{
+              fontSize: "14px",
+              display: "flex",
+              justifyContent: "space-between",
+            }}
+          >
+            Payment Mode: <span>{data?.paymentIn?.paymentMode}</span>
           </p>
         </div>
       </div>
 
-      <div className="flex flex-col gap-3 text-sm">
-        <span className="border p-1 w-30  text-center rounded-xs bg-zinc-200 border-zinc-400">
+      <div
+        style={{
+          display: "flex",
+          flexDirection: "column",
+          gap: "12px",
+          fontSize: "14px",
+          marginTop: "12px",
+        }}
+      >
+        <span
+          style={{
+            border: "1px solid #e4e4e7",
+            padding: "4px",
+            width: "120px",
+            fontSize: "12px",
+            textAlign: "center",
+            borderRadius: "4px",
+            backgroundColor: "#e4e4e7",
+          }}
+        >
           PAYMENT FROM
         </span>
-        <span className="">Customer Party</span>
-        <span className="border p-1 w-30  text-center rounded-xs bg-zinc-200 border-zinc-400">
+        <span>{data?.paymentIn?.partyId?.partyName}</span>
+        <span
+          style={{
+            border: "1px solid #e4e4e7",
+            padding: "4px",
+            width: "120px",
+            fontSize: "12px",
+            textAlign: "center",
+            borderRadius: "4px",
+            backgroundColor: "#e4e4e7",
+          }}
+        >
           RECEIPT FOR
         </span>
       </div>
+
       {/* TABLE */}
-      <div className="overflow-x-auto pt-5">
-        <table className="table">
-          {/* head */}
+      <div style={{ overflowX: "auto", paddingTop: "20px" }}>
+        <table
+          style={{
+            width: "100%",
+            borderCollapse: "collapse",
+            fontSize: "14px",
+          }}
+        >
           <thead>
-            <tr className="bg-zinc-300">
-              <th>#</th>
-              <th>INVOICE NUMBER</th>
-              <th>INVOICE DATE</th>
-              <th>INVOICE AMOUNT</th>
-              <th>PAYMENT AMOUNT</th>
-              <th>TDS</th>
-              <th>BALANCE DUE</th>
+            <tr style={{ backgroundColor: "#d4d4d8", fontSize: "12px" }}>
+              <th style={{ padding: "6px" }}>#</th>
+              <th style={{ padding: "6px" }}>INVOICE NUMBER</th>
+              <th style={{ padding: "6px" }}>INVOICE DATE</th>
+              <th style={{ padding: "6px" }}>INVOICE AMOUNT</th>
+              <th style={{ padding: "6px" }}>PAYMENT AMOUNT</th>
+              <th style={{ padding: "6px" }}>TDS</th>
+              <th style={{ padding: "6px" }}>BALANCE DUE</th>
             </tr>
           </thead>
           <tbody>
-            {/* row 1 */}
-            <tr>
-              <th>1</th>
-              <td>5</td>
-              <td>225-09-15</td>
-              <td>50000</td>
-              <td>50000</td>
-              <td>0.0</td>
-              <td>50000</td>
+            {data?.invoices &&
+              data?.invoices?.map((invoice, index) => (
+                <tr key={index}>
+                  <td style={{ padding: "6px", textAlign: "center" }}>
+                    {index + 1}
+                  </td>
+                  <td style={{ padding: "6px", textAlign: "center" }}>
+                    {invoice?.salesInvoiceNumber}
+                  </td>
+                  <td style={{ padding: "6px", textAlign: "center" }}>
+                    {invoice?.salesInvoiceDate.split("T")[0]}
+                  </td>
+                  <td style={{ padding: "6px" }}>
+                    <div
+                      style={{
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                      }}
+                    >
+                      <FaIndianRupeeSign style={{ color: "#71717a" }} />
+                      {invoice?.totalAmount}
+                    </div>
+                  </td>
+                  <td style={{ padding: "6px", textAlign: "center" }}>
+                    <div
+                      style={{
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                      }}
+                    >
+                      <FaIndianRupeeSign style={{ color: "#71717a" }} />
+                      {invoice?.settledAmount}
+                    </div>
+                  </td>
+                  <td style={{ padding: "6px", textAlign: "center" }}>
+                    {invoice?.TDS || "0"}
+                  </td>
+                  <td style={{ padding: "6px" }}>
+                    <div
+                      style={{
+                        display: "flex",
+                        alignItems: "center",
+                        justifyContent: "center",
+                      }}
+                    >
+                      <FaIndianRupeeSign style={{ color: "#71717a" }} />
+                      {invoice?.pendingAmount}
+                    </div>
+                  </td>
+                </tr>
+              ))}
+
+            <tr style={{ backgroundColor: "#d4d4d8" }}>
+              <th></th>
+              <td></td>
+              <td></td>
+              <td
+                style={{
+                  fontWeight: 600,
+                  textAlign: "center",
+                  padding: "5px 0px",
+                }}
+              >
+                TOTAL
+              </td>
+              <td>
+                <div
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                  }}
+                >
+                  <FaIndianRupeeSign style={{ color: "#71717a" }} /> {total}
+                </div>
+              </td>
+              <td></td>
+              <td></td>
             </tr>
           </tbody>
         </table>
-        <div className="pl-122 p-2 bg-zinc-200 font-semibold text-gray-700">
-          <span className="pr-43 ">Total</span> <span>50000</span>
-        </div>
 
-        <div className="flex justify-between pt-8">
-          <div className="">
-            <p className="flex text-sm pb-2">
-              <span className="pr-5 flex">Total</span>
-              <span className="flex items-center font-semibold">
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "space-between",
+            paddingTop: "32px",
+          }}
+        >
+          <div>
+            <p
+              style={{
+                display: "flex",
+                fontSize: "14px",
+                paddingBottom: "8px",
+              }}
+            >
+              <span style={{ paddingRight: "20px", display: "flex" }}>
+                Total
+              </span>
+              <span
+                style={{
+                  display: "flex",
+                  alignItems: "center",
+                  fontWeight: 600,
+                }}
+              >
                 <FaIndianRupeeSign size={14} />
-                50000
+                {data?.invoices &&
+                  data?.invoices.reduce(
+                    (acc, invoice) => acc + invoice?.settledAmount,
+                    0
+                  )}
               </span>
             </p>
-            <span className=" text-sm">Amount Paid In Word</span>
-            <p className="font-semibold text-sm">Fifty Thousand Rupees </p>
+            <span style={{ fontSize: "14px" }}>Amount Paid In Word</span>
+            <p style={{ fontWeight: 600, fontSize: "14px" }}>
+              {converter.toWords(Number(total || 0)).toUpperCase()}{" "}
+              <span style={{ textTransform: "uppercase" }}>Rupees</span>
+            </p>
           </div>
-          <div className="flex flex-col text-sm ">
+          <div
+            style={{
+              display: "flex",
+              flexDirection: "column",
+              fontSize: "14px",
+            }}
+          >
             <span>Authorized signature for </span>
             <span>Business Name</span>
-            <div className="border w-80 h-25"></div>
+            <div
+              style={{
+                border: "1px solid #000",
+                width: "320px",
+                height: "100px",
+              }}
+            ></div>
           </div>
         </div>
       </div>
@@ -86,4 +263,4 @@ const PaymentIn = () => {
   );
 };
 
-export default PaymentIn;
+export default PaymentInTemplate;

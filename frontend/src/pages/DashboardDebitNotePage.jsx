@@ -9,7 +9,7 @@ const DashboardDebitNotePage = () => {
         <DashboardNavbar title={"Debit Note"} />
         <SalesNavigationMenus title={"Debit Note"} btnText={"Debit Note"} />
         <div className="mt-5 h-80 rounded-md mx-4 ">
-          <table className="table ">
+          <table className="table table-zebra">
             {/* head */}
             <thead>
               <tr className="bg-zinc-100">

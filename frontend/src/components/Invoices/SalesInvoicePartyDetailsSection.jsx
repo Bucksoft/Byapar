@@ -353,7 +353,7 @@ const SalesInvoicePartyDetailsSection = ({
                 <>
                   <div className="absolute text-xs mt-1 mx-2 rounded-sm shadow-md z-100 bg-white shadow-zinc-500 w-3/4 ">
                     <div className="overflow-x-auto">
-                      <table className="table table-xs">
+                      <table className="table table-xs table-zebra">
                         {/* head */}
                         <thead>
                           <tr className="text-xs bg-zinc-100">

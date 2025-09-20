@@ -165,7 +165,7 @@ const DashboardItemsPage = () => {
               <input
                 type="search"
                 required
-                placeholder="Search"
+                placeholder="Search By Item Name"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
               />

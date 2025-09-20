@@ -9,6 +9,7 @@ import { useNavigate } from "react-router-dom";
 import { PackagePlus, Plus } from "lucide-react";
 import { GrFormSubtract } from "react-icons/gr";
 import { FiPackage } from "react-icons/fi";
+import { AiOutlineProduct } from "react-icons/ai";
 
 const ItemsList = ({ showLowStock, items }) => {
   const [selectedItems, setSelectedItems] = useState([]);
@@ -85,7 +86,7 @@ const ItemsList = ({ showLowStock, items }) => {
 
   return (
     <div className="overflow-x-auto">
-      {selectedItems.length > 0 && (
+      {selectedItems.length > 0 ? (
         <div className="py-3 w-full flex justify-start">
           {/* Open the modal using document.getElementById('ID').showModal() method */}
           <button
@@ -115,14 +116,17 @@ const ItemsList = ({ showLowStock, items }) => {
             </form>
           </dialog>
         </div>
+      ) : (
+        ""
       )}
-      <table className="table mt-5 w-full ">
+      <table className="table mt-5 w-full table-zebra">
         {/* head */}
         <thead className="">
-          <tr className="bg-zinc-100 ">
+          <tr className="bg-[var(--primary-background)] ">
             <th></th>
             <th>Sr No.</th>
             <th>Item Name</th>
+            <th>Item Type</th>
             <th>Item Code</th>
             <th>Stock Quantity</th>
             <th>Selling Price</th>
@@ -132,7 +136,7 @@ const ItemsList = ({ showLowStock, items }) => {
         </thead>
         <tbody>
           {/* row 1 */}
-          {items.length > 0 &&
+          {items.length > 0 ? (
             items.map((item, index) => (
               <tr
                 key={item?._id}
@@ -149,13 +153,9 @@ const ItemsList = ({ showLowStock, items }) => {
                 </td>
                 <td>{index + 1}</td>
                 <td>
-                  <div className="flex flex-col gap-1">
-                    {item?.itemName}
-                    <p className="text-xs badge badge-secondary badge-soft badge-sm">
-                      {item?.itemType}
-                    </p>
-                  </div>
+                  <div className="flex flex-col gap-1">{item?.itemName}</div>
                 </td>
+                <td>{item?.itemType}</td>
                 <td>{item?.itemCode || item?.serviceCode || "-"}</td>
                 <td>
                   {item.itemType === "product" ? (
@@ -378,13 +378,27 @@ const ItemsList = ({ showLowStock, items }) => {
                   <td>-</td>
                 )}
               </tr>
-            ))}
+            ))
+          ) : (
+            <tr>
+              {!showLowStock && (
+                <td colSpan="9" className="text-center py-4 ">
+                  <div className="w-full flex items-center justify-center py-20 flex-col gap-3 text-zinc-400">
+                    <AiOutlineProduct size={40} />
+                    <span className="text-sm">
+                      No items matching the current filter
+                    </span>
+                  </div>
+                </td>
+              )}
+            </tr>
+          )}
         </tbody>
       </table>
       <>
         {showLowStock && (
-          <div>
-            <p className="flex flex-col items-center gap-2 text-center text-gray-500 mt-4">
+          <div className="mt-16">
+            <p className="flex flex-col items-center gap-2 text-center text-gray-400 mt-4">
               <FiPackage size={30} />
               No products are below the low stock level
             </p>

@@ -51,7 +51,19 @@ const DashboardMyBusinesses = () => {
     },
     onSuccess: (data) => {
       toast.success(data?.msg);
-      queryClient.invalidateQueries({ queryKey: ["business"] });
+      queryClient.invalidateQueries({
+        queryKey: [
+          "business",
+          "invoices",
+          "quotations",
+          "paymentIns",
+          "deliveryChallans",
+          "proformaInvoice",
+          "items",
+          "parties",
+          id,
+        ],
+      });
     },
   });
 
@@ -116,11 +128,12 @@ const DashboardMyBusinesses = () => {
                       Business Details :
                     </h3>
                     <div className="grid grid-cols-2 gap-2 min-h-[120px]">
-                      <p className="text-xs mt-1 p-2 bg-white border border-zinc-200 rounded-lg inset-shadow-2xs shadow-lg hover:scale-105 transition-all">
+                      <p className="text-xs mt-1 p-2 bg-white border border-zinc-200 rounded-lg inset-shadow-2xs shadow-lg hover:scale-105 transition-all break-all whitespace-normal">
                         <span className="text-zinc-500 font-medium">
                           Company email
                         </span>
-                        <br /> {business?.companyEmail}
+                        <br />
+                        {business?.companyEmail}
                       </p>
 
                       <p className="text-xs mt-1 p-2 bg-white border border-zinc-200 rounded-lg inset-shadow-2xs shadow-lg hover:scale-105 transition-all">

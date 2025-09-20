@@ -9,6 +9,7 @@ const SalesNavigationMenus = ({
   setPage,
   setSearchedQuery,
   setFilterDate,
+  filterDate,
 }) => {
   const navigate = useNavigate();
   return (
@@ -61,15 +62,16 @@ const SalesNavigationMenus = ({
           {/* calender */}
           <select
             className="select select-sm"
+            value={filterDate}
             onChange={(e) => setFilterDate(e.target.value)}
           >
-            <option value="today" className="hidden">
-              Today
+            <option value="" disabled>
+              --Select-Day--
             </option>
             <option value="today">Today</option>
             <option value="yesterday">Yesterday</option>
-            <option value="this week">This week</option>
-            <option value="last week">Last week</option>
+            <option value="thisWeek">This week</option>
+            <option value="lastWeek">Last week</option>
           </select>
 
           {/* create quotation optional */}

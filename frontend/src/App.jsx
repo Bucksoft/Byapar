@@ -74,7 +74,7 @@ import DashboardPaymentOutDetails from "./pages/DashboardPaymentOutDetails";
 import DashboardUpdateInvoicesPage from "./pages/DashboardUpdateInvoicesPage";
 
 function App() {
-  const { user, setUser } = useAuthStore();
+  const { setUser } = useAuthStore();
   const { setBusiness } = useBusinessStore();
 
   const {
