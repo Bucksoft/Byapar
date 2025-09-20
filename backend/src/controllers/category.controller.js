@@ -13,11 +13,14 @@ export async function createCategory(req, res) {
     }
     const newCategory = await Category.create({
       categoryName: category,
+      businessId: req?.params?.id,
+      clientId: req.user?.id,
     });
     return res
       .status(201)
       .json({ success: true, msg: "Category Added", newCategory });
   } catch (error) {
+    console.log(error);
     return res.status(500).json({ msg: "Internal Server Error" });
   }
 }
