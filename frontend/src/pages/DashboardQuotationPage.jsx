@@ -20,13 +20,9 @@ const DashboardQuotationPage = () => {
   const { business } = useBusinessStore();
   const { setQuotations } = useQuotationStore();
   const [searchedQuery, setSearchedQuery] = useState("");
-<<<<<<< HEAD
-  const [filterDate, setFilterDate] = useState("today");
-=======
   const [filterDate, setFilterDate] = useState("");
   const [quotationType, setQuotationType] = useState("");
 
->>>>>>> 1433e7982096681ed9869a0c775e41d7adf6fd1d
   const navigate = useNavigate();
 
   const { isLoading, data: quotations = [] } = useQuery({
@@ -39,10 +35,6 @@ const DashboardQuotationPage = () => {
     enabled: !!business?._id,
   });
 
-<<<<<<< HEAD
-  const searchedQuotations = quotations?.filter((quotation) => {
-    // Text search
-=======
   const filteredQuotations = quotations.filter((quotation) => {
     const quotationDate = dayjs(
       quotation?.quotationDate || quotation?.createdAt
@@ -79,40 +71,10 @@ const DashboardQuotationPage = () => {
     }
 
     // --- Search filter ---
->>>>>>> 1433e7982096681ed9869a0c775e41d7adf6fd1d
     if (searchedQuery.trim()) {
       const query = searchedQuery.toLowerCase();
       const matchesText =
         quotation?.quotationNumber?.toString().toLowerCase().includes(query) ||
-<<<<<<< HEAD
-        quotation?.partyName?.toLowerCase().includes(query);
-      if (!matchesText) return false;
-    }
-
-    const quotationDate = dayjs(
-      quotation?.quotationDate || quotation?.createdAt
-    );
-    switch (filterDate) {
-      case "today":
-        return quotationDate.isSame(dayjs(), "day");
-      case "yesterday":
-        return quotationDate.isSame(dayjs().subtract(1, "day"), "day");
-      case "thisWeek":
-        return quotationDate.isBetween(
-          dayjs().startOf("isoWeek"),
-          dayjs().endOf("isoWeek"),
-          null,
-          "[]"
-        );
-      case "lastWeek":
-        const startLastWeek = dayjs().subtract(1, "week").startOf("isoWeek");
-        const endLastWeek = dayjs().subtract(1, "week").endOf("isoWeek");
-        return quotationDate.isBetween(startLastWeek, endLastWeek, null, "[]");
-      default:
-        return true;
-    }
-  });
-=======
         quotation?.partyId?.partyName?.toLowerCase().includes(query);
       return matchesText;
     }
@@ -131,23 +93,12 @@ const DashboardQuotationPage = () => {
   });
 
   console.log(quotationType);
->>>>>>> 1433e7982096681ed9869a0c775e41d7adf6fd1d
 
   return (
     <main className="h-screen w-full flex">
       <section className="h-full w-full bg-gray-100 p-2">
         <div className="border border-zinc-300 h-full rounded-md bg-white p-3">
           <DashboardNavbar title={"Quotation / Estimate"} />
-<<<<<<< HEAD
-          <SalesNavigationMenus
-            title={"Quotation / Estimate"}
-            btnText={"Quotation"}
-            selectText={"quotation"}
-            setSearchedQuery={setSearchedQuery}
-            setFilterDate={setFilterDate}
-          />
-=======
->>>>>>> 1433e7982096681ed9869a0c775e41d7adf6fd1d
 
           {/* Top controls */}
           <div className="flex gap-3 px-4 py-5 items-center justify-between">
