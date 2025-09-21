@@ -296,7 +296,7 @@ export const itemSchema = z.object({
   SACCode: z.string().optional(),
   serviceCode: z.string().optional(),
 
-  lowStockQuantity: z.string().optional(),
+  lowStockQuantity: z.number().optional(),
 
   showItemInOnlineStore: z.boolean().default(false).optional(),
 

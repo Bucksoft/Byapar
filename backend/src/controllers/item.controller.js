@@ -136,18 +136,39 @@ export async function getItem(req, res) {
 
 export async function getAllItems(req, res) {
   try {
-    const items = await Item.find({
-      $and: [{ businessId: req.params?.id }, { clientId: req.user?.id }],
-    });
-    if (!items) {
-      return res.status(400).json({ success: true, msg: "Item not found" });
+    const businessId = req.params?.id;
+
+    if (!businessId) {
+      return res.status(400).json({
+        success: false,
+        msg: "Business ID is required",
+      });
     }
-    return res.status(200).json({ success: true, items });
+
+    const items = await Item.find({
+      businessId,
+      clientId: req.user?.id,
+    });
+
+    if (!items || items.length === 0) {
+      return res.status(404).json({
+        success: false,
+        msg: "No items found for this business",
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      count: items.length,
+      items,
+    });
   } catch (error) {
-    console.error("Error in creating item", error);
-    return res
-      .status(500)
-      .json({ success: false, msg: "Internal Server Error" });
+    console.error("❌ Error in fetching items:", error.message);
+    return res.status(500).json({
+      success: false,
+      msg: "Internal server error",
+      error: error.message,
+    });
   }
 }
 

@@ -31,13 +31,14 @@ const DashboardSalesPage = () => {
     data: invoices,
     isSuccess,
   } = useQuery({
-    queryKey: ["invoices"],
+    queryKey: ["invoices", business?._id],
     queryFn: async () => {
-      const res = await axiosInstance.get(`/sales-invoice/${business?._id}`);
-      return res.data?.invoices;
+      if (!business) return [];
+      const res = await axiosInstance.get(`/sales-invoice/${business._id}`);
+      return res.data?.invoices || [];
     },
+    enabled: !!business,
   });
-
   // mutation to delete an invoice
   const mutation = useMutation({
     mutationFn: async () => {
@@ -48,6 +49,9 @@ const DashboardSalesPage = () => {
       toast.success(data?.msg);
       document.getElementById("my_modal_2").close();
       queryClient.invalidateQueries({ queryKey: ["invoices"] });
+    },
+    onError: (err) => {
+      toast.error(err.response.data.msg);
     },
   });
 
@@ -64,7 +68,10 @@ const DashboardSalesPage = () => {
             invoice?.partyId?.partyName
               ?.toLowerCase()
               .includes(searchQuery.toLowerCase()) ||
-            invoice?.salesInvoiceNumber === Number(searchQuery)
+            invoice?.salesInvoiceNumber
+              .toString()
+              .toLowerCase()
+              .includes(searchQuery.toString().toLowerCase())
         )
       : invoices;
 
@@ -186,123 +193,160 @@ const DashboardSalesPage = () => {
           </div>
         </motion.div>
 
-        <div className="overflow-x-auto flex-1 rounded-box border border-base-content/5 bg-base-100 mt-5 ">
+        <div className="overflow-x-auto flex-1 bg-base-100 mt-5 ">
           {isLoading ? (
             <div className="w-full py-3 flex justify-center">
               <CustomLoader text={"Getting all invoices..."} />
             </div>
           ) : (
-            <motion.table
-              initial={{
-                opacity: 0,
-                translateY: 100,
-              }}
-              animate={{
-                opacity: 1,
-                translateY: 0,
-              }}
-              transition={{
-                ease: "easeInOut",
-                duration: 0.2,
-                delay: 0.3,
-              }}
-              className="table"
-            >
-              {/* head */}
-              <thead>
-                <tr className="bg-[var(--primary-background)]">
-                  <th>Date</th>
-                  <th>Invoice Number</th>
-                  <th>Party Name</th>
-                  <th>Due In</th>
-                  <th>Amount</th>
-                  <th>Status</th>
-                  <th>Action</th>
-                </tr>
-              </thead>
-              <tbody>
-                {(searchedInvoices || invoices).map((invoice) => (
-                  <tr
-                    key={invoice?._id}
-                    onClick={(e) => {
-                      navigate(`/dashboard/sales-invoice/${invoice?._id}`);
-                    }}
-                    className="cursor-pointer"
-                  >
-                    <td>{invoice?.salesInvoiceDate.split("T")[0]}</td>
-                    <td>{invoice?.salesInvoiceNumber}</td>
-                    <td>{invoice?.partyId?.partyName}</td>
-                    <td>{invoice?.dueDate.split("T")[0]}</td>
-                    <td className="flex items-center gap-1">
-                      <LiaRupeeSignSolid />
-                      {Number(invoice?.totalAmount).toLocaleString("en-IN")}
-                    </td>
-                    <td>
-                      <p
-                        className={`badge badge-soft badge-sm ${
-                          invoice?.status === "unpaid"
-                            ? "badge-error"
-                            : invoice?.status === "partially paid"
-                            ? "badge-secondary"
-                            : "badge-success"
-                        }`}
-                      >
-                        {invoice?.status}
-                      </p>
-                    </td>
-                    <td onClick={(e) => e.stopPropagation()}>
-                      <div className="dropdown dropdown-end">
-                        <div
-                          tabIndex={0}
-                          role="button"
-                          className="btn m-1 btn-xs"
-                          onClick={(e) => e.stopPropagation()}
-                        >
-                          <EllipsisVertical size={13} />
-                        </div>
-                        <ul
-                          tabIndex={0}
-                          className="dropdown-content menu bg-base-100 rounded-box z-10 w-52 p-2 shadow-sm"
-                          onClick={(e) => e.stopPropagation()}
-                        >
-                          <li>
-                            <a>
-                              <FaRegEdit /> Edit
-                            </a>
-                          </li>
-                          {/* <li>
-                            <a>
-                              <MdOutlineHistory />
-                              Edit History
-                            </a>
-                          </li>
-                          <li>
-                            <a>
-                              <BiDuplicate />
-                              Duplicate
-                            </a>
-                          </li> */}
-                          <li>
-                            <a
-                              onClick={() => {
-                                document
-                                  .getElementById("my_modal_2")
-                                  .showModal();
-                                setInvoiceId(invoice?._id);
-                              }}
-                              className="text-[var(--error-text-color)]"
-                            >
-                              <BsTrash3 />
-                              Delete
-                            </a>
-                          </li>
-                        </ul>
-                      </div>
-                    </td>
+            (searchedInvoices || invoices) && (
+              <motion.table
+                initial={{
+                  opacity: 0,
+                  translateY: 100,
+                }}
+                animate={{
+                  opacity: 1,
+                  translateY: 0,
+                }}
+                transition={{
+                  ease: "easeInOut",
+                  duration: 0.2,
+                  delay: 0.3,
+                }}
+                className="table table-zebra"
+              >
+                {/* head */}
+                <thead>
+                  <tr className="bg-[var(--primary-background)]">
+                    <th>Date</th>
+                    <th>Invoice Number</th>
+                    <th>Party Name</th>
+                    <th>Due In</th>
+                    <th>Amount</th>
+                    <th>Status</th>
+                    <th>Action</th>
                   </tr>
-                ))}
-              </tbody>
-            </motion.table>
+                </thead>
+                <tbody>
+                  {searchedInvoices.length > 0 ? (
+                    searchedInvoices.map((invoice) => (
+                      <tr
+                        key={invoice?._id}
+                        onClick={(e) => {
+                          navigate(`/dashboard/sales-invoice/${invoice?._id}`);
+                        }}
+                        className="cursor-pointer hover:bg-zinc-50"
+                      >
+                        <td>{invoice?.salesInvoiceDate.split("T")[0]}</td>
+                        <td>{invoice?.salesInvoiceNumber}</td>
+                        <td>{invoice?.partyId?.partyName}</td>
+                        <td>{invoice?.dueDate.split("T")[0]}</td>
+                        <td className="flex items-center gap-1">
+                          <LiaRupeeSignSolid />
+                          {Number(invoice?.totalAmount).toLocaleString("en-IN")}
+                        </td>
+                        <td>
+                          <p
+                            className={`badge badge-soft badge-sm ${
+                              invoice?.status === "unpaid"
+                                ? "badge-error"
+                                : invoice?.status === "partially paid"
+                                ? "badge-secondary"
+                                : invoice?.status === "cancelled"
+                                ? "badge-primary"
+                                : "badge-success"
+                            }`}
+                          >
+                            {invoice?.status}
+                          </p>
+                        </td>
+                        {invoice?.status !== "cancelled" ? (
+                          <td onClick={(e) => e.stopPropagation()}>
+                            <div className="dropdown dropdown-end">
+                              <div
+                                tabIndex={0}
+                                role="button"
+                                className="btn m-1 btn-xs"
+                                onClick={(e) => e.stopPropagation()}
+                              >
+                                <EllipsisVertical size={13} />
+                              </div>
+                              <ul
+                                tabIndex={0}
+                                className="dropdown-content menu bg-base-100 rounded-box z-10 w-52 p-2 shadow-sm"
+                                onClick={(e) => e.stopPropagation()}
+                              >
+                                <li>
+                                  <a>
+                                    <FaRegEdit /> Edit
+                                  </a>
+                                </li>
+                                <li>
+                                  <a
+                                    onClick={() => {
+                                      document
+                                        .getElementById("my_modal_2")
+                                        .showModal();
+                                      setInvoiceId(invoice?._id);
+                                    }}
+                                    className="text-[var(--error-text-color)]"
+                                  >
+                                    <BsTrash3 />
+                                    Delete
+                                  </a>
+                                </li>
+                              </ul>
+                            </div>
+                          </td>
+                        ) : (
+                          <td className="text-center">-</td>
+                        )}
+                      </tr>
+                    ))
+                  ) : (
+                    <tr>
+                      <td
+                        colSpan="7"
+                        className="text-center py-4 text-gray-500"
+                      >
+                        <div className="w-full flex items-center justify-center py-20 flex-col gap-3 text-zinc-400">
+                          <FaFileInvoice size={40} />
+                          <span className="text-sm">
+                            No transactions matching the current filter
+                          </span>
+                        </div>
+                      </td>
+                    </tr>
+                  )}
+                </tbody>
+              </motion.table>
+            )
+          )}
+
+          {(!searchedInvoices || !invoices) && (
+            <div className="w-full flex justify-center py-19 flex-col items-center gap-4">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                width="48"
+                height="48"
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                className="icon text-zinc-500 icon-tabler icons-tabler-outline icon-tabler-receipt-rupee"
+              >
+                <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                <path d="M5 21v-16a2 2 0 0 1 2 -2h10a2 2 0 0 1 2 2v16l-3 -2l-2 2l-2 -2l-2 2l-2 -2l-3 2" />
+                <path d="M15 7h-6h1a3 3 0 0 1 0 6h-1l3 3" />
+                <path d="M9 10h6" />
+              </svg>
+              <h1 className="text-zinc-500">
+                You haven't generated any invoices yet.
+              </h1>
+            </div>
           )}
 
           {invoices?.length <= 0 && (
@@ -324,7 +368,7 @@ const DashboardSalesPage = () => {
             <div className="modal-box">
               <h3 className="font-bold text-lg">Confirm Deletion</h3>
               <p className="py-4 text-sm">
-                Are you sure you want to delete the selected item(s)? This
+                Are you sure you want to delete the selected invoice ? This
                 action cannot be undone.
               </p>
               <div className="flex w-full">

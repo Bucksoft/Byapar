@@ -98,7 +98,7 @@ const QuotationInvoice = () => {
         <section className="flex items-center justify-between">
           <div className="flex items-center gap-2 mt-7">
             <button
-              onClick={() => downloadPDF(invoiceIdToDownload)}
+              onClick={() => downloadPDF(invoiceIdToDownload, "quotation")}
               className="btn btn-sm"
             >
               <Download size={15} /> Download PDF

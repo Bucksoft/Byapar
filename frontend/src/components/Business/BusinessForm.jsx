@@ -8,13 +8,14 @@ import { MdOutlineCalendarToday } from "react-icons/md";
 import { axiosInstance } from "../../config/axios";
 import CustomLoader from "../Loader";
 import toast from "react-hot-toast";
-import { Trash } from "lucide-react";
+import { Cross, Trash } from "lucide-react";
 import { useRef } from "react";
 import { useBusinessStore } from "../../store/businessStore";
 import { useNavigate } from "react-router-dom";
+import { RxCross2 } from "react-icons/rx";
 
 const BusinessForm = ({ businessToBeUpdated }) => {
-  const [additionalInformation, setAdditionalInformation] = useState([{}]);
+  const [additionalInformation, setAdditionalInformation] = useState([]);
   const [additionalInfoKey, setAdditionalInfoKey] = useState("");
   const [additionalInfoValue, setAdditionalInfoValue] = useState("");
   const [logoPreviewUrl, setLogoPreviewUrl] = useState("");
@@ -70,15 +71,22 @@ const BusinessForm = ({ businessToBeUpdated }) => {
   const handleLogoChange = (e) => {
     const file = e.target.files[0];
     if (!file) return;
-    const maxFileSize = 5 * 1024 * 1024;
+
+    const maxFileSize = 5 * 1024 * 1024; // 5MB
     if (file.size > maxFileSize) {
       setFileSizeError(true);
       toast.error("File is too big");
       return;
     }
-    logoRef.current = file;
-    const url = URL.createObjectURL(file);
-    setLogoPreviewUrl(url);
+
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      const base64String = reader.result;
+      setLogoPreviewUrl(base64String);
+      const pureBase64 = base64String.split(",")[1];
+      logoRef.current = pureBase64;
+    };
+    reader.readAsDataURL(file);
     e.target.value = null;
   };
 
@@ -86,9 +94,17 @@ const BusinessForm = ({ businessToBeUpdated }) => {
   const handleSignatureChange = (e) => {
     const file = e.target.files[0];
     if (!file) return;
-    signatureRef.current = file;
-    const url = URL.createObjectURL(file);
-    setSignaturePreviewUrl(url);
+
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      const base64String = reader.result;
+      setSignaturePreviewUrl(base64String);
+
+      const pureBase64 = base64String.split(",")[1];
+      signatureRef.current = pureBase64;
+    };
+    reader.readAsDataURL(file);
+
     e.target.value = null;
   };
 
@@ -108,6 +124,7 @@ const BusinessForm = ({ businessToBeUpdated }) => {
     },
     onSuccess: (data) => {
       toast.success("Business created");
+      navigate("/dashboard/my-businesses");
       queryClient.invalidateQueries({ queryKey: ["business"] });
       setBusiness(data);
     },
@@ -201,11 +218,13 @@ const BusinessForm = ({ businessToBeUpdated }) => {
                     <RiChat1Line size={14} />
                     Chat Support
                   </button> */}
-          <button className="btn btn-sm  bg-[var(--primary-btn)]">
+          {/* <button className="btn btn-sm  bg-[var(--primary-btn)]">
             <MdOutlineCalendarToday size={14} />
             Close Financial Year
+          </button> */}
+          <button className="btn btn-sm" onClick={() => navigate(-1)}>
+            Cancel
           </button>
-          <button className="btn btn-sm ">Cancel</button>
           {businessToBeUpdated ? (
             <button
               onClick={handleSubmit}
@@ -252,28 +271,26 @@ const BusinessForm = ({ businessToBeUpdated }) => {
           }}
           className="flex flex-col  p-4 mt-1 ml-2"
         >
-          <div className="flex gap-7 mb-4">
+          <div className="flex gap-7 mb-4 relative">
             <motion.label
-              initial={{
-                filter: "blur(10px)",
-                opacity: 0,
-              }}
-              animate={{
-                filter: "blur(0px)",
-                opacity: 1,
-              }}
-              transition={{
-                ease: "easeInOut",
-                duration: 0.3,
-                delay: 0.3,
-              }}
+              initial={{ filter: "blur(10px)", opacity: 0 }}
+              animate={{ filter: "blur(0px)", opacity: 1 }}
+              transition={{ ease: "easeInOut", duration: 0.3, delay: 0.3 }}
               htmlFor="logo"
               className={`border flex-col items-center justify-center bg-[#F6F9FF] ${
                 fileSizeError ? "border-red-500" : "border-blue-500"
-              }  flex border-dashed  cursor-pointer p-5 text-xs gap-2`}
+              } flex border-dashed cursor-pointer p-5 text-xs gap-2 relative`}
             >
               {logoPreviewUrl ? (
-                <img src={logoPreviewUrl} size={80} />
+                <img
+                  src={logoPreviewUrl}
+                  alt="Logo"
+                  style={{
+                    width: "150px",
+                    height: "100px",
+                    objectFit: "cover",
+                  }}
+                />
               ) : (
                 <>
                   <LuImagePlus size={20} className="text-blue-500" />
@@ -284,15 +301,28 @@ const BusinessForm = ({ businessToBeUpdated }) => {
                 </>
               )}
             </motion.label>
+            {logoPreviewUrl && (
+              <div
+                onClick={(e) => {
+                  e.stopPropagation();
+                  logoRef.current = null;
+                  setLogoPreviewUrl(null);
+                }}
+                className="absolute -left-2 -top-2 z-10 bg-red-500 rounded-full text-white p-1 border border-red-500 cursor-pointer"
+              >
+                <RxCross2 size={15} />
+              </div>
+            )}
+
             <input
               type="file"
               id="logo"
               accept="image/*"
               name="logo"
               className="hidden"
-              max={"5MB"}
-              onClick={handleLogoChange}
+              onChange={handleLogoChange}
             />
+
             {fileSizeError && (
               <small className="text-red-500">File is too big</small>
             )}
@@ -552,22 +582,22 @@ const BusinessForm = ({ businessToBeUpdated }) => {
         >
           <div className="flex gap-5 mb-4 items-center justify-between">
             <div className="w-1/2 flex flex-col  justify-between">
-              <p className="text-[13px]  text-gray-600 mb-2">
-                Business Type (Select multiple, if applicable)
-              </p>
+              <p className="text-[13px] text-gray-600 mb-2">Business Type</p>
               <select
                 name="businessType"
                 value={data.businessType}
                 disabled={mutation?.isPending}
                 onChange={handleInputChange}
-                className="select select-sm "
+                className="select select-sm"
               >
-                <option className="hidden">Retailer</option>
-                <option>Retailer</option>
-                <option>Wholesaler</option>
-                <option>Distributor</option>
-                <option>Manufacturer</option>
-                <option>Services</option>
+                <option value="" disabled>
+                  -- Select-Business-Type --
+                </option>
+                <option value="Retailer">Retailer</option>
+                <option value="Wholesaler">Wholesaler</option>
+                <option value="Distributor">Distributor</option>
+                <option value="Manufacturer">Manufacturer</option>
+                <option value="Services">Services</option>
               </select>
               <small className="text-xs text-[var(--error-text-color)] ">
                 {
@@ -576,15 +606,19 @@ const BusinessForm = ({ businessToBeUpdated }) => {
                 }
               </small>
             </div>
-            <div className="w-1/2 flex flex-col justify-between">
+
+            <div className="w-1/2 flex flex-col justify-between ">
               <p className="text-[13px]  text-gray-600 mb-2">Industry Type</p>
               <select
                 name="industryType"
                 value={data.industryType}
                 disabled={mutation?.isPending}
                 onChange={handleInputChange}
-                className="select select-sm mt-[15.5px]"
+                className="select select-sm "
               >
+                <option value="" disabled>
+                  -- Select-Industry-Type --
+                </option>
                 <option className="hidden">
                   Accounting and Financial Services
                 </option>
@@ -595,6 +629,57 @@ const BusinessForm = ({ businessToBeUpdated }) => {
                 <option>Boardband/ cable/ internet</option>
                 <option>Building Material and Construction</option>
                 <option>Cleaning and pest Control</option>
+                <option>Consulting</option>
+                <option>Dairy (Milk)</option>
+                <option>Doctor / Clinic / Hospital</option>
+                <option>Education-Schooling/Coaching</option>
+                <option>Electrical works</option>
+                <option>Electronics</option>
+                <option>Engineering</option>
+                <option>Event planning and management</option>
+                <option>FMCG</option>
+                <option>Fitness - Gym and Spa</option>
+                <option>Footwear</option>
+                <option>Fruits and Vegetables</option>
+                <option>Furniture</option>
+                <option>Garment/Clothing</option>
+                <option>General Store(Kirana)</option>
+                <option>Gift Shop</option>
+                <option>Hardware</option>
+                <option>Home services</option>
+                <option>Hotels and Hospitality</option>
+                <option>Information Technology</option>
+                <option>Interiors</option>
+                <option>Jewellery</option>
+                <option>Liquor</option>
+                <option>Machinery</option>
+                <option>Meat</option>
+                <option>Medical Devices</option>
+                <option>Medicine(Pharma)</option>
+                <option>Mobile and accessories</option>
+                <option>Oil And Gas</option>
+                <option>Opticals</option>
+                <option>Other services</option>
+                <option>Others</option>
+                <option>Packaging</option>
+                <option>Paints</option>
+                <option>Photography</option>
+                <option>Plywood</option>
+                <option>Printing</option>
+                <option>Real estate - Rentals and Lease</option>
+                <option>Restaurants/ Cafe/ Catering</option>
+                <option>Safety Equipments</option>
+                <option>Salon</option>
+                <option>Scrap</option>
+                <option>Service Centres</option>
+                <option>Sports Equipments</option>
+                <option>Stationery</option>
+                <option>Tailoring/ Boutique</option>
+                <option>Textiles</option>
+                <option>Tiles/Sanitary Ware</option>
+                <option>Tours and Travel</option>
+                <option>Transport and Logistics</option>
+                <option value="Utensils">Utensils</option>
               </select>
               <small className="text-xs text-[var(--error-text-color)] ">
                 {
@@ -616,6 +701,9 @@ const BusinessForm = ({ businessToBeUpdated }) => {
               onChange={handleInputChange}
               className="select select-sm "
             >
+              <option value="" disabled>
+                -- Select-Business-Registration-Type --
+              </option>
               <option className="hidden">Private Limited Company</option>
               <option>Private Limited Company</option>
               <option>Public Limited Company</option>
@@ -643,9 +731,30 @@ const BusinessForm = ({ businessToBeUpdated }) => {
           </div>
 
           <p className="text-[13px] text-gray-500">Signature</p>
-          <div className="flex items-center justify-between py-2">
-            {singaturePreviewUrl ? (
+          <div className="flex items-center justify-between py-2 relative ">
+            {/* {singaturePreviewUrl ? (
               <img src={singaturePreviewUrl} size={100} />
+            ) : (
+              <>
+                <label
+                  htmlFor="signature"
+                  className="border border-dashed p-11 text-xs border-blue-500 text-blue-500 cursor-pointer"
+                >
+                  + Add Signature
+                </label>
+              </>
+            )} */}
+            {singaturePreviewUrl ? (
+              <img
+                src={singaturePreviewUrl}
+                alt="signature"
+                style={{
+                  width: "150px",
+                  height: "100px",
+                  objectFit: "cover",
+                }}
+                className="border border-dashed p-5 border-blue-500"
+              />
             ) : (
               <>
                 <label
@@ -665,6 +774,19 @@ const BusinessForm = ({ businessToBeUpdated }) => {
               onChange={handleSignatureChange}
               className="hidden"
             />
+
+            {singaturePreviewUrl && (
+              <div
+                onClick={(e) => {
+                  e.stopPropagation();
+                  signatureRef.current = null;
+                  setSignaturePreviewUrl(null);
+                }}
+                className="absolute left-33 -top-1 z-10 bg-red-500 rounded-full text-white p-1 border border-red-500 cursor-pointer"
+              >
+                <RxCross2 size={15} />
+              </div>
+            )}
           </div>
 
           <div className="border rounded mt-2 border-[var(--primary-border)]">
@@ -691,7 +813,7 @@ const BusinessForm = ({ businessToBeUpdated }) => {
                 value={additionalInfoValue}
                 onChange={(e) => setAdditionalInfoValue(e.target.value)}
               />
-              <button
+              <div
                 onClick={() =>
                   setAdditionalInformation((prev) => [
                     ...prev,
@@ -704,19 +826,25 @@ const BusinessForm = ({ businessToBeUpdated }) => {
                 className="btn btn-sm bg-[var(--primary-btn)] ml-3"
               >
                 Add
-              </button>
+              </div>
             </div>
-            {additionalInformation.length > 0 &&
+            {Array.isArray(additionalInformation) &&
+              additionalInformation.length > 0 &&
               additionalInformation.map((info, index) => (
                 <div
                   key={index}
-                  className="px-4 py-2 text-sm flex items-center justify-between"
+                  className="px-4 pb-2 text-sm flex items-center justify-between"
                 >
                   <div>
                     <h3>{info?.key}</h3>
                     <span className="text-zinc-500">{info?.value}</span>
                   </div>
                   <Trash
+                    onClick={() =>
+                      setAdditionalInformation((prev) =>
+                        prev.filter((info, i) => info?.key !== info?.key)
+                      )
+                    }
                     size={15}
                     className="text-[var(--error-text-color)] cursor-pointer"
                   />

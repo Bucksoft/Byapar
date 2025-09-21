@@ -3,6 +3,7 @@ import SalesInvoice from "../models/salesInvoiceSchema.js";
 import Party from "../models/party.schema.js";
 import { Item } from "../models/item.schema.js";
 
+// CONTROLLER TO CREATE A SALES INVOICE
 export async function createSalesInvoice(req, res) {
   try {
     const data = req.body;
@@ -26,6 +27,7 @@ export async function createSalesInvoice(req, res) {
 
     const existingInvoice = await SalesInvoice.findOne({
       salesInvoiceNumber: validatedResult.data?.salesInvoiceNumber,
+      businessId: req?.params?.id,
     });
 
     if (existingInvoice) {
@@ -37,27 +39,31 @@ export async function createSalesInvoice(req, res) {
 
     // SALES INVOICE MEIN STOCK KAM HOTA HAI, AGR PRODUCT HAI TO WRNA SERVICE KE CASE MEIN NHI HOTA
     for (const soldItem of data?.items) {
-      const item = await Item.findById(soldItem?._id);
-      if (!item) {
-        return res
-          .status(400)
-          .json({ success: false, msg: `Item not found : ${item?.itemName}` });
-      }
-      if (item?.currentStock < soldItem.quantity) {
-        return res.status(400).json({
-          success: false,
-          msg: `Insufficient stock for ${item?.itemName}`,
+      if (soldItem.itemType === "product") {
+        const item = await Item.findById(soldItem?._id);
+        if (!item) {
+          return res.status(400).json({
+            success: false,
+            msg: `Item not found : ${item?.itemName}`,
+          });
+        }
+        if (item?.currentStock < soldItem.quantity) {
+          return res.status(400).json({
+            success: false,
+            msg: `Insufficient stock for ${item?.itemName}`,
+          });
+        }
+        await Item.findByIdAndUpdate(soldItem?._id, {
+          $inc: { currentStock: -soldItem?.quantity },
         });
       }
-      await Item.findByIdAndUpdate(soldItem?._id, {
-        $inc: { currentStock: -soldItem?.quantity },
-      });
     }
 
     const salesInvoice = await SalesInvoice.create({
       partyId: party?._id,
       businessId: req.params?.id,
       clientId: req.user?.id,
+      type: "sales invoice",
       ...data,
     });
 
@@ -67,6 +73,7 @@ export async function createSalesInvoice(req, res) {
     party.totalDebits = (party.totalDebits || 0) + salesInvoice.balanceAmount;
     party.totalInvoices =
       (party.totalInvoices || 0) + salesInvoice.balanceAmount;
+    party.totalCredits = (party.totalCredits || 0) - salesInvoice.balanceAmount;
     await party.save();
 
     if (!salesInvoice) {
@@ -87,6 +94,7 @@ export async function createSalesInvoice(req, res) {
   }
 }
 
+// CONTROLLER TO GET ALL THE SALES INVOICES
 export async function getAllInvoices(req, res) {
   try {
     const invoices = await SalesInvoice.find({
@@ -106,29 +114,76 @@ export async function getAllInvoices(req, res) {
   }
 }
 
+// CONTROLLER TO DELETE INVOICE (MARK STATUS AS CANCELLED AND INCREMENT THE STOCK OF THAT ITEM)
 export async function deleteInvoice(req, res) {
   try {
     const { id } = req.params;
+    const userId = req.user?.id;
+
     if (!id) {
       return res
         .status(400)
         .json({ success: false, msg: "Please provide invoice id" });
     }
-    const deletedInvoice = await SalesInvoice.findByIdAndDelete({
-      _id: id,
-      clientId: req.user?.id,
-    });
-    if (!deletedInvoice) {
+
+    const invoice = await SalesInvoice.findById(id).populate("partyId");
+    if (!invoice) {
+      return res.status(404).json({ success: false, msg: "Invoice not found" });
+    }
+
+    if (invoice.status === "cancelled") {
       return res
         .status(400)
-        .json({ success: false, msg: "Failed to delete sales invoice" });
+        .json({ success: false, msg: "Invoice is already cancelled" });
     }
-    return res
-      .status(200)
-      .json({ success: true, msg: "Invoice deleted successfully" });
+
+    const party = invoice.partyId;
+    if (!party) {
+      return res
+        .status(400)
+        .json({ success: false, msg: "Linked party not found" });
+    }
+
+    const reversalAmount = invoice.balanceAmount || 0;
+
+    invoice.status = "cancelled";
+    invoice.cancelledAt = new Date();
+    invoice.cancelledBy = userId || null;
+    invoice.pendingAmount = 0;
+    invoice.settledAmount = 0;
+
+    if (Array.isArray(invoice.items)) {
+      for (const soldItem of invoice.items) {
+        if (soldItem.itemType === "product") {
+          const item = await Item.findById(soldItem?._id);
+          if (!item) {
+            return res.status(400).json({
+              success: false,
+              msg: `Item not found: ${soldItem?._id}`,
+            });
+          }
+          await Item.findByIdAndUpdate(soldItem?._id, {
+            $inc: { currentStock: soldItem?.quantity },
+          });
+        }
+      }
+    }
+
+    party.currentBalance = (party.currentBalance || 0) - reversalAmount;
+    party.totalDebits = (party.totalDebits || 0) - reversalAmount;
+    party.totalInvoices = (party.totalInvoices || 0) - reversalAmount;
+    party.totalCredits = (party.totalCredits || 0) + reversalAmount;
+
+    await party.save();
+    await invoice.save();
+
+    return res.status(200).json({
+      success: true,
+      msg: "Invoice cancelled successfully",
+      invoice,
+    });
   } catch (error) {
-    console.log("ERROR IN DELETING SALES INVOICE ");
-    console.log(error);
+    console.error("ERROR IN CANCELLING SALES INVOICE", error);
     return res.status(500).json({ err: "Internal server error", error });
   }
 }

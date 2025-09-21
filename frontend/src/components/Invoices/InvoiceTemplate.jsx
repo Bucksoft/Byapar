@@ -4,7 +4,13 @@ import { LiaRupeeSignSolid } from "react-icons/lia";
 import { useEffect, useRef } from "react";
 import converter from "number-to-words";
 
-const InvoiceTemplate = ({ type, color, invoice, setInvoiceIdToDownload }) => {
+const InvoiceTemplate = ({
+  type,
+  color,
+  invoice,
+  setInvoiceIdToDownload,
+  printRef,
+}) => {
   const { business } = useBusinessStore();
   const invoiceIdToDownload = useRef();
 
@@ -23,7 +29,11 @@ const InvoiceTemplate = ({ type, color, invoice, setInvoiceIdToDownload }) => {
     parseAmount(invoice?.sgst);
 
   return (
-    <main style={{ display: "flex", width: "100%", height: "100vh" }}>
+    <main
+      style={{ display: "flex", width: "100%", height: "100vh" }}
+      ref={printRef}
+      className="print-invoice"
+    >
       <div
         ref={invoiceIdToDownload}
         id="invoice"
@@ -35,6 +45,10 @@ const InvoiceTemplate = ({ type, color, invoice, setInvoiceIdToDownload }) => {
           padding: "16px",
           // boxShadow: "0 4px 12px rgba(0,0,0,0.2)",
         }}
+<<<<<<< HEAD
+=======
+        className="invoice-content"
+>>>>>>> 1433e7982096681ed9869a0c775e41d7adf6fd1d
       >
         {/* Header */}
         <div

@@ -1,8 +1,6 @@
-import jsPDF from "jspdf";
-import html2canvas from "html2canvas";
 import { axiosInstance } from "../src/config/axios";
 
-export const downloadPDF = async (id) => {
+export const downloadPDF = async (id, title) => {
   try {
     const input = document.getElementById(id);
     const element = input.outerHTML;
@@ -31,7 +29,7 @@ export const downloadPDF = async (id) => {
     const url = window.URL.createObjectURL(new Blob([response.data]));
     const link = document.createElement("a");
     link.href = url;
-    link.setAttribute("download", "invoice.pdf");
+    link.setAttribute("download", `${title}.pdf`);
     document.body.appendChild(link);
     link.click();
     link.remove();

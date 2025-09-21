@@ -1,13 +1,45 @@
 import React from "react";
 import { GrDocumentExcel } from "react-icons/gr";
 import { LiaRupeeSignSolid } from "react-icons/lia";
+import { useInvoiceStore } from "../../store/invoicesStore";
+import { useQuotationStore } from "../../store/quotationStore";
+import { usePaymentInStore } from "../../store/paymentInStore";
+import { useEffect } from "react";
+import { useState } from "react";
 
-const PartyTransactions = ({ party, partyInvoices }) => {
-  console.log(partyInvoices);
+const PartyTransactions = ({ party, filter }) => {
+  const { invoices } = useInvoiceStore();
+  const { quotations } = useQuotationStore();
+  const { paymentIns } = usePaymentInStore();
+  const [transactions, setTransactions] = useState([]);
+
+  useEffect(() => {
+    const partyInvoices = invoices
+      .filter((invoice) => invoice.partyName === party?.partyName)
+      .map((invoice) => ({ ...invoice, type: "sales invoice" }));
+
+    const partyQuotations = quotations
+      .filter((quotation) => quotation.partyName === party?.partyName)
+      .map((quotation) => ({ ...quotation, type: "quotation" }));
+
+    const partyPaymentIns = paymentIns
+      .filter((paymentIn) => paymentIn.partyName === party?.partyName)
+      .map((paymentIn) => ({ ...paymentIn, type: "payment in" }));
+
+    setTransactions([...partyInvoices, ...partyPaymentIns, ...partyQuotations]);
+  }, [invoices, quotations, paymentIns, party]);
+
+  const filteredTransactions =
+    filter && filter !== "all_transactions"
+      ? transactions.filter(
+          (t) => t.type.replace(" ", "_") === filter.toLowerCase() // sales_invoice → sales invoice
+        )
+      : transactions;
+
   return (
     <section>
       <div className="overflow-x-auto">
-        <table className="table">
+        <table className="table table-sm table-zebra">
           {/* head */}
           <thead>
             <tr className="bg-zinc-100">
@@ -20,40 +52,60 @@ const PartyTransactions = ({ party, partyInvoices }) => {
             </tr>
           </thead>
           <tbody>
-            {partyInvoices?.length > 0 &&
-              partyInvoices.map((partyInvoice, index) => (
-                <tr key={partyInvoice?._id}>
+            {filteredTransactions?.length > 0 &&
+              filteredTransactions.map((transaction, index) => (
+                <tr key={transaction?._id}>
                   <td>{index + 1}</td>
-                  <td>{partyInvoice?.salesInvoiceDate.split("T")[0] || "-"}</td>
-                  <td>{partyInvoice?.type || "-"}</td>
-                  <td>{partyInvoice?.salesInvoiceNumber || "-"}</td>
+                  <td>
+                    {transaction?.salesInvoiceDate?.split("T")[0] ||
+                      transaction?.quotationDate?.split("T")[0] ||
+                      transaction?.paymentDate?.split("T")[0] ||
+                      "-"}
+                  </td>
+                  <td>{transaction?.type || "-"}</td>
+                  <td>
+                    {transaction?.salesInvoiceNumber ||
+                      transaction?.quotationNumber ||
+                      transaction?.paymentInNumber ||
+                      "-"}
+                  </td>
                   <td>
                     <div className="flex items-center">
                       <LiaRupeeSignSolid />
-                      {Number(partyInvoice?.totalAmount).toLocaleString(
-                        "en-IN"
-                      ) || "-"}
+                      {transaction?.totalAmount != null
+                        ? Number(transaction.totalAmount).toLocaleString(
+                            "en-IN"
+                          )
+                        : transaction?.paymentAmount != null
+                        ? Number(transaction.paymentAmount).toLocaleString(
+                            "en-IN"
+                          )
+                        : "-"}
                     </div>
                   </td>
                   <td>
                     <div
-                      className={`badge badge-sm  ${
-                        partyInvoice?.status === "unpaid"
+                      className={`  ${
+                        transaction.status && "badge badge-sm badge-soft"
+                      }    ${
+                        transaction?.status === "unpaid"
                           ? "badge-error"
                           : "badge-success"
                       }`}
                     >
-                      {partyInvoice?.status}
+                      {transaction?.status && transaction?.status}
                     </div>
                   </td>
                 </tr>
               ))}
           </tbody>
         </table>
-        <div className="flex items-center justify-center w-full py-16 flex-col text-zinc-500 gap-2">
-          <GrDocumentExcel size={25} />
-          No transactions yet
-        </div>
+        {filteredTransactions.length === 0 && (
+          <div className="flex items-center justify-center w-full py-16 flex-col text-zinc-500 gap-2">
+            <GrDocumentExcel size={25} />
+            No transactions yet
+          </div>
+        )}
       </div>
     </section>
   );

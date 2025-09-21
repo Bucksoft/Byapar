@@ -73,6 +73,11 @@ const DashboardItemsSidebar = () => {
   // create new item mutation
   const mutation = useMutation({
     mutationFn: async (data) => {
+      if (!business) {
+        throw new Error(
+          "You don't have any active business yet, create one first"
+        );
+      }
       const res = await axiosInstance.post(`/item/${business?._id}`, { data });
       return res.data;
     },
@@ -88,6 +93,8 @@ const DashboardItemsSidebar = () => {
       toast.error(
         err?.response?.data?.validationError?.itemName._errors[0] ||
           err?.response?.data?.msg ||
+          err.response?.data?.err ||
+          err.message ||
           "Something went wrong"
       );
     },

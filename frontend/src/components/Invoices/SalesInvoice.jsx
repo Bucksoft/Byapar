@@ -1,4 +1,4 @@
-import { ArrowLeft, Download, EllipsisVertical } from "lucide-react";
+import { ArrowLeft, Download, EllipsisVertical, Printer } from "lucide-react";
 import { GiProfit } from "react-icons/gi";
 import { TbFileInvoice } from "react-icons/tb";
 import { useNavigate, useParams } from "react-router-dom";
@@ -6,14 +6,16 @@ import InvoiceTemplate from "./InvoiceTemplate";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { axiosInstance } from "../../config/axios";
 import { downloadPDF } from "../../../helpers/downloadPdf";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import toast from "react-hot-toast";
 import { queryClient } from "../../main";
 import CustomLoader from "../Loader";
+import { handlePrint } from "../../../helpers/print";
 
 const SalesInvoice = () => {
   const { id } = useParams();
   const navigate = useNavigate();
+  const printRef = useRef();
   const [invoiceIdToDownload, setInvoiceIdToDownload] = useState();
 
   // THIS IS THE QUERY TO GET THE INVOICE BASED ON ID
@@ -39,7 +41,7 @@ const SalesInvoice = () => {
   });
 
   return (
-    <main className="p-2 h-screen ">
+    <main className="p-2 h-screen">
       <div className="h-full w-full bg-white rounded-lg p-4 flex flex-col">
         {/* Header */}
         <header className="flex items-center justify-between">
@@ -55,6 +57,18 @@ const SalesInvoice = () => {
               <GiProfit />
               Profit Details
             </button> */}
+            <button
+              onClick={() => handlePrint(printRef)}
+              className="btn btn-sm btn-dash"
+            >
+              <Printer size={15} /> Print PDF
+            </button>
+            <button
+              onClick={() => downloadPDF(invoiceIdToDownload, "sales invoice")}
+              className="btn btn-sm"
+            >
+              <Download size={15} /> Download PDF
+            </button>
             <div className="dropdown dropdown-end">
               <div tabIndex={0} role="button" className="btn btn-sm">
                 <EllipsisVertical size={14} />
@@ -101,13 +115,7 @@ const SalesInvoice = () => {
 
         {/* Subheading */}
         <section className="flex items-center justify-between">
-          <div className="flex items-center gap-2 mt-7">
-            <button
-              onClick={() => downloadPDF(invoiceIdToDownload)}
-              className="btn btn-sm"
-            >
-              <Download size={15} /> Download PDF
-            </button>
+          <div className="flex items-center gap-2 ">
             {/* <select className="select select-sm">
               <option className="hidden">Print PDF</option>
               <option>Print PDF</option>
@@ -142,6 +150,7 @@ const SalesInvoice = () => {
               color={"#568F87"}
               invoice={invoice}
               type={"Sales Invoice"}
+              printRef={printRef}
               setInvoiceIdToDownload={setInvoiceIdToDownload}
             />
           </section>

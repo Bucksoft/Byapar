@@ -1,3 +1,4 @@
+import mongoose from "mongoose";
 import { salesInvoiceSchema } from "../config/validation.js";
 import { Item } from "../models/item.schema.js";
 import Party from "../models/party.schema.js";
@@ -8,27 +9,26 @@ export async function createSalesReturn(req, res) {
   try {
     const validatedResult = salesInvoiceSchema.safeParse(req.body);
     const data = req.body;
+
     if (!validatedResult.success) {
       const validationError = validatedResult.error.format();
       return res
         .status(422)
         .json({ success: false, msg: "Validation failed", validationError });
     }
-    const partyName = validatedResult.data?.partyName;
-    const party = await Party.findOne({
-      partyName,
-    });
 
+    const partyName = validatedResult.data?.partyName;
+    const party = await Party.findOne({ partyName });
     if (!party) {
       return res
         .status(400)
-        .json({ success: false, msg: "Party doesn't exists" });
+        .json({ success: false, msg: "Party doesn't exist" });
     }
 
     const existingSalesReturn = await SalesReturn.findOne({
       salesReturnNumber: validatedResult.data?.salesInvoiceNumber,
+      businessId: req?.params?.id,
     });
-
     if (existingSalesReturn) {
       return res.status(400).json({
         success: false,
@@ -36,15 +36,35 @@ export async function createSalesReturn(req, res) {
       });
     }
 
-    const originalInvoice = await SalesInvoice.findById(req.body?.invoiceId);
-    if (!originalInvoice) {
-      return res.status(400).json()
+    let itemsToProcess = [];
+
+    const hasInvoiceId =
+      req.body?.invoiceId &&
+      req.body.invoiceId.trim() !== "" &&
+      mongoose.isValidObjectId(req.body.invoiceId);
+
+    if (hasInvoiceId) {
+      const invoiceId = new mongoose.Types.ObjectId(req.body.invoiceId);
+      const originalInvoice = await SalesInvoice.findById(invoiceId);
+
+      if (!originalInvoice) {
+        return res
+          .status(400)
+          .json({ success: false, msg: "Original Invoice not found" });
+      }
+
+      itemsToProcess = data?.items || [];
+    } else {
+      if (!data?.items?.length) {
+        return res.status(400).json({
+          success: false,
+          msg: "No items provided for manual sales return",
+        });
+      }
+      itemsToProcess = data.items;
     }
-
-
-
-
-    for (const returnedItem of data?.items) {
+    // updating stock
+    for (const returnedItem of itemsToProcess) {
       const item = await Item.findById(returnedItem?._id);
       if (!item) {
         return res.status(404).json({
@@ -53,25 +73,65 @@ export async function createSalesReturn(req, res) {
         });
       }
 
-      await Item.findByIdAndUpdate(returnedItem?._id, {
-        $inc: { currentStock: returnedItem?.quantity },
+      await Item.findByIdAndUpdate(returnedItem._id, {
+        $inc: { currentStock: returnedItem.quantity },
       });
     }
 
-    const { _id, salesInvoiceNumber, salesInvoiceDate, ...cleanData } = data;
-    const salesReturn = await SalesReturn.create({
-      partyId: party?._id,
+    // // updating sales invoice
+    const returnTotals = itemsToProcess.reduce((acc, item) => {
+      return acc + item?.quantity * item?.salesPrice;
+    }, 0);
+
+    if (hasInvoiceId && originalInvoice) {
+      const updatedBalance = originalInvoice?.balance - returnTotals;
+
+      await SalesInvoice.findByIdAndUpdate(originalInvoice._id, {
+        $set: {
+          balance: Math.max(0, updatedBalance),
+          status: updatedBalance <= 0 ? "paid" : "unpaid",
+        },
+      });
+    }
+
+    const {
+      _id,
+      salesInvoiceNumber,
+      salesInvoiceDate,
+      invoiceId,
+      ...cleanData
+    } = data;
+
+    const salesReturnPayload = {
+      partyId: party._id,
       salesReturnNumber: validatedResult.data?.salesInvoiceNumber,
       businessId: req.params?.id,
       clientId: req.user?.id,
       ...cleanData,
-    });
+    };
 
-    if (!salesReturn) {
-      return res
-        .status(400)
-        .json({ success: false, msg: "Sales return could not be created" });
+    if (hasInvoiceId) {
+      salesReturnPayload.invoiceId = req.body.invoiceId;
     }
+
+    const salesReturn = await SalesReturn.create(salesReturnPayload);
+    if (!salesReturn) {
+      return res.status(400).json({
+        success: false,
+        msg: "Sales return could not be created",
+      });
+    }
+
+    const returnTotal = salesReturn?.balanceAmount || 0;
+
+    party.currentBalance = (party.currentBalance || 0) - returnTotal;
+
+    party.totalDebits = Math.max(0, (party.totalDebits || 0) - returnTotal);
+    party.totalInvoices = Math.max(0, (party.totalInvoices || 0) - returnTotal);
+
+    party.totalCredits = (party.totalCredits || 0) + returnTotal;
+
+    await party.save();
 
     return res.status(201).json({
       success: true,
@@ -79,8 +139,7 @@ export async function createSalesReturn(req, res) {
       salesReturn,
     });
   } catch (error) {
-    console.log("ERROR IN CREATING SALES RETURN");
-    console.log(error);
+    console.log("ERROR IN CREATING SALES RETURN", error);
     return res.status(500).json({ err: "Internal server error", error });
   }
 }

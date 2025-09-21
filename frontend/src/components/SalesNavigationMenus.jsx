@@ -9,9 +9,9 @@ const SalesNavigationMenus = ({
   setPage,
   setSearchedQuery,
   setFilterDate,
+  filterDate,
 }) => {
   const navigate = useNavigate();
-
   return (
     <main>
       {title === "Payment In" && (
@@ -27,10 +27,24 @@ const SalesNavigationMenus = ({
 
       <div className="flex justify-between mx-5 mt-5">
         <div
-          className={`flex gap-3 ${title === "Payment In" ? "w-3/6" : ""}   `}
+          className={`flex gap-3  ${
+            title === "Payment In" ||
+            title === "Sales Return" ||
+            title === "Credit Note"
+              ? "w-3/6"
+              : ""
+          }   `}
         >
           {/* search box */}
-          <div className={` ${title === "Payment In" ? "w-full" : ""}  `}>
+          <div
+            className={` ${
+              title === "Payment In" ||
+              title === "Sales Return" ||
+              title === "Credit Note"
+                ? "w-full"
+                : ""
+            }  `}
+          >
             <label className="input input-sm">
               <Search size={16} className="" />
               <input
@@ -48,15 +62,16 @@ const SalesNavigationMenus = ({
           {/* calender */}
           <select
             className="select select-sm"
+            value={filterDate}
             onChange={(e) => setFilterDate(e.target.value)}
           >
-            <option value="today" className="hidden">
-              Today
+            <option value="" disabled>
+              --Select-Day--
             </option>
             <option value="today">Today</option>
             <option value="yesterday">Yesterday</option>
-            <option value="this week">This week</option>
-            <option value="last week">Last week</option>
+            <option value="thisWeek">This week</option>
+            <option value="lastWeek">Last week</option>
           </select>
 
           {/* create quotation optional */}

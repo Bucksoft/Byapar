@@ -14,7 +14,19 @@ import toast from "react-hot-toast";
 import { useState } from "react";
 import { IoMdArrowDropdown } from "react-icons/io";
 import { useBusinessStore } from "../store/businessStore";
-import { RiMenu3Fill } from "react-icons/ri";
+import { useInvoiceStore } from "../store/invoicesStore";
+import { useItemStore } from "../store/itemStore";
+import { usePartyStore } from "../store/partyStore";
+import { usePaymentInStore } from "../store/paymentInStore";
+import { usePaymentOutStore } from "../store/paymentOutStore";
+import { useProformaInvoiceStore } from "../store/proformaStore";
+import { usePurchaseInvoiceStore } from "../store/purchaseInvoiceStore";
+import { useQuotationStore } from "../store/quotationStore";
+import { useSalesReturnStore } from "../store/salesReturnStore";
+import { useCategoryStore } from "../store/categoryStore";
+import { useChallanStore } from "../store/challanStore";
+import { BsExclamationCircle } from "react-icons/bs";
+import { useMutation } from "@tanstack/react-query";
 
 export const container = {
   hidden: { opacity: 0 },
@@ -40,18 +52,46 @@ export const dashboardLinksItems = {
 const Sidebar = () => {
   const navigate = useNavigate();
   // const [sidebarShrink, setSidebarShrink] = useState(false);
+  const { business, setBusinesses, setBusiness } = useBusinessStore();
+  const { setInvoices } = useInvoiceStore();
   const { setUser } = useAuthStore();
-  const { business } = useBusinessStore();
+  const { setItems, setItem } = useItemStore();
+  const { setDeliveryChallans } = useChallanStore();
+  const { setParties, setParty } = usePartyStore();
+  const { setPaymentIns, setPaymentIn } = usePaymentInStore();
+  const { setPaymentOuts } = usePaymentOutStore();
+  const { setProformaInvoices } = useProformaInvoiceStore();
+  const { setPurchaseInvoices } = usePurchaseInvoiceStore();
+  const { setCategories } = useCategoryStore();
+  const { setQuotations } = useQuotationStore();
+
+  const { setSaleReturns } = useSalesReturnStore();
   const [currentLink, setCurrentLink] = useState("");
 
-  const mutation = {
+  const mutation = useMutation({
     mutationFn: async () => {
       await axiosInstance.post("/user/logout");
       setUser(null);
+      setBusinesses(null);
+      setBusiness(null);
+      setInvoices(null);
+      setItems(null);
+      setParties(null);
+      setPaymentIns(null);
+      setItem(null);
+      setParty(null);
+      setPaymentIn(null);
+      setPaymentOuts(null);
+      setProformaInvoices(null);
+      setPurchaseInvoices(null);
+      setDeliveryChallans(null);
+      setQuotations(null);
+      setSaleReturns(null);
+      setCategories(null);
       navigate("/login");
       toast.success("Logged out");
     },
-  };
+  });
 
   return (
     <>
@@ -84,7 +124,7 @@ const Sidebar = () => {
         </motion.h1>
 
         {/* business details */}
-        <div className="flex gap-3 px-5 py-3 items-center border-b border-b-zinc-800">
+        <div className="flex gap-3 px-5 py-3 items-center border-b border-b-zinc-800 ">
           <div className="avatar avatar-sm">
             <div className="w-9 rounded-full">
               <img
@@ -93,10 +133,11 @@ const Sidebar = () => {
               />
             </div>
           </div>
-          <div>
-            <p className="font-medium text-sm">
-              {business?.companyEmail ||
-                business?.businessName ||
+
+          <div className="flex-1">
+            <p className="font-medium text-sm break-words whitespace-normal">
+              {business?.businessName ||
+                business?.companyEmail ||
                 "Business name"}
             </p>
             <small className="text-xs text-neutral-500">
@@ -139,7 +180,7 @@ const Sidebar = () => {
                         <span className="transition-all duration-200 group-hover:-translate-x-2">
                           {field.icon}
                         </span>
-                        <span className>{field.label}</span>
+                        <span>{field.label}</span>
                       </div>
                       <IoMdArrowDropdown className="mr-4" />
                     </NavLink>
@@ -303,23 +344,44 @@ const Sidebar = () => {
           </motion.div>
         </div>
 
+        {/* LOGOUT BUTTON */}
         <button
-          onClick={() => mutation.mutate()}
-          className="fixed bottom-0 w-1/6 flex items-center justify-center p-2 "
+          onClick={() => document.getElementById("my_modal_5").showModal()}
+          className="fixed bottom-0 w-1/6 flex items-center justify-center p-2"
         >
           <div className="flex items-center gap-3 justify-center bg-info px-5 py-2 rounded-md backdrop-blur-md w-[99%]">
-            {mutation.isPending ? (
-              <>
-                <CustomLoader text={"Logging out...."} />
-              </>
-            ) : (
-              <>
-                <TbLogout2 className="group-hover:rotate-90 transition-all ease-in-out duration-200 group-hover:scale-120" />
-                Logout
-              </>
-            )}
+            <TbLogout2 className="group-hover:rotate-90 transition-all ease-in-out duration-200 group-hover:scale-120" />
+            Logout
           </div>
         </button>
+
+        <dialog
+          id="my_modal_5"
+          className="modal modal-bottom sm:modal-middle text-black"
+        >
+          <div className="modal-box">
+            <div className="flex items-center justify-center flex-col">
+              <BsExclamationCircle size={40} className="text-red-500" />
+              <h1 className="mt-4 font-bold">Logout Confirmation</h1>
+              <p className="text-zinc-500">
+                Are you sure you want to log out from this account?
+              </p>
+            </div>
+
+            <div className="modal-action">
+              <form method="dialog">
+                {/* if there is a button in form, it will close the modal */}
+                <button className="btn btn-sm">Cancel</button>
+              </form>
+              <button
+                onClick={() => mutation.mutate()}
+                className="btn btn-sm bg-red-500 text-white hover:bg-red-500/90"
+              >
+                Logout
+              </button>
+            </div>
+          </div>
+        </dialog>
       </section>
     </>
   );

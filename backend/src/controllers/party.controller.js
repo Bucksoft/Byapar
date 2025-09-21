@@ -33,7 +33,7 @@ export async function createParty(req, res) {
     if (!validationResult.success) {
       return res.status(422).json({
         success: false,
-        msg: "Party validation failed",
+        msg: "Please fill all the details",
         validationError: validationResult.error.format(),
       });
     }
@@ -149,22 +149,39 @@ export async function createParty(req, res) {
 // get All parties
 export async function getAllParties(req, res) {
   try {
-    // FETCH THE BUSINESS ID
-    const id = req.params?.id;
-    // FETCH THE DETAILS OF THE PARTIES OF A PARTICULAR BUSINESS
-    const parties = await Party.find({
-      $and: [{ businessId: id }, { clientId: req.user?.id }],
-    });
-    //  GIVE A PROPER RESPONSE IF THERE ARE NO PARTIES
-    if (!parties) {
-      return res.status(400).json({ success: false, msg: "Parties not found" });
+    const businessId = new mongoose.Types.ObjectId(req.params?.id);
+
+    if (!businessId) {
+      return res.status(400).json({
+        success: false,
+        msg: "Business ID is required",
+      });
     }
-    // GIVE SUCCESS RESPONSE IF PARTIES ARE FOUND
-    return res.status(200).json(parties);
+
+    const parties = await Party.find({
+      businessId,
+      clientId: req.user?.id,
+    });
+
+    if (!parties || parties.length === 0) {
+      return res.status(404).json({
+        success: false,
+        msg: "No parties found for this business",
+      });
+    }
+
+    return res.status(200).json({
+      success: true,
+      count: parties.length,
+      data: parties,
+    });
   } catch (error) {
-    console.log("ERROR IN FETCHING ALL PARTIES ");
-    console.log(error);
-    return res.status(500).json({ err: "Internal server error", error });
+    console.error("❌ ERROR IN FETCHING ALL PARTIES:", error);
+    return res.status(500).json({
+      success: false,
+      msg: "Internal server error",
+      error: error.message,
+    });
   }
 }
 

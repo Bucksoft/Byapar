@@ -1,6 +1,6 @@
 import { ArrowLeft, IndianRupee, Landmark, Settings } from "lucide-react";
 import { statesAndCities } from "../utils/constants";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { axiosInstance } from "../config/axios";
 import toast from "react-hot-toast";
@@ -44,8 +44,8 @@ const DashboardAddPartyPage = () => {
     bankAndBranchName: "",
     upiId: "",
   });
-  const { setCategories } = useCategoryStore();
-
+  const { setCategories, categories: newCategories } = useCategoryStore();
+  const dropdownRef = useRef();
   // handling the input field changes
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -72,6 +72,11 @@ const DashboardAddPartyPage = () => {
   // handling actual form submission
   const mutation = useMutation({
     mutationFn: async (data) => {
+      if (!business) {
+        throw new Error(
+          "You don't have any active business yet, create one first"
+        );
+      }
       const res = await axiosInstance.post("/parties", data);
       return res.data.party;
     },
@@ -82,7 +87,31 @@ const DashboardAddPartyPage = () => {
       queryClient.invalidateQueries({ queryKey: ["parties"] });
     },
     onError: (err) => {
-      toast.error(err.response.data.msg || err.response.data.err);
+      toast.error(
+        err.response?.data?.msg || err.response?.data?.err || err.message
+      );
+    },
+  });
+
+  const categoryMutation = useMutation({
+    mutationFn: async (data) => {
+      console.log(data);
+
+      const res = await axiosInstance.post(`/category/${business?._id}`, {
+        categoryName: data,
+      });
+      return res.data;
+    },
+    onSuccess: (data) => {
+      toast.success(data?.msg);
+      setCategories([data?.newCategory, ...categories]);
+      setAddCategoryPopup(false);
+      if (dropdownRef.current) {
+        dropdownRef.current.open = false;
+      }
+    },
+    onError: (err) => {
+      toast.error(err.message);
     },
   });
 
@@ -129,7 +158,7 @@ const DashboardAddPartyPage = () => {
                 id="party_name"
                 name="partyName"
                 className="input input-sm"
-                placeholder="Enter party name"
+                placeholder="Enter Party Name"
                 disabled={mutation.isPending}
                 value={data.partyName}
                 onChange={handleInputChange}
@@ -153,7 +182,7 @@ const DashboardAddPartyPage = () => {
                 disabled={mutation.isPending}
                 value={data.mobileNumber}
                 onChange={handleInputChange}
-                placeholder="Enter mobile number"
+                placeholder="Enter Mobile Number"
               />
               <small className="text-xs text-[var(--error-text-color)] ">
                 {
@@ -174,7 +203,7 @@ const DashboardAddPartyPage = () => {
                 disabled={mutation.isPending}
                 onChange={handleInputChange}
                 className="input input-sm"
-                placeholder="Enter email"
+                placeholder="Enter Email"
               />
               <small className="text-xs text-[var(--error-text-color)] ">
                 {
@@ -249,9 +278,9 @@ const DashboardAddPartyPage = () => {
                 }
               </small>
             </div>
-            <button className="btn btn-sm mt-6 bg-[var(--secondary-btn)]">
+            {/* <button className="btn btn-sm mt-6 bg-[var(--secondary-btn)]">
               Get Details
-            </button>
+            </button> */}
             <div>
               <label htmlFor="PAN_number" className="text-xs text-zinc-700">
                 PAN Number
@@ -264,7 +293,7 @@ const DashboardAddPartyPage = () => {
                 value={data.PANno}
                 onChange={handleInputChange}
                 className="input input-sm"
-                placeholder="Enter party PAN number"
+                placeholder="Enter Party PAN Number"
               />
               <small className="text-xs text-[var(--error-text-color)] ">
                 {
@@ -274,11 +303,11 @@ const DashboardAddPartyPage = () => {
               </small>
             </div>
           </div>
-          <p className="text-xs text-zinc-500 mt-5">
+          {/* <p className="text-xs text-zinc-500 mt-5">
             Note: You can auto populate party detauls from GSTIN
-          </p>
+          </p> */}
 
-          <div className="divider" />
+          {/* <div className="divider" /> */}
 
           <div className="grid grid-cols-4 gap-3 mt-2 ">
             <div>
@@ -305,12 +334,12 @@ const DashboardAddPartyPage = () => {
                 Party Category
               </label>
 
-              <details className="dropdown mt-1 z-10">
+              <details ref={dropdownRef} className="dropdown mt-1 z-10">
                 <summary className="select select-sm">
                   {data.categoryName || "Party Category"}
                 </summary>
                 <ul className="menu dropdown-content bg-base-100 rounded-box  w-52 p-2 shadow-sm">
-                  {categories?.map((category) => (
+                  {newCategories?.map((category) => (
                     <li
                       onClick={(e) => {
                         setData((prev) => ({
@@ -318,6 +347,9 @@ const DashboardAddPartyPage = () => {
                           categoryName: e.target.innerHTML,
                         }));
                         setAddCategoryPopup(false);
+                        if (dropdownRef.current) {
+                          dropdownRef.current.open = false;
+                        }
                       }}
                       className="text-xs hover:bg-zinc-100 p-2 cursor-pointer"
                     >
@@ -439,7 +471,7 @@ const DashboardAddPartyPage = () => {
               value={data.billingAddress}
               onChange={handleInputChange}
               className="textarea w-full"
-              placeholder="Enter billing address"
+              placeholder="Enter Billing Address"
             ></textarea>
             <small className="text-xs text-[var(--error-text-color)] ">
               {
@@ -458,7 +490,7 @@ const DashboardAddPartyPage = () => {
               value={data.shippingAddress}
               onChange={handleInputChange}
               className="textarea w-full bg-zinc-300"
-              placeholder="Enter shipping address"
+              placeholder="Enter Shipping Address"
             ></textarea>
             <small className="text-xs text-[var(--error-text-color)] ">
               {
@@ -658,11 +690,7 @@ const DashboardAddPartyPage = () => {
                     Cancel
                   </button>
                   <button
-                    onClick={() => {
-                      if (data.categoryName) {
-                        setAddCategoryPopup(false);
-                      }
-                    }}
+                    onClick={() => categoryMutation.mutate(data?.categoryName)}
                     className="btn btn-sm bg-[var(--secondary-btn)]"
                   >
                     Add

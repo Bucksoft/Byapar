@@ -1,4 +1,4 @@
-import { ArrowLeft, Download, EllipsisVertical } from "lucide-react";
+import { ArrowLeft, Download, EllipsisVertical, Printer } from "lucide-react";
 import { GiProfit } from "react-icons/gi";
 import { TbFileInvoice } from "react-icons/tb";
 import { useNavigate, useParams } from "react-router-dom";
@@ -6,21 +6,22 @@ import InvoiceTemplate from "./InvoiceTemplate";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { axiosInstance } from "../../config/axios";
 import { downloadPDF } from "../../../helpers/downloadPdf";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import toast from "react-hot-toast";
 import { queryClient } from "../../main";
 import CustomLoader from "../Loader";
+import { handlePrint } from "../../../helpers/print";
 
 const SalesReturn = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const [invoiceIdToDownload, setInvoiceIdToDownload] = useState("invoice");
+  const printRef = useRef();
 
   // THIS IS THE QUERY TO GET THE INVOICE BASED ON ID
   const { isLoading, data: saleReturn } = useQuery({
     queryFn: async () => {
       const res = await axiosInstance.get(`/sales-return/return/${id}`);
-      console.log(res);
       return res.data?.saleReturn;
     },
   });
@@ -48,10 +49,23 @@ const SalesReturn = () => {
             <div className="badge badge-secondary badge-soft">Refunded</div>
           </div>
           <div className="flex items-center gap-3">
-            <button className="btn btn-sm">
+            {/* <button className="btn btn-sm">
               <GiProfit />
               Profit Details
+            </button> */}
+            <button
+              onClick={() => handlePrint(printRef)}
+              className="btn btn-sm btn-dash"
+            >
+              <Printer size={15} /> Print PDF
             </button>
+            <button
+              onClick={() => downloadPDF(invoiceIdToDownload)}
+              className="btn btn-sm"
+            >
+              <Download size={15} /> Download PDF
+            </button>
+
             <div className="dropdown dropdown-end">
               <div tabIndex={0} role="button" className="btn btn-sm">
                 <EllipsisVertical size={14} />
@@ -63,7 +77,7 @@ const SalesReturn = () => {
                 <li>
                   <button>Edit</button>
                 </li>
-                <li>
+                {/* <li>
                   <button>Edit History</button>
                 </li>
                 <li>
@@ -71,12 +85,17 @@ const SalesReturn = () => {
                 </li>
                 <li>
                   <button>Issue Credit Note</button>
-                </li>
-                <li
-                  onClick={() => mutation.mutate(id)}
-                  className="text-[var(--error-text-color)]"
-                >
-                  <button>Delete</button>
+                </li> */}
+                <li className="text-[var(--error-text-color)]">
+                  <button
+                    onClick={() => {
+                      document.getElementById("my_modal_3").showModal();
+                      setInvoiceIdToDelete(invoice?._id);
+                    }}
+                    className="text-error"
+                  >
+                    Delete
+                  </button>
                 </li>
               </ul>
             </div>
@@ -85,14 +104,8 @@ const SalesReturn = () => {
 
         {/* Subheading */}
         <section className="flex items-center justify-between">
-          <div className="flex items-center gap-2 mt-7">
-            <button
-              onClick={() => downloadPDF(invoiceIdToDownload)}
-              className="btn btn-sm"
-            >
-              <Download size={15} /> Download PDF
-            </button>
-            <select className="select select-sm">
+          <div className="flex items-center gap-2 ">
+            {/* <select className="select select-sm">
               <option className="hidden">Print PDF</option>
               <option>Print PDF</option>
               <option>Print Thermal</option>
@@ -104,21 +117,23 @@ const SalesReturn = () => {
               <option className="hidden">Share</option>
               <option>Whatsapp</option>
               <option>SMS</option>
-            </select>
+            </select> */}
           </div>
 
-          <div className="flex items-center gap-2">
+          {/* <div className="flex items-center gap-2">
             <button className="btn btn-sm btn-soft btn-info">
               Generate E-way Bill
             </button>
             <button className="btn btn-sm btn-soft btn-info">
               <TbFileInvoice /> Generate e-Invoice
             </button>
-          </div>
+          </div> */}
         </section>
 
         {isLoading ? (
-          <CustomLoader text={"Loading..."} />
+          <div className="w-full flex justify-center py-16">
+            <CustomLoader text={"Loading..."} />
+          </div>
         ) : (
           <section className="mt-3 bg-zinc-100 flex justify-center py-1 overflow-y-scroll flex-1">
             {/* Invoice template */}
@@ -127,10 +142,33 @@ const SalesReturn = () => {
               color={"green"}
               invoice={saleReturn}
               setInvoiceIdToDownload={setInvoiceIdToDownload}
+              printRef={printRef}
             />
           </section>
         )}
       </div>
+      <dialog id="my_modal_3" className="modal">
+        <div className="modal-box">
+          <form method="dialog">
+            <button className="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">
+              ✕
+            </button>
+          </form>
+          <h3 className="font-bold text-lg">Are you sure ?</h3>
+          <p className="py-4">
+            This action cannot be undone. All values associated with this field
+            will be lost.
+          </p>
+          <div className="w-full grid place-items-end">
+            <button
+              onClick={() => mutation.mutate()}
+              className="btn btn-sm bg-[var(--error-text-color)] text-[var(--primary-text-color)]"
+            >
+              Delete
+            </button>
+          </div>
+        </div>
+      </dialog>
     </main>
   );
 };

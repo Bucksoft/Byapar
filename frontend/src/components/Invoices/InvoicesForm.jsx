@@ -26,6 +26,8 @@ const InvoicesForm = ({
   const { business } = useBusinessStore();
   const { invoices } = useInvoiceStore();
   const { quotations } = useQuotationStore();
+  const [quantities, setQuantities] = useState({});
+
   const invoiceNoRef = useRef();
   const invoiceData = {
     paymentTerms: 0,
@@ -76,6 +78,11 @@ const InvoicesForm = ({
 
   const mutation = useMutation({
     mutationFn: async (formData) => {
+      if (!business) {
+        throw new Error(
+          "You don't have any active business yet, create one first"
+        );
+      }
       if (!party) {
         throw new Error("Please select a party");
       }
@@ -169,10 +176,6 @@ const InvoicesForm = ({
     },
   });
 
-  // add near your other useState declarations
-  const [quantities, setQuantities] = useState({});
-
-  // --- normalize invoiceToUpdate when editing and seed addedItems + quantities + data ---
   useEffect(() => {
     if (isEditing && invoiceToUpdate) {
       // Normalize items coming from backend (ensure numeric fields & quantity)
@@ -259,8 +262,6 @@ const InvoicesForm = ({
         </div>
       </header>
       {/* navbar ends ----------------------------------------------------- */}
-
-      {/* Upper section of invoice form invoice number, dates , party name details etc */}
       <SalesInvoicePartyDetailsSection
         data={data}
         setData={setData}
@@ -270,9 +271,7 @@ const InvoicesForm = ({
         invoiceNoRef={invoiceNoRef}
         isEditing={isEditing}
       />
-      {/* Upper section of invoice form invoice number, dates , party name details etc ends here ---------------------------------------*/}
 
-      {/* This is the table where items are listed with their prices ----------------------------*/}
       <SalesInvoiceItemTable
         title={title}
         data={data}

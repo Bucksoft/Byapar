@@ -77,7 +77,7 @@ const DashboardPaymentOutPage = () => {
                   <CustomLoader text={"Loading..."} />
                 </div>
               ) : paymentOuts?.length > 0 ? (
-                <table className="table ">
+                <table className="table table-zebra">
                   <thead>
                     <tr className="text-xs bg-zinc-100">
                       <th>Date</th>

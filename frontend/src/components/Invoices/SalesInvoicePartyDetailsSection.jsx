@@ -40,6 +40,7 @@ const SalesInvoicePartyDetailsSection = ({
     }));
   };
 
+  // this use effect fetches all the invoices of the selected party
   useEffect(() => {
     if (title === "Sales Return") {
       const selectedPartyInvoices = invoices.filter(
@@ -139,7 +140,6 @@ const SalesInvoicePartyDetailsSection = ({
           </div>
         </div>
 
-        
         {/* third block */}
         <div className="border-t border-r border-zinc-300 pt-1 relative">
           {/* upper part */}
@@ -353,7 +353,7 @@ const SalesInvoicePartyDetailsSection = ({
                 <>
                   <div className="absolute text-xs mt-1 mx-2 rounded-sm shadow-md z-100 bg-white shadow-zinc-500 w-3/4 ">
                     <div className="overflow-x-auto">
-                      <table className="table table-xs">
+                      <table className="table table-xs table-zebra">
                         {/* head */}
                         <thead>
                           <tr className="text-xs bg-zinc-100">

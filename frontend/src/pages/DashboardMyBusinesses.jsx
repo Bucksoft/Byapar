@@ -10,6 +10,7 @@ import toast from "react-hot-toast";
 import { useState } from "react";
 import { queryClient } from "../main";
 import { BsTrash3 } from "react-icons/bs";
+import businessImg from "../assets/business.svg";
 
 const DashboardMyBusinesses = () => {
   const {
@@ -50,7 +51,19 @@ const DashboardMyBusinesses = () => {
     },
     onSuccess: (data) => {
       toast.success(data?.msg);
-      queryClient.invalidateQueries({ queryKey: ["business"] });
+      queryClient.invalidateQueries({
+        queryKey: [
+          "business",
+          "invoices",
+          "quotations",
+          "paymentIns",
+          "deliveryChallans",
+          "proformaInvoice",
+          "items",
+          "parties",
+          id,
+        ],
+      });
     },
   });
 
@@ -59,13 +72,15 @@ const DashboardMyBusinesses = () => {
       <div className="h-full w-full bg-white rounded-lg p-3">
         <div className="flex items-center justify-between">
           <h1 className="font-semibold">My Businesses</h1>
-          <button
-            onClick={() => navigate("/dashboard/business")}
-            className="btn btn-sm bg-[var(--primary-btn)]"
-          >
-            {" "}
-            <Plus size={15} /> Create new business
-          </button>
+          {businesses && businesses.length > 0 && (
+            <button
+              onClick={() => navigate("/dashboard/business")}
+              className="btn btn-sm bg-[var(--primary-btn)]"
+            >
+              {" "}
+              <Plus size={15} /> Create new business
+            </button>
+          )}
         </div>
 
         {/* Businesses Cards */}
@@ -76,6 +91,7 @@ const DashboardMyBusinesses = () => {
         ) : (
           <section className="grid grid-cols-3 gap-3 py-8">
             {businesses &&
+              businesses.length > 0 &&
               businesses.map((business) => (
                 <div
                   key={business?._id}
@@ -112,11 +128,12 @@ const DashboardMyBusinesses = () => {
                       Business Details :
                     </h3>
                     <div className="grid grid-cols-2 gap-2 min-h-[120px]">
-                      <p className="text-xs mt-1 p-2 bg-white border border-zinc-200 rounded-lg inset-shadow-2xs shadow-lg hover:scale-105 transition-all">
+                      <p className="text-xs mt-1 p-2 bg-white border border-zinc-200 rounded-lg inset-shadow-2xs shadow-lg hover:scale-105 transition-all break-all whitespace-normal">
                         <span className="text-zinc-500 font-medium">
                           Company email
                         </span>
-                        <br /> {business?.companyEmail}
+                        <br />
+                        {business?.companyEmail}
                       </p>
 
                       <p className="text-xs mt-1 p-2 bg-white border border-zinc-200 rounded-lg inset-shadow-2xs shadow-lg hover:scale-105 transition-all">
@@ -237,6 +254,23 @@ const DashboardMyBusinesses = () => {
               ))}
           </section>
         )}
+        <div className="w-full flex justify-center py-16">
+          {businesses && businesses.length <= 0 && (
+            <div className="flex flex-col items-center">
+              <img src={businessImg} alt="businessBackground" width={400} />
+              <h1 className="text-xl font-semibold text-zinc-600">
+                Create your first business
+              </h1>
+              <button
+                onClick={() => navigate("/dashboard/business")}
+                className="btn btn-sm bg-[var(--primary-btn)] mt-5"
+              >
+                {" "}
+                <Plus size={15} /> Create new business
+              </button>
+            </div>
+          )}
+        </div>
       </div>
     </main>
   );

@@ -33,11 +33,15 @@ const OtpInputForm = ({ email }) => {
         </small>
         <input
           type="text"
+          inputMode="numeric"
+          pattern="\d*"
           placeholder="OTP"
           value={otp}
-          onChange={(e) => setOtp(e.target.value)}
-          className="input input-sm mt-2 bg-zinc-100 rounded-full "
+          maxLength={6}
+          onChange={(e) => setOtp(e.target.value.replace(/\D/g, ""))}
+          className="input input-sm mt-2 bg-zinc-100 rounded-full"
         />
+
         {mutation.isError && (
           <p className="text-xs text-red-500">
             {mutation.error.response.data.err}

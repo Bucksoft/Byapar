@@ -2,16 +2,23 @@ import { useMutation, useQuery } from "@tanstack/react-query";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { axiosInstance } from "../config/axios";
 import { usePaymentInStore } from "../store/paymentInStore";
-import { ArrowLeft, Download, SquarePen } from "lucide-react";
+import { ArrowLeft, Download, Printer, SquarePen } from "lucide-react";
 import { BsTrash3 } from "react-icons/bs";
 import { LiaRupeeSignSolid } from "react-icons/lia";
 import toast from "react-hot-toast";
 import { queryClient } from "../main";
 import CustomLoader from "../components/Loader";
+import { useState } from "react";
+import PaymentInTemplate from "../components/Invoices/PaymentIn";
+import { downloadPDF } from "../../helpers/downloadPdf";
+import { useRef } from "react";
+import { handlePrint } from "../../helpers/print";
 
 const DashboardPaymentInDetails = () => {
   const { id } = useParams();
   const { setPaymentIn } = usePaymentInStore();
+  const [paymentInIdToDownload, setPaymentIdToDownload] = useState("");
+  const printRef = useRef();
   const navigate = useNavigate();
 
   const { isLoading, data: PaymentIn } = useQuery({
@@ -43,7 +50,7 @@ const DashboardPaymentInDetails = () => {
   });
 
   return (
-    <main className="h-full p-2">
+    <main className="h-full p-2 relative">
       <section className="h-full w-full bg-white rounded-lg p-3">
         {/* HEADER */}
         <header className="flex items-center justify-between">
@@ -100,16 +107,22 @@ const DashboardPaymentInDetails = () => {
 
         {/* MENUS */}
         <section className="flex items-center gap-2 mt-7 w-3/4 ">
-          <button className="btn btn-sm">
+          <button
+            className="btn btn-sm"
+            onClick={() => {
+              setPaymentIdToDownload(PaymentIn?.paymentIn?._id);
+              document.getElementById("my_modal_1").showModal();
+            }}
+          >
             <Download size={15} /> Download PDF
           </button>
-          <select className="select select-sm w-1/6">
-            <option className="hidden">Print PDF</option>
-            <option>Print PDF</option>
-            <option>Print Thermal</option>
-            <option>Print Duplicate</option>
-            <option>Print Triplicate</option>
-          </select>
+
+          <button
+            onClick={() => handlePrint(printRef)}
+            className="btn btn-sm btn-dash"
+          >
+            <Printer size={15} /> Print
+          </button>
 
           <select onChange={handleShare} className="select select-sm w-1/6">
             <option className="hidden">Share</option>
@@ -166,7 +179,7 @@ const DashboardPaymentInDetails = () => {
               </div>
 
               <div className="overflow-x-auto">
-                <table className="table">
+                <table className="table table-zebra">
                   {/* head */}
                   <thead>
                     <tr className="bg-zinc-200">
@@ -212,6 +225,27 @@ const DashboardPaymentInDetails = () => {
           </>
         )}
       </section>
+      <dialog id="my_modal_1" className="modal">
+        <div className="modal-box w-11/12 max-w-5xl">
+          <PaymentInTemplate
+            data={PaymentIn}
+            id={paymentInIdToDownload}
+            printRef={printRef}
+          />
+          <div className="modal-action">
+            <form method="dialog">
+              {/* if there is a button in form, it will close the modal */}
+              <button className="btn btn-sm">Close</button>
+            </form>
+            <button
+              onClick={() => downloadPDF(paymentInIdToDownload, "payment in")}
+              className="btn btn-sm btn-info"
+            >
+              <Download size={15} /> Download
+            </button>
+          </div>
+        </div>
+      </dialog>
     </main>
   );
 };

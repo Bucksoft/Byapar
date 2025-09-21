@@ -15,7 +15,8 @@ const DashboardCard = ({ details }) => {
       >
         {details.content}
       </p>
-      <button className="btn btn-sm mt-8">{details.btnText}</button>
+      {/* <button className="btn btn-sm mt-8">{details.btnText}</button> */}
+      <button className="btn btn-sm mt-8">Coming Soon</button>
     </div>
   );
 };

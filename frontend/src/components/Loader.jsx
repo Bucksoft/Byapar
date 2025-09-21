@@ -4,10 +4,10 @@ const CustomLoader = ({ text }) => {
       className={`flex items-center gap-2  ${
         text === "Deleting..."
           ? "text-[var(--error-text-color)]"
-          : "text-zinc-800"
+          : "text-zinc-600"
       }  text-xs`}
     >
-      <span className="loading loading-dots loading-xs"></span> {text}
+      <span className="loading loading-dots loading-sm"></span> {text}
     </div>
   );
 };

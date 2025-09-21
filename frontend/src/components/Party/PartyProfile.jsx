@@ -53,7 +53,7 @@ const PartyProfile = ({ party }) => {
           </div>
           <div>
             <label className="text-zinc-500">PAN Number</label>
-            <p className="mt-1">{party?.PANno}</p>
+            <p className="mt-1">{party?.PANno || "-"}</p>
           </div>
           <div>
             <label className="text-zinc-500">Billing Address</label>
@@ -91,7 +91,7 @@ const PartyProfile = ({ party }) => {
       </div>
 
       {/* credit details */}
-      <div className=" border border-zinc-200 rounded-md">
+      {/* <div className=" border border-zinc-200 rounded-md">
         <h1 className="font-medium bg-zinc-100 border-b p-2 border-zinc-200">
           Party Bank Details
         </h1>
@@ -104,7 +104,7 @@ const PartyProfile = ({ party }) => {
             </p>
           </div>
         </div>
-      </div>
+      </div> */}
     </section>
   );
 };

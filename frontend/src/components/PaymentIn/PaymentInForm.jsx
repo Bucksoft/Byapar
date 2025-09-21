@@ -19,7 +19,7 @@ const PaymentInForm = () => {
   const { parties, setParty } = usePartyStore();
   const { invoices } = useInvoiceStore();
   const { business } = useBusinessStore();
-  const { paymentIns } = usePaymentInStore();
+  const { paymentIns, setPaymentIns } = usePaymentInStore();
   const [selectedParty, setSelectedParty] = useState();
   const [paymentInToEdit, setPaymentInToEdit] = useState();
   const [totalInvoiceAmount, setTotalInvoiceAmount] = useState(0);
@@ -32,7 +32,7 @@ const PaymentInForm = () => {
     paymentAmount: 0,
     paymentDate: new Date(Date.now()),
     paymentMode: "cash",
-    paymentInNumber: 1,
+    paymentInNumber: paymentIns.length + 1 || 1,
     notes: "",
     settledInvoices: {},
   });
@@ -127,11 +127,10 @@ const PaymentInForm = () => {
       } else {
         res = await axiosInstance.post(`/payment-in/${business?._id}`, data);
       }
-
       return res.data;
     },
     onSuccess: (data) => {
-      toast.success(data.msg || "Payment In recorded successfully");
+      toast.success(data?.msg || "Payment In recorded successfully");
       setParty(data);
       navigate("/dashboard/payment-in");
       queryClient.invalidateQueries({ queryKey: ["paymentIns", "invoices"] });
@@ -312,7 +311,7 @@ const PaymentInForm = () => {
           {allInvoices.length > 0 && (
             <div className="overflow-x-auto border border-zinc-300 rounded-lg">
               <p className="p-4 font-medium">Settle invoices</p>
-              <table className="table w-full ">
+              <table className="table w-full table-zebra">
                 {/* head */}
                 <thead>
                   <tr className="bg-[var(--primary-background)] ">

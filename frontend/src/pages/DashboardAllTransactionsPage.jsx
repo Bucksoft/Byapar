@@ -38,7 +38,7 @@ const DashboardAllTransactionsPage = () => {
         </div>
 
         <div className="overflow-x-auto">
-          <table className="table mt-5 table-sm">
+          <table className="table mt-5 table-sm table-zebra">
             {/* head */}
             <thead>
               <tr className="bg-[var(--primary-background)]">
