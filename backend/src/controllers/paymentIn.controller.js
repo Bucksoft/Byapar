@@ -136,6 +136,7 @@ export async function createPaymentIn(req, res) {
 
 export async function getAllPaymentInDetails(req, res) {
   try {
+    const totalPaymentIns = await PaymentIn.countDocuments({});
     const paymentIns = await PaymentIn.find({
       $and: [
         {
@@ -151,7 +152,7 @@ export async function getAllPaymentInDetails(req, res) {
         .status(400)
         .json({ success: false, msg: "Payment In details not found" });
     }
-    return res.status(200).json({ success: true, paymentIns });
+    return res.status(200).json({ success: true, paymentIns, totalPaymentIns });
   } catch (error) {
     console.error("ERROR IN GETTING PAYMENT IN DETAILS :", error);
     return res

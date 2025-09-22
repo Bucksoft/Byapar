@@ -14,6 +14,7 @@ import CustomLoader from "../Loader";
 import { BsFillSaveFill } from "react-icons/bs";
 import { useInvoiceStore } from "../../store/invoicesStore";
 import { useQuotationStore } from "../../store/quotationStore";
+import { useSalesReturnStore } from "../../store/salesReturnStore";
 
 const InvoicesForm = ({
   title,
@@ -24,8 +25,9 @@ const InvoicesForm = ({
   invoiceToUpdate,
 }) => {
   const { business } = useBusinessStore();
-  const { invoices } = useInvoiceStore();
-  const { quotations } = useQuotationStore();
+  const { totalInvoices } = useInvoiceStore();
+  const { totalQuotations } = useQuotationStore();
+  const { totalSalesReturn } = useSalesReturnStore();
   const [quantities, setQuantities] = useState({});
 
   const invoiceNoRef = useRef();
@@ -37,9 +39,11 @@ const InvoicesForm = ({
     salesInvoiceDate: new Date(Date.now()),
     salesInvoiceNumber:
       title === "Sales Invoice"
-        ? invoices?.length + 1
+        ? totalInvoices + 1
         : title === "Quotation"
-        ? quotations.length + 1
+        ? totalQuotations + 1
+        : title === "Sales Return"
+        ? totalSalesReturn + 1
         : 1,
     partyName: party?.partyName || "",
     items: [],
@@ -234,7 +238,7 @@ const InvoicesForm = ({
   return (
     <main className="max-h-screen w-full">
       {/* navbar starts ----------------------------------------------------- */}
-      <header className="p-2 w-full flex items-center justify-between ">
+      <header className="p-2 w-full flex items-center justify-between">
         <div className="flex items-center justify-center">
           <ArrowLeft size={18} onClick={() => navigate(-1)} />
           <span className="pl-3">

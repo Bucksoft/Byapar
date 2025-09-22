@@ -4,9 +4,11 @@ import { LiaRupeeSignSolid } from "react-icons/lia";
 import { useItemStore } from "../../store/itemStore";
 import { Link } from "react-router-dom";
 import { FaBarcode } from "react-icons/fa6";
-import { CircleX, Percent } from "lucide-react";
+import { CircleX, Percent, Plus } from "lucide-react";
 import { useInvoiceStore } from "../../store/invoicesStore";
 import { usePurchaseInvoiceStore } from "../../store/purchaseInvoiceStore";
+import DashboardItemsSidebar from "../../pages/Items/DashboardItemsSidebar";
+import { HiMiniMinusSmall, HiOutlinePlus } from "react-icons/hi2";
 
 const SalesInvoiceItemTable = ({ title, data, setData, isEditing }) => {
   const [searchItemQuery, setSearchItemQuery] = useState("");
@@ -70,7 +72,6 @@ const SalesInvoiceItemTable = ({ title, data, setData, isEditing }) => {
     );
   };
 
-  // MAIN CALCULATION HERE 👇👇👇
   useEffect(() => {
     if (!addedItems?.length) return;
 
@@ -391,23 +392,23 @@ const SalesInvoiceItemTable = ({ title, data, setData, isEditing }) => {
 
         <div className="w-7/10 ">
           <button
-            onClick={() => document.getElementById("my_modal_1").showModal()}
+            onClick={() => document.getElementById("my_modal_10").showModal()}
             className="btn btn-info  btn-dash w-full hover:bg-none"
           >
             + Add Item
           </button>
 
-          <dialog id="my_modal_1" className="modal">
+          <dialog id="my_modal_10" className="modal">
             <div className="modal-box max-w-5xl p-0">
               <h3 className="font-semibold text-lg bg-zinc-100 p-2">
                 Add Items
               </h3>
               <div className="p-4">
-                <div className="flex items-center gap-3">
+                <div className="flex items-center gap-3 justify-between">
                   <input
                     type="text"
                     placeholder="Search Items"
-                    className="input input-sm w-1/2"
+                    className="input input-sm "
                     value={searchItemQuery}
                     onChange={(e) => setSearchItemQuery(e.target.value)}
                   />
@@ -418,12 +419,31 @@ const SalesInvoiceItemTable = ({ title, data, setData, isEditing }) => {
                     <option disabled={true}>Select Category</option>
                     <option>Crimson</option>
                   </select> */}
-                  <Link
-                    to={"/dashboard/items/basic-details"}
-                    className="btn btn-dash btn-info btn-sm  w-1/2"
-                  >
-                    Create New Item
-                  </Link>
+                  <div>
+                    <button
+                      // to={"/dashboard/items/basic-details"}
+                      onClick={() =>
+                        document.getElementById("my_modal_3").showModal()
+                      }
+                      className="btn btn-sm btn-outline btn-info"
+                    >
+                      <Plus size={14} /> Create Item
+                    </button>
+
+                    <dialog id="my_modal_3" className="modal">
+                      <div className="modal-box w-11/12 max-w-5xl h-3/4">
+                        <DashboardItemsSidebar
+                          // data={items}
+                          modalId={"my_modal_3"}
+                        />
+                        {/* <div className="modal-action">
+                  <form method="dialog">
+                    <button className="btn">Close</button>
+                  </form>
+                </div> */}
+                      </div>
+                    </dialog>
+                  </div>
                 </div>
 
                 <div className="overflow-x-auto mt-4  rounded-box border border-base-content/5 bg-base-100">
@@ -436,7 +456,7 @@ const SalesInvoiceItemTable = ({ title, data, setData, isEditing }) => {
                         <th>Sales Price</th>
                         <th>Purchase Price</th>
                         <th>Current Stock</th>
-                        <th>Quantity</th>
+                        <th className="text-center">Quantity</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -455,53 +475,64 @@ const SalesInvoiceItemTable = ({ title, data, setData, isEditing }) => {
                             <td>{item?.currentStock || "-"}</td>
                             <td>
                               {showCounterId === item?._id ? (
-                                <div className="flex justify-center">
+                                <div className="flex items-center justify-center space-x-2">
+                                  {/* Counter Box */}
+                                  <div className="flex items-center bg-white border border-gray-300 rounded-xl shadow-sm overflow-hidden">
+                                    {/* Minus Button */}
+                                    <button
+                                      onClick={() =>
+                                        setQuantities((prev) => ({
+                                          ...prev,
+                                          [item._id]: Math.max(
+                                            (prev[item._id] || 1) - 1,
+                                            0
+                                          ),
+                                        }))
+                                      }
+                                      className="px-3 py-2 bg-[var(--primary-btn)] hover:bg-[var(--primary-btn)]/90 transition-colors text-white"
+                                    >
+                                      <HiMiniMinusSmall className="w-4 h-4" />
+                                    </button>
+
+                                    {/* Input */}
+                                    <input
+                                      type="number"
+                                      min={0}
+                                      value={quantities[item._id] || 1}
+                                      onChange={(e) =>
+                                        setQuantities((prev) => ({
+                                          ...prev,
+                                          [item._id]: Number(e.target.value),
+                                        }))
+                                      }
+                                      placeholder="0"
+                                      className="w-12 text-center text-sm font-medium outline-none border-x border-gray-200"
+                                    />
+
+                                    {/* Plus Button */}
+                                    <button
+                                      onClick={() =>
+                                        setQuantities((prev) => ({
+                                          ...prev,
+                                          [item._id]: (prev[item._id] || 1) + 1,
+                                        }))
+                                      }
+                                      className="px-3 py-2 bg-[var(--primary-btn)] hover:bg-[var(--primary-btn)]/90 transition-colors text-white"
+                                    >
+                                      <HiOutlinePlus className="w-4 h-4" />
+                                    </button>
+                                  </div>
+
+                                  {/* Remove Icon */}
                                   <button
-                                    onClick={() =>
-                                      setQuantities((prev) => ({
-                                        ...prev,
-                                        [item._id]: Math.max(
-                                          (prev[item._id] || 1) - 1,
-                                          0
-                                        ),
-                                      }))
-                                    }
-                                    className="btn btn-xs btn-info"
-                                  >
-                                    -
-                                  </button>
-
-                                  <input
-                                    type="number"
-                                    min={0}
-                                    value={quantities[item._id] || 1}
-                                    onChange={(e) =>
-                                      setQuantities((prev) => ({
-                                        ...prev,
-                                        [item._id]: Number(e.target.value),
-                                      }))
-                                    }
-                                    placeholder="0"
-                                    className="input input-xs w-15 text-center"
-                                  />
-
-                                  <button
-                                    onClick={() =>
-                                      setQuantities((prev) => ({
-                                        ...prev,
-                                        [item._id]: (prev[item._id] || 1) + 1,
-                                      }))
-                                    }
-                                    className="btn btn-xs btn-info"
-                                  >
-                                    +
-                                  </button>
-
-                                  <CircleX
-                                    size={18}
-                                    className="ml-2"
                                     onClick={() => setShowCounterId(false)}
-                                  />
+                                    className="p-2 rounded-full hover:bg-red-100 transition-colors"
+                                  >
+                                    <CircleX
+                                      size={18}
+                                      className="text-red-500"
+                                    />
+                                  </button>
                                 </div>
                               ) : (
                                 <button
@@ -512,7 +543,7 @@ const SalesInvoiceItemTable = ({ title, data, setData, isEditing }) => {
                                       [item._id]: prev[item._id] ?? 1,
                                     }));
                                   }}
-                                  className="btn btn-xs w-full "
+                                  className="btn btn-xs w-full btn-dash"
                                 >
                                   Add
                                 </button>

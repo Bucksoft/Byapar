@@ -1,12 +1,19 @@
 import { ChevronDown, IndianRupee, Search } from "lucide-react";
 import { gstRates, uomList } from "../../utils/constants";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { motion } from "framer-motion";
 import { useCategoryStore } from "../../store/categoryStore";
+import { useBusinessStore } from "../../store/businessStore";
+import { useMutation } from "@tanstack/react-query";
+import { axiosInstance } from "../../config/axios";
+import { queryClient } from "../../main";
+import toast from "react-hot-toast";
 
 const DashboardItemsBasicDetailPage = ({ data, setData, err }) => {
   const [showAddCategoryPopup, setShowAddCategoryPopup] = useState(false);
-  const { categories } = useCategoryStore();
+  const { business } = useBusinessStore();
+  const dropdownRef = useRef();
+  const { categories, setCategories } = useCategoryStore();
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -16,14 +23,37 @@ const DashboardItemsBasicDetailPage = ({ data, setData, err }) => {
     }));
   };
 
+  // ADD CATEGORY MUTATION
+  const categoryMutation = useMutation({
+    mutationFn: async (data) => {
+      const res = await axiosInstance.post(`/category/${business?._id}`, {
+        categoryName: data,
+      });
+      return res.data;
+    },
+    onSuccess: (data) => {
+      console.log(data);
+      setShowAddCategoryPopup(false);
+      toast.success(data?.msg);
+      setCategories([data?.newCategory, ...categories]);
+      // if (dropdownRef.current) {
+      //   dropdownRef.current.open = false;
+      // }
+      queryClient.invalidateQueries({ queryKey: ["category"] });
+    },
+    onError: (err) => {
+      toast.error(err.message);
+    },
+  });
+
   return (
     <main className="grid grid-cols-2 gap-15">
       {/* left container */}
       <div className="">
         <div className=" flex flex-col">
           <p className="text-xs text-gray-600">Item Type </p>
-          <div className="h-full flex">
-            <p className="px-2 py-2 text-xs text-gray-600 w-1/2 mt-2 border border-[var(--primary-border)] rounded-xs flex items-center justify-between">
+          <div className="h-full flex gap-2">
+            <p className="px-2 py-2 text-xs text-gray-600 w-1/2 border border-[var(--primary-border)] rounded-xs flex items-center justify-between">
               {" "}
               Product
               <input
@@ -31,18 +61,18 @@ const DashboardItemsBasicDetailPage = ({ data, setData, err }) => {
                 name="itemType"
                 value={"product"}
                 onChange={handleInputChange}
-                checked={data.itemType === "product"}
+                checked={data?.itemType === "product"}
                 className="radio radio-xs"
               />
             </p>
-            <p className="px-2 text-xs text-gray-600 w-1/2 mt-2 border border-[var(--primary-border)] rounded-xs ml-5 flex items-center justify-between">
+            <p className="px-2 py-2 text-xs text-gray-600 w-1/2 border border-[var(--primary-border)] rounded-xs flex items-center justify-between">
               {" "}
               Services
               <input
                 type="radio"
                 value={"service"}
                 onChange={handleInputChange}
-                checked={data.itemType === "service"}
+                checked={data?.itemType === "service"}
                 name="itemType"
                 className="radio radio-xs"
               />
@@ -52,7 +82,7 @@ const DashboardItemsBasicDetailPage = ({ data, setData, err }) => {
 
         <div className=" flex flex-col mt-5">
           <p className="text-xs text-gray-600">
-            {data.itemType === "product" ? (
+            {data?.itemType === "product" ? (
               <>
                 Item Name <span className="text-red-500">*</span>{" "}
               </>
@@ -65,7 +95,7 @@ const DashboardItemsBasicDetailPage = ({ data, setData, err }) => {
           <div className="">
             <input
               type="text"
-              value={data.itemName}
+              value={data?.itemName}
               name="itemName"
               onChange={handleInputChange}
               placeholder="eg: Apple 5kg size"
@@ -83,7 +113,7 @@ const DashboardItemsBasicDetailPage = ({ data, setData, err }) => {
             <IndianRupee size={16} className="text-gray-600 w-10" />
             <input
               type="text"
-              value={data.salesPrice}
+              value={data?.salesPrice}
               name="salesPrice"
               onChange={(e) =>
                 setData((prev) => ({
@@ -96,7 +126,7 @@ const DashboardItemsBasicDetailPage = ({ data, setData, err }) => {
             />
             <select
               name="salesPriceType"
-              value={data.salesPriceType}
+              value={data?.salesPriceType}
               onChange={(e) =>
                 setData((prev) => ({
                   ...prev,
@@ -118,7 +148,7 @@ const DashboardItemsBasicDetailPage = ({ data, setData, err }) => {
             <select
               name="measuringUnit"
               className="select select-sm w-full"
-              value={data.measuringUnit}
+              value={data?.measuringUnit}
               onChange={handleInputChange}
             >
               {uomList.map((unit, index) => (
@@ -137,57 +167,48 @@ const DashboardItemsBasicDetailPage = ({ data, setData, err }) => {
       {/* right container */}
       <div className="flex flex-col justify-between">
         <div className="flex flex-col">
-          <span className="text-xs text-gray-600">Category</span>
-          <div className="flex items-center h-8 border border-[var(--primary-border)] rounded-xs mt-2">
-            <input
-              type="text"
-              value={data.category}
-              readOnly
-              placeholder="Select Category"
-              className="w-full text-xs outline-none pl-3"
-            />
-            <div
-              value={data.category}
-              onChange={handleInputChange}
-              name="category"
-              className="dropdown dropdown-end w-5 mr-5"
-            >
-              <div
-                tabIndex={0}
-                role="button"
-                className="text-xs font-medium flex items-center justify-between text-gray-600"
-              >
-                <ChevronDown size={20} className="text-gray-600" />
-              </div>
-              <ul
-                tabIndex={0}
-                className="dropdown-content menu bg-base-100 rounded-box z-1 w-52 p-2 shadow-xs text-gray-600"
-              >
-                {categories &&
-                  categories.map((category) => (
-                    <li
-                      onClick={(e) =>
-                        setData((prev) => ({
-                          ...prev,
-                          category: e.target.innerHTML,
-                        }))
+          <div className="flex flex-col mt-1">
+            <label htmlFor="category" className="text-xs text-zinc-700 ">
+              Category
+            </label>
+
+            <details ref={dropdownRef} className="dropdown mt-1 z-10">
+              <summary className="select select-sm">
+                {data?.category || "Category"}
+              </summary>
+              <ul className="menu dropdown-content bg-base-100 rounded-box  w-52 p-2 shadow-sm">
+                {categories?.map((category) => (
+                  <li
+                    onClick={(e) => {
+                      setData((prev) => ({
+                        ...prev,
+                        category: e.target.innerHTML,
+                      }));
+                      setShowAddCategoryPopup(false);
+                      if (dropdownRef.current) {
+                        dropdownRef.current.open = false;
                       }
-                      className="p-2 hover:bg-zinc-100 mb-1 cursor-pointer rounded-md"
-                    >
-                      {category?.categoryName}
-                    </li>
-                  ))}
-                {/* Open the modal using document.getElementById('ID').showModal() method */}
+                    }}
+                    className="text-xs hover:bg-zinc-100 p-2 cursor-pointer"
+                  >
+                    {category?.categoryName}
+                  </li>
+                ))}
+
                 <button
-                  className="btn btn-dash btn-sm btn-info"
-                  onClick={() => {
-                    setShowAddCategoryPopup(true);
-                  }}
+                  onClick={() => setShowAddCategoryPopup(true)}
+                  className="btn btn-sm btn-dash btn-info mt-2"
                 >
                   Add Category
                 </button>
               </ul>
-            </div>
+            </details>
+            {/* <small className="text-xs text-[var(--error-text-color)] mt-1 ">
+              {
+                categoryMutation.error?.response?.data?.validationError?.categoryName
+                  ?._errors[0]
+              }
+            </small> */}
           </div>
         </div>
 
@@ -210,7 +231,7 @@ const DashboardItemsBasicDetailPage = ({ data, setData, err }) => {
               className="w-full text-xs outline-none"
             /> */}
             <select
-              value={data.gstTaxRate}
+              value={data?.gstTaxRate}
               onChange={handleInputChange}
               className="select select-sm w-full"
               name="gstTaxRate"
@@ -233,7 +254,7 @@ const DashboardItemsBasicDetailPage = ({ data, setData, err }) => {
             <div className="">
               <input
                 name="openingStock"
-                value={data.openingStock}
+                value={data?.openingStock}
                 onChange={(e) =>
                   setData((prev) => ({
                     ...prev,
@@ -252,7 +273,7 @@ const DashboardItemsBasicDetailPage = ({ data, setData, err }) => {
             <div className="">
               <input
                 name="serviceCode"
-                value={data.serviceCode}
+                value={data?.serviceCode}
                 onChange={(e) =>
                   setData((prev) => ({
                     ...prev,
@@ -288,7 +309,7 @@ const DashboardItemsBasicDetailPage = ({ data, setData, err }) => {
             {/* Input */}
             <input
               type="text"
-              value={data.category}
+              value={data?.category}
               onChange={handleInputChange}
               name="category"
               className="input input-sm mt-4 w-full border border-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400"
@@ -304,7 +325,10 @@ const DashboardItemsBasicDetailPage = ({ data, setData, err }) => {
                 Cancel
               </button>
               <button
-                onClick={() => setShowAddCategoryPopup(false)}
+                onClick={() => {
+                  categoryMutation.mutate(data?.category);
+                  setShowAddCategoryPopup(false);
+                }}
                 className="btn btn-sm bg-[var(--secondary-btn)]"
               >
                 Add

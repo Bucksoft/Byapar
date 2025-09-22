@@ -97,17 +97,20 @@ export async function createSalesInvoice(req, res) {
 // CONTROLLER TO GET ALL THE SALES INVOICES
 export async function getAllInvoices(req, res) {
   try {
+    const totalInvoices = await SalesInvoice.countDocuments({});
     const invoices = await SalesInvoice.find({
       $and: [{ businessId: req.params?.id, clientId: req.user?.id }],
     })
       .populate("partyId")
       .sort("salesInvoiceDate");
+
     if (!invoices) {
       return res
         .status(400)
         .json({ success: false, msg: "Invoices not found" });
     }
-    return res.status(200).json({ success: true, invoices });
+
+    return res.status(200).json({ success: true, invoices, totalInvoices });
   } catch (error) {
     console.log("ERROR IN GETTING  SALES INVOICE ");
     return res.status(500).json({ err: "Internal server error", error });

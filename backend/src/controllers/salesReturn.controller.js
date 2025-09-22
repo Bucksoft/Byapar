@@ -146,6 +146,7 @@ export async function createSalesReturn(req, res) {
 
 export async function getAllSalesReturn(req, res) {
   try {
+    const totalSalesReturn = await SalesReturn.countDocuments({});
     const businessId = req.params.id;
     const salesReturn = await SalesReturn.find({
       $and: [{ businessId: businessId, clientId: req?.user?.id }],
@@ -155,7 +156,9 @@ export async function getAllSalesReturn(req, res) {
         .status(400)
         .json({ success: false, msg: "Sales return not found" });
     }
-    return res.status(200).json({ success: true, salesReturn });
+    return res
+      .status(200)
+      .json({ success: true, salesReturn, totalSalesReturn });
   } catch (error) {
     console.log("ERROR IN CREATING SALES RETURN");
     return res.status(500).json({ err: "Internal server error", error });

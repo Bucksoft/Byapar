@@ -20,7 +20,7 @@ import dayjs from "dayjs";
 
 const DashboardSalesReturnPage = () => {
   const { business } = useBusinessStore();
-  const { setSaleReturns } = useSalesReturnStore();
+  const { setSaleReturns, setTotalSalesReturn } = useSalesReturnStore();
   const [searchedQuery, setSearchedQuery] = useState("");
   const [saleReturnId, setSaleReturnId] = useState();
   const [filterDate, setFilterDate] = useState("");
@@ -43,10 +43,12 @@ const DashboardSalesReturnPage = () => {
     },
   });
 
+  // Query to fetch all the sales return
   const { isLoading, data: salesReturn } = useQuery({
     queryKey: ["salesReturn"],
     queryFn: async () => {
       const res = await axiosInstance.get(`/sales-return/${business?._id}`);
+      setTotalSalesReturn(res.data?.totalSalesReturn);
       setSaleReturns(res.data?.salesReturn);
       return res.data?.salesReturn;
     },

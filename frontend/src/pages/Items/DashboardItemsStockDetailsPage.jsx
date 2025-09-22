@@ -25,7 +25,7 @@ const DashboardItemsStockDetailsPage = ({ data, setData }) => {
   // };
 
   return (
-    <main className="p-6">
+    <main className="">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {/* Left section */}
         <div className="space-y-5">
@@ -183,7 +183,7 @@ const DashboardItemsStockDetailsPage = ({ data, setData }) => {
       </div>
 
       {/* Upload section */}
-      <div className="mt-4 border-2 border-dashed border-gray-300 rounded-md flex items-center h-24 p-4">
+      {/* <div className="mt-4 border-2 border-dashed border-gray-300 rounded-md flex items-center h-24 p-4">
         <UploadCloud size={30} className="text-gray-600 mx-4" />
         <div>
           <p className="text-xs text-gray-600">
@@ -194,7 +194,7 @@ const DashboardItemsStockDetailsPage = ({ data, setData }) => {
           </p>
         </div>
         <button className="btn btn-info ml-auto">Select files</button>
-      </div>
+      </div> */}
     </main>
   );
 };

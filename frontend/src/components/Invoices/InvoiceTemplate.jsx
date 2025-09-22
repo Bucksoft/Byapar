@@ -403,7 +403,7 @@ const InvoiceTemplate = ({
                 }}
               >
                 <p style={{ fontWeight: 600 }}>Total Amount (in words)</p>
-                <span>{converter.toWords(total).toUpperCase()}</span>
+                <span>{converter.toWords(total).toUpperCase()} ONLY</span>
               </div>
             </div>
           </section>

@@ -6,6 +6,14 @@ import { useInvoiceStore } from "../../store/invoicesStore";
 import { Search } from "lucide-react";
 import { LiaFileInvoiceSolid, LiaRupeeSignSolid } from "react-icons/lia";
 import { usePurchaseInvoiceStore } from "../../store/purchaseInvoiceStore";
+import { FaPen } from "react-icons/fa6";
+import { GoPlus } from "react-icons/go";
+import { useMutation } from "@tanstack/react-query";
+import { states } from "../../utils/constants";
+import { axiosInstance } from "../../config/axios";
+import { useBusinessStore } from "../../store/businessStore";
+import toast from "react-hot-toast";
+import { queryClient } from "../../main";
 
 const SalesInvoicePartyDetailsSection = ({
   title,
@@ -21,9 +29,33 @@ const SalesInvoicePartyDetailsSection = ({
   const [partyInvoices, setPartyInvoices] = useState([]);
   const [showPartyInvoicePopup, setShowPartyInvoicePopup] = useState(false);
 
+  const [editShippingAddress, setEditShippingAddress] = useState(0);
+  const [shippingData, setShippingData] = useState({
+    shippingName: party?.partyName,
+    streetAddress: "",
+    state: "",
+    pincode: "",
+    city: "",
+  });
+
+  //  FOR EDITING THE SHIPPING ADDRESS
+  useEffect(() => {
+    const shippingAddress = party?.fullShippingAddress.filter(
+      (address) => address?.id === editShippingAddress
+    );
+    setShippingData({
+      shippingName: shippingAddress?.[0]?.shippingName,
+      streetAddress: shippingAddress?.[0]?.streetAddress,
+      state: shippingAddress?.[0]?.state,
+      city: shippingAddress?.[0]?.city,
+      pincode: shippingAddress?.[0]?.pincode,
+    });
+  }, [editShippingAddress]);
+
   const { parties } = usePartyStore();
   const { invoices } = useInvoiceStore(); // FOR SALES RETURN
   const { purchaseInvoices } = usePurchaseInvoiceStore(); //  FOR PURCHASE RETURN
+  const { business } = useBusinessStore();
 
   const searchedParties = parties?.filter((party) =>
     party?.partyName.toLowerCase().includes(searchPartyQuery.toLowerCase())
@@ -55,18 +87,57 @@ const SalesInvoicePartyDetailsSection = ({
     }
   }, [party]);
 
+  // SHIPPING ADDRESS CHANGE MUTATION
+  const shippingMutation = useMutation({
+    mutationFn: async () => {
+      if (Number(editShippingAddress) > 0) {
+        const res = await axiosInstance.patch(
+          `/parties/shipping-address/update/${business?._id}?id=${party?._id}&addressId=${editShippingAddress}`,
+          {
+            shippingData,
+          }
+        );
+        return res.data;
+      } else {
+        const res = await axiosInstance.patch(
+          `/parties/shipping-address/${business?._id}?id=${party?._id}`,
+          {
+            shippingData,
+          }
+        );
+        return res.data;
+      }
+    },
+
+    onSuccess: (data) => {
+      toast.success(data?.msg);
+      console.log(data);
+      document.getElementById("my_modal_1").close();
+      document.getElementById("my_modal_2").close();
+      queryClient.invalidateQueries({ queryKey: ["parties"] });
+    },
+  });
+
   return (
     <>
-      <section className="grid grid-cols-3 h-48 ">
+      <section className="grid grid-cols-3 h-48">
         {/* first block */}
-        <div className="border-t border-r border-zinc-300 ">
+        <div
+          className={`border-t border-r border-zinc-300 ${
+            !party && "col-span-2"
+          } `}
+        >
           <div className="bg-red flex items-center justify-between p-[7.49px] border-b border-b-zinc-300">
             <span className="text-xs">Bill To</span>
 
             {/* Change and add new party dropdown  ----------------------------------------------*/}
 
             <div className="dropdown dropdown-end">
-              <div tabIndex={0} role="button" className="btn btn-xs text-xxs ">
+              <div
+                tabIndex={0}
+                role="button"
+                className="btn btn-xs text-xxs btn-neutral btn-outline "
+              >
                 {!party ? "Add" : "Change"} Party
               </div>
               <ul
@@ -100,47 +171,301 @@ const SalesInvoicePartyDetailsSection = ({
 
           <div className=" p-2 ">
             <p className="text-sm font-medium ">{party?.partyName}</p>
-            <p className="text-xs pt-1 text-zinc-400">
-              Phone Number:{" "}
-              <span className="text-black">{party?.mobileNumber}</span>{" "}
-            </p>
-            <p className="text-xs pt-1 text-zinc-400">
-              Address:{" "}
-              <span className="text-black">{party?.billingAddress}</span>{" "}
-            </p>
-          </div>
-        </div>
-        {/* second block */}
-        <div className="border-t border-r border-zinc-300 ">
-          <div className="bg-red flex items-center justify-between p-2 border-b border-b-zinc-300">
-            <span className="text-xs">
-              Ship{" "}
-              {title === "Sales Return" || title === "Credit Note"
-                ? "From"
-                : "To"}
-            </span>
-            {title === "Delivery Challan" ? (
-              <p className="py-[12.5px]" />
-            ) : (
-              <button className="btn btn-xs text-xxs border">
-                Change Shipping Address
-              </button>
+            {party?.mobileNumber && (
+              <p className="text-xs pt-1 text-zinc-400">
+                Phone Number:{" "}
+                <span className="text-black">{party?.mobileNumber}</span>{" "}
+              </p>
             )}
-          </div>
-          <div className="p-2">
-            <p className="text-sm font-medium ">Business Name</p>
-            <p className="text-xs pt-1 text-zinc-400">
-              Phone Number:{" "}
-              <span className="text-black">{party?.mobileNumber}</span>
-            </p>
-            <p className="text-xs pt-1 text-zinc-400">
-              Address:{" "}
-              <span className="text-black">{party?.billingAddress}</span>{" "}
-            </p>
+            {party?.billingAddress && (
+              <p className="text-xs pt-1 text-zinc-400">
+                Address:{" "}
+                <span className="text-black">{party?.billingAddress}</span>{" "}
+              </p>
+            )}
           </div>
         </div>
 
-        {/* third block */}
+        {/* second block SHIPPING ADDRESS */}
+        {party && (
+          <div className="border-t border-r border-zinc-300 ">
+            <div className="bg-red flex items-center justify-between p-2 border-b border-b-zinc-300">
+              <span className="text-xs">
+                Ship{" "}
+                {title === "Sales Return" || title === "Credit Note"
+                  ? "From"
+                  : "To"}
+              </span>
+              {title === "Delivery Challan" ? (
+                <p className="py-[12.5px]" />
+              ) : (
+                // SHIPPING ADDRESS MODAL
+                <>
+                  <button
+                    onClick={() =>
+                      document.getElementById("my_modal_1").showModal()
+                    }
+                    className="btn btn-xs text-xxs border btn-neutral btn-outline"
+                  >
+                    Change Shipping Address
+                  </button>
+                  <dialog id="my_modal_1" className="modal">
+                    <div className="modal-box">
+                      <h3 className="font-bold text-lg">
+                        {party?.shippingAddress > 0 ? "Change" : "Add"} Shipping
+                        Address
+                      </h3>
+
+                      {/* SHIPPING ADDRESS TABLE */}
+                      {party?.fullShippingAddress && (
+                        <div className="overflow-x-auto">
+                          <table className="table table-zebra table-sm mt-5">
+                            {/* head */}
+                            <thead>
+                              <tr className="bg-zinc-100">
+                                <th>Address</th>
+                                <th className="text-center">Edit</th>
+                                <th className="text-right">Select</th>
+                              </tr>
+                            </thead>
+                            <tbody>
+                              {/* row 1 */}
+                              {party?.fullShippingAddress.length &&
+                                party.fullShippingAddress.map((address) => (
+                                  <tr key={address?.id}>
+                                    <td className="py-2">
+                                      {address?.streetAddress || "-"}
+                                    </td>
+                                    <td className="w-full flex justify-center py-2">
+                                      <FaPen
+                                        onClick={() => {
+                                          setEditShippingAddress(address?.id);
+                                          document
+                                            .getElementById("my_modal_2")
+                                            .showModal();
+                                          document
+                                            .getElementById("my_modal_1")
+                                            .close();
+                                        }}
+                                        size={12}
+                                        className="text-zinc-500 text-center hover:text-zinc-600 cursor-pointer"
+                                      />
+                                    </td>
+                                    <td className="text-right">
+                                      <input
+                                        type="radio"
+                                        name="radio-2"
+                                        className="radio radio-xs"
+                                        defaultChecked={false}
+                                        onChange={() => {
+                                          setParty((prev) => ({
+                                            ...prev,
+                                            shippingAddress:
+                                              address?.streetAddress,
+                                          }));
+                                        }}
+                                      />
+                                    </td>
+                                  </tr>
+                                ))}
+                            </tbody>
+                          </table>
+                        </div>
+                      )}
+                      <>
+                        <button
+                          onClick={() => {
+                            document.getElementById("my_modal_2").showModal();
+                            document.getElementById("my_modal_1").close();
+                          }}
+                          className="btn btn-sm mt-3 btn-dash btn-info"
+                        >
+                          <GoPlus />
+                          Add New Shipping Address
+                        </button>
+                        {/* MAIN DIALOG BOX TO CHANGE/ADD SHIPPING ADDRESS */}
+                        <dialog id="my_modal_2" className="modal">
+                          <div className="modal-box">
+                            <h3 className="font-bold text-lg">
+                              Add Shipping Address
+                            </h3>
+                            <div className="flex flex-col mt-2">
+                              <label
+                                htmlFor="name"
+                                className="text-zinc-700 text-sm mb-1"
+                              >
+                                Shipping Name
+                              </label>
+                              <input
+                                type="text"
+                                placeholder="Enter Shipping Name"
+                                className="input input-sm w-full"
+                                value={shippingData?.shippingName}
+                                onChange={(e) =>
+                                  setShippingData((prev) => ({
+                                    ...prev,
+                                    shippingName: e.target.value,
+                                  }))
+                                }
+                              />
+                            </div>
+                            <div className="flex flex-col mt-2">
+                              <label
+                                htmlFor="address"
+                                className="text-zinc-700 text-sm mb-1"
+                              >
+                                Street Address
+                              </label>
+                              <textarea
+                                type="text"
+                                className="textarea w-full"
+                                value={shippingData?.streetAddress}
+                                placeholder="Enter Street Address"
+                                onChange={(e) =>
+                                  setShippingData((prev) => ({
+                                    ...prev,
+                                    streetAddress: e.target.value,
+                                  }))
+                                }
+                              />
+                            </div>
+
+                            <div className="flex items-center gap-3">
+                              {/* STATE */}
+                              <div>
+                                <div className="flex flex-col mt-2">
+                                  <label
+                                    htmlFor="state"
+                                    className="text-zinc-700 text-sm "
+                                  >
+                                    State
+                                  </label>
+
+                                  <fieldset className="fieldset ">
+                                    <select
+                                      name="state"
+                                      value={shippingData?.state}
+                                      onChange={(e) =>
+                                        setShippingData((prev) => ({
+                                          ...prev,
+                                          state: e.target.value,
+                                        }))
+                                      }
+                                      className="select select-sm "
+                                    >
+                                      <option value="" disabled>
+                                        --Select-state--
+                                      </option>
+                                      {states?.map((state) => (
+                                        <option
+                                          key={state}
+                                          hidden={state === "Enter state"}
+                                        >
+                                          {state}
+                                        </option>
+                                      ))}
+                                    </select>
+                                  </fieldset>
+                                </div>
+                              </div>
+                              {/* PINCODE */}
+                              <div>
+                                <label
+                                  htmlFor="state"
+                                  className="text-zinc-700 text-sm mb-1"
+                                >
+                                  Pincode
+                                </label>
+                                <input
+                                  type="number"
+                                  className="input input-sm w-full"
+                                  value={shippingData?.pincode}
+                                  placeholder="Enter Pincode"
+                                  onChange={(e) =>
+                                    setShippingData((prev) => ({
+                                      ...prev,
+                                      pincode: e.target.value,
+                                    }))
+                                  }
+                                />
+                              </div>
+                            </div>
+
+                            {/* CITY */}
+                            <div>
+                              <label
+                                htmlFor="state"
+                                className="text-zinc-700 text-sm mb-1"
+                              >
+                                City
+                              </label>
+                              <input
+                                type="text"
+                                placeholder="Enter City"
+                                className="input input-sm w-full"
+                                value={shippingData?.city}
+                                onChange={(e) =>
+                                  setShippingData((prev) => ({
+                                    ...prev,
+                                    city: e.target.value,
+                                  }))
+                                }
+                              />
+                            </div>
+                            <div className="divider"></div>
+                            {/* BUTTONS */}
+                            <div className=" w-full flex justify-end">
+                              <button
+                                onClick={() => shippingMutation.mutate()}
+                                className="btn btn-sm bg-[var(--primary-btn)]"
+                              >
+                                {editShippingAddress ? "Save" : "Add"}{" "}
+                              </button>
+                            </div>
+                          </div>
+                          <form method="dialog" className="modal-backdrop">
+                            <button>close</button>
+                          </form>
+                        </dialog>
+                      </>
+
+                      <div className="modal-action">
+                        <form method="dialog">
+                          {/* if there is a button in form, it will close the modal */}
+                          <button className="btn btn-sm bg-[var(--primary-btn)]">
+                            Close
+                          </button>
+                        </form>
+                        {/* {party?.shippingAddress?.length > 0 && (
+                          <button className="btn btn-sm bg-[var(--primary-btn)]">
+                            Change
+                          </button>
+                        )} */}
+                      </div>
+                    </div>
+                  </dialog>
+                </>
+              )}
+            </div>
+            <div className="p-2">
+              <p className="text-sm font-medium ">{party?.partyName}</p>
+              {party?.mobileNumber && (
+                <p className="text-xs pt-1 text-zinc-400">
+                  Phone Number:{" "}
+                  <span className="text-black">{party?.mobileNumber}</span>
+                </p>
+              )}
+              {party?.fullShippingAddress.length && (
+                <p className="text-xs pt-1 text-zinc-400">
+                  Address:{" "}
+                  <span className="text-black">{party?.shippingAddress}</span>{" "}
+                </p>
+              )}
+            </div>
+          </div>
+        )}
+
+        {/* third block - PAYMENT TERMS AND INVOICE NUMBER GENERATION */}
         <div className="border-t border-r border-zinc-300 pt-1 relative">
           {/* upper part */}
           <div className=" p-2 flex space-x-2 items-center">

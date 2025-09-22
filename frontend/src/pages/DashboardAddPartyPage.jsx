@@ -95,8 +95,6 @@ const DashboardAddPartyPage = () => {
 
   const categoryMutation = useMutation({
     mutationFn: async (data) => {
-      console.log(data);
-
       const res = await axiosInstance.post(`/category/${business?._id}`, {
         categoryName: data,
       });
@@ -326,6 +324,7 @@ const DashboardAddPartyPage = () => {
               </select>
             </div>
 
+            {/* CATEGORY SECTION */}
             <div className="flex flex-col mt-1">
               <label
                 htmlFor="Party_category"

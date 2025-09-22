@@ -8,6 +8,8 @@ export const useSalesReturnStore = create(
       setSaleReturns: (data) => set({ saleReturns: data }),
       saleReturn: null,
       setSaleReturn: (data) => set({ saleReturn: data }),
+      totalSalesReturn: 0,
+      setTotalSalesReturn: (data) => set({ totalSalesReturn: data }),
     }),
     {
       name: "salesReturn",

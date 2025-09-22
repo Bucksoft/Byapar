@@ -258,3 +258,101 @@ export async function deleteParty(req, res) {
     return res.status(500).json({ err: "Internal server error", error });
   }
 }
+
+// function to update party shipping address
+export async function updateShippingAddress(req, res) {
+  try {
+    const businessId = req.params.id;
+    const partyId = req.query.id;
+    const data = req.body;
+
+    // finding the party first
+    const party = await Party.findOne({
+      _id: partyId,
+      businessId: businessId,
+    });
+
+    if (!party) {
+      return res
+        .status(400)
+        .json({ success: false, msg: "Party does not exists" });
+    }
+
+    const nextId = (party.fullShippingAddress?.length || 0) + 1;
+
+    const updatedParty = await Party.findByIdAndUpdate(
+      partyId,
+      {
+        $push: {
+          fullShippingAddress: {
+            id: nextId,
+            shippingName: data?.shippingData?.shippingName,
+            streetAddress: data?.shippingData?.streetAddress,
+            state: data?.shippingData?.state,
+            pincode: data?.shippingData?.pincode,
+            city: data?.shippingData?.city,
+          },
+        },
+      },
+      { new: true }
+    );
+
+    return res.status(200).json({
+      success: true,
+      msg: "Shipping address updated successfully",
+      updatedParty,
+    });
+  } catch (error) {
+    return res
+      .status(500)
+      .json({ success: false, msg: "Internal Server Error" });
+  }
+}
+
+export async function updateFullShippingAddress(req, res) {
+  try {
+    const data = req.body.shippingData;
+    const partyId = req.query?.id;
+    const addressId = Number(req.query?.addressId);
+    const businessId = req.params.id;
+
+    // FINDING THE PARTY
+    const party = await Party.findOne({
+      _id: partyId,
+      businessId: businessId,
+    });
+
+    if (!party) {
+      return res
+        .status(400)
+        .json({ success: false, msg: "Party does not exists" });
+    }
+
+    // FILTER OUT THE SHIPPING ADDRESS
+    const shippingAddressToEdit = party?.fullShippingAddress.filter(
+      (add) => add?.id === addressId
+    );
+    if (!shippingAddressToEdit) {
+      return res
+        .status(400)
+        .json({ success: false, msg: "Shipping Address not found" });
+    }
+
+    shippingAddressToEdit[0].shippingName = data?.shippingName;
+    shippingAddressToEdit[0].streetAddress = data?.streetAddress;
+    shippingAddressToEdit[0].pincode = data?.pincode;
+    shippingAddressToEdit[0].state = data?.state;
+    shippingAddressToEdit[0].city = data?.city;
+
+    await party.save();
+
+    return res
+      .status(200)
+      .json({ success: false, msg: "Updated successfully", party });
+  } catch (error) {
+    console.log(error);
+    return res
+      .status(500)
+      .json({ success: false, msg: "Internal Server Error" });
+  }
+}
