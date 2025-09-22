@@ -28,45 +28,7 @@ export async function generatePdf(req, res) {
       </html>
     `;
 
-<<<<<<< HEAD
-    const page = await browser.newPage();
-
-    // Wrap user HTML into a full HTML document
-    const finalHtml = `
-      <!DOCTYPE html>
-      <html>
-        <head>
-          <meta charset="utf-8" />
-          <title>Invoice</title>
-          <style>
-            @page {
-              size: A4;
-              margin: 10mm;
-            }
-            body {
-              font-family: Arial, sans-serif;
-              margin: 0;
-              padding: 0;
-            }
-            .invoice-container {
-              width: 100%;
-              max-width: 1000px;
-              margin: auto;
-            }
-          </style>
-        </head>
-        <body>
-          <div class="invoice-container">
-            ${html}
-          </div>
-        </body>
-      </html>
-    `;
-
-    await page.setContent(finalHtml, { waitUntil: "networkidle0" });
-=======
     const file = { content: finalHtml };
->>>>>>> 1433e7982096681ed9869a0c775e41d7adf6fd1d
 
     // Generate PDF
     const pdfBuffer = await pdf.generatePdf(file, {

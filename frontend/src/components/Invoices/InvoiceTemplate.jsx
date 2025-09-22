@@ -45,10 +45,7 @@ const InvoiceTemplate = ({
           padding: "16px",
           // boxShadow: "0 4px 12px rgba(0,0,0,0.2)",
         }}
-<<<<<<< HEAD
-=======
         className="invoice-content"
->>>>>>> 1433e7982096681ed9869a0c775e41d7adf6fd1d
       >
         {/* Header */}
         <div
