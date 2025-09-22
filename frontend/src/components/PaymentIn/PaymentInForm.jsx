@@ -225,7 +225,11 @@ const PaymentInForm = () => {
               <p className="flex items-center mb-1 text-green-500 text-xs">
                 Current Balance :
                 <LiaRupeeSignSolid />{" "}
-                {Number(totalInvoiceAmount).toLocaleString("en-IN")}
+                {
+                  parties?.filter(
+                    (party) => party?.partyName === selectedParty
+                  )[0]?.currentBalance
+                }
               </p>
             )}
 
