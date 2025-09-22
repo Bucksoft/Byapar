@@ -19,7 +19,7 @@ const PaymentInForm = () => {
   const { parties, setParty } = usePartyStore();
   const { invoices } = useInvoiceStore();
   const { business } = useBusinessStore();
-  const { paymentIns, setPaymentIns } = usePaymentInStore();
+  const { paymentIns, totalPaymentIns } = usePaymentInStore();
   const [selectedParty, setSelectedParty] = useState();
   const [paymentInToEdit, setPaymentInToEdit] = useState();
   const [totalInvoiceAmount, setTotalInvoiceAmount] = useState(0);
@@ -32,7 +32,7 @@ const PaymentInForm = () => {
     paymentAmount: 0,
     paymentDate: new Date(Date.now()),
     paymentMode: "cash",
-    paymentInNumber: paymentIns.length + 1 || 1,
+    paymentInNumber: totalPaymentIns + 1,
     notes: "",
     settledInvoices: {},
   });

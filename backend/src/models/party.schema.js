@@ -72,6 +72,16 @@ const partySchema = new mongoose.Schema(
     shippingAddress: {
       type: String,
     },
+    fullShippingAddress: [
+      {
+        id: Number,
+        shippingName: String,
+        streetAddress: String,
+        state: String,
+        pincode: String,
+        city: String,
+      },
+    ],
     creditPeriod: {
       type: Number,
       default: 0,

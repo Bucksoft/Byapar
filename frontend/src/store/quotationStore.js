@@ -8,6 +8,8 @@ export const useQuotationStore = create(
       setQuotations: (data) => set({ quotations: data }),
       quotation: null,
       setQuotation: (data) => set({ quotation: data }),
+      totalQuotations: 0,
+      setTotalQuotations: (data) => set({ totalQuotations: data }),
     }),
     {
       name: "quotations",

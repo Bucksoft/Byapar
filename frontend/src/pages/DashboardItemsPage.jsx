@@ -16,6 +16,8 @@ import ItemsList from "../components/Items/ItemsList";
 import { useBusinessStore } from "../store/businessStore";
 import { AiOutlineStock } from "react-icons/ai";
 import { BsFillBoxSeamFill } from "react-icons/bs";
+import DashboardItemsBasicDetailPage from "./Items/DashboardItemsBasicDetailPage";
+import DashboardItemsSidebar from "./Items/DashboardItemsSidebar";
 
 const DashboardItemsPage = () => {
   const navigate = useNavigate();
@@ -179,14 +181,26 @@ const DashboardItemsPage = () => {
             </button>
           </div>
 
-          <div>
-            <Link
-              to={"/dashboard/items/basic-details"}
-              className="btn btn-sm bg-[var(--primary-btn)]"
-            >
-              <Plus size={14} /> Create Item
-            </Link>
-          </div>
+          {/* CREATE ITEM */}
+
+          <button
+            // to={"/dashboard/items/basic-details"}
+            onClick={() => document.getElementById("my_modal_3").showModal()}
+            className="btn btn-sm bg-[var(--primary-btn)]"
+          >
+            <Plus size={14} /> Create Item
+          </button>
+
+          <dialog id="my_modal_3" className="modal">
+            <div className="modal-box w-11/12 max-w-5xl h-3/4">
+              <DashboardItemsSidebar data={items} modalId={"my_modal_3"} />
+              {/* <div className="modal-action">
+                  <form method="dialog">
+                    <button className="btn">Close</button>
+                  </form>
+                </div> */}
+            </div>
+          </dialog>
         </motion.div>
 
         {isLoading ? (

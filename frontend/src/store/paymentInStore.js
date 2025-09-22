@@ -8,6 +8,8 @@ export const usePaymentInStore = create(
       setPaymentIns: (data) => set({ paymentIns: data }),
       paymentIn: null,
       setPaymentIn: (data) => set({ paymentIn: data }),
+      totalPaymentIns: 0,
+      setTotalPaymentIns: (data) => set({ totalPaymentIns: data }),
     }),
     {
       name: "paymentIn",

@@ -19,7 +19,7 @@ import CustomLoader from "../../components/Loader";
 import { useBusinessStore } from "../../store/businessStore";
 import DashboardItemsSACCodePage from "./DashboardItemsSACCodePage";
 
-const DashboardItemsSidebar = () => {
+const DashboardItemsSidebar = ({ modalId, itemIdToEdit }) => {
   const navigate = useNavigate();
   const [itemToBeEdited, setItemToBeEdited] = useState();
   const { state } = useLocation();
@@ -28,10 +28,10 @@ const DashboardItemsSidebar = () => {
   const [currentField, setCurrentField] = useState("Basic Details");
 
   useEffect(() => {
-    if (!state || !items?.length) return;
-    const matchingItems = items.filter((item) => item?._id === state);
+    if (!itemIdToEdit || !items?.length) return;
+    const matchingItems = items.filter((item) => item?._id === itemIdToEdit);
     setItemToBeEdited(matchingItems[0]);
-  }, [state, items]);
+  }, [itemIdToEdit, items]);
 
   const initialFormState = {
     itemType: "product",
@@ -70,52 +70,47 @@ const DashboardItemsSidebar = () => {
     setCurrentField(title);
   };
 
-  // create new item mutation
-  const mutation = useMutation({
+  const itemMutation = useMutation({
     mutationFn: async (data) => {
       if (!business) {
         throw new Error(
           "You don't have any active business yet, create one first"
         );
       }
-      const res = await axiosInstance.post(`/item/${business?._id}`, { data });
-      return res.data;
+
+      if (itemIdToEdit) {
+        const res = await axiosInstance.patch(`/item/${itemIdToEdit}`, {
+          data,
+        });
+        return res.data;
+      } else {
+        const res = await axiosInstance.post(`/item/${business?._id}`, {
+          data,
+        });
+        return res.data;
+      }
     },
+
     onSuccess: (data) => {
       toast.success(data.msg);
       setItem(data);
       setData(initialFormState);
+
+      if (!itemIdToEdit) {
+        document.getElementById(modalId)?.close();
+      }
+
       queryClient.invalidateQueries({ queryKey: ["items"] });
       navigate(`/dashboard/items`);
     },
+
     onError: (err) => {
       console.log(err);
       toast.error(
-        err?.response?.data?.validationError?.itemName._errors[0] ||
+        err?.response?.data?.validationError?.itemName?._errors?.[0] ||
           err?.response?.data?.msg ||
-          err.response?.data?.err ||
-          err.message ||
-          "Something went wrong"
-      );
-    },
-  });
-
-  // edit details mutation
-  const editMutation = useMutation({
-    mutationFn: async (data) => {
-      const res = await axiosInstance.patch(`/item/${state}`, { data });
-      return res.data;
-    },
-    onSuccess: (data) => {
-      toast.success(data.msg);
-      setItem(data);
-      setData(initialFormState);
-      queryClient.invalidateQueries({ queryKey: ["items"] });
-      navigate(`/dashboard/items`);
-    },
-    onError: (err) => {
-      toast.error(
-        err?.response?.data?.validationError?.itemName._errors[0] ||
+          err?.response?.data?.err ||
+          err?.message ||
           "Something went wrong"
       );
     },
@@ -123,15 +118,15 @@ const DashboardItemsSidebar = () => {
 
   return (
     <>
-      <main className="w-full min-h-screen flex flex-col">
-        <div className="w-full flex flex-col text-sm flex-1">
-          <p className="font-medium text-lg py-5 flex items-center bg-white">
+      <main className="h-full">
+        <div className="w-full flex flex-col text-sm flex-1 ">
+          <p className="font-medium text-lg flex items-center my-3">
             <span className="mx-6">
               {state ? "Edit Item" : "Create New Item"}
             </span>
           </p>
 
-          <div className="flex flex-1 ">
+          <div className="flex h-full flex-1 p-2 ">
             {/* Sidebar */}
             <motion.div
               initial={{
@@ -146,15 +141,21 @@ const DashboardItemsSidebar = () => {
                 ease: "easeInOut",
                 duration: 0.3,
               }}
-              className="w-3/15 p-2 m-3 rounded-md"
+              className="w-3/10 rounded-md"
             >
               {data?.itemType === "product" ? (
-                <div className="flex items-center shadow-lg rounded-md flex-col p-3 h-full bg-white">
+                <div
+                  style={{
+                    boxShadow:
+                      "rgba(0, 0, 0, 0.16) 0px 3px 6px, rgba(0, 0, 0, 0.23) 0px 3px 6px",
+                  }}
+                  className="flex items-center h-full rounded-md flex-col p-3 bg-white"
+                >
                   {newItemsSidebarDetails?.map((item) => (
                     <div
                       onClick={() => handleSidebar(item?.title)}
                       key={item.id}
-                      className={`my-2 cursor-pointer rounded-md w-full transition-all ease-in duration-150 h-10 flex items-center font-normal text-gray-600 hover:bg-info/10 ${
+                      className={`my-1 cursor-pointer rounded-md w-full transition-all ease-in duration-150 h-10  flex items-center font-normal text-gray-600 hover:bg-info/10 ${
                         item.title === currentField && "text-info bg-info/10"
                       }`}
                     >
@@ -211,16 +212,23 @@ const DashboardItemsSidebar = () => {
                 ease: "easeInOut",
                 duration: 0.3,
               }}
-              className="shadow-lg rounded-md w-full bg-white p-10 m-6 flex-1 h-[calc(100vh-150px)] flex flex-col"
+              style={{
+                boxShadow:
+                  "rgba(0, 0, 0, 0.16) 0px 3px 6px, rgba(0, 0, 0, 0.23) 0px 3px 6px",
+              }}
+              className="shadow-lg rounded-md w-full bg-white p-5 flex flex-col ml-2"
             >
               {/* Scrollable fixed-height content */}
-              <div className="flex-1 overflow-auto">
-                <div className="h-full">
+              <div className="flex-1 overflow-auto ">
+                <div className="">
                   {currentField === "Basic Details" ? (
                     <DashboardItemsBasicDetailPage
                       data={data}
                       setData={setData}
-                      err={mutation.isError && mutation.error?.response?.data}
+                      err={
+                        itemMutation.isError &&
+                        itemMutation.error?.response?.data
+                      }
                     />
                   ) : currentField === "Stock Details" ? (
                     <DashboardItemsStockDetailsPage
@@ -246,18 +254,18 @@ const DashboardItemsSidebar = () => {
               {/* <div className="divider"></div> */}
               <div className="w-full flex justify-end gap-3 mt-4 ">
                 <button
-                  onClick={() => navigate(-1)}
+                  onClick={() => document.getElementById(modalId).close()}
                   className="btn btn-sm w-1/7"
                 >
                   Cancel
                 </button>
                 {state ? (
                   <button
-                    disabled={editMutation.isPending}
-                    onClick={() => editMutation.mutate(data)}
+                    disabled={itemMutation.isPending}
+                    onClick={() => itemMutation.mutate(data)}
                     className="btn btn-sm bg-[var(--primary-btn)] w-1/7"
                   >
-                    {editMutation.isPending ? (
+                    {itemMutation.isPending ? (
                       <CustomLoader text={"Updating..."} />
                     ) : (
                       "Save Changes"
@@ -265,11 +273,11 @@ const DashboardItemsSidebar = () => {
                   </button>
                 ) : (
                   <button
-                    disabled={mutation.isPending}
-                    onClick={() => mutation.mutate(data)}
+                    disabled={itemMutation.isPending}
+                    onClick={() => itemMutation.mutate(data)}
                     className="btn btn-sm bg-[var(--primary-btn)] w-1/7"
                   >
-                    {mutation.isPending ? (
+                    {itemMutation.isPending ? (
                       <CustomLoader text={"Loading..."} />
                     ) : (
                       "Save"

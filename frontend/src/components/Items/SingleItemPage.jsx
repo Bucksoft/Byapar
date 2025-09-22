@@ -1,7 +1,7 @@
 import { useNavigate, useParams } from "react-router-dom";
 import { useItemStore } from "../../store/itemStore";
 import { useEffect, useState } from "react";
-import { ArrowLeft, Package } from "lucide-react";
+import { ArrowLeft, Package, Plus } from "lucide-react";
 import { BsTrash3 } from "react-icons/bs";
 import { FaRegEdit } from "react-icons/fa";
 import { dashboardSingleItemPageMenus } from "../../utils/constants";
@@ -11,13 +11,14 @@ import SingleItemPartyWiseDetails from "./SingleItemPartyWiseDetails";
 import SingleItemStockDetails from "./SingleItemStockDetails";
 import SingleItemDetails from "./SingleItemDetails";
 import { DayPicker } from "react-day-picker";
-import { FaCalculator, FaRegFileLines } from "react-icons/fa6";
+import { FaCalculator, FaPen, FaRegFileLines } from "react-icons/fa6";
 import { useMutation } from "@tanstack/react-query";
 import { axiosInstance } from "../../config/axios";
 import toast from "react-hot-toast";
 import CustomLoader from "../Loader";
 import { queryClient } from "../../main";
 import { LuFileUser } from "react-icons/lu";
+import DashboardItemsSidebar from "../../pages/Items/DashboardItemsSidebar";
 
 const SingleItemPage = () => {
   const { id } = useParams();
@@ -65,15 +66,29 @@ const SingleItemPage = () => {
             )}
           </div>
 
-          <div className="text-sm space-x-3">
-            <button
-              className="btn btn-sm"
-              onClick={() =>
-                navigate("/dashboard/items/basic-details", { state: item?._id })
-              }
-            >
-              <FaRegEdit /> Edit
-            </button>
+          <div className="text-sm space-x-3 flex">
+            <div>
+              <button
+                // to={"/dashboard/items/basic-details"}
+                onClick={() =>
+                  document.getElementById("my_modal_3").showModal()
+                }
+                className="btn btn-sm "
+              >
+                <FaPen size={12} /> Edit Item
+              </button>
+
+              <dialog id="my_modal_3" className="modal">
+                <div className="modal-box w-11/12 max-w-5xl h-3/4">
+                  <DashboardItemsSidebar data={items} modalId={"my_modal_3"} itemIdToEdit={item?._id}/>
+                  {/* <div className="modal-action">
+                  <form method="dialog">
+                    <button className="btn">Close</button>
+                  </form>
+                </div> */}
+                </div>
+              </dialog>
+            </div>
 
             <button
               disabled={mutation.isPending}

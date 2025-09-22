@@ -87,6 +87,7 @@ export async function getQuotationById(req, res) {
 
 export async function getAllQuotations(req, res) {
   try {
+    const totalQuotations = await Quotation.countDocuments({});
     const quotations = await Quotation.find({
       $and: [
         {
@@ -102,7 +103,7 @@ export async function getAllQuotations(req, res) {
         .status(400)
         .json({ success: false, msg: "Quotations not found" });
     }
-    return res.status(200).json({ success: true, quotations });
+    return res.status(200).json({ success: true, quotations, totalQuotations });
   } catch (error) {
     console.log("Error in getting  quotations", error);
     return res

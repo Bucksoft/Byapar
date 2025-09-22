@@ -18,7 +18,7 @@ import toast from "react-hot-toast";
 import { useBusinessStore } from "../store/businessStore";
 
 const DashboardSalesPage = () => {
-  const { setInvoices } = useInvoiceStore();
+  const { setInvoices, setTotalInvoices } = useInvoiceStore();
   const [showDeletePopup, setShowDeletePopup] = useState(false);
   const [invoiceId, setInvoiceId] = useState();
   const [searchQuery, setSearchQuery] = useState("");
@@ -35,6 +35,7 @@ const DashboardSalesPage = () => {
     queryFn: async () => {
       if (!business) return [];
       const res = await axiosInstance.get(`/sales-invoice/${business._id}`);
+      setTotalInvoices(res.data?.totalInvoices);
       return res.data?.invoices || [];
     },
     enabled: !!business,
@@ -76,7 +77,7 @@ const DashboardSalesPage = () => {
       : invoices;
 
   return (
-    <main className="h-full p-2 ">
+    <main className="h-full p-2">
       <div className="h-full w-full flex flex-col bg-white rounded-lg p-3">
         <DashboardNavbar title={"Sales Invoice"} isReport={"true"} />
         <motion.div

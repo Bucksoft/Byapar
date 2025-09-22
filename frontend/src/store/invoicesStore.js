@@ -8,6 +8,8 @@ export const useInvoiceStore = create(
       setInvoices: (data) => set({ invoices: data }),
       invoice: null,
       setInvoice: (data) => set({ invoice: data }),
+      totalInvoices: 0,
+      setTotalInvoices: (data) => set({ totalInvoices: data }),
     }),
     {
       name: "invoice",
