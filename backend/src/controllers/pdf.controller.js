@@ -34,6 +34,7 @@ export async function generatePdf(req, res) {
     const pdfBuffer = await pdf.generatePdf(file, {
       format: "A4",
       printBackground: true,
+      preferCSSPageSize: true,
     });
 
     res.set({
