@@ -44,8 +44,20 @@ const deliveryChallanSchema = new mongoose.Schema(
     },
     status: {
       type: String,
-      enum: ["paid", "unpaid", "draft", "partially paid", "cancelled"],
-      default: "unpaid",
+      enum: [
+        "paid",
+        "unpaid",
+        "draft",
+        "partially paid",
+        "cancelled",
+        "draft",
+        "open",
+        "accepted",
+        "rejected",
+        "converted",
+        "expired",
+      ],
+      default: "open",
     },
   },
   {

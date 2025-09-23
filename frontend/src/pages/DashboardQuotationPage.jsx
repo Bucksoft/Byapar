@@ -93,7 +93,6 @@ const DashboardQuotationPage = () => {
     return true;
   });
 
-  console.log(quotationType);
 
   return (
     <main className="h-screen w-full flex">
@@ -161,9 +160,9 @@ const DashboardQuotationPage = () => {
                 <CustomLoader text={"Loading..."} />
               </div>
             ) : filteredQuotations.length > 0 ? (
-              <table className="table table-zebra">
+              <table className="table table-zebra border border-zinc-100">
                 <thead>
-                  <tr className="text-xs bg-[var(--primary-background)] ">
+                  <tr className="text-xs bg-[var(--primary-background)]">
                     <th className="w-60">Date</th>
                     <th className="w-60">Quotation Number</th>
                     <th className="w-60">Party Name</th>

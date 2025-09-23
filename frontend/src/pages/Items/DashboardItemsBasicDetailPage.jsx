@@ -179,6 +179,7 @@ const DashboardItemsBasicDetailPage = ({ data, setData, err }) => {
               <ul className="menu dropdown-content bg-base-100 rounded-box  w-52 p-2 shadow-sm">
                 {categories?.map((category) => (
                   <li
+                    key={category?._id}
                     onClick={(e) => {
                       setData((prev) => ({
                         ...prev,

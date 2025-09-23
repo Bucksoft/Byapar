@@ -393,7 +393,7 @@ const SalesInvoiceItemTable = ({ title, data, setData, isEditing }) => {
         <div className="w-7/10 ">
           <button
             onClick={() => document.getElementById("my_modal_10").showModal()}
-            className="btn btn-info  btn-dash w-full hover:bg-none"
+            className="btn btn-info w-full hover:btn-dash"
           >
             + Add Item
           </button>
@@ -571,7 +571,7 @@ const SalesInvoiceItemTable = ({ title, data, setData, isEditing }) => {
                       }));
                     setAddedItems(selected);
                     setData((prev) => ({ ...prev, items: selected }));
-                    document.getElementById("my_modal_1").close();
+                    document.getElementById("my_modal_10").close();
                     setShowCounterId(false);
                   }}
                 >

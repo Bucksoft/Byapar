@@ -72,6 +72,7 @@ import ProformaInvoice from "./components/Invoices/ProformaInvoice";
 import PurchaseInvoice from "./components/Invoices/PurchaseInvoice";
 import DashboardPaymentOutDetails from "./pages/DashboardPaymentOutDetails";
 import DashboardUpdateInvoicesPage from "./pages/DashboardUpdateInvoicesPage";
+import CreditNote from "./components/Invoices/CreditNote";
 
 function App() {
   const { setUser } = useAuthStore();
@@ -268,6 +269,10 @@ function App() {
           <Route
             path="/dashboard/credit-note"
             element={<DashboardCreditNotePage />}
+          />
+          <Route
+            path="/dashboard/credit-note/:id"
+            element={<CreditNote />}
           />
 
           <Route

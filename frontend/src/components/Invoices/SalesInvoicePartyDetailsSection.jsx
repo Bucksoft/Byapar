@@ -64,6 +64,7 @@ const SalesInvoicePartyDetailsSection = ({
   const searchedInvoices = invoices?.filter(
     (invoice) => invoice?.salesInvoiceNumber === Number(invoiceSearchQuery)
   );
+
   const handleInputChange = (e) => {
     const { name, value, type, checked } = e.target;
     setData((prev) => ({
@@ -74,7 +75,7 @@ const SalesInvoicePartyDetailsSection = ({
 
   // this use effect fetches all the invoices of the selected party
   useEffect(() => {
-    if (title === "Sales Return") {
+    if (title === "Sales Return" || title === "Credit Note") {
       const selectedPartyInvoices = invoices.filter(
         (invoice) => invoice?.partyName === party?.partyName
       );
@@ -196,256 +197,252 @@ const SalesInvoicePartyDetailsSection = ({
                   ? "From"
                   : "To"}
               </span>
-              {title === "Delivery Challan" ? (
-                <p className="py-[12.5px]" />
-              ) : (
-                // SHIPPING ADDRESS MODAL
-                <>
-                  <button
-                    onClick={() =>
-                      document.getElementById("my_modal_1").showModal()
-                    }
-                    className="btn btn-xs text-xxs border btn-neutral btn-outline"
-                  >
-                    Change Shipping Address
-                  </button>
-                  <dialog id="my_modal_1" className="modal">
-                    <div className="modal-box">
-                      <h3 className="font-bold text-lg">
-                        {party?.shippingAddress > 0 ? "Change" : "Add"} Shipping
-                        Address
-                      </h3>
+              {/* // SHIPPING ADDRESS MODAL */}
+              <>
+                <button
+                  onClick={() =>
+                    document.getElementById("my_modal_1").showModal()
+                  }
+                  className="btn btn-xs text-xxs border btn-neutral btn-outline"
+                >
+                  Change Shipping Address
+                </button>
+                <dialog id="my_modal_1" className="modal">
+                  <div className="modal-box">
+                    <h3 className="font-bold text-lg">
+                      {party?.shippingAddress > 0 ? "Change" : "Add"} Shipping
+                      Address
+                    </h3>
 
-                      {/* SHIPPING ADDRESS TABLE */}
-                      {party?.fullShippingAddress && (
-                        <div className="overflow-x-auto">
-                          <table className="table table-zebra table-sm mt-5">
-                            {/* head */}
-                            <thead>
-                              <tr className="bg-zinc-100">
-                                <th>Address</th>
-                                <th className="text-center">Edit</th>
-                                <th className="text-right">Select</th>
-                              </tr>
-                            </thead>
-                            <tbody>
-                              {/* row 1 */}
-                              {party?.fullShippingAddress.length &&
-                                party.fullShippingAddress.map((address) => (
-                                  <tr key={address?.id}>
-                                    <td className="py-2">
-                                      {address?.streetAddress || "-"}
-                                    </td>
-                                    <td className="w-full flex justify-center py-2">
-                                      <FaPen
-                                        onClick={() => {
-                                          setEditShippingAddress(address?.id);
-                                          document
-                                            .getElementById("my_modal_2")
-                                            .showModal();
-                                          document
-                                            .getElementById("my_modal_1")
-                                            .close();
-                                        }}
-                                        size={12}
-                                        className="text-zinc-500 text-center hover:text-zinc-600 cursor-pointer"
-                                      />
-                                    </td>
-                                    <td className="text-right">
-                                      <input
-                                        type="radio"
-                                        name="radio-2"
-                                        className="radio radio-xs"
-                                        defaultChecked={false}
-                                        onChange={() => {
-                                          setParty((prev) => ({
-                                            ...prev,
-                                            shippingAddress:
-                                              address?.streetAddress,
-                                          }));
-                                        }}
-                                      />
-                                    </td>
-                                  </tr>
-                                ))}
-                            </tbody>
-                          </table>
-                        </div>
-                      )}
-                      <>
-                        <button
-                          onClick={() => {
-                            document.getElementById("my_modal_2").showModal();
-                            document.getElementById("my_modal_1").close();
-                          }}
-                          className="btn btn-sm mt-3 btn-dash btn-info"
-                        >
-                          <GoPlus />
-                          Add New Shipping Address
-                        </button>
-                        {/* MAIN DIALOG BOX TO CHANGE/ADD SHIPPING ADDRESS */}
-                        <dialog id="my_modal_2" className="modal">
-                          <div className="modal-box">
-                            <h3 className="font-bold text-lg">
-                              Add Shipping Address
-                            </h3>
-                            <div className="flex flex-col mt-2">
-                              <label
-                                htmlFor="name"
-                                className="text-zinc-700 text-sm mb-1"
-                              >
-                                Shipping Name
-                              </label>
-                              <input
-                                type="text"
-                                placeholder="Enter Shipping Name"
-                                className="input input-sm w-full"
-                                value={shippingData?.shippingName}
-                                onChange={(e) =>
-                                  setShippingData((prev) => ({
-                                    ...prev,
-                                    shippingName: e.target.value,
-                                  }))
-                                }
-                              />
-                            </div>
-                            <div className="flex flex-col mt-2">
-                              <label
-                                htmlFor="address"
-                                className="text-zinc-700 text-sm mb-1"
-                              >
-                                Street Address
-                              </label>
-                              <textarea
-                                type="text"
-                                className="textarea w-full"
-                                value={shippingData?.streetAddress}
-                                placeholder="Enter Street Address"
-                                onChange={(e) =>
-                                  setShippingData((prev) => ({
-                                    ...prev,
-                                    streetAddress: e.target.value,
-                                  }))
-                                }
-                              />
-                            </div>
-
-                            <div className="flex items-center gap-3">
-                              {/* STATE */}
-                              <div>
-                                <div className="flex flex-col mt-2">
-                                  <label
-                                    htmlFor="state"
-                                    className="text-zinc-700 text-sm "
-                                  >
-                                    State
-                                  </label>
-
-                                  <fieldset className="fieldset ">
-                                    <select
-                                      name="state"
-                                      value={shippingData?.state}
-                                      onChange={(e) =>
-                                        setShippingData((prev) => ({
+                    {/* SHIPPING ADDRESS TABLE */}
+                    {party?.fullShippingAddress && (
+                      <div className="overflow-x-auto">
+                        <table className="table table-zebra table-sm mt-5">
+                          {/* head */}
+                          <thead>
+                            <tr className="bg-zinc-100">
+                              <th>Address</th>
+                              <th className="text-center">Edit</th>
+                              <th className="text-right">Select</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {/* row 1 */}
+                            {party?.fullShippingAddress.length &&
+                              party.fullShippingAddress.map((address) => (
+                                <tr key={address?.id}>
+                                  <td className="py-2">
+                                    {address?.streetAddress || "-"}
+                                  </td>
+                                  <td className="w-full flex justify-center py-2">
+                                    <FaPen
+                                      onClick={() => {
+                                        setEditShippingAddress(address?.id);
+                                        document
+                                          .getElementById("my_modal_2")
+                                          .showModal();
+                                        document
+                                          .getElementById("my_modal_1")
+                                          .close();
+                                      }}
+                                      size={12}
+                                      className="text-zinc-500 text-center hover:text-zinc-600 cursor-pointer"
+                                    />
+                                  </td>
+                                  <td className="text-right">
+                                    <input
+                                      type="radio"
+                                      name="radio-2"
+                                      className="radio radio-xs"
+                                      defaultChecked={false}
+                                      onChange={() => {
+                                        setParty((prev) => ({
                                           ...prev,
-                                          state: e.target.value,
-                                        }))
-                                      }
-                                      className="select select-sm "
-                                    >
-                                      <option value="" disabled>
-                                        --Select-state--
-                                      </option>
-                                      {states?.map((state) => (
-                                        <option
-                                          key={state}
-                                          hidden={state === "Enter state"}
-                                        >
-                                          {state}
-                                        </option>
-                                      ))}
-                                    </select>
-                                  </fieldset>
-                                </div>
-                              </div>
-                              {/* PINCODE */}
-                              <div>
+                                          shippingAddress:
+                                            address?.streetAddress,
+                                        }));
+                                      }}
+                                    />
+                                  </td>
+                                </tr>
+                              ))}
+                          </tbody>
+                        </table>
+                      </div>
+                    )}
+                    <>
+                      <button
+                        onClick={() => {
+                          document.getElementById("my_modal_2").showModal();
+                          document.getElementById("my_modal_1").close();
+                        }}
+                        className="btn btn-sm mt-3 btn-dash btn-info"
+                      >
+                        <GoPlus />
+                        Add New Shipping Address
+                      </button>
+                      {/* MAIN DIALOG BOX TO CHANGE/ADD SHIPPING ADDRESS */}
+                      <dialog id="my_modal_2" className="modal">
+                        <div className="modal-box">
+                          <h3 className="font-bold text-lg">
+                            Add Shipping Address
+                          </h3>
+                          <div className="flex flex-col mt-2">
+                            <label
+                              htmlFor="name"
+                              className="text-zinc-700 text-sm mb-1"
+                            >
+                              Shipping Name
+                            </label>
+                            <input
+                              type="text"
+                              placeholder="Enter Shipping Name"
+                              className="input input-sm w-full"
+                              value={shippingData?.shippingName}
+                              onChange={(e) =>
+                                setShippingData((prev) => ({
+                                  ...prev,
+                                  shippingName: e.target.value,
+                                }))
+                              }
+                            />
+                          </div>
+                          <div className="flex flex-col mt-2">
+                            <label
+                              htmlFor="address"
+                              className="text-zinc-700 text-sm mb-1"
+                            >
+                              Street Address
+                            </label>
+                            <textarea
+                              type="text"
+                              className="textarea w-full"
+                              value={shippingData?.streetAddress}
+                              placeholder="Enter Street Address"
+                              onChange={(e) =>
+                                setShippingData((prev) => ({
+                                  ...prev,
+                                  streetAddress: e.target.value,
+                                }))
+                              }
+                            />
+                          </div>
+
+                          <div className="flex items-center gap-3">
+                            {/* STATE */}
+                            <div>
+                              <div className="flex flex-col mt-2">
                                 <label
                                   htmlFor="state"
-                                  className="text-zinc-700 text-sm mb-1"
+                                  className="text-zinc-700 text-sm "
                                 >
-                                  Pincode
+                                  State
                                 </label>
-                                <input
-                                  type="number"
-                                  className="input input-sm w-full"
-                                  value={shippingData?.pincode}
-                                  placeholder="Enter Pincode"
-                                  onChange={(e) =>
-                                    setShippingData((prev) => ({
-                                      ...prev,
-                                      pincode: e.target.value,
-                                    }))
-                                  }
-                                />
+
+                                <fieldset className="fieldset ">
+                                  <select
+                                    name="state"
+                                    value={shippingData?.state}
+                                    onChange={(e) =>
+                                      setShippingData((prev) => ({
+                                        ...prev,
+                                        state: e.target.value,
+                                      }))
+                                    }
+                                    className="select select-sm "
+                                  >
+                                    <option value="" disabled>
+                                      --Select-state--
+                                    </option>
+                                    {states?.map((state) => (
+                                      <option
+                                        key={state}
+                                        hidden={state === "Enter state"}
+                                      >
+                                        {state}
+                                      </option>
+                                    ))}
+                                  </select>
+                                </fieldset>
                               </div>
                             </div>
-
-                            {/* CITY */}
+                            {/* PINCODE */}
                             <div>
                               <label
                                 htmlFor="state"
                                 className="text-zinc-700 text-sm mb-1"
                               >
-                                City
+                                Pincode
                               </label>
                               <input
-                                type="text"
-                                placeholder="Enter City"
+                                type="number"
                                 className="input input-sm w-full"
-                                value={shippingData?.city}
+                                value={shippingData?.pincode}
+                                placeholder="Enter Pincode"
                                 onChange={(e) =>
                                   setShippingData((prev) => ({
                                     ...prev,
-                                    city: e.target.value,
+                                    pincode: e.target.value,
                                   }))
                                 }
                               />
                             </div>
-                            <div className="divider"></div>
-                            {/* BUTTONS */}
-                            <div className=" w-full flex justify-end">
-                              <button
-                                onClick={() => shippingMutation.mutate()}
-                                className="btn btn-sm bg-[var(--primary-btn)]"
-                              >
-                                {editShippingAddress ? "Save" : "Add"}{" "}
-                              </button>
-                            </div>
                           </div>
-                          <form method="dialog" className="modal-backdrop">
-                            <button>close</button>
-                          </form>
-                        </dialog>
-                      </>
 
-                      <div className="modal-action">
-                        <form method="dialog">
-                          {/* if there is a button in form, it will close the modal */}
-                          <button className="btn btn-sm bg-[var(--primary-btn)]">
-                            Close
-                          </button>
+                          {/* CITY */}
+                          <div>
+                            <label
+                              htmlFor="state"
+                              className="text-zinc-700 text-sm mb-1"
+                            >
+                              City
+                            </label>
+                            <input
+                              type="text"
+                              placeholder="Enter City"
+                              className="input input-sm w-full"
+                              value={shippingData?.city}
+                              onChange={(e) =>
+                                setShippingData((prev) => ({
+                                  ...prev,
+                                  city: e.target.value,
+                                }))
+                              }
+                            />
+                          </div>
+                          <div className="divider"></div>
+                          {/* BUTTONS */}
+                          <div className=" w-full flex justify-end">
+                            <button
+                              onClick={() => shippingMutation.mutate()}
+                              className="btn btn-sm bg-[var(--primary-btn)]"
+                            >
+                              {editShippingAddress ? "Save" : "Add"}{" "}
+                            </button>
+                          </div>
+                        </div>
+                        <form method="dialog" className="modal-backdrop">
+                          <button>close</button>
                         </form>
-                        {/* {party?.shippingAddress?.length > 0 && (
+                      </dialog>
+                    </>
+
+                    <div className="modal-action">
+                      <form method="dialog">
+                        {/* if there is a button in form, it will close the modal */}
+                        <button className="btn btn-sm bg-[var(--primary-btn)]">
+                          Close
+                        </button>
+                      </form>
+                      {/* {party?.shippingAddress?.length > 0 && (
                           <button className="btn btn-sm bg-[var(--primary-btn)]">
                             Change
                           </button>
                         )} */}
-                      </div>
                     </div>
-                  </dialog>
-                </>
-              )}
+                  </div>
+                </dialog>
+              </>
             </div>
             <div className="p-2">
               <p className="text-sm font-medium ">{party?.partyName}</p>
@@ -645,7 +642,7 @@ const SalesInvoicePartyDetailsSection = ({
                   {data?.invoiceId && (
                     <span className="font-semibold">
                       #
-                      {title === "Sales Return"
+                      {title === "Sales Return" || title === "Credit Note"
                         ? invoices.filter(
                             (invoice) => invoice?._id === data?.invoiceId
                           )[0]?.salesInvoiceNumber
@@ -698,14 +695,15 @@ const SalesInvoicePartyDetailsSection = ({
                                 className="hover:bg-zinc-100 cursor-pointer"
                                 onClick={() => {
                                   setData((prev) => ({
-                                    ...prev,
-                                    invoiceId: partyInvoice?._id,
+                                    ...partyInvoice,
+                                    invoiceId: partyInvoice?._id, // SET THE SELECTED INVOICE ID
                                   }));
                                   setShowPartyInvoicePopup(false);
                                 }}
                               >
                                 <td>
-                                  {title === "Sales Return"
+                                  {title === "Sales Return" ||
+                                  title === "Credit Note"
                                     ? partyInvoice?.salesInvoiceDate.split(
                                         "T"
                                       )[0]
@@ -716,7 +714,8 @@ const SalesInvoicePartyDetailsSection = ({
                                     : ""}
                                 </td>
                                 <td>
-                                  {title === "Sales Return"
+                                  {title === "Sales Return" ||
+                                  title === "Credit Note"
                                     ? partyInvoice?.salesInvoiceNumber
                                     : title === "Purchase Return"
                                     ? partyInvoice?.purchaseInvoiceNumber
@@ -725,9 +724,16 @@ const SalesInvoicePartyDetailsSection = ({
                                 <td>
                                   <div className="flex items-center">
                                     <LiaRupeeSignSolid />
-                                    {Number(
-                                      partyInvoice?.totalAmount
-                                    ).toLocaleString("en-IN")}
+                                    {title === "Sales Return" ||
+                                    title === "Credit Note"
+                                      ? Number(
+                                          partyInvoice?.totalAmount
+                                        ).toLocaleString("en-IN")
+                                      : title === "Purchase Return"
+                                      ? Number(
+                                          partyInvoice?.totalAmount
+                                        ).toLocaleString("en-IN")
+                                      : ""}
                                   </div>
                                 </td>
                               </tr>

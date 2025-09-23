@@ -8,6 +8,8 @@ export const useProformaInvoiceStore = create(
       setProformaInvoices: (data) => set({ proformaInvoices: data }),
       proformaInvoice: null,
       setProformaInvoice: (data) => set({ proformaInvoice: data }),
+      totalProformaInvoices: 0,
+      setTotalProformaInvoices: (data) => set({ totalProformaInvoices: data }),
     }),
     {
       name: "proformaInvoice",

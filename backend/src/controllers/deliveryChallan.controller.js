@@ -48,6 +48,7 @@ export async function createDeliveryChallan(req, res) {
       deliveryChallanDate: validatedResult?.data?.salesInvoiceDate,
       businessId: req.params?.id,
       clientId: req.user?.id,
+      status: "open",
       ...cleanData,
     });
 
@@ -73,6 +74,7 @@ export async function createDeliveryChallan(req, res) {
 export async function getAllDeliveryChallan(req, res) {
   try {
     const businessId = req.params?.id;
+    const totalDeliveryChallans = await DeliveryChallan.countDocuments({});
     if (!businessId) {
       return res
         .status(400)
@@ -80,13 +82,15 @@ export async function getAllDeliveryChallan(req, res) {
     }
     const deliveryChallans = await DeliveryChallan.find({
       $and: [{ businessId }, { clientId: req.user?.id }],
-    });
+    }).populate("partyId");
     if (!deliveryChallans) {
       return res
         .status(400)
         .json({ status: false, msg: "Delivery Challans not found" });
     }
-    return res.status(200).json({ success: true, deliveryChallans });
+    return res
+      .status(200)
+      .json({ success: true, deliveryChallans, totalDeliveryChallans });
   } catch (error) {
     console.log("Error in getting delivery challans", error);
     return res

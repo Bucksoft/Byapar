@@ -10,6 +10,8 @@ const SalesNavigationMenus = ({
   setSearchedQuery,
   setFilterDate,
   filterDate,
+  type,
+  setType,
 }) => {
   const navigate = useNavigate();
   return (
@@ -79,30 +81,18 @@ const SalesNavigationMenus = ({
             title === "Proforma Invoice" ||
             title === "Delivery Challan" ||
             title === "Purchase Orders") && (
-            <div className="dropdown dropdown-center w-60 ">
-              <div
-                tabIndex={0}
-                role="button"
-                className=" bg-white btn btn-wide w-full  btn-sm  text-xs font-medium flex items-center justify-between"
-              >
-                <span className="text-zinc-400">Show Open {selectText}</span>
-                <ChevronDown size={16} className="text-zinc-400" />
-              </div>
-              <ul
-                tabIndex={0}
-                className="dropdown-content menu bg-base-100 rounded-box z-1 w-52 p-2 shadow-sm text-zinc-400 "
-              >
-                <li>
-                  <a>Show All {selectText}</a>
-                </li>
-                <li>
-                  <a>Show Open {selectText}</a>
-                </li>
-                <li>
-                  <a>Show Closed {selectText}</a>
-                </li>
-              </ul>
-            </div>
+            <select
+              className="select select-sm"
+              value={type}
+              onChange={(e) => setType(e.target.value)}
+            >
+              <option value="" disabled>
+                --Select-type--
+              </option>
+              <option value="open">Show Open {selectText}</option>
+              <option value="closed">Show Closed {selectText}</option>
+              <option value="all">Show All {selectText}</option>
+            </select>
           )}
         </div>
         <div>
