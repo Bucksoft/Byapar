@@ -109,7 +109,7 @@ const DashboardSalesReturnPage = () => {
 
   return (
     <main className="h-full p-2">
-      <div className="h-full w-full bg-white rounded-lg p-3">
+      <div className="h-full w-full bg-gradient-to-b from-white to-transparent rounded-lg p-3">
         <DashboardNavbar title={"Sales Return"} />
         <SalesNavigationMenus
           btnText={"Sales Return"}

@@ -95,7 +95,7 @@ const Sidebar = () => {
 
   return (
     <>
-      <section className="h-screen bg-[var(--sidebar-background)] text-white/70 shadow-md max-h-screen overflow-y-auto hide-scrollbar border border-zinc-200 relative">
+      <section className="h-screen bg-[var(--sidebar-background)] text-black/70 max-h-screen overflow-y-auto hide-scrollbar relative">
         {/* nav */}
         <motion.h1
           initial={{
@@ -106,7 +106,7 @@ const Sidebar = () => {
             translateX: 0,
             filter: "blur(0)",
           }}
-          className="sticky  top-0 z-10 text-md text-white font-semibold flex items-center justify-between gap-3 w-full px-5 py-3 bg-white/10 backdrop-blur-md"
+          className="sticky  top-0 z-10 text-md text-black font-semibold flex items-center justify-between gap-3 w-full px-5 py-3 backdrop-blur-md border-b border-b-zinc-200"
         >
           {/* <img
             src={ByaparLogo}
@@ -124,7 +124,7 @@ const Sidebar = () => {
         </motion.h1>
 
         {/* business details */}
-        <div className="flex gap-3 px-5 py-3 items-center border-b border-b-zinc-800 ">
+        <div className="flex gap-3 px-5 py-3 items-center border-b border-b-zinc-200 ">
           <div className="avatar avatar-sm">
             <div className="w-9 rounded-full">
               <img
@@ -146,7 +146,7 @@ const Sidebar = () => {
           </div>
         </div>
 
-        <div className="py-2 border-b border-zinc-800">
+        <div className="py-2 border-b border-zinc-300">
           <label className="font-semibold pl-4 text-xs text-[var(--primary-btn)]">
             GENERAL
           </label>
@@ -168,7 +168,7 @@ const Sidebar = () => {
                       to={`/dashboard/${field.label.toLowerCase()}`}
                       onClick={() => setCurrentLink(field?.label)}
                       className={({ isActive }) =>
-                        `flex items-center  justify-between text-xs font-medium cursor-pointer py-2 pl-[13.5px] w-full transition-all duration-200 ease-in-out  
+                        `flex items-center  justify-between text-xs font-medium cursor-pointer py-2 pl-[13.5px] w-full transition-all duration-200 ease-in-out  text-black/70
                 ${
                   isActive
                     ? "bg-[var(--primary-btn)]/10 text-[var(--primary-btn)] border-l-2 scale-105"
@@ -189,7 +189,7 @@ const Sidebar = () => {
                     {currentLink === field.label && (
                       <div
                         name={field.label}
-                        className="bg-white/10 rounded-lg overflow-hidden text-xs cursor-pointer outline-none w-[80%] mb-2 ml-7 z-10 transition-all duration-200 ease-in-out"
+                        className=" text-black overflow-hidden text-xs cursor-pointer outline-none w-[80%] my-2 ml-7 z-10 transition-all duration-200  ease-in-out border-l border-l-zinc-200"
                       >
                         {field.subLinks?.map((sublink) => (
                           <NavLink
@@ -199,8 +199,8 @@ const Sidebar = () => {
                               `block p-2 rounded-md transition-all duration-200 ease-in-out 
                       ${
                         isActive
-                          ? "bg-[var(--primary-btn)]/20 text-[var(--primary-btn)] font-semibold"
-                          : "text-white hover:bg-white/20"
+                          ? " text-[var(--primary-btn)] font-semibold"
+                          : "hover:bg-white/20"
                       }`
                             }
                           >
@@ -242,7 +242,7 @@ const Sidebar = () => {
           </motion.div>
         </div>
 
-        <div className="hidden  py-2 border-b border-zinc-800">
+        <div className="hidden  py-2 border-b border-zinc-300">
           <label className="pl-4 font-semibold text-xs text-[var(--primary-btn)]">
             ACCOUNTING SOLUTIONS
           </label>

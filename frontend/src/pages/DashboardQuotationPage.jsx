@@ -97,8 +97,8 @@ const DashboardQuotationPage = () => {
 
   return (
     <main className="h-screen w-full flex">
-      <section className="h-full w-full bg-gray-100 p-2">
-        <div className="border border-zinc-300 h-full rounded-md bg-white p-3">
+      <section className="h-full w-full  p-2">
+        <div className=" h-full rounded-md bg-gradient-to-b from-white to-transparent p-3">
           <DashboardNavbar title={"Quotation / Estimate"} />
 
           {/* Top controls */}

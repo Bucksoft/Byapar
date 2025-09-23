@@ -23,7 +23,8 @@ const DashboardPaymentInPage = () => {
   const [page, setPage] = useState("");
   const navigate = useNavigate();
   const [searchedQuery, setSearchedQuery] = useState("");
-  const { setPaymentIns, setTotalPaymentIns, totalPaymentIns } = usePaymentInStore();
+  const { setPaymentIns, setTotalPaymentIns, totalPaymentIns } =
+    usePaymentInStore();
   const [filterDate, setFilterDate] = useState("");
   const { business } = useBusinessStore();
 
@@ -95,7 +96,7 @@ const DashboardPaymentInPage = () => {
       {page === "Payment In" ? (
         <PaymentInForm />
       ) : (
-        <div className="h-full w-full bg-white rounded-lg p-3">
+        <div className="h-full w-full bg-gradient-to-b from-white to-transparent rounded-lg p-3">
           <DashboardNavbar title={"Payment In"} />
           <SalesNavigationMenus
             btnText={"Payment In"}

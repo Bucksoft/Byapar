@@ -1,7 +1,7 @@
 import { Mail } from "lucide-react";
 import { FcGoogle } from "react-icons/fc";
 import ByaparLogo from "../assets/Byapar.png";
-import LoginImage from "../assets/Login_image.png";
+import LoginImage from "../assets/Byapar.png";
 import { useMutation } from "@tanstack/react-query";
 import { useRef, useState } from "react";
 import { axiosInstance } from "../config/axios";
@@ -33,16 +33,53 @@ const LoginPage = () => {
 
   return (
     <>
-      <div className="min-h-screen w-full relative flex items-center justify-center bg-gradient-to-b from-neutral-900/90 to-black">
-        {/* Ocean Abyss Background with Top Glow */}
+      <main className="h-screen w-full flex items-center justify-center">
+        <div className="absolute bottom-0 w-full ">
+          <svg
+            width="100%"
+            height="100%"
+            id="svg"
+            viewBox="0 0 1440 590"
+            xmlns="http://www.w3.org/2000/svg"
+            class="transition duration-300 ease-in-out delay-150"
+          >
+            <defs>
+              <linearGradient id="gradient" x1="0%" y1="50%" x2="100%" y2="50%">
+                <stop offset="5%" stop-color="#F78DA7"></stop>
+                <stop offset="95%" stop-color="#8ED1FC"></stop>
+              </linearGradient>
+            </defs>
+            <path
+              d="M 0,600 L 0,150 C 152.13333333333333,171.06666666666666 304.26666666666665,192.13333333333335 455,180 C 605.7333333333333,167.86666666666665 755.0666666666666,122.53333333333333 919,112 C 1082.9333333333334,101.46666666666667 1261.4666666666667,125.73333333333333 1440,150 L 1440,600 L 0,600 Z"
+              stroke="none"
+              stroke-width="0"
+              fill="url(#gradient)"
+              fill-opacity="0.53"
+              class="transition-all duration-300 ease-in-out delay-150 path-0"
+            ></path>
+            <defs>
+              <linearGradient id="gradient" x1="0%" y1="50%" x2="100%" y2="50%">
+                <stop offset="5%" stop-color="#F78DA7"></stop>
+                <stop offset="95%" stop-color="#8ED1FC"></stop>
+              </linearGradient>
+            </defs>
+            <path
+              d="M 0,600 L 0,350 C 156.2666666666667,352.79999999999995 312.5333333333334,355.59999999999997 479,368 C 645.4666666666666,380.40000000000003 822.1333333333332,402.4 984,401 C 1145.8666666666668,399.6 1292.9333333333334,374.8 1440,350 L 1440,600 L 0,600 Z"
+              stroke="none"
+              stroke-width="0"
+              fill="url(#gradient)"
+              fill-opacity="1"
+              class="transition-all duration-300 ease-in-out delay-150 path-1"
+            ></path>
+          </svg>
+        </div>
 
-        {/* Your Content/Components */}
         <div
           style={{
             boxShadow:
               "rgba(60, 64, 67, 0.3) 0px 1px 2px 0px, rgba(60, 64, 67, 0.15) 0px 1px 3px 1px",
           }}
-          className="border p-2 border-zinc-200 bg-white rounded-xl w-3/5 grid grid-cols-2 items-center"
+          className="border relative z-10 p-2 border-zinc-200 bg-white/10 backdrop-blur-3xl rounded-xl w-3/5 grid grid-cols-2 items-center"
         >
           {/* left section */}
           <section className="flex items-start px-10 flex-col ">
@@ -171,9 +208,7 @@ const LoginPage = () => {
             <OtpInputForm email={email} />
           </motion.div>
         )}
-      </div>
-
-      {/* <main className="h-screen w-full md:p-16 bg-gradient-to-r from-[var(--gradient-from)] via-[var(--gradient-via)] to-[var(--gradient-to)] grid md:place-items-center relative"></main> */}
+      </main>
     </>
   );
 };
