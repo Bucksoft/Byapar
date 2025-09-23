@@ -124,7 +124,7 @@ const DashboardSalesReturnPage = () => {
               <CustomLoader text={"Loading..."} />
             </div>
           ) : searchedSaleReturns?.length > 0 ? (
-            <table className="table table-zebra">
+            <table className="table table-zebra border border-zinc-100">
               {/* head */}
               <thead>
                 <tr className="text-xs bg-zinc-100">

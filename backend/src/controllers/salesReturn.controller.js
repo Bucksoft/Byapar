@@ -84,11 +84,11 @@ export async function createSalesReturn(req, res) {
     }, 0);
 
     if (hasInvoiceId && originalInvoice) {
-      const updatedBalance = originalInvoice?.balance - returnTotals;
+      const updatedBalance = originalInvoice?.balanceAmount - returnTotals;
 
       await SalesInvoice.findByIdAndUpdate(originalInvoice._id, {
         $set: {
-          balance: Math.max(0, updatedBalance),
+          balanceAmount: Math.max(0, updatedBalance),
           status: updatedBalance <= 0 ? "paid" : "unpaid",
         },
       });

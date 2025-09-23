@@ -48,6 +48,7 @@ export async function createProformaInvoice(req, res) {
       proformaInvoiceDate: validatedResult?.data?.salesInvoiceDate,
       businessId: req.params?.id,
       clientId: req.user?.id,
+      status: "open",
       ...cleanData,
     });
 
@@ -73,20 +74,25 @@ export async function createProformaInvoice(req, res) {
 export async function getAllProformaInvoices(req, res) {
   try {
     const businessId = req.params?.id;
+    const totalProformaInvoices = await ProformaInvoice.countDocuments({});
     if (!businessId) {
       return res
         .status(400)
         .json({ success: false, msg: "Business Id not provided" });
     }
+
     const proformaInvoices = await ProformaInvoice.find({
       $and: [{ businessId }, { clientId: req.user?.id }],
-    });
+    }).populate("partyId");
+
     if (!proformaInvoices) {
       return res
         .status(400)
         .json({ status: false, msg: "Proforma Invoices not found" });
     }
-    return res.status(200).json({ success: true, proformaInvoices });
+    return res
+      .status(200)
+      .json({ success: true, proformaInvoices, totalProformaInvoices });
   } catch (error) {
     console.log("Error in getting proforma invoices", error);
     return res

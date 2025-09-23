@@ -1,6 +1,6 @@
 import { axiosInstance } from "../src/config/axios";
 
-export const downloadPDF = async (id, title) => {
+export const downloadPDF = async (id, title = "invoice") => {
   try {
     const input = document.getElementById(id);
     const element = input.outerHTML;

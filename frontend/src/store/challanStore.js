@@ -8,6 +8,8 @@ export const useChallanStore = create(
       setDeliveryChallan: (data) => set({ deliveryChallan: data }),
       deliveryChallans: null,
       setDeliveryChallans: (data) => set({ deliveryChallans: data }),
+      totalDeliveryChallans: 0,
+      setTotalDeliveryChallans: (data) => set({ totalDeliveryChallans: data }),
     }),
     {
       name: "deliveryChallan",

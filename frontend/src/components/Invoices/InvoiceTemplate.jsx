@@ -30,7 +30,11 @@ const InvoiceTemplate = ({
 
   return (
     <main
-      style={{ display: "flex", width: "100%", height: "100vh" }}
+      style={{
+        display: "flex",
+        width: "100%",
+        height: "100vh",
+      }}
       ref={printRef}
       className="print-invoice"
     >
@@ -43,6 +47,8 @@ const InvoiceTemplate = ({
           backgroundColor: "#fff",
           margin: "auto",
           padding: "16px",
+          // boxShadow:
+          //   "5px 5px 5px rgba(0,0,0,0.5), -5px -5px 5px rgba(0,0,0,0.5)",
           // boxShadow: "0 4px 12px rgba(0,0,0,0.2)",
         }}
         className="invoice-content"
@@ -71,6 +77,8 @@ const InvoiceTemplate = ({
               ? "Proforma Invoice"
               : type === "Purchase Invoice"
               ? "Purchase Invoice"
+              : type === "Credit Note"
+              ? "Credit Note"
               : ""}
           </h1>
         </div>
@@ -117,6 +125,8 @@ const InvoiceTemplate = ({
                 ? "Proforma Invoice No."
                 : type === "Purchase Invoice"
                 ? "Purchase Invoice No."
+                : type === "Credit Note"
+                ? "Credit Note No."
                 : ""}
             </p>
             <span>
@@ -132,6 +142,8 @@ const InvoiceTemplate = ({
                 ? invoice?.proformaInvoiceNumber
                 : type === "Purchase Invoice"
                 ? invoice?.purchaseInvoiceNumber
+                : type === "Credit Note"
+                ? invoice?.creditNoteNumber
                 : ""}
             </span>
           </div>
@@ -150,6 +162,8 @@ const InvoiceTemplate = ({
                 ? "Proforma Invoice Date"
                 : type === "Purchase Invoice"
                 ? "Purchase Invoice Date"
+                : type === "Credit Note"
+                ? "Credit Note Date"
                 : ""}
             </p>
             <span>
@@ -165,13 +179,19 @@ const InvoiceTemplate = ({
                 ? invoice?.proformaInvoiceDate?.split("T")[0]
                 : type === "Purchase Invoice"
                 ? invoice?.purchaseInvoiceDate?.split("T")[0]
+                : type === "Credit Note"
+                ? invoice?.creditNoteDate?.split("T")[0]
                 : ""}
             </span>
           </div>
 
           <div>
             <p style={{ color: color, fontWeight: "600" }}>
-              {type === "Quotation" ? "Expiry Date" : "Due Date"}
+              {type === "Quotation" || type === "Proforma Invoice"
+                ? "Expiry Date"
+                : type === "Credit Note"
+                ? ""
+                : "Due Date"}
             </p>
             <span>
               {type === "Sales Return"
@@ -194,19 +214,40 @@ const InvoiceTemplate = ({
         <hr style={{ margin: "16px 0", borderColor: "#d4d4d8" }} />
 
         {/* Bill to */}
-        <section style={{ fontSize: "14px" }}>
-          <h3 style={{ fontWeight: 500 }}>BILL TO</h3>
-          <p style={{ fontWeight: "bold" }}>{invoice?.partyId?.partyName}</p>
-          <p style={{ fontSize: "14px", color: "#3f3f46" }}>
-            {invoice?.partyId?.billingAddress}
-          </p>
-          <p style={{ fontWeight: 600 }}>
-            Mobile{" "}
-            <span style={{ fontWeight: "normal" }}>
-              {invoice?.partyId?.mobileNumber}
-            </span>
-          </p>
-        </section>
+        <div className="w-full flex items-center justify-between">
+          <section style={{ fontSize: "14px" }}>
+            <h3 style={{ fontWeight: 500 }}>
+              {type === "Credit Note" ? "PARTY NAME" : "BILL TO"}
+            </h3>
+            <p style={{ fontWeight: "bold" }}>{invoice?.partyId?.partyName}</p>
+            <p style={{ fontSize: "14px", color: "#3f3f46" }}>
+              {invoice?.partyId?.billingAddress}
+            </p>
+            <p style={{ fontWeight: 600 }}>
+              Mobile{" "}
+              <span style={{ fontWeight: "normal" }}>
+                {invoice?.partyId?.mobileNumber}
+              </span>
+            </p>
+          </section>
+          {/* {type === "Delivery Challan" && (
+            <section style={{ fontSize: "14px" }}>
+              <h3 style={{ fontWeight: 500 }}>SHIP TO</h3>
+              <p style={{ fontWeight: "bold" }}>
+                {invoice?.partyId?.partyName}
+              </p>
+              <p style={{ fontSize: "14px", color: "#3f3f46" }}>
+                {invoice?.partyId?.shippingAddress}
+              </p>
+              <p style={{ fontWeight: 600 }}>
+                Mobile{" "}
+                <span style={{ fontWeight: "normal" }}>
+                  {invoice?.partyId?.mobileNumber}
+                </span>
+              </p>
+            </section>
+          )} */}
+        </div>
 
         {/* Items table */}
         <div style={{ overflowX: "auto", marginTop: "16px" }}>

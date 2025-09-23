@@ -12,42 +12,44 @@ import { queryClient } from "../../main";
 import CustomLoader from "../Loader";
 import { handlePrint } from "../../../helpers/print";
 
-const ProformaInvoice = () => {
+const CreditNote = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const printRef = useRef();
-  const [invoiceIdToDownload, setInvoiceIdToDownload] = useState("invoice");
+  const [invoiceIdToDownload, setInvoiceIdToDownload] = useState();
 
-  // THIS IS THE QUERY TO GET THE INVOICE BASED ON ID
-  const { isLoading, data: proformaInvoice } = useQuery({
+  // THIS IS THE QUERY TO GET THE CREDIT NOTE BASED ON ID
+  const { isLoading, data: creditNote } = useQuery({
     queryFn: async () => {
-      const res = await axiosInstance.get(`/proforma-invoice/invoice/${id}`);
-      return res.data?.proformaInvoice;
+      const res = await axiosInstance.get(`/credit-note/invoice/${id}`);
+      return res.data?.creditNote;
     },
   });
 
   // THIS IS THE MUTATION TO DELETE THE INVOICE
   const mutation = useMutation({
-    mutationFn: async (invoiceId) => {
-      const res = await axiosInstance.delete(`/proforma-invoice/${invoiceId}`);
+    mutationFn: async () => {
+      const res = await axiosInstance.delete(
+        `/credit-note/${invoiceIdToDownload}`
+      );
       return res.data;
     },
     onSuccess: (data) => {
       toast.success(data?.msg);
-      queryClient.invalidateQueries({ queryKey: ["proformaInvoice"] });
+      queryClient.invalidateQueries({ queryKey: ["creditNote"] });
     },
   });
 
   return (
-    <main className="p-2 h-screen ">
+    <main className="p-2 h-screen">
       <div className="h-full w-full bg-white rounded-lg p-4 flex flex-col">
         {/* Header */}
         <header className="flex items-center justify-between">
           <div className="flex items-center gap-3">
             <ArrowLeft onClick={() => navigate(-1)} />
-            <h1 className="font-medium">Proforma Invoice</h1>
+            <h1 className="font-medium">Credit Note</h1>
             <div className="badge badge-success badge-soft">
-              {proformaInvoice?.status}
+              {creditNote?.status}
             </div>
           </div>
           <div className="flex items-center gap-3">
@@ -62,9 +64,7 @@ const ProformaInvoice = () => {
               <Printer size={15} /> Print PDF
             </button>
             <button
-              onClick={() =>
-                downloadPDF(invoiceIdToDownload, "proforma invoice")
-              }
+              onClick={() => downloadPDF(invoiceIdToDownload, "credit note")}
               className="btn btn-sm"
             >
               <Download size={15} /> Download PDF
@@ -78,7 +78,15 @@ const ProformaInvoice = () => {
                 className="dropdown-content menu bg-base-100 rounded-box z-1 w-52 p-2 shadow-sm"
               >
                 <li>
-                  <button>Edit</button>
+                  <button
+                    onClick={() =>
+                      navigate(
+                        `/dashboard/update/${creditNote?._id}?type=sales invoice`
+                      )
+                    }
+                  >
+                    Edit
+                  </button>
                 </li>
                 {/* <li>
                   <button>Edit History</button>
@@ -93,7 +101,7 @@ const ProformaInvoice = () => {
                   <button
                     onClick={() => {
                       document.getElementById("my_modal_3").showModal();
-                      setInvoiceIdToDelete(invoice?._id);
+                      setInvoiceIdToDelete(creditNote?._id);
                     }}
                     className="text-error"
                   >
@@ -107,14 +115,8 @@ const ProformaInvoice = () => {
 
         {/* Subheading */}
         <section className="flex items-center justify-between">
-          <div className="flex items-center gap-2 mt-7">
-            {/* <button
-              onClick={() => downloadPDF(invoiceIdToDownload)}
-              className="btn btn-sm"
-            >
-              <Download size={15} /> Download PDF
-            </button>
-            <select className="select select-sm">
+          <div className="flex items-center gap-2 ">
+            {/* <select className="select select-sm">
               <option className="hidden">Print PDF</option>
               <option>Print PDF</option>
               <option>Print Thermal</option>
@@ -129,27 +131,25 @@ const ProformaInvoice = () => {
             </select> */}
           </div>
 
-          <div className="flex items-center gap-2">
-            {/* <button className="btn btn-sm btn-soft btn-info">
+          {/* <div className="flex items-center gap-2">
+            <button className="btn btn-sm btn-soft btn-info">
               Generate E-way Bill
             </button>
             <button className="btn btn-sm btn-soft btn-info">
               <TbFileInvoice /> Generate e-Invoice
-            </button> */}
-          </div>
+            </button>
+          </div> */}
         </section>
 
         {isLoading ? (
-          <div className="w-full flex justify-center py-5">
-            <CustomLoader text={"Loading..."} />
-          </div>
+          <CustomLoader text={"Loading..."} />
         ) : (
-          <section className="mt-3 bg-sky-50 flex justify-center py-1 overflow-y-scroll flex-1">
+          <section className="mt-3 bg-neutral-100 flex justify-center py-1 overflow-y-scroll flex-1">
             {/* Invoice template */}
             <InvoiceTemplate
-              color={"#AE75DA"}
-              invoice={proformaInvoice}
-              type={"Proforma Invoice"}
+              color={"#CD5656"}
+              invoice={creditNote}
+              type={"Credit Note"}
               printRef={printRef}
               setInvoiceIdToDownload={setInvoiceIdToDownload}
             />
@@ -182,4 +182,4 @@ const ProformaInvoice = () => {
   );
 };
 
-export default ProformaInvoice;
+export default CreditNote;

@@ -215,7 +215,7 @@ const DashboardSalesPage = () => {
                   duration: 0.2,
                   delay: 0.3,
                 }}
-                className="table table-zebra"
+                className="table table-zebra border border-zinc-100 "
               >
                 {/* head */}
                 <thead>

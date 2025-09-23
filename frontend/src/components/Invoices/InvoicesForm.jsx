@@ -15,6 +15,9 @@ import { BsFillSaveFill } from "react-icons/bs";
 import { useInvoiceStore } from "../../store/invoicesStore";
 import { useQuotationStore } from "../../store/quotationStore";
 import { useSalesReturnStore } from "../../store/salesReturnStore";
+import { useCreditNoteStore } from "../../store/creditNoteStore";
+import { useChallanStore } from "../../store/challanStore";
+import { useProformaInvoiceStore } from "../../store/proformaStore";
 
 const InvoicesForm = ({
   title,
@@ -28,9 +31,15 @@ const InvoicesForm = ({
   const { totalInvoices } = useInvoiceStore();
   const { totalQuotations } = useQuotationStore();
   const { totalSalesReturn } = useSalesReturnStore();
+  const { totalCreditNotes } = useCreditNoteStore();
+  const { totalDeliveryChallans } = useChallanStore();
+  const { totalProformaInvoices } = useProformaInvoiceStore();
+
   const [quantities, setQuantities] = useState({});
 
   const invoiceNoRef = useRef();
+
+  // INVOICE DATA TO SEND
   const invoiceData = {
     paymentTerms: 0,
     dueDate: new Date(Date.now()),
@@ -44,7 +53,13 @@ const InvoicesForm = ({
         ? totalQuotations + 1
         : title === "Sales Return"
         ? totalSalesReturn + 1
-        : 1,
+        : title === "Credit Note"
+        ? totalCreditNotes + 1
+        : title === "Delivery Challan"
+        ? totalDeliveryChallans + 1
+        : title === "Proforma Invoice"
+        ? totalProformaInvoices + 1
+        : "",
     partyName: party?.partyName || "",
     items: [],
     discountSubtotal: 0,
@@ -164,6 +179,8 @@ const InvoicesForm = ({
         navigate(`/dashboard/proforma-invoice/${data?.proformaInvoice?._id}`);
       } else if (data?.purchaseReturn?._id) {
         navigate(`/dashboard/purchase-return/${data?.purchaseReturn?._id}`);
+      } else if (data?.creditNoteNumber?._id) {
+        navigate(`/dashboard/credit-note/${data?.creditNoteNumber?._id}`);
       }
     },
     onError: (err) => {

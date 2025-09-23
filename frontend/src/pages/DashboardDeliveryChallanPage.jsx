@@ -16,17 +16,23 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
 import { queryClient } from "../main";
+import dayjs from "dayjs";
 
 const DashboardDeliveryChallanPage = () => {
   const { business } = useBusinessStore();
-  const { setDeliveryChallans } = useChallanStore();
+  const { setDeliveryChallans, setTotalDeliveryChallans } = useChallanStore();
   const navigate = useNavigate();
   const [showDeletePopup, setShowDeletePopup] = useState(false);
+  const [type, setType] = useState("");
+  const [searchedQuery, setSearchedQuery] = useState("");
+  const [filterDate, setFilterDate] = useState("");
+  const [invoiceId, setInvoiceId] = useState();
 
   const { isLoading, data: deliveryChallans } = useQuery({
     queryKey: ["deliveryChallan"],
     queryFn: async () => {
       const res = await axiosInstance.get(`/delivery-challan/${business?._id}`);
+      setTotalDeliveryChallans(res.data?.totalDeliveryChallans);
       setDeliveryChallans(res.data?.deliveryChallans);
       return res.data?.deliveryChallans;
     },
@@ -34,7 +40,7 @@ const DashboardDeliveryChallanPage = () => {
 
   const mutation = useMutation({
     mutationFn: async (id) => {
-      const res = await axiosInstance.delete(`/delivery-challan/${id}`);
+      const res = await axiosInstance.delete(`/delivery-challan/${invoiceId}`);
       return res.data;
     },
     onSuccess: (data) => {
@@ -42,6 +48,68 @@ const DashboardDeliveryChallanPage = () => {
       queryClient.invalidateQueries({ queryKey: ["deliveryChallan"] });
     },
   });
+
+  const filteredChallans =
+    deliveryChallans &&
+    deliveryChallans.filter((challan) => {
+      const challanDate = dayjs(
+        challan?.deliveryChallanDate || challan?.createdAt
+      );
+
+      // --- Date filter ---
+      switch (filterDate) {
+        case "today":
+          if (!challanDate.isSame(dayjs(), "day")) return false;
+          break;
+        case "yesterday":
+          if (!challanDate.isSame(dayjs().subtract(1, "day"), "day"))
+            return false;
+          break;
+        case "thisWeek":
+          if (
+            !challanDate.isBetween(
+              dayjs().startOf("isoWeek"),
+              dayjs().endOf("isoWeek"),
+              null,
+              "[]"
+            )
+          )
+            return false;
+          break;
+        case "lastWeek":
+          const startLastWeek = dayjs().subtract(1, "week").startOf("isoWeek");
+          const endLastWeek = dayjs().subtract(1, "week").endOf("isoWeek");
+          if (!challanDate.isBetween(startLastWeek, endLastWeek, null, "[]"))
+            return false;
+          break;
+        default:
+          break;
+      }
+
+      // --- Search filter ---
+      if (searchedQuery.trim()) {
+        const query = searchedQuery.toLowerCase();
+        const matchesText =
+          challan?.deliveryChallanNumber
+            ?.toString()
+            .toLowerCase()
+            .includes(query) ||
+          challan?.partyId?.partyName?.toLowerCase().includes(query);
+        return matchesText;
+      }
+
+      // FILTERING BASED ON QUOTATION TYPE
+      if (type === "open" || type === "closed") {
+        const matchesText = challan?.status
+          ?.toLowerCase()
+          .includes(type.toLowerCase());
+        return matchesText;
+      } else {
+        return challan;
+      }
+
+      return true;
+    });
 
   return (
     <main className="h-full p-2">
@@ -51,14 +119,18 @@ const DashboardDeliveryChallanPage = () => {
           title={"Delivery Challan"}
           selectText={"Challan"}
           btnText={"Delivery Challan"}
+          type={type}
+          setType={setType}
+          setFilterDate={setFilterDate}
+          setSearchedQuery={setSearchedQuery}
         />
         <div className=" mt-5 h-80 rounded-md mx-4 ">
           {isLoading ? (
             <div className="w-full flex justify-center py-16">
               <CustomLoader text={"Loading..."} />
             </div>
-          ) : deliveryChallans ? (
-            <table className="table table-zebra">
+          ) : filteredChallans.length > 0 ? (
+            <table className="table table-zebra border border-zinc-100">
               {/* head */}
               <thead>
                 <tr className="text-xs bg-zinc-100">
@@ -71,7 +143,7 @@ const DashboardDeliveryChallanPage = () => {
                 </tr>
               </thead>
               <tbody>
-                {deliveryChallans.map((challan) => (
+                {filteredChallans.map((challan) => (
                   <tr
                     key={challan?._id}
                     onClick={() =>
@@ -89,7 +161,7 @@ const DashboardDeliveryChallanPage = () => {
                       </div>
                     </td>
                     <td>
-                      <div className="badge badge-soft badge-sm badge-primary">
+                      <div className="badge badge-soft badge-sm badge-success">
                         {challan?.status}
                       </div>
                     </td>
@@ -131,7 +203,7 @@ const DashboardDeliveryChallanPage = () => {
                                 document
                                   .getElementById("my_modal_2")
                                   .showModal();
-                                setInvoiceId(invoice?._id);
+                                setInvoiceId(challan?._id);
                               }}
                               className="text-[var(--error-text-color)]"
                             >

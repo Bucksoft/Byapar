@@ -114,7 +114,7 @@ const DashboardPaymentInPage = () => {
                 <CustomLoader text={"Loading..."} />
               </div>
             ) : filteredPaymentIns?.length > 0 ? (
-              <table className="table table-zebra">
+              <table className="table table-zebra border border-zinc-100">
                 <thead>
                   <tr className="text-xs bg-[var(--primary-background)]">
                     <th>Date</th>
