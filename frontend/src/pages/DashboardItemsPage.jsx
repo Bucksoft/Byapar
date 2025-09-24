@@ -88,7 +88,7 @@ const DashboardItemsPage = () => {
 
   return (
     <main className="h-full p-2">
-      <div className="h-full w-full bg-white rounded-lg p-3">
+      <div className="h-full w-full bg-gradient-to-b from-white to-transparent rounded-lg p-3">
         <DashboardNavbar title={"Items"} isReport={"true"} />
 
         <motion.section

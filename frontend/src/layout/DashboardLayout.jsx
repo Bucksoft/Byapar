@@ -51,7 +51,7 @@ const DashboardLayout = () => {
       </section>
 
       {/* Main Content */}
-      <section className="flex-1 md:ml-0 mt-0 md:mt-0 min-h-screen overflow-x-hidden">
+      <section className="flex-1 md:ml-0 mt-0 md:mt-0 min-h-screen overflow-x-hidden bg-[var(--sidebar-background)]">
         <Outlet />
       </section>
     </main>

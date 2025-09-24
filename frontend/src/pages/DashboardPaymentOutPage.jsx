@@ -11,7 +11,7 @@ import { usePaymentOutStore } from "../store/paymentOutStore";
 import CustomLoader from "../components/Loader";
 import { LiaRupeeSignSolid } from "react-icons/lia";
 import { EllipsisVertical } from "lucide-react";
-import { FaRegEdit } from "react-icons/fa";
+import { FaFileInvoice, FaRegEdit } from "react-icons/fa";
 import toast from "react-hot-toast";
 
 const DashboardPaymentOutPage = () => {

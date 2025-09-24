@@ -77,8 +77,8 @@ const DashboardSalesPage = () => {
       : invoices;
 
   return (
-    <main className="h-full p-2">
-      <div className="h-full w-full flex flex-col bg-white rounded-lg p-3">
+    <main className="h-full p-2 ">
+      <div className="h-full w-full flex flex-col bg-gradient-to-b from-white to-transparent rounded-lg p-3">
         <DashboardNavbar title={"Sales Invoice"} isReport={"true"} />
         <motion.div
           variants={container}

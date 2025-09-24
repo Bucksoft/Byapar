@@ -89,7 +89,7 @@ const DashboardPartiesPage = () => {
 
   return (
     <main className="h-full p-2">
-      <section className="h-full w-full bg-white rounded-lg p-3">
+      <section className="h-full w-full bg-gradient-to-b from-white to-transparent rounded-lg p-3">
         {/* Parties top navigation bar */}
         <DashboardNavbar title={"Parties"} />
 
