@@ -8,6 +8,8 @@ export const usePartyStore = create(
       setParties: (data) => set({ parties: data }),
       party: null,
       setParty: (data) => set({ party: data }),
+      totalParties: 0,
+      setTotalParties: (data) => set({ totalParties: data }),
     }),
     {
       name: "party",

@@ -27,6 +27,7 @@ import { useCategoryStore } from "../store/categoryStore";
 import { useChallanStore } from "../store/challanStore";
 import { BsExclamationCircle } from "react-icons/bs";
 import { useMutation } from "@tanstack/react-query";
+import ByaparLogo from "../assets/Byapar_Logo.svg";
 
 export const container = {
   hidden: { opacity: 0 },
@@ -106,21 +107,16 @@ const Sidebar = () => {
             translateX: 0,
             filter: "blur(0)",
           }}
-          className="sticky  top-0 z-10 text-md text-black font-semibold flex items-center justify-between gap-3 w-full px-5 py-3 backdrop-blur-md border-b border-b-zinc-200"
+          className="sticky  top-0 z-10 text-md text-black font-semibold flex items-center  gap-3 w-full px-5 py-3 backdrop-blur-md border-b border-b-zinc-200"
         >
-          {/* <img
-            src={ByaparLogo}
-            alt="Byapar_logo"
-            className="-ml-8 w-16 h-16 "
-            width={100}
-          /> */}
-          Byapar
+          <img src={ByaparLogo} alt="Byapar_logo" className=" w-8 h-8 " />
           {/* <button
             className="cursor-pointer"
             onClick={() => setSidebarShrink((prev) => !prev)}
           >
             <RiMenu3Fill />
           </button> */}
+          <span className="-ml-[13.5px]">yapar</span>
         </motion.h1>
 
         {/* business details */}

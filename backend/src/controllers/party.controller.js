@@ -149,8 +149,7 @@ export async function createParty(req, res) {
 // get All parties
 export async function getAllParties(req, res) {
   try {
-    const businessId = new mongoose.Types.ObjectId(req.params?.id);
-
+    const businessId = req.params?.id;
     if (!businessId) {
       return res.status(400).json({
         success: false,
@@ -158,10 +157,19 @@ export async function getAllParties(req, res) {
       });
     }
 
-    const parties = await Party.find({
-      businessId,
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
+    const skip = (page - 1) * limit;
+
+    const filter = {
+      businessId: new mongoose.Types.ObjectId(businessId),
       clientId: req.user?.id,
-    });
+    };
+
+    const parties = await Party.find(filter)
+      .skip(skip)
+      .limit(limit)
+      .sort({ createdAt: -1 });
 
     if (!parties || parties.length === 0) {
       return res.status(404).json({
@@ -170,9 +178,15 @@ export async function getAllParties(req, res) {
       });
     }
 
+    const totalParties = await Party.countDocuments(filter);
+    const totalPages = Math.ceil(totalParties / limit);
+
     return res.status(200).json({
       success: true,
-      count: parties.length,
+      page,
+      totalPages,
+      limit,
+      totalParties,
       data: parties,
     });
   } catch (error) {
@@ -351,6 +365,53 @@ export async function updateFullShippingAddress(req, res) {
       .json({ success: false, msg: "Updated successfully", party });
   } catch (error) {
     console.log(error);
+    return res
+      .status(500)
+      .json({ success: false, msg: "Internal Server Error" });
+  }
+}
+
+// bulk add multiple parties
+export async function bulkAddParties(req, res) {
+  try {
+    const data = req.body;
+    const businessId = req.params.id;
+    console.log("DATA", data);
+
+    const transformParties = (data, businessId, clientId) => {
+      return data
+        .filter((item) => item.Name && item.Name.trim() !== "")
+        .map((item) => {
+          // if (item.ReceivableBalance && item.ReceivableBalance > 0) {
+          //   openingBalance = item.ReceivableBalance;
+          //   openingBalanceStatus = "To Collect";
+          // } else if (item.PayableBalance && item.PayableBalance > 0) {
+          //   openingBalance = item.PayableBalance;
+          //   openingBalanceStatus = "To Pay";
+          // }
+
+          return {
+            partyName: item.Name,
+            mobileNumber: item.PhoneNo || "",
+            email: item.Email || "",
+            billingAddress: item.Address || "",
+            GSTIN: item.GSTIN || "",
+            businessId,
+            clientId,
+          };
+        });
+    };
+
+    const dataToInsert = transformParties(data, businessId, req.user.id);
+    const inserted = await Party.insertMany(dataToInsert, { ordered: false });
+    if (!inserted) {
+      return res.status(400).json({ success: false, msg: "Failed to insert!" });
+    }
+    return res
+      .status(200)
+      .json({ success: true, msg: "Inserted successfully", inserted });
+  } catch (error) {
+    console.log("ERROR ", error);
     return res
       .status(500)
       .json({ success: false, msg: "Internal Server Error" });

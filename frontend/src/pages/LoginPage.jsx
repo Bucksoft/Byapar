@@ -1,6 +1,6 @@
 import { Mail } from "lucide-react";
 import { FcGoogle } from "react-icons/fc";
-import ByaparLogo from "../assets/Byapar.png";
+import ByaparLogo from "../assets/Byapar_Logo.svg";
 import LoginImage from "../assets/Byapar.png";
 import { useMutation } from "@tanstack/react-query";
 import { useRef, useState } from "react";
@@ -82,13 +82,13 @@ const LoginPage = () => {
           className="border relative z-10 p-2 border-zinc-200 bg-white/10 backdrop-blur-3xl rounded-xl w-3/5 grid grid-cols-2 items-center"
         >
           {/* left section */}
-          <section className="flex items-start px-10 flex-col ">
-            {/* <img
-                src={ByaparLogo}
-                alt="Byapar_logo"
-                width={200}
-                className="mb-16 -ml-10"
-              /> */}
+          <section className="flex items-start mt-16 h-full px-10 flex-col ">
+            <img
+              src={ByaparLogo}
+              alt="Byapar_logo"
+              width={80}
+              className="mb-8"
+            />
 
             <h1 className="font-semibold text-4xl flex justify-between w-full items-center">
               Login / Register
@@ -203,7 +203,7 @@ const LoginPage = () => {
               ease: "easeInOut",
               duration: 0.3,
             }}
-            className="absolute h-screen w-full bg-black/70 backdrop-blur-md flex items-center justify-center"
+            className="absolute h-screen w-full bg-black/70 backdrop-blur-md z-20 flex items-center justify-center"
           >
             <OtpInputForm email={email} />
           </motion.div>
