@@ -21,6 +21,7 @@ const DashboardPaymentInDetails = () => {
   const printRef = useRef();
   const navigate = useNavigate();
 
+  // QUERY TO FETCH ALL THE PAYMENT INS
   const { isLoading, data: PaymentIn } = useQuery({
     queryKey: ["payment-in"],
     queryFn: async () => {
@@ -36,6 +37,7 @@ const DashboardPaymentInDetails = () => {
     console.log(e.target.value);
   }
 
+  // MUTATION TO DELETE THE PAYMENT IN
   const mutation = useMutation({
     mutationFn: async () => {
       const res = await axiosInstance.delete(`/payment-in/${id}`);

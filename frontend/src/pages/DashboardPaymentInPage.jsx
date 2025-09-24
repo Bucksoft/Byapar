@@ -118,9 +118,10 @@ const DashboardPaymentInPage = () => {
                 <thead>
                   <tr className="text-xs bg-[var(--primary-background)]">
                     <th>Date</th>
-                    <th>Payment Number</th>
+                    <th className="text-center">Payment Number</th>
                     <th className="text-center">Party Name</th>
-                    <th className="text-right">Payment Amount</th>
+                    <th className="text-center">Payment Amount</th>
+                    <th className="text-right">Status</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -133,16 +134,29 @@ const DashboardPaymentInPage = () => {
                       className="cursor-pointer hover:bg-zinc-50"
                     >
                       <td>{paymentIn?.paymentDate.split("T")[0]}</td>
-                      <td>{paymentIn?.paymentInNumber || "-"}</td>
+                      <td className="text-center">
+                        {paymentIn?.paymentInNumber || "-"}
+                      </td>
                       <td className="text-center">
                         {paymentIn?.partyName || "-"}
                       </td>
                       <td>
-                        <div className="flex items-center justify-end">
+                        <div className="flex items-center justify-center">
                           <LiaRupeeSignSolid />
                           {Number(paymentIn?.paymentAmount).toLocaleString(
                             "en-IN"
                           ) || "-"}
+                        </div>
+                      </td>
+                      <td className="text-right">
+                        <div
+                          className={`badge badge-soft ${
+                            paymentIn?.status === "cancelled"
+                              ? "badge-error"
+                              : "badge-warning"
+                          }  `}
+                        >
+                          {paymentIn?.status}
                         </div>
                       </td>
                     </tr>

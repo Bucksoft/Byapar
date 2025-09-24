@@ -44,6 +44,11 @@ const paymentInSchema = new mongoose.Schema({
     type: String,
     default: "payment in",
   },
+  status: {
+    type: String,
+    enum: ["active", "cancelled", "reversed", "pending", "completed"],
+    default: "active",
+  },
   settledInvoices: [{}],
 });
 

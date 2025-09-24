@@ -114,15 +114,17 @@ export async function getAllQuotations(req, res) {
 
 export async function deleteQuotation(req, res) {
   try {
-    console.log(req.params);
     const id = new mongoose.Types.ObjectId(req.params.id);
     if (!id) {
       return res.status(400).json({ msg: "Please provide invoice id" });
     }
-    const deletedQuotation = await Quotation.findByIdAndDelete(id);
+    const deletedQuotation = await Quotation.findById(id);
     if (!deletedQuotation) {
       return res.status(400).json({ msg: "Quotation not found" });
     }
+    console.log(deleteQuotation);
+    deletedQuotation.status = "expired";
+    await deletedQuotation.save();
     return res.status(200).json({ msg: "Quotation deleted successfully" });
   } catch (error) {
     console.log("Error in deleting quotation", error);

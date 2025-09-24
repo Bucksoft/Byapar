@@ -25,6 +25,7 @@ const DashboardQuotationPage = () => {
 
   const navigate = useNavigate();
 
+  // QUERY TO GET ALL THE INVOICES
   const { isLoading, data: quotations = [] } = useQuery({
     queryKey: ["quotations", business?._id],
     queryFn: async () => {
@@ -92,7 +93,6 @@ const DashboardQuotationPage = () => {
 
     return true;
   });
-
 
   return (
     <main className="h-screen w-full flex">
@@ -193,7 +193,13 @@ const DashboardQuotationPage = () => {
                         </div>
                       </td>
                       <td>
-                        <div className="badge badge-accent badge-soft">
+                        <div
+                          className={`badge ${
+                            quotation?.status === "expired"
+                              ? "badge-error"
+                              : "badge-accent"
+                          } badge-soft`}
+                        >
                           {quotation?.status}
                         </div>
                       </td>

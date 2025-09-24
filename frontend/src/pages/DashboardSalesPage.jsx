@@ -237,15 +237,28 @@ const DashboardSalesPage = () => {
                         onClick={(e) => {
                           navigate(`/dashboard/sales-invoice/${invoice?._id}`);
                         }}
-                        className="cursor-pointer hover:bg-zinc-50"
+                        className={`cursor-pointer hover:bg-zinc-50 `}
                       >
                         <td>{invoice?.salesInvoiceDate.split("T")[0]}</td>
                         <td>{invoice?.salesInvoiceNumber}</td>
                         <td>{invoice?.partyId?.partyName}</td>
                         <td>{invoice?.dueDate.split("T")[0]}</td>
-                        <td className="flex items-center gap-1">
-                          <LiaRupeeSignSolid />
-                          {Number(invoice?.totalAmount).toLocaleString("en-IN")}
+                        <td className="flex  flex-col gap-1">
+                          <div className="flex items-center">
+                            <LiaRupeeSignSolid />
+                            {Number(invoice?.totalAmount).toLocaleString(
+                              "en-IN"
+                            )}
+                          </div>
+                          {invoice?.pendingAmount > 0 && (
+                            <small className="flex items-center text-error">
+                              <LiaRupeeSignSolid />{" "}
+                              {Number(invoice?.pendingAmount).toLocaleString(
+                                "en-IN"
+                              )}{" "}
+                              unpaid
+                            </small>
+                          )}
                         </td>
                         <td>
                           <p
@@ -301,7 +314,7 @@ const DashboardSalesPage = () => {
                             </div>
                           </td>
                         ) : (
-                          <td className="text-center">-</td>
+                          <td>-</td>
                         )}
                       </tr>
                     ))

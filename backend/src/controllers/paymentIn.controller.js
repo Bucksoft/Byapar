@@ -201,11 +201,46 @@ export async function deletePaymentIn(req, res) {
         .status(400)
         .json({ success: false, msg: "Please provide the payment in id" });
     }
-    const deletedPaymentIn = await PaymentIn.findByIdAndDelete(id);
-    if (!deletedPaymentIn) {
-      return res.status(400).json({ success: false, msg: "Failed to delete" });
+
+    const paymentIn = await PaymentIn.findById(id).populate("partyId");
+    if (!paymentIn) {
+      return res.status(400).json({ success: false, msg: "Payment not found" });
     }
-    return res.status(200).json({ success: true, msg: "Deleted successfully" });
+
+    const session = await mongoose.startSession();
+    session.startTransaction();
+
+    try {
+      if (paymentIn.paymentAmount > 0 && paymentIn.partyId) {
+        paymentIn.partyId.currentBalance += paymentIn.paymentAmount;
+        await paymentIn.partyId.save({ session });
+      }
+
+      for (const settled of paymentIn.settledInvoices) {
+        const [[invoiceId, amountSettled]] = Object.entries(settled);
+        const id = new mongoose.Types.ObjectId(invoiceId);
+        const invoice = await SalesInvoice.findById(id).session(session);
+        if (invoice) {
+          invoice.settledAmount -= amountSettled;
+          invoice.pendingAmount += amountSettled;
+          if (invoice.settledAmount < 0) invoice.settledAmount = 0;
+          invoice.status = "unpaid";
+          await invoice.save({ session });
+        }
+      }
+      paymentIn.status = "cancelled";
+      await paymentIn.save();
+      await session.commitTransaction();
+      session.endSession();
+
+      return res
+        .status(200)
+        .json({ success: true, msg: "Payment deleted successfully" });
+    } catch (err) {
+      await session.abortTransaction();
+      session.endSession();
+      throw err;
+    }
   } catch (error) {
     console.error("ERROR IN DELETING PAYMENT IN DETAILS :", error);
     return res

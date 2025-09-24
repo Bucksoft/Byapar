@@ -139,7 +139,7 @@ const DeliveryChallan = () => {
           <section className="mt-3 bg-neutral-100 flex justify-center py-1 overflow-y-scroll flex-1">
             {/* Invoice template */}
             <InvoiceTemplate
-              color={"#91ADC8"}
+              color={"#129990"}
               invoice={deliveryChallan}
               type={"Delivery Challan"}
               printRef={printRef}
