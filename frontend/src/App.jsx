@@ -73,6 +73,7 @@ import PurchaseInvoice from "./components/Invoices/PurchaseInvoice";
 import DashboardPaymentOutDetails from "./pages/DashboardPaymentOutDetails";
 import DashboardUpdateInvoicesPage from "./pages/DashboardUpdateInvoicesPage";
 import CreditNote from "./components/Invoices/CreditNote";
+import PreviewExcel from "./components/PreviewExcel";
 
 function App() {
   const { setUser } = useAuthStore();
@@ -111,6 +112,7 @@ function App() {
       <Routes>
         <Route path="/" element={<HomePage />} />
         <Route path="/login" element={<LoginPage />} />
+        <Route path="/preview-excel/:id" element={<PreviewExcel />} />
         <Route path="/dashboard" element={<DashboardLayout />}>
           <Route index element={<DashboardPage />} />
           <Route path="/dashboard/parties" element={<DashboardPartiesPage />} />
@@ -270,10 +272,7 @@ function App() {
             path="/dashboard/credit-note"
             element={<DashboardCreditNotePage />}
           />
-          <Route
-            path="/dashboard/credit-note/:id"
-            element={<CreditNote />}
-          />
+          <Route path="/dashboard/credit-note/:id" element={<CreditNote />} />
 
           <Route
             path="/dashboard/parties/create-credit-note"

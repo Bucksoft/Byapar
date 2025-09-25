@@ -11,8 +11,9 @@ body {
 
 :root {
   --primary-btn: rgb(0, 186, 254);
-  --primary-background: #e4e4e7;
+  --primary-background: #d4d4d8;
   --primary-border: #d1d5dc;
+  --table-border: #d4d4d8;
   --gray-text: #707072;
   --secondary-btn: rgb(0, 211, 144);
   --primary-text-color: rgb(255, 255, 255);

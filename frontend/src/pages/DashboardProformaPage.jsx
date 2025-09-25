@@ -134,10 +134,10 @@ const DashboardProformaPage = () => {
             </div>
           ) : filteredProforma.length > 0 ? (
             <>
-              <table className="table table-zebra border border-zinc-100">
+              <table className="table table-zebra border border-[var(--table-border)]">
                 {/* head */}
                 <thead>
-                  <tr className="text-xs bg-zinc-100">
+                  <tr className="text-xs bg-[var(--primary-background)]">
                     <th>Date</th>
                     <th>Proforma Invoice Number</th>
                     <th>Party Name</th>

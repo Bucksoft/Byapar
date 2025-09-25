@@ -85,7 +85,7 @@ const ItemsList = ({ showLowStock, items }) => {
   });
 
   return (
-    <div className="overflow-x-auto">
+    <div className="overflow-x-auto ">
       {selectedItems.length > 0 ? (
         <div className="py-3 w-full flex justify-start">
           {/* Open the modal using document.getElementById('ID').showModal() method */}
@@ -119,10 +119,10 @@ const ItemsList = ({ showLowStock, items }) => {
       ) : (
         ""
       )}
-      <table className="table mt-5 w-full table-zebra">
+      <table className="table border border-[var(--table-border)]  mb-5 mt-5 w-full table-zebra">
         {/* head */}
         <thead className="">
-          <tr className="bg-[var(--primary-background)] ">
+          <tr className="bg-[var(--primary-background)]">
             <th></th>
             <th>Sr No.</th>
             <th>Item Name</th>

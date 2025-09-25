@@ -17,7 +17,7 @@ const SingleItemPartyWiseDetails = ({ item }) => {
         </button>
       </header>
       <div className="overflow-x-auto mt-4">
-        <table className="table table-zebra">
+        <table className="table table-zebra bg-zinc-300 border border-zinc-200">
           {/* head */}
           <thead>
             <tr className="bg-zinc-100">

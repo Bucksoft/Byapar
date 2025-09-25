@@ -178,6 +178,18 @@ export async function getAllParties(req, res) {
       });
     }
 
+    // Calculating total 'to collect' & 'to pay'
+    let toCollect = 0;
+    let toPay = 0;
+    const allParties = await Party.find(filter);
+    allParties.forEach((party) => {
+      if (party.partyType === "Customer") {
+        toCollect += party?.currentBalance || 0;
+      } else if (party.partyType === "Supplier") {
+        toPay += party.currentBalance || 0;
+      }
+    });
+
     const totalParties = await Party.countDocuments(filter);
     const totalPages = Math.ceil(totalParties / limit);
 
@@ -187,6 +199,8 @@ export async function getAllParties(req, res) {
       totalPages,
       limit,
       totalParties,
+      toCollect,
+      toPay,
       data: parties,
     });
   } catch (error) {
@@ -412,6 +426,27 @@ export async function bulkAddParties(req, res) {
       .json({ success: true, msg: "Inserted successfully", inserted });
   } catch (error) {
     console.log("ERROR ", error);
+    return res
+      .status(500)
+      .json({ success: false, msg: "Internal Server Error" });
+  }
+}
+
+// get parties without pagination
+export async function allParties(req, res) {
+  try {
+    const businessId = req.params.id;
+    if (!businessId) {
+      return res
+        .status(400)
+        .json({ success: false, msg: "Please provide the business id" });
+    }
+    const parties = await Party.find({
+      businessId: businessId,
+      clientId: req.user.id,
+    });
+    return res.status(200).json({ parties });
+  } catch (error) {
     return res
       .status(500)
       .json({ success: false, msg: "Internal Server Error" });

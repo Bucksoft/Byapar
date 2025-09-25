@@ -215,7 +215,7 @@ const DashboardSalesPage = () => {
                   duration: 0.2,
                   delay: 0.3,
                 }}
-                className="table table-zebra border border-zinc-100 "
+                className="table table-zebra border border-[var(--table-border)] "
               >
                 {/* head */}
                 <thead>
@@ -250,7 +250,8 @@ const DashboardSalesPage = () => {
                               "en-IN"
                             )}
                           </div>
-                          {invoice?.pendingAmount > 0 && (
+                          {invoice?.pendingAmount &&
+                          invoice.pendingAmount > 0 ? (
                             <small className="flex items-center text-error">
                               <LiaRupeeSignSolid />{" "}
                               {Number(invoice?.pendingAmount).toLocaleString(
@@ -258,6 +259,16 @@ const DashboardSalesPage = () => {
                               )}{" "}
                               unpaid
                             </small>
+                          ) : invoice.status !== "cancelled" ? (
+                            <small className="flex items-center text-error">
+                              <LiaRupeeSignSolid />{" "}
+                              {Number(invoice?.totalAmount).toLocaleString(
+                                "en-IN"
+                              )}{" "}
+                              unpaid
+                            </small>
+                          ) : (
+                            ""
                           )}
                         </td>
                         <td>

@@ -219,3 +219,14 @@ export async function updateStock(req, res) {
       .json({ success: false, msg: "Internal Server Error" });
   }
 }
+
+export async function addBulkItems(req, res) {
+  try {
+    const data = req.body;
+    return res.status(200).json({ success: false, msg: "OK" });
+  } catch (error) {
+    return res
+      .status(500)
+      .json({ success: false, msg: "Internal Server Error" });
+  }
+}

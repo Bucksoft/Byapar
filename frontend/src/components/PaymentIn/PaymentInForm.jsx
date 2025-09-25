@@ -4,7 +4,7 @@ import { usePartyStore } from "../../store/partyStore";
 import { useEffect, useRef, useState } from "react";
 import { useInvoiceStore } from "../../store/invoicesStore";
 import { LiaRupeeSignSolid } from "react-icons/lia";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import CustomLoader from "../../components/Loader";
 import toast from "react-hot-toast";
 import { useBusinessStore } from "../../store/businessStore";
@@ -35,6 +35,15 @@ const PaymentInForm = () => {
     paymentInNumber: totalPaymentIns + 1,
     notes: "",
     settledInvoices: {},
+  });
+
+  const { data: allParties } = useQuery({
+    queryFn: async () => {
+      const res = await axiosInstance.get(
+        `/parties/all-parties/${business?._id}`
+      );
+      return res.data?.parties;
+    },
   });
 
   useEffect(() => {
@@ -214,7 +223,7 @@ const PaymentInForm = () => {
               }}
             >
               <option className="hidden">Select Party</option>
-              {parties?.map((party) => (
+              {allParties?.map((party) => (
                 <option value={party?.partyName} key={party?._id}>
                   {party?.partyName}
                 </option>

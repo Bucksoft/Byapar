@@ -447,7 +447,7 @@ const SalesInvoiceItemTable = ({ title, data, setData, isEditing }) => {
                 </div>
 
                 <div className="overflow-x-auto mt-4  rounded-box border border-base-content/5 bg-base-100">
-                  <table className="table table-zebra">
+                  <table className="table table-zebra bg-zinc-300 ">
                     {/* head */}
                     <thead>
                       <tr className="text-xs bg-zinc-100">

@@ -1,5 +1,6 @@
 import express from "express";
 import {
+  allParties,
   bulkAddParties,
   createParty,
   deleteParty,
@@ -14,6 +15,7 @@ import { isAuth } from "../middleware/auth.middleware.js";
 const router = express.Router();
 
 router.route("/").post(isAuth, createParty);
+router.route("/all-parties/:id").get(isAuth, allParties);
 router.route("/bulk/:id").post(isAuth, bulkAddParties);
 router.route("/shipping-address/:id").patch(isAuth, updateShippingAddress);
 router

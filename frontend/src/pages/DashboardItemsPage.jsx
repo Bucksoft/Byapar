@@ -7,17 +7,18 @@ import { PiMicrosoftExcelLogoFill } from "react-icons/pi";
 import { motion } from "framer-motion";
 import { container } from "../components/Sidebar";
 import { Link, useNavigate } from "react-router-dom";
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { axiosInstance } from "../config/axios";
 import CustomLoader from "../components/Loader";
 import { useItemStore } from "../store/itemStore";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import ItemsList from "../components/Items/ItemsList";
 import { useBusinessStore } from "../store/businessStore";
 import { AiOutlineStock } from "react-icons/ai";
 import { BsFillBoxSeamFill } from "react-icons/bs";
 import DashboardItemsBasicDetailPage from "./Items/DashboardItemsBasicDetailPage";
 import DashboardItemsSidebar from "./Items/DashboardItemsSidebar";
+import { uploadExcel } from "../../helpers/uploadExcel";
 
 const DashboardItemsPage = () => {
   const navigate = useNavigate();
@@ -27,6 +28,24 @@ const DashboardItemsPage = () => {
   const [stockValue, setStockValue] = useState(0);
   const [showLowStock, setShowLowStock] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
+  const fileRef = useRef();
+
+  // MUTATION TO UPLOAD ITEMS IN BULK
+  const bulkMutation = useMutation({
+    mutationFn: async (data) => {
+      const res = await axiosInstance.post(`/item/bulk/${business?._id}`, data);
+      console.log(res);
+    },
+  });
+
+  const handleFileUpload = async (e) => {
+    const selectedFile = e.target.files[0];
+    const sanitizedData = await uploadExcel(selectedFile);
+    console.log(sanitizedData);
+    if (sanitizedData) {
+      bulkMutation.mutate(sanitizedData);
+    }
+  };
 
   const {
     data: items,
@@ -87,7 +106,7 @@ const DashboardItemsPage = () => {
     });
 
   return (
-    <main className="h-full p-2">
+    <main className="h-screen overflow-y-scroll p-2">
       <div className="h-full w-full bg-gradient-to-b from-white to-transparent rounded-lg p-3">
         <DashboardNavbar title={"Items"} isReport={"true"} />
 
@@ -244,6 +263,52 @@ const DashboardItemsPage = () => {
             )}
           </>
         )}
+
+        {/* HANDLING BULK UPLOAD */}
+        <div className="p-5 w-full border mb-5 border-zinc-300 shadow-md bg-gradient-to-r from-zinc-100 to-sky-200">
+          <h1 className="font-semibold">Add Multiple Items at once</h1>
+          <p className="text-zinc-500 text-sm">
+            Bulk upload all your items to Byapar using excel
+          </p>
+          <input
+            type="file"
+            className="file-input file-input-sm hidden"
+            ref={fileRef}
+            onChange={handleFileUpload}
+          />
+          <button
+            onClick={() => fileRef.current.click()}
+            disabled={bulkMutation.isPending}
+            className="btn btn-success btn-sm mt-3 "
+          >
+            {bulkMutation.isPending ? (
+              <CustomLoader text={"Adding items..."} />
+            ) : (
+              <>
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="20"
+                  height="20"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  className="icon icon-tabler icons-tabler-outline icon-tabler-file-spreadsheet"
+                >
+                  <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                  <path d="M14 3v4a1 1 0 0 0 1 1h4" />
+                  <path d="M17 21h-10a2 2 0 0 1 -2 -2v-14a2 2 0 0 1 2 -2h7l5 5v11a2 2 0 0 1 -2 2z" />
+                  <path d="M8 11h8v7h-8z" />
+                  <path d="M8 15h8" />
+                  <path d="M11 11v7" />
+                </svg>{" "}
+                Upload Excel
+              </>
+            )}
+          </button>
+        </div>
       </div>
     </main>
   );

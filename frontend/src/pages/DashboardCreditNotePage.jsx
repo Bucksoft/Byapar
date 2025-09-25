@@ -61,10 +61,10 @@ const DashboardCreditNotePage = () => {
             </div>
           ) : (
             (searchedCreditNotes || data) && (
-              <table className="table table-zebra border border-zinc-100">
+              <table className="table table-zebra border border-[var(--table-border)]">
                 {/* head */}
-                <thead>
-                  <tr className="text-xs bg-zinc-100 ">
+                <thead className="">
+                  <tr className="text-xs bg-[var(--primary-background)] ">
                     <th>Date</th>
                     <th>Credit Note Number</th>
                     <th>Party Name</th>

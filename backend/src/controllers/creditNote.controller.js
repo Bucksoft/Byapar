@@ -47,11 +47,20 @@ export async function createCreditNote(req, res) {
       const invoiceId = new mongoose.Types.ObjectId(req.body.invoiceId);
       const originalInvoice = await SalesInvoice.findById(invoiceId);
 
-      if (!originalInvoice) {
-        return res
-          .status(400)
-          .json({ success: false, msg: "Original Invoice not found" });
-      }
+      // if (originalInvoice) {
+      //   originalInvoice.pendingAmount =
+      //     (originalInvoice.pendingAmount || originalInvoice.totalAmount) -
+      //     creditNote.totalAmount;
+
+      //   if (originalInvoice.pendingAmount <= 0) {
+      //     originalInvoice.pendingAmount = 0;
+      //     originalInvoice.status = "paid";
+      //   } else {
+      //     originalInvoice.status = "partially_paid";
+      //   }
+
+      //   await originalInvoice.save();
+      // }
 
       itemsToProcess = data?.items || [];
     } else {

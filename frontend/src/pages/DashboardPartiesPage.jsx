@@ -29,6 +29,8 @@ import { queryClient } from "../main.jsx";
 import { useBusinessStore } from "../store/businessStore.js";
 import Excel from "exceljs";
 import { cleanKeys } from "../../helpers/cleanKeys.js";
+import { v4 as uuid } from "uuid";
+import { uploadExcel } from "../../helpers/uploadExcel.js";
 
 const DashboardPartiesPage = () => {
   const [searchQuery, setSearchQuery] = useState("");
@@ -36,10 +38,11 @@ const DashboardPartiesPage = () => {
   const { setParties, setTotalParties, totalParties } = usePartyStore();
   const [toCollect, setToCollect] = useState(0);
   const [toPay, setToPay] = useState(0);
-  const [page, setPage] = useState(0);
-  const [limit, setLimit] = useState(10);
+  const [page, setPage] = useState(1);
   const fileRef = useRef();
   const navigate = useNavigate();
+
+  const limit = 10;
 
   // MUTATION TO UPLOAD BULK PARTY DATA
   const bulkMutation = useMutation({
@@ -69,44 +72,30 @@ const DashboardPartiesPage = () => {
   });
 
   // FETCHING ALL PARTIES OF A PARTICULAR BUSINESS
-  const { isLoading, data, isPlaceholderData } = useQuery({
-    queryKey: ["parties"],
+  const { isLoading, data } = useQuery({
+    queryKey: ["parties", page],
     queryFn: async () => {
       if (!business) {
-        return;
+        return [];
       }
       const res = await axiosInstance.get(
         `/parties/all/${business?._id}?page=${page}&limit=${limit}`
       );
+      setToCollect(res.data.toCollect);
+      setToPay(res.data.toPay);
       setTotalParties(res.data.totalParties);
       setParties(res.data?.data);
-      return res.data.data;
+      return res.data;
     },
-    placeholderData: keepPreviousData,
+    keepPreviousData: true,
   });
 
   // SEARCH FUNCTIONALITY
   const parties =
     data &&
-    data?.filter((item) =>
+    data?.data?.filter((item) =>
       item?.partyName.toLowerCase().includes(searchQuery.toLowerCase())
     );
-
-  useEffect(() => {
-    // implementing to collect and to pay
-    if (!data) return;
-    let toCollect = 0;
-    let toPay = 0;
-    data.forEach((party) => {
-      if (party.partyType === "Customer") {
-        toCollect += party?.currentBalance || 0;
-      } else if (party.partyType === "Supplier") {
-        toPay += party?.currentBalance || 0;
-      }
-    });
-    setToCollect(toCollect);
-    setToPay(toPay);
-  }, [data]);
 
   if (isLoading) {
     return (
@@ -116,55 +105,19 @@ const DashboardPartiesPage = () => {
     );
   }
 
-  // 📁 EXCEL FILE INPUT CHANGE HANDLER
-  const handleFileUpload = (e) => {
+  // EXCEL FILE INPUT CHANGE HANDLER
+  const handleFileUpload = async (e) => {
     const selectedFile = e.target.files[0];
-    const wb = new Excel.Workbook();
-    const reader = new FileReader();
-
-    reader.readAsArrayBuffer(selectedFile);
-    reader.onload = () => {
-      const buffer = reader.result;
-      wb.xlsx.load(buffer).then((workbook) => {
-        const extractedData = [];
-
-        workbook.eachSheet((sheet) => {
-          let headers = [];
-
-          sheet.eachRow((row, rowIndex) => {
-            const rowValues = row.values;
-            if (rowIndex === 1) {
-              // First row → treat as headers
-              headers = rowValues.slice(1); // remove first undefined element
-            } else {
-              // Remaining rows → map to headers
-              const rowData = {};
-              rowValues.slice(1).forEach((cell, i) => {
-                rowData[headers[i]] = cell ?? ""; // fallback empty string if undefined
-              });
-              extractedData.push(rowData);
-            }
-          });
-        });
-
-        const sanitizedData = cleanKeys(extractedData);
-        console.log("Extracted JSON:", sanitizedData);
-        // 👉 You now have clean JSON like:
-        // [
-        //   { Name: "John", Email: "john@mail.com", "Phone No.": "1234567890", ... },
-        //   { Name: "Jane", Email: "jane@mail.com", "Phone No.": "9876543210", ... }
-        // ]
-        if (sanitizedData) {
-          bulkMutation.mutate(sanitizedData);
-        }
-      });
-    };
+    const sanitizedData = await uploadExcel(selectedFile);
+    if (sanitizedData) {
+      bulkMutation.mutate(sanitizedData);
+    }
   };
 
   return (
     <main className="h-screen overflow-y-scroll p-2">
       {
-        <section className="h-full w-full bg-gradient-to-b from-white to-transparent rounded-lg p-3">
+        <section className="  h-full w-full bg-gradient-to-b from-white to-transparent rounded-lg p-3">
           {/* Parties top navigation bar */}
           <DashboardNavbar title={"Parties"} />
 
@@ -246,11 +199,11 @@ const DashboardPartiesPage = () => {
             animate={{ opacity: 1, scale: 1 }}
             transition={{ ease: "easeInOut", duration: 0.2 }}
             className="relative z-10 bg-base-100 mt-8 
-             h-[500px] overflow-y-auto overflow-x-auto border border-zinc-300 "
+             h-[460px] overflow-y-auto overflow-x-auto border border-[var(--table-border)] "
           >
             {parties ? (
               <table className="table table-zebra text-xs min-w-full">
-                <thead className="sticky top-0 bg-zinc-300 z-20">
+                <thead className="sticky top-0 bg-[var(--primary-background)] z-20">
                   <tr>
                     <th>Party Name</th>
                     <th className="text-center">Category</th>
@@ -312,21 +265,23 @@ const DashboardPartiesPage = () => {
           <div className="w-full flex items-center justify-end p-4">
             <div className="join join-sm">
               <button
-                className="join-item btn btn-info"
-                onClick={() => setPage((old) => Math.max(old - 1, 0))}
-                disabled={page === 0}
+                className="join-item btn btn-neutral btn-sm"
+                onClick={() => setPage((old) => Math.max(old - 1, 1))}
+                disabled={page === 1}
               >
                 <FaArrowLeft />
               </button>
-              <button className="join-item btn ">{page + 1}</button>
+
+              <button className="join-item btn btn-sm">{page}</button>
+
               <button
                 onClick={() => {
-                  if (!isPlaceholderData && data.hasMore) {
+                  if (data && page < data.totalPages) {
                     setPage((old) => old + 1);
                   }
                 }}
-                disabled={isPlaceholderData || !data?.hasMore}
-                className="join-item btn btn-info"
+                disabled={!data || page >= data.totalPages}
+                className="join-item btn btn-neutral btn-sm"
               >
                 <FaArrowRight />
               </button>
@@ -334,7 +289,7 @@ const DashboardPartiesPage = () => {
           </div>
 
           {/* BULK ADD PARTIES AT ONCE */}
-          <div className=" p-5 w-full border mt-5 border-zinc-300 shadow-md bg-gradient-to-r from-zinc-100 to-sky-200">
+          <div className="p-5 w-full border mb-5 border-zinc-300 shadow-md bg-gradient-to-r from-zinc-100 to-sky-200">
             <h1 className="font-semibold">Add Multiple Parties at once</h1>
             <p className="text-zinc-500 text-sm">
               {" "}
@@ -379,6 +334,40 @@ const DashboardPartiesPage = () => {
                 </>
               )}
             </button>
+
+            {/* <button
+              onClick={() => fileRef.current.click()}
+              disabled={bulkMutation.isPending}
+              className="btn btn-success btn-sm mt-3 "
+            >
+              {bulkMutation.isPending ? (
+                <CustomLoader text={"Adding parties..."} />
+              ) : (
+                <>
+                  {" "}
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="20"
+                    height="20"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    className="icon icon-tabler icons-tabler-outline icon-tabler-file-spreadsheet"
+                  >
+                    <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                    <path d="M14 3v4a1 1 0 0 0 1 1h4" />
+                    <path d="M17 21h-10a2 2 0 0 1 -2 -2v-14a2 2 0 0 1 2 -2h7l5 5v11a2 2 0 0 1 -2 2z" />
+                    <path d="M8 11h8v7h-8z" />
+                    <path d="M8 15h8" />
+                    <path d="M11 11v7" />
+                  </svg>{" "}
+                  Upload Excel
+                </>
+              )}
+            </button> */}
           </div>
         </section>
       }
