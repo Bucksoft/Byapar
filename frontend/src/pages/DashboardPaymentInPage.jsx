@@ -32,7 +32,6 @@ const DashboardPaymentInPage = () => {
     queryKey: ["paymentIns"],
     queryFn: async () => {
       const res = await axiosInstance.get(`/payment-in/all/${business?._id}`);
-      console.log(res);
       setTotalPaymentIns(res.data?.totalPaymentIns);
       setPaymentIns(res.data.paymentIns);
       return res.data.paymentIns;

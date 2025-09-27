@@ -12,44 +12,43 @@ import { queryClient } from "../../main";
 import CustomLoader from "../Loader";
 import { handlePrint } from "../../../helpers/print";
 
-const CreditNote = () => {
+const PurchaseOrder = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const printRef = useRef();
-  const [invoiceIdToDownload, setInvoiceIdToDownload] = useState();
+  const [invoiceIdToDownload, setInvoiceIdToDownload] = useState("invoice");
 
-  // THIS IS THE QUERY TO GET THE CREDIT NOTE BASED ON ID
-  const { isLoading, data: creditNote } = useQuery({
+  // THIS IS THE QUERY TO GET THE PURCHASE ORDER BASED ON ID
+  const { isLoading, data: invoice } = useQuery({
     queryFn: async () => {
-      const res = await axiosInstance.get(`/credit-note/invoice/${id}`);
-      return res.data?.creditNote;
+      const res = await axiosInstance.get(`/purchase-order/invoice/${id}`);
+      return res.data?.purchaseOrder;
     },
   });
 
-  // THIS IS THE MUTATION TO DELETE THE INVOICE
+  // THIS IS THE MUTATION TO DELETE THE PURCHASE ORDER
   const mutation = useMutation({
-    mutationFn: async () => {
-      const res = await axiosInstance.delete(
-        `/credit-note/${invoiceIdToDownload}`
-      );
+    mutationFn: async (invoiceId) => {
+      const res = await axiosInstance.delete(`/purchase-order/${invoiceId}`);
       return res.data;
     },
     onSuccess: (data) => {
       toast.success(data?.msg);
-      queryClient.invalidateQueries({ queryKey: ["creditNote"] });
+      queryClient.invalidateQueries({ queryKey: ["purchaseOrder"] });
+      document.getElementById("my_modal_3").close();
     },
   });
 
   return (
-    <main className="p-2 h-screen">
+    <main className="p-2 h-screen ">
       <div className="h-full w-full bg-white rounded-lg p-4 flex flex-col">
         {/* Header */}
         <header className="flex items-center justify-between">
           <div className="flex items-center gap-3">
             <ArrowLeft onClick={() => navigate(-1)} />
-            <h1 className="font-medium">Credit Note</h1>
+            <h1 className="font-medium">Purchase Invoice</h1>
             <div className="badge badge-success badge-soft">
-              {creditNote?.status}
+              {invoice?.status}
             </div>
           </div>
           <div className="flex items-center gap-3">
@@ -64,7 +63,7 @@ const CreditNote = () => {
               <Printer size={15} /> Print PDF
             </button>
             <button
-              onClick={() => downloadPDF(invoiceIdToDownload, "credit note")}
+              onClick={() => downloadPDF(invoiceIdToDownload, "purchase order")}
               className="btn btn-sm"
             >
               <Download size={15} /> Download PDF
@@ -81,7 +80,7 @@ const CreditNote = () => {
                   <button
                     onClick={() =>
                       navigate(
-                        `/dashboard/update/${creditNote?._id}?type=credit note`
+                        `/dashboard/update/${invoice?._id}?type=delivery challan`
                       )
                     }
                   >
@@ -101,7 +100,7 @@ const CreditNote = () => {
                   <button
                     onClick={() => {
                       document.getElementById("my_modal_3").showModal();
-                      setInvoiceIdToDelete(creditNote?._id);
+                      setInvoiceIdToDelete(invoice?._id);
                     }}
                     className="text-error"
                   >
@@ -142,14 +141,16 @@ const CreditNote = () => {
         </section>
 
         {isLoading ? (
-          <CustomLoader text={"Loading..."} />
+          <div className="w-full py-16 flex justify-center">
+            <CustomLoader text={"Loading..."} />
+          </div>
         ) : (
-          <section className="mt-3 bg-neutral-100 flex justify-center py-1 overflow-y-scroll flex-1">
+          <section className="mt-3 bg-sky-50 flex justify-center py-1 overflow-y-scroll flex-1">
             {/* Invoice template */}
             <InvoiceTemplate
-              color={"#CD5656"}
-              invoice={creditNote}
-              type={"Credit Note"}
+              color={"#37353E"}
+              invoice={invoice}
+              type={"Purchase Order"}
               printRef={printRef}
               setInvoiceIdToDownload={setInvoiceIdToDownload}
             />
@@ -182,4 +183,4 @@ const CreditNote = () => {
   );
 };
 
-export default CreditNote;
+export default PurchaseOrder;

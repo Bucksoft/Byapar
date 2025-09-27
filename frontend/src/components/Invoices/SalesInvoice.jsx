@@ -37,6 +37,7 @@ const SalesInvoice = () => {
     onSuccess: (data) => {
       toast.success(data?.msg);
       queryClient.invalidateQueries({ queryKey: ["invoices"] });
+      document.getElementById("my_modal_3").close();
     },
   });
 

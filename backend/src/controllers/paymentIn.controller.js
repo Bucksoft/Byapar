@@ -193,6 +193,8 @@ export async function getSinglePaymentInDetail(req, res) {
   }
 }
 
+// ADJUST THE SALES INVOICE AMOUNT
+// ADJUST THE PARTY BALANCE AMOUNT
 export async function deletePaymentIn(req, res) {
   try {
     const { id } = req.params;
@@ -211,11 +213,13 @@ export async function deletePaymentIn(req, res) {
     session.startTransaction();
 
     try {
+      // PARTY's BALANCE GETS ADJUSTED AGAIN (PREVIOUS BALANCE + PAYMENT AMOUNT)
       if (paymentIn.paymentAmount > 0 && paymentIn.partyId) {
         paymentIn.partyId.currentBalance += paymentIn.paymentAmount;
         await paymentIn.partyId.save({ session });
       }
 
+      // SETTLING THE INVOICE AMOUNT AND MARKING IT AS UNPAID
       for (const settled of paymentIn.settledInvoices) {
         const [[invoiceId, amountSettled]] = Object.entries(settled);
         const id = new mongoose.Types.ObjectId(invoiceId);
@@ -228,6 +232,8 @@ export async function deletePaymentIn(req, res) {
           await invoice.save({ session });
         }
       }
+
+      // NO UPDATE IN THE ITEMS
       paymentIn.status = "cancelled";
       await paymentIn.save();
       await session.commitTransaction();

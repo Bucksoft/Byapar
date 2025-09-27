@@ -1,12 +1,14 @@
 import mongoose from "mongoose";
 
-const purchaseInvoiceSchema = new mongoose.Schema(
+const purchaseOrderSchema = new mongoose.Schema(
   {
     partyName: { type: String, default: "" },
-    purchaseInvoiceNumber: { type: Number, required: true },
-    purchaseInvoiceDate: { type: Date, default: Date.now },
-    paymentTerms: { type: Number },
-    dueDate: { type: Date, default: Date.now },
+    purchaseOrderNumber: { type: Number, required: true },
+    purchaseOrderDate: { type: Date, default: Date.now },
+    // paymentTerms: { type: Number },
+    // dueDate: { type: Date, default: Date.now },
+    validFor: { type: Number },
+    validityDate: { type: Date, default: Date.now },
     items: [
       {
         type: mongoose.Schema.Types.Mixed,
@@ -44,12 +46,12 @@ const purchaseInvoiceSchema = new mongoose.Schema(
     },
     status: {
       type: String,
-      enum: ["paid", "unpaid", "draft", "partially paid", "cancelled"],
-      default: "unpaid",
+      enum: ["draft", "open", "accepted", "rejected", "converted", "expired"],
+      default: "open",
     },
     type: {
       type: String,
-      default: "purchase invoice",
+      default: "purchase order",
     },
   },
   {
@@ -58,8 +60,5 @@ const purchaseInvoiceSchema = new mongoose.Schema(
   }
 );
 
-const PurchaseInvoice = mongoose.model(
-  "PurchaseInvoice",
-  purchaseInvoiceSchema
-);
-export default PurchaseInvoice;
+const PurchaseOrder = mongoose.model("PurchaseOrder", purchaseOrderSchema);
+export default PurchaseOrder;

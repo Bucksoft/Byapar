@@ -181,12 +181,16 @@ export async function getAllParties(req, res) {
     // Calculating total 'to collect' & 'to pay'
     let toCollect = 0;
     let toPay = 0;
+
     const allParties = await Party.find(filter);
+
     allParties.forEach((party) => {
-      if (party.partyType === "Customer") {
-        toCollect += party?.currentBalance || 0;
-      } else if (party.partyType === "Supplier") {
-        toPay += party.currentBalance || 0;
+      const balance = party?.currentBalance || 0;
+
+      if (balance > 0) {
+        toCollect += balance;
+      } else if (balance < 0) {
+        toPay += Math.abs(balance);
       }
     });
 
@@ -337,6 +341,7 @@ export async function updateShippingAddress(req, res) {
   }
 }
 
+// function to update full shipping address
 export async function updateFullShippingAddress(req, res) {
   try {
     const data = req.body.shippingData;

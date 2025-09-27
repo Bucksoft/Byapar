@@ -18,6 +18,8 @@ import { useSalesReturnStore } from "../../store/salesReturnStore";
 import { useCreditNoteStore } from "../../store/creditNoteStore";
 import { useChallanStore } from "../../store/challanStore";
 import { useProformaInvoiceStore } from "../../store/proformaStore";
+import { usePurchaseInvoiceStore } from "../../store/purchaseInvoiceStore";
+import { usePurchaseOrderStore } from "../../store/purchaseOrderStore";
 
 const InvoicesForm = ({
   title,
@@ -34,6 +36,8 @@ const InvoicesForm = ({
   const { totalCreditNotes } = useCreditNoteStore();
   const { totalDeliveryChallans } = useChallanStore();
   const { totalProformaInvoices } = useProformaInvoiceStore();
+  const { totalPurchaseInvoices } = usePurchaseInvoiceStore();
+  const { totalPurchaseOrders } = usePurchaseOrderStore();
 
   const [quantities, setQuantities] = useState({});
 
@@ -59,6 +63,10 @@ const InvoicesForm = ({
         ? totalDeliveryChallans + 1
         : title === "Proforma Invoice"
         ? totalProformaInvoices + 1
+        : title === "Purchase Invoice"
+        ? totalPurchaseInvoices + 1
+        : title === "Purchase Order"
+        ? totalPurchaseOrders + 1
         : "",
     partyName: party?.partyName || "",
     items: [],
@@ -83,18 +91,21 @@ const InvoicesForm = ({
   const [addedItems, setAddedItems] = useState([]);
   const [data, setData] = useState(invoiceData);
 
+  // THIS USE EFFECT IS FOR SETTING THE INVOICE WHICH NEEDS TO BE UPDATED
   useEffect(() => {
     if (isEditing && invoiceToUpdate) {
       setData((prev) => ({
         ...prev,
         ...invoiceToUpdate,
         partyName: invoiceToUpdate?.partyName || prev.partyName,
+        partyId: { ...invoiceToUpdate?.partyId },
       }));
 
       setAddedItems(invoiceToUpdate?.items || []);
     }
   }, [isEditing, invoiceToUpdate]);
 
+  // MUTATION FOR CREATING & UPDATING INVOICE
   const mutation = useMutation({
     mutationFn: async (formData) => {
       if (!business) {
@@ -137,6 +148,9 @@ const InvoicesForm = ({
         case "Purchase Return":
           endpoint = `/purchase-return/${business?._id}`;
           break;
+        case "Purchase Order":
+          endpoint = `/purchase-order/${business?._id}`;
+          break;
         default:
           toast.error("Invalid invoice type");
           return;
@@ -164,7 +178,7 @@ const InvoicesForm = ({
     onSuccess: (data) => {
       toast.success(data?.msg);
       queryClient.invalidateQueries({ queryKey: ["invoices"] });
-
+      console.log(data);
       if (data?.quotation?._id) {
         navigate(`/dashboard/quotations/${data?.quotation?._id}`);
       } else if (data?.salesInvoice?._id) {
@@ -181,6 +195,8 @@ const InvoicesForm = ({
         navigate(`/dashboard/purchase-return/${data?.purchaseReturn?._id}`);
       } else if (data?.creditNoteNumber?._id) {
         navigate(`/dashboard/credit-note/${data?.creditNoteNumber?._id}`);
+      } else if (data?.purchaseOrder?._id) {
+        navigate(`/dashboard/purchase-order/${data?.purchaseOrder?._id}`);
       }
     },
     onError: (err) => {
@@ -274,9 +290,8 @@ const InvoicesForm = ({
               <CustomLoader text={"Saving..."} />
             ) : (
               <>
-                {" "}
                 <BsFillSaveFill />
-                Save {title}
+                {isEditing ? `Update ${title}` : `Save ${title}`}
               </>
             )}
           </button>

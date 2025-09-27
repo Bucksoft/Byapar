@@ -49,6 +49,7 @@ const DashboardProformaPage = () => {
     onSuccess: (data) => {
       toast.success(data?.msg);
       queryClient.invalidateQueries({ queryKey: ["proformaInvoice"] });
+      document.getElementById("my_modal_2").close();
     },
   });
 
@@ -170,7 +171,13 @@ const DashboardProformaPage = () => {
                       </td>
                       <td>
                         {" "}
-                        <div className="badge badge-soft badge-sm badge-success">
+                        <div
+                          className={`badge badge-soft badge-sm  ${
+                            proforma.status === "expired"
+                              ? "badge-error"
+                              : "badge-success"
+                          } `}
+                        >
                           {proforma?.status}
                         </div>
                       </td>
@@ -190,9 +197,16 @@ const DashboardProformaPage = () => {
                             onClick={(e) => e.stopPropagation()}
                           >
                             <li>
-                              <a>
+                              <button
+                                onClick={() =>
+                                  navigate(
+                                    `/dashboard/update/${proforma?._id}?type=proforma invoice`
+                                  )
+                                }
+                                className="flex items-center gap-2"
+                              >
                                 <FaRegEdit /> Edit
-                              </a>
+                              </button>
                             </li>
                             {/* <li>
                               <a>

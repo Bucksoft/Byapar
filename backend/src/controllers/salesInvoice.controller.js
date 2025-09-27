@@ -222,3 +222,16 @@ export async function getInvoiceById(req, res) {
       .json({ success: false, msg: "Internal server error" });
   }
 }
+
+export async function updatedSalesInvoice(req, res) {
+  try {
+    const data = req.body;
+    console.log("REQUEST PARAMETERS", req.params);
+    console.log(data);
+    return res.status(200).json({ success: false, msg: "OK" });
+  } catch (error) {
+    return res
+      .status(500)
+      .json({ success: false, msg: "Internal Server Error" });
+  }
+}

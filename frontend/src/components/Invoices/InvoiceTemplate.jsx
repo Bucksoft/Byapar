@@ -36,13 +36,13 @@ const InvoiceTemplate = ({
         height: "100vh",
       }}
       ref={printRef}
-      className="print-invoice"
+      className="print-invoice py-5"
     >
       <div
         ref={invoiceIdToDownload}
         id="invoice"
         style={{
-          maxWidth: "800px",
+          width: "800px",
           height: "100%",
           backgroundColor: "#fff",
           margin: "auto",
@@ -79,6 +79,8 @@ const InvoiceTemplate = ({
               ? "Purchase Invoice"
               : type === "Credit Note"
               ? "Credit Note"
+              : type === "Purchase Order"
+              ? "Purchase Order"
               : ""}
           </h1>
         </div>
@@ -127,6 +129,8 @@ const InvoiceTemplate = ({
                 ? "Purchase Invoice No."
                 : type === "Credit Note"
                 ? "Credit Note No."
+                : type === "Purchase Order"
+                ? "Purchase Order No."
                 : ""}
             </p>
             <span>
@@ -144,6 +148,8 @@ const InvoiceTemplate = ({
                 ? invoice?.purchaseInvoiceNumber
                 : type === "Credit Note"
                 ? invoice?.creditNoteNumber
+                : type === "Purchase Order"
+                ? invoice?.purchaseOrderNumber
                 : ""}
             </span>
           </div>
@@ -164,6 +170,8 @@ const InvoiceTemplate = ({
                 ? "Purchase Invoice Date"
                 : type === "Credit Note"
                 ? "Credit Note Date"
+                : type === "Purchase Order"
+                ? "Purchase Order Date"
                 : ""}
             </p>
             <span>
@@ -181,13 +189,17 @@ const InvoiceTemplate = ({
                 ? invoice?.purchaseInvoiceDate?.split("T")[0]
                 : type === "Credit Note"
                 ? invoice?.creditNoteDate?.split("T")[0]
+                : type === "Purchase Order"
+                ? invoice?.purchaseOrderDate?.split("T")[0]
                 : ""}
             </span>
           </div>
 
           <div>
             <p style={{ color: color, fontWeight: "600" }}>
-              {type === "Quotation" || type === "Proforma Invoice"
+              {type === "Quotation" ||
+              type === "Proforma Invoice" ||
+              type === "Purchase Order"
                 ? "Expiry Date"
                 : type === "Credit Note"
                 ? ""
@@ -206,6 +218,8 @@ const InvoiceTemplate = ({
                 ? invoice?.proformaInvoiceDate?.split("T")[0]
                 : type === "Purchase Invoice"
                 ? invoice?.purchaseInvoiceDate?.split("T")[0]
+                : type === "Purchase Order"
+                ? invoice?.purchaseOrderDate?.split("T")[0]
                 : ""}
             </span>
           </div>
@@ -217,11 +231,17 @@ const InvoiceTemplate = ({
         <div className="w-full flex items-center justify-between">
           <section style={{ fontSize: "14px" }}>
             <h3 style={{ fontWeight: 500 }}>
-              {type === "Credit Note" ? "PARTY NAME" : "BILL TO"}
+              {type === "Credit Note"
+                ? "PARTY NAME"
+                : type === "Purchase Order"
+                ? "BILL FROM"
+                : "BILL TO"}
             </h3>
             <p style={{ fontWeight: "bold" }}>{invoice?.partyId?.partyName}</p>
             <p style={{ fontSize: "14px", color: "#3f3f46" }}>
-              {invoice?.partyId?.billingAddress}
+              {type === "Purchase Order"
+                ? invoice?.partyId?.shippingAddress
+                : invoice?.partyId?.billingAddress}
             </p>
             <p style={{ fontWeight: 600 }}>
               Mobile{" "}
@@ -383,14 +403,14 @@ const InvoiceTemplate = ({
                 <p>CGST </p>
                 <span style={{ display: "flex", alignItems: "center" }}>
                   <LiaRupeeSignSolid />
-                  {invoice?.cgst}
+                  {Number(invoice?.cgst).toLocaleString("en-IN")}
                 </span>
               </div>
               <div style={{ display: "flex", justifyContent: "space-between" }}>
                 <p>SGST</p>
                 <span style={{ display: "flex", alignItems: "center" }}>
                   <LiaRupeeSignSolid />
-                  {invoice?.sgst}
+                  {Number(invoice?.sgst).toLocaleString("en-IN")}
                 </span>
               </div>
 
@@ -444,7 +464,9 @@ const InvoiceTemplate = ({
                 }}
               >
                 <p style={{ fontWeight: 600 }}>Total Amount (in words)</p>
-                <span>{converter.toWords(total).toUpperCase()} ONLY</span>
+                <span>
+                  {converter.toWords(Math.round(total)).toUpperCase()} ONLY
+                </span>
               </div>
             </div>
           </section>

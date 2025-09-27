@@ -82,14 +82,20 @@ const SalesInvoiceItemTable = ({ title, data, setData, isEditing }) => {
 
     let updatedItems = addedItems.map((item) => {
       const qty = quantities[item._id] || 1;
-      const salesPrice = Number(item.salesPrice) || 0;
+      // Use purchasePrice for Purchase Invoice/Return, salesPrice otherwise
+      const price =
+        title === "Purchase Invoice" ||
+        title === "Purchase Return" ||
+        title === "Purchase Order"
+          ? Number(item.purchasePrice) || 0
+          : Number(item.salesPrice) || 0;
       const gstRate = getGSTPercentage(item.gstTaxRate);
 
       // Step 1: Get Base Price (without tax)
       const basePrice =
         item.gstTaxRateType === "without tax"
-          ? salesPrice
-          : salesPrice * (100 / (100 + gstRate));
+          ? price
+          : price * (100 / (100 + gstRate));
 
       // Step 2: Discount (either % or fixed amount)
       let discountAmount = 0;
@@ -163,7 +169,7 @@ const SalesInvoiceItemTable = ({ title, data, setData, isEditing }) => {
       totalTaxableAmount -= discountValue;
 
       // Recalculate GST after discount
-      totalGstAmount = (totalTaxableAmount * getGSTPercentage("18%")) / 100; // 👈 replace with dynamic GST logic if mixed
+      totalGstAmount = (totalTaxableAmount * getGSTPercentage("18%")) / 100;
       totalAmount = totalTaxableAmount + totalGstAmount;
 
       balanceAmount = totalAmount;
@@ -276,7 +282,7 @@ const SalesInvoiceItemTable = ({ title, data, setData, isEditing }) => {
             <input
               type="number"
               min={0}
-              value={quantities[addedItem._id] || 0}
+              value={quantities[addedItem._id] || addedItem?.quantity}
               onChange={(e) =>
                 setQuantities((prev) => ({
                   ...prev,
@@ -565,10 +571,39 @@ const SalesInvoiceItemTable = ({ title, data, setData, isEditing }) => {
                   onClick={() => {
                     const selected = items
                       .filter((item) => (quantities[item._id] || 0) > 0)
-                      .map((item) => ({
-                        ...item,
-                        quantity: quantities[item._id],
-                      }));
+                      .map((item) => {
+                        if (
+                          title === "Purchase Invoice" ||
+                          title === "Purchase Return" ||
+                          title === "Purchase Order"
+                        ) {
+                          return {
+                            ...item,
+                            quantity: quantities[item._id],
+                            priceType: "purchase",
+                            basePrice: item.purchasePrice,
+                            purchasePrice: item.purchasePrice,
+                            gstTaxRate:
+                              item.purchaseGstTaxRate || item.gstTaxRate,
+                            gstTaxRateType: "with tax",
+                            discountPercent: 0,
+                            discountAmount: 0,
+                          };
+                        } else {
+                          // Sales Invoice or Sales Return
+                          return {
+                            ...item,
+                            quantity: quantities[item._id],
+                            priceType: "sales",
+                            basePrice: item.salesPrice,
+                            salesPrice: item.salesPrice,
+                            gstTaxRate: item.gstTaxRate,
+                            gstTaxRateType: "with tax",
+                            discountPercent: 0,
+                            discountAmount: 0,
+                          };
+                        }
+                      });
                     setAddedItems(selected);
                     setData((prev) => ({ ...prev, items: selected }));
                     document.getElementById("my_modal_10").close();

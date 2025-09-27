@@ -62,29 +62,25 @@ const DashboardItemsPage = () => {
     },
   });
 
+  // CALCULATING STOCK VALUE AND LOW STOCK ITEMS
   useEffect(() => {
     if (isSuccess && items) {
       const products = items.filter((item) => item?.itemType === "product");
-      const totalInventoryValue = products.reduce(
-        (acc, product) =>
-          acc + (product?.purchasePrice || 0) * (product?.currentStock || 0),
+
+      const totalStockValue = products.reduce(
+        (sum, product) =>
+          sum + (product?.purchasePrice || 0) * (product?.currentStock || 0),
         0
       );
-      // 15000000
-      const totalUnits = products.reduce(
-        (acc, product) => acc + (product?.currentStock || 0),
-        0
-      );
-      // 500
-      const wacPerUnit = totalUnits > 0 ? totalInventoryValue / totalUnits : 0;
-      const stockValue = wacPerUnit * totalUnits;
-      const lowStockProducts = products.filter(
+
+      const lowStockCount = products.filter(
         (product) =>
           typeof product?.lowStockQuantity === "number" &&
           product?.currentStock < product?.lowStockQuantity
-      );
-      setStockValue(stockValue);
-      setLowStockItems(lowStockProducts.length);
+      ).length;
+
+      setStockValue(totalStockValue);
+      setLowStockItems(lowStockCount);
       setItems(items);
     }
   }, [isSuccess, items]);

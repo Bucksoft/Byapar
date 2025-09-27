@@ -80,7 +80,7 @@ const SalesInvoicePartyDetailsSection = ({
         (invoice) => invoice?.partyName === party?.partyName
       );
       setPartyInvoices(selectedPartyInvoices);
-    } else if (title === "Purchase Return") {
+    } else if (title === "Purchase Return" || title === "Debit Note") {
       const selectedPartyInvoices = purchaseInvoices.filter(
         (invoice) => invoice?.partyName === party?.partyName
       );
@@ -112,10 +112,12 @@ const SalesInvoicePartyDetailsSection = ({
 
     onSuccess: (data) => {
       toast.success(data?.msg);
-      console.log(data);
+      queryClient.invalidateQueries({
+        queryKey: ["parties", "allParties", business?._id],
+        refetchType: "active",
+      });
       document.getElementById("my_modal_1").close();
       document.getElementById("my_modal_2").close();
-      queryClient.invalidateQueries({ queryKey: ["parties"] });
     },
   });
 
@@ -129,7 +131,9 @@ const SalesInvoicePartyDetailsSection = ({
           } `}
         >
           <div className="bg-red flex items-center justify-between p-[7.49px] border-b border-b-zinc-300">
-            <span className="text-xs">Bill To</span>
+            <span className="text-xs">
+              Bill {title === "Purchase Invoice" ? "From" : "To"}
+            </span>
 
             {/* Change and add new party dropdown  ----------------------------------------------*/}
 
@@ -193,7 +197,10 @@ const SalesInvoicePartyDetailsSection = ({
             <div className="bg-red flex items-center justify-between p-2 border-b border-b-zinc-300">
               <span className="text-xs">
                 Ship{" "}
-                {title === "Sales Return" || title === "Credit Note"
+                {title === "Sales Return" ||
+                title === "Credit Note" ||
+                title === "Purchase Invoice" ||
+                title === "Purchase Order"
                   ? "From"
                   : "To"}
               </span>
@@ -471,7 +478,7 @@ const SalesInvoicePartyDetailsSection = ({
               <input
                 type="number"
                 placeholder="1"
-                value={data?.salesInvoiceNumber}
+                value={data?.salesInvoiceNumber || 1}
                 ref={invoiceNoRef}
                 name={"salesInvoiceNumber"}
                 onChange={(e) =>
@@ -578,7 +585,7 @@ const SalesInvoicePartyDetailsSection = ({
                 </>
               )}
             </>
-          ) : title === "Quotation" ? (
+          ) : title === "Quotation" || title === "Purchase Order" ? (
             <>
               {" "}
               <div className="px-2 py-4 flex space-x-2 border border-dashed w-fit m-2 rounded-md ">
@@ -634,7 +641,8 @@ const SalesInvoicePartyDetailsSection = ({
             </>
           ) : title === "Sales Return" ||
             title === "Credit Note" ||
-            title === "Purchase Return" ? (
+            title === "Purchase Return" ||
+            title === "Debit Note" ? (
             <>
               <div className="px-2 flex flex-col w-full relative">
                 <small>
@@ -646,7 +654,7 @@ const SalesInvoicePartyDetailsSection = ({
                         ? invoices.filter(
                             (invoice) => invoice?._id === data?.invoiceId
                           )[0]?.salesInvoiceNumber
-                        : title === "Purchase Return"
+                        : title === "Purchase Return" || title === "Debit Note"
                         ? purchaseInvoices.filter(
                             (invoice) => invoice?.partyName === party?.partyName
                           )[0]?.purchaseInvoiceNumber
@@ -695,6 +703,7 @@ const SalesInvoicePartyDetailsSection = ({
                                 className="hover:bg-zinc-100 cursor-pointer"
                                 onClick={() => {
                                   setData((prev) => ({
+                                    ...prev,
                                     ...partyInvoice,
                                     invoiceId: partyInvoice?._id, // SET THE SELECTED INVOICE ID
                                   }));
@@ -707,7 +716,8 @@ const SalesInvoicePartyDetailsSection = ({
                                     ? partyInvoice?.salesInvoiceDate.split(
                                         "T"
                                       )[0]
-                                    : title === "Purchase Return"
+                                    : title === "Purchase Return" ||
+                                      title === "Debit Note"
                                     ? partyInvoice?.purchaseInvoiceDate.split(
                                         "T"
                                       )[0]
@@ -717,7 +727,8 @@ const SalesInvoicePartyDetailsSection = ({
                                   {title === "Sales Return" ||
                                   title === "Credit Note"
                                     ? partyInvoice?.salesInvoiceNumber
-                                    : title === "Purchase Return"
+                                    : title === "Purchase Return" ||
+                                      title === "Debit Note"
                                     ? partyInvoice?.purchaseInvoiceNumber
                                     : ""}
                                 </td>
@@ -729,7 +740,8 @@ const SalesInvoicePartyDetailsSection = ({
                                       ? Number(
                                           partyInvoice?.totalAmount
                                         ).toLocaleString("en-IN")
-                                      : title === "Purchase Return"
+                                      : title === "Purchase Return" ||
+                                        title === "Debit Note"
                                       ? Number(
                                           partyInvoice?.totalAmount
                                         ).toLocaleString("en-IN")

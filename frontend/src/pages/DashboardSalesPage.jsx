@@ -303,9 +303,16 @@ const DashboardSalesPage = () => {
                                 onClick={(e) => e.stopPropagation()}
                               >
                                 <li>
-                                  <a>
+                                  <button
+                                    onClick={() =>
+                                      navigate(
+                                        `/dashboard/update/${invoice?._id}?type=sales invoice`
+                                      )
+                                    }
+                                    className="flex items-center gap-2"
+                                  >
                                     <FaRegEdit /> Edit
-                                  </a>
+                                  </button>
                                 </li>
                                 <li>
                                   <a
@@ -372,18 +379,6 @@ const DashboardSalesPage = () => {
                 You haven't generated any invoices yet.
               </h1>
             </div>
-          )}
-
-          {invoices?.length <= 0 && (
-            <motion.div
-              initial={{ opacity: 0, scale: 0 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ ease: "easeInOut", duration: 0.2, delay: 0.4 }}
-              className="w-full flex items-center justify-center my-8 flex-col gap-3 text-zinc-400"
-            >
-              <FaFileInvoice size={40} />
-              No transactions matching the current filter
-            </motion.div>
           )}
         </div>
       </div>

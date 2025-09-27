@@ -1,10 +1,10 @@
 import mongoose from "mongoose";
 
-const purchaseInvoiceSchema = new mongoose.Schema(
+const debitNoteSchema = new mongoose.Schema(
   {
     partyName: { type: String, default: "" },
-    purchaseInvoiceNumber: { type: Number, required: true },
-    purchaseInvoiceDate: { type: Date, default: Date.now },
+    debitNoteNumber: { type: Number, required: true },
+    debitNoteDate: { type: Date, default: Date.now },
     paymentTerms: { type: Number },
     dueDate: { type: Date, default: Date.now },
     items: [
@@ -42,14 +42,14 @@ const purchaseInvoiceSchema = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: "UserCredential",
     },
+    invoiceId: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "SalesInvoice",
+    },
     status: {
       type: String,
       enum: ["paid", "unpaid", "draft", "partially paid", "cancelled"],
       default: "unpaid",
-    },
-    type: {
-      type: String,
-      default: "purchase invoice",
     },
   },
   {
@@ -58,8 +58,5 @@ const purchaseInvoiceSchema = new mongoose.Schema(
   }
 );
 
-const PurchaseInvoice = mongoose.model(
-  "PurchaseInvoice",
-  purchaseInvoiceSchema
-);
-export default PurchaseInvoice;
+const DebitNote = mongoose.model("DebitNote", debitNoteSchema);
+export default DebitNote;

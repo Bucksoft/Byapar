@@ -9,18 +9,16 @@ const DashboardDebitNotePage = () => {
         <DashboardNavbar title={"Debit Note"} />
         <SalesNavigationMenus title={"Debit Note"} btnText={"Debit Note"} />
         <div className="mt-5 h-80 rounded-md mx-4 ">
-          <table className="table table-zebra">
+          <table className="table table-zebra border border-[var(--table-border)]">
             {/* head */}
             <thead>
-              <tr className="bg-zinc-100">
-                <th className=" ">Date</th>
-                <th className=" ">Debit Note Number</th>
-                <th className="">Party Name</th>
-
-                <th className="">Purchase No</th>
-                <th className="">Amount</th>
-
-                <th className="">Status</th>
+              <tr className="bg-[var(--primary-background)]">
+                <th>Date</th>
+                <th>Debit Note Number</th>
+                <th>Party Name</th>
+                <th>Purchase No</th>
+                <th>Amount</th>
+                <th>Status</th>
               </tr>
             </thead>
           </table>

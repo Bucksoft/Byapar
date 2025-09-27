@@ -74,6 +74,7 @@ import DashboardPaymentOutDetails from "./pages/DashboardPaymentOutDetails";
 import DashboardUpdateInvoicesPage from "./pages/DashboardUpdateInvoicesPage";
 import CreditNote from "./components/Invoices/CreditNote";
 import PreviewExcel from "./components/PreviewExcel";
+import PurchaseOrder from "./components/Invoices/PurchaseOrder";
 
 function App() {
   const { setUser } = useAuthStore();
@@ -231,6 +232,11 @@ function App() {
           <Route
             path="/dashboard/purchase-order"
             element={<DashoardPurchaseOrderPage />}
+          />
+
+          <Route
+            path="/dashboard/purchase-order/:id"
+            element={<PurchaseOrder />}
           />
 
           <Route

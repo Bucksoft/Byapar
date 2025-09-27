@@ -31,6 +31,8 @@ import Excel from "exceljs";
 import { cleanKeys } from "../../helpers/cleanKeys.js";
 import { v4 as uuid } from "uuid";
 import { uploadExcel } from "../../helpers/uploadExcel.js";
+import { IoMdArrowDown, IoMdArrowUp } from "react-icons/io";
+import { IoArrowDownSharp } from "react-icons/io5";
 
 const DashboardPartiesPage = () => {
   const [searchQuery, setSearchQuery] = useState("");
@@ -117,7 +119,7 @@ const DashboardPartiesPage = () => {
   return (
     <main className="h-screen overflow-y-scroll p-2">
       {
-        <section className="  h-full w-full bg-gradient-to-b from-white to-transparent rounded-lg p-3">
+        <section className=" h-full w-full bg-gradient-to-b from-white to-transparent rounded-lg p-3">
           {/* Parties top navigation bar */}
           <DashboardNavbar title={"Parties"} />
 
@@ -144,12 +146,14 @@ const DashboardPartiesPage = () => {
                 <span className="font-medium text-2xl flex items-center gap-2">
                   {details?.label === "To Collect" && (
                     <>
-                      <FaIndianRupeeSign size={15} /> {toCollect}
+                      <FaIndianRupeeSign size={15} />{" "}
+                      {Number(toCollect).toLocaleString("en-IN")}
                     </>
                   )}
                   {details?.label === "To Pay" && (
                     <>
-                      <FaIndianRupeeSign size={15} /> {toPay}
+                      <FaIndianRupeeSign size={15} />{" "}
+                      {Number(toPay).toLocaleString("en-IN")}
                     </>
                   )}
                   {details?.label === "All Parties" && (
@@ -231,7 +235,18 @@ const DashboardPartiesPage = () => {
                       <td>{party?.categoryName || "-"}</td>
                       <td>{party?.mobileNumber || "-"}</td>
                       <td>{party?.partyType || "-"}</td>
-                      <td>₹ {party?.currentBalance || 0}</td>
+                      <td className="">
+                        <div className="flex items-center justify-center gap-2">
+                          {party?.currentBalance > 0 ? (
+                            <IoMdArrowUp className="text-success" />
+                          ) : party?.currentBalance < 0 ? (
+                            <IoMdArrowDown className="text-error" />
+                          ) : (
+                            ""
+                          )}{" "}
+                          ₹ {Math.abs(party?.currentBalance) || 0}
+                        </div>
+                      </td>
                       <td
                         onClick={(e) => e.stopPropagation()}
                         className="flex items-center gap-2 justify-end"
@@ -256,7 +271,12 @@ const DashboardPartiesPage = () => {
               </table>
             ) : (
               <div className="w-full flex flex-col gap-3 items-center justify-center py-16">
-                ...
+                <h1 className="text-zinc-500">
+                  No parties found for this business
+                </h1>
+                <Link to={"/dashboard/add-party"} className="btn btn-info">
+                  Create party
+                </Link>
               </div>
             )}
           </motion.div>
@@ -334,43 +354,31 @@ const DashboardPartiesPage = () => {
                 </>
               )}
             </button>
-
-            {/* <button
-              onClick={() => fileRef.current.click()}
-              disabled={bulkMutation.isPending}
-              className="btn btn-success btn-sm mt-3 "
-            >
-              {bulkMutation.isPending ? (
-                <CustomLoader text={"Adding parties..."} />
-              ) : (
-                <>
-                  {" "}
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    width="20"
-                    height="20"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    className="icon icon-tabler icons-tabler-outline icon-tabler-file-spreadsheet"
-                  >
-                    <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-                    <path d="M14 3v4a1 1 0 0 0 1 1h4" />
-                    <path d="M17 21h-10a2 2 0 0 1 -2 -2v-14a2 2 0 0 1 2 -2h7l5 5v11a2 2 0 0 1 -2 2z" />
-                    <path d="M8 11h8v7h-8z" />
-                    <path d="M8 15h8" />
-                    <path d="M11 11v7" />
-                  </svg>{" "}
-                  Upload Excel
-                </>
-              )}
-            </button> */}
           </div>
         </section>
       }
+
+      {/* DELETE MODAL */}
+      <dialog id="my_modal_3" className="modal">
+        <div className="modal-box">
+          <h3 className="font-bold text-lg">Confirm Deletion</h3>
+          <p className="py-4 text-sm">
+            Are you sure you want to delete the selected invoice ? This action
+            cannot be undone.
+          </p>
+          <div className="flex w-full">
+            <button
+              onClick={() => mutation.mutate()}
+              className="btn btn-sm btn-ghost  ml-auto text-[var(--error-text-color)]"
+            >
+              Delete
+            </button>
+          </div>
+        </div>
+        <form method="dialog" className="modal-backdrop">
+          <button>close</button>
+        </form>
+      </dialog>
     </main>
   );
 };

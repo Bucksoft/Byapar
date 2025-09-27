@@ -38,7 +38,7 @@ const DashboardNavbar = ({ title, isReport }) => {
 
       {/* Reports dropdown */}
       <div className="flex gap-5 items-center ">
-        <div className="">
+        {/* <div className="">
           {isReport && (
             <select onChange={handleChange} className="select select-sm">
               {title === "Items" ? (
@@ -53,22 +53,24 @@ const DashboardNavbar = ({ title, isReport }) => {
                     Item Sales Summary
                   </option>
                 </>
+              ) : title === "Sales Invoice" ? (
+                <>
+                  <option value={"Sales Summary"} className="hidden">
+                    Sales Summary
+                  </option>
+                  <option value={"Sales Summary"}>Sales Summary</option>
+                  <option value={"GSTR-1 (Sales)"}>GSTR-1 (Sales)</option>
+                  <option value={"DayBook"}>DayBook</option>
+                  <option value={"Bill Wise Profit"}>Bill Wise Profit</option>
+                </>
+              ) : title === "Purchase Invoice" ? (
+                ""
               ) : (
-                title === "Sales Invoice" && (
-                  <>
-                    <option value={"Sales Summary"} className="hidden">
-                      Sales Summary
-                    </option>
-                    <option value={"Sales Summary"}>Sales Summary</option>
-                    <option value={"GSTR-1 (Sales)"}>GSTR-1 (Sales)</option>
-                    <option value={"DayBook"}>DayBook</option>
-                    <option value={"Bill Wise Profit"}>Bill Wise Profit</option>
-                  </>
-                )
+                ""
               )}
             </select>
           )}
-        </div>
+        </div> */}
 
         {/* <button className="btn btn-square btn-sm bg-transparent group">
           <IoSettingsOutline

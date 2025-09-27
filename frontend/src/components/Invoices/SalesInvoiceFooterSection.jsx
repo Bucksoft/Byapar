@@ -183,11 +183,15 @@ const SalesInvoiceFooterSection = ({ data, setData, title }) => {
           <>
             <div className="flex justify-between py-2">
               <span className={`px-2 w-fit text-xs`}>SGST</span>
-              <span className=" text-xs pr-5">₹ {data?.sgst}</span>
+              <span className=" text-xs pr-5">
+                ₹ {Number(data?.sgst).toLocaleString("en-IN")}
+              </span>
             </div>
             <div className="flex justify-between py-2">
               <span className={`px-2 w-fit text-xs`}>CGST</span>
-              <span className=" text-xs pr-5">₹ {data?.cgst}</span>
+              <span className=" text-xs pr-5">
+                ₹ {Number(data?.cgst).toLocaleString("en-IN")}
+              </span>
             </div>
           </>
         )}
