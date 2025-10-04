@@ -31,7 +31,11 @@ const app = express();
 
 app.use(
   cors({
-    origin: ["https://byapar-frontend.onrender.com", "http://localhost:5173"],
+    origin: [
+      "https://byapar-frontend.onrender.com",
+      "http://localhost:5173",
+      "https://byapar.bucksoftech.top/",
+    ],
     credentials: true,
   })
 );
@@ -41,11 +45,15 @@ app.use(cookieParser());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
-
-app.use('/health',(req,res)=>{
-  res.status(200).json({msg:"server is healthy", uptime:process.uptime(), timestamp:Date.now()});
-})
-
+app.use("/health", (req, res) => {
+  res
+    .status(200)
+    .json({
+      msg: "server is healthy",
+      uptime: process.uptime(),
+      timestamp: Date.now(),
+    });
+});
 
 app.use("/api/v1/business", businessRoutes);
 app.use("/api/v1/user", userRoutes);

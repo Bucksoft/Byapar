@@ -82,22 +82,25 @@ const DashboardPage = () => {
                         </tr>
                       </thead>
                       <tbody>
-                        {invoices.slice(0, 3).map((invoice) => (
-                          <tr key={invoice?._id}>
-                            <td>
-                              {invoice?.salesInvoiceDate.split("T")[0] || "-"}
-                            </td>
-                            <td>{invoice?.type || "-"}</td>
-                            <td>{invoice?.salesInvoiceNumber || "-"}</td>
-                            <td>{invoice?.partyId?.partyName || "-"}</td>
-                            <td className="flex items-center">
-                              <LiaRupeeSignSolid />
-                              {Number(invoice?.totalAmount).toLocaleString(
-                                "en-IN"
-                              ) || "-"}
-                            </td>
-                          </tr>
-                        ))}
+                        {invoices &&
+                          invoices?.invoices.slice(0, 3).map((invoice) => (
+                            <tr key={invoice?._id}>
+                              <td>
+                                {(invoice?.salesInvoiceDate &&
+                                  invoice?.salesInvoiceDate.split("T")[0]) ||
+                                  "-"}
+                              </td>
+                              <td>{invoice?.type || "-"}</td>
+                              <td>{invoice?.salesInvoiceNumber || "-"}</td>
+                              <td>{invoice?.partyId?.partyName || "-"}</td>
+                              <td className="flex items-center">
+                                <LiaRupeeSignSolid />
+                                {Number(invoice?.totalAmount).toLocaleString(
+                                  "en-IN"
+                                ) || "-"}
+                              </td>
+                            </tr>
+                          ))}
                       </tbody>
                     </table>
                     <div className="w-full text-center mt-2">
