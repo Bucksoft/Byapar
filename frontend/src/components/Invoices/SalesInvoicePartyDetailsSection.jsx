@@ -61,9 +61,11 @@ const SalesInvoicePartyDetailsSection = ({
     party?.partyName.toLowerCase().includes(searchPartyQuery.toLowerCase())
   );
 
-  const searchedInvoices = invoices?.filter(
-    (invoice) => invoice?.salesInvoiceNumber === Number(invoiceSearchQuery)
-  );
+  const searchedInvoices =
+    invoices &&
+    invoices.invoices?.filter(
+      (invoice) => invoice?.salesInvoiceNumber === Number(invoiceSearchQuery)
+    );
 
   const handleInputChange = (e) => {
     const { name, value, type, checked } = e.target;

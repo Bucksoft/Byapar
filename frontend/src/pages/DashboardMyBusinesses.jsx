@@ -7,10 +7,11 @@ import { IoMdCheckmarkCircleOutline } from "react-icons/io";
 import { PenSquare, Plus } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { queryClient } from "../main";
 import { BsTrash3 } from "react-icons/bs";
 import businessImg from "../assets/business.svg";
+import { useAuthStore } from "../store/authStore";
 
 const DashboardMyBusinesses = () => {
   const {

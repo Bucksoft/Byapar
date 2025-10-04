@@ -270,7 +270,7 @@ const DashboardSalesPage = () => {
                   </tr>
                 </thead>
                 <tbody>
-                  {searchedInvoices.length > 0 ? (
+                  {searchedInvoices && searchedInvoices?.length > 0 ? (
                     searchedInvoices.map((invoice) => (
                       <tr
                         key={invoice?._id}

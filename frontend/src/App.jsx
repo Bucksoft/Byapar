@@ -78,36 +78,7 @@ import PurchaseOrder from "./components/Invoices/PurchaseOrder";
 import DebitNote from "./components/Invoices/DebitNote";
 
 function App() {
-  const { setUser } = useAuthStore();
-  const { setBusiness } = useBusinessStore();
-
-  const {
-    data: userData,
-    isSuccess,
-    isLoading,
-  } = useQuery({
-    queryKey: ["user"],
-    queryFn: async () => {
-      const res = await axiosInstance.get("/user/me");
-      setUser(res.data?.user);
-      return res.data?.user;
-    },
-  });
-
-  useEffect(() => {
-    if (isSuccess && userData) {
-      setBusiness(userData.activeBusinessId || null);
-    }
-  }, [isSuccess, userData, setBusiness]);
-
-  // if (isLoading) {
-  //   return (
-  //     <div className="h-screen w-full flex items-center justify-center">
-  //       <CustomLoader text={"Loading...."} />
-  //     </div>-9
-  //   );
-
-  // }
+  const { user } = useAuthStore();
 
   return (
     <>
