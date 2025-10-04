@@ -54,6 +54,7 @@ const DashboardStaffPage = () => {
                   src={calclo}
                   alt="Calculator With Clock"
                   className="w-full max-w-[150px] object-contain"
+                  loading="lazy"
                 />
               </div>
               <p className="text-center text-sm border-t border-[var(--primary-border)] p-3">
@@ -83,6 +84,7 @@ const DashboardStaffPage = () => {
                   src={calcal}
                   alt="Calculator with Calendar"
                   className="w-full max-w-[150px] object-contain"
+                  loading="lazy"
                 />
               </div>
               <p className="text-center text-sm border-t border-[var(--primary-border)] p-3">
@@ -112,6 +114,7 @@ const DashboardStaffPage = () => {
                   src={mes}
                   alt="Message Icon"
                   className="w-full max-w-[150px] object-contain"
+                  loading="lazy"
                 />
               </div>
               <p className="text-center text-sm border-t border-[var(--primary-border)] p-4">

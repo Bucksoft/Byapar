@@ -57,6 +57,7 @@ const DashboardLowStockPage = () => {
                 src={itemstocksummary}
                 alt="src/assets/itemstocksummary"
                 className="w-50"
+                loading="lazy"
               />
               <p className="text-sm text-gray-500 font-normal">
                 No items available to generate report

@@ -88,6 +88,7 @@ const LoginPage = () => {
               alt="Byapar_logo"
               width={80}
               className="mb-8"
+              loading="lazy"
             />
 
             <h1 className="font-semibold text-4xl flex justify-between w-full items-center">

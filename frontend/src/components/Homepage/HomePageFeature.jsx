@@ -24,7 +24,13 @@ const HomePageFeature = () => {
           {/* cards */}
 
           <div className="relative ">
-            <img src={one} alt="card1" width={500} className="rounded-xl " />
+            <img
+              src={one}
+              alt="card1"
+              width={500}
+              className="rounded-xl "
+              loading="lazy"
+            />
             <div className="absolute top-0 bg-white/10 p-2 backdrop-blur-[3px] h-full w-full rounded-xl">
               <h1 className="bg-white w-fit px-2 text-sm rounded-md">
                 Smart GST Calculations
@@ -49,7 +55,13 @@ const HomePageFeature = () => {
             </div>
           </div>
           <div className="relative ">
-            <img src={two} alt="card1" width={500} className="rounded-xl " />
+            <img
+              src={two}
+              alt="card1"
+              width={500}
+              className="rounded-xl "
+              loading="lazy"
+            />
             <div className="absolute top-0 bg-white/10 p-2 backdrop-blur-[3px] h-full w-full rounded-xl">
               <h1 className="bg-white w-fit px-2 text-sm rounded-md">
                 Inventory Management
@@ -74,7 +86,13 @@ const HomePageFeature = () => {
             </div>
           </div>
           <div className="relative ">
-            <img src={three} alt="card1" width={500} className="rounded-xl " />
+            <img
+              src={three}
+              alt="card1"
+              width={500}
+              className="rounded-xl "
+              loading="lazy"
+            />
             <div className="absolute top-0 bg-white/10 p-2 backdrop-blur-[3px] h-full w-full rounded-xl">
               <h1 className="bg-white w-fit px-2 text-sm rounded-md">
                 Business Analytics
@@ -99,7 +117,13 @@ const HomePageFeature = () => {
             </div>
           </div>
           <div className="relative ">
-            <img src={four} alt="card1" width={500} className="rounded-xl " />
+            <img
+              src={four}
+              alt="card1"
+              width={500}
+              className="rounded-xl "
+              loading="lazy"
+            />
             <div className="absolute top-0 bg-white/10 p-2 backdrop-blur-[3px] h-full w-full rounded-xl">
               <h1 className="bg-white w-fit px-2 text-sm rounded-md">
                 Professional Billing
@@ -124,7 +148,13 @@ const HomePageFeature = () => {
             </div>
           </div>
           <div className="relative ">
-            <img src={five} alt="card1" width={500} className="rounded-xl " />
+            <img
+              src={five}
+              alt="card1"
+              width={500}
+              className="rounded-xl "
+              loading="lazy"
+            />
             <div className="absolute top-0 bg-white/10 p-2 backdrop-blur-[3px] h-full w-full rounded-xl">
               <h1 className="bg-white w-fit px-2 text-sm rounded-md">
                 Data Security
@@ -150,7 +180,13 @@ const HomePageFeature = () => {
             </div>
           </div>
           <div className="relative ">
-            <img src={six} alt="card1" width={500} className="rounded-xl " />
+            <img
+              src={six}
+              alt="card1"
+              width={500}
+              className="rounded-xl "
+              loading="lazy"
+            />
             <div className="absolute top-0 bg-white/10 p-2 backdrop-blur-[3px] h-full w-full rounded-xl">
               <h1 className="bg-white w-fit px-2 text-sm rounded-md">
                 Time-Saving Automation

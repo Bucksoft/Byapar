@@ -331,6 +331,7 @@ const DashboardManageUsersPage = () => {
                         src={manageuser1}
                         alt="/src/assets/manageuser1"
                         className="w-30"
+                        loading="lazy"
                       />
                       <div className="flex flex-col">
                         <p className="text-sm font-bold">

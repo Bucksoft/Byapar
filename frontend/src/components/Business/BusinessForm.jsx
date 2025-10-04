@@ -290,6 +290,7 @@ const BusinessForm = ({ businessToBeUpdated }) => {
                     height: "100px",
                     objectFit: "cover",
                   }}
+                  loading="lazy"
                 />
               ) : (
                 <>
@@ -733,7 +734,7 @@ const BusinessForm = ({ businessToBeUpdated }) => {
           <p className="text-[13px] text-gray-500">Signature</p>
           <div className="flex items-center justify-between py-2 relative ">
             {/* {singaturePreviewUrl ? (
-              <img src={singaturePreviewUrl} size={100} />
+              <img src={singaturePreviewUrl} size={100} loading="lazy"/>
             ) : (
               <>
                 <label
@@ -753,6 +754,7 @@ const BusinessForm = ({ businessToBeUpdated }) => {
                   height: "100px",
                   objectFit: "cover",
                 }}
+                loading="lazy"
                 className="border border-dashed p-5 border-blue-500"
               />
             ) : (

@@ -71,6 +71,7 @@ const DashboardRateListPage = () => {
                   src={itemratelist}
                   alt="src/assets/itemratelist"
                   className="w-50"
+                  loading="lazy"
                 />
                 <p className="text-sm text-gray-500 font-normal">
                   No transactions available to generate report
