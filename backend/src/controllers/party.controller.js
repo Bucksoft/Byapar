@@ -329,6 +329,19 @@ export async function updateShippingAddress(req, res) {
       { new: true }
     );
 
+    if (!updatedParty) {
+      return res.status(400).json({
+        success: false,
+        msg: "Party's shipping address could not be updated",
+      });
+    }
+
+    // set the shipping address field also
+    if (data?.shippingData?.streetAddress) {
+      updatedParty.shippingAddress = data?.shippingData?.streetAddress;
+      await updatedParty.save();
+    }
+
     return res.status(200).json({
       success: true,
       msg: "Shipping address updated successfully",

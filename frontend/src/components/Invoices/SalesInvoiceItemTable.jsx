@@ -23,6 +23,7 @@ const SalesInvoiceItemTable = ({ title, data, setData, isEditing }) => {
     item?.itemName.toLowerCase().includes(searchItemQuery.toLowerCase())
   );
 
+  // HANDLE GST TYPE CHANGE
   const handleSetGstTaxRateType = (e, itemId) => {
     const { value } = e.target;
     setAddedItems((prevItems) =>
@@ -32,6 +33,7 @@ const SalesInvoiceItemTable = ({ title, data, setData, isEditing }) => {
     );
   };
 
+  // HANDLE DISCOUNT CHANGE
   const handleSetDiscountPercent = (percent, itemId) => {
     setAddedItems((prev) =>
       prev.map((item) => {
@@ -52,6 +54,7 @@ const SalesInvoiceItemTable = ({ title, data, setData, isEditing }) => {
     );
   };
 
+  // HANDLE DISCOUNT CHANGE
   const handleSetDiscountAmount = (amount, itemId) => {
     setAddedItems((prev) =>
       prev.map((item) => {
@@ -82,11 +85,12 @@ const SalesInvoiceItemTable = ({ title, data, setData, isEditing }) => {
 
     let updatedItems = addedItems.map((item) => {
       const qty = quantities[item._id] || 1;
-      // Use purchasePrice for Purchase Invoice/Return, salesPrice otherwise
+      // PURCHASE KE LIYE ITEMS KI PURCHASE PRICE LAGANI HAI, AUR SALES KE LIYE SALES PRICE
       const price =
         title === "Purchase Invoice" ||
         title === "Purchase Return" ||
-        title === "Purchase Order"
+        title === "Purchase Order" ||
+        title === "Debit Note"
           ? Number(item.purchasePrice) || 0
           : Number(item.salesPrice) || 0;
       const gstRate = getGSTPercentage(item.gstTaxRate);

@@ -120,7 +120,7 @@ export async function createDebitNote(req, res) {
 
     // ADJUSTING PARTY BALANCE
     if (party && debitNote.totalAmount > 0) {
-      party.currentBalance = party.currentBalance - debitNote.totalAmount;
+      party.currentBalance = party.currentBalance + debitNote.totalAmount;
       await party.save();
     }
   } catch (error) {
@@ -133,6 +133,20 @@ export async function createDebitNote(req, res) {
 
 export async function getAllDebitNotes(req, res) {
   try {
+    const businessId = req.params?.id;
+    if (!businessId) {
+      return res
+        .status(400)
+        .json({ success: false, msg: "Business id is required" });
+    }
+    const debitNotes = await DebitNote.find({
+      businessId,
+      clientId: req.user?.id,
+    })
+      .populate("partyId")
+      .sort({ createdAt: -1 });
+    const totalDebitNotes = await DebitNote.countDocuments({});
+    return res.status(200).json({ success: true, totalDebitNotes, debitNotes });
   } catch (error) {
     return res
       .status(500)
@@ -142,6 +156,68 @@ export async function getAllDebitNotes(req, res) {
 
 export async function getDebitNoteById(req, res) {
   try {
+    const id = req.params?.id;
+    if (!id) {
+      return res
+        .status(400)
+        .json({ success: false, msg: "Debit Note id is required" });
+    }
+    const debitNote = await DebitNote.findById(id).populate("partyId");
+    if (!debitNote) {
+      return res
+        .status(404)
+        .json({ success: false, msg: "Debit Note not found" });
+    }
+    return res.status(200).json({ success: true, debitNote });
+  } catch (error) {
+    return res
+      .status(500)
+      .json({ success: false, msg: "Internal Server error" });
+  }
+}
+
+export async function deleteDebitNote(req, res) {
+  try {
+    const id = req.params?.id;
+    if (!id) {
+      return res
+        .status(400)
+        .json({ success: false, msg: "Debit Note id is required" });
+    }
+    const debitNote = await DebitNote.findById(id);
+    if (!debitNote) {
+      return res
+        .status(404)
+        .json({ success: false, msg: "Debit Note not found" });
+    }
+    // RESTORING STOCK
+    for (const debitNoteItem of debitNote.items) {
+      await Item.findByIdAndUpdate(debitNoteItem._id, {
+        $inc: { currentStock: debitNoteItem.quantity },
+      });
+    }
+    const party = await Party.findById(debitNote.partyId);
+    if (party && debitNote.totalAmount > 0) {
+      party.currentBalance = party.currentBalance - debitNote.totalAmount;
+      await party.save();
+    }
+    // marking related invoice as unpaid if it was marked paid due to this debit note , debit note amont is equal to invoice amount
+    if (debitNote?.invoiceId) {
+      const relatedInvoice = await PurchaseInvoice.findById(
+        debitNote.invoiceId
+      );
+      if (relatedInvoice) {
+        if (relatedInvoice.status === "paid") {
+          relatedInvoice.status = "unpaid";
+          relatedInvoice.pendingAmount = relatedInvoice.totalAmount;
+          await relatedInvoice.save();
+        } else if (relatedInvoice.status === "partially paid") {
+          relatedInvoice.pendingAmount =
+            (relatedInvoice.pendingAmount || 0) + debitNote.totalAmount;
+          await relatedInvoice.save();
+        }
+      }
+    }
   } catch (error) {
     return res
       .status(500)

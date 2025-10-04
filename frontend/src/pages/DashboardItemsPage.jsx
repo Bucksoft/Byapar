@@ -34,14 +34,12 @@ const DashboardItemsPage = () => {
   const bulkMutation = useMutation({
     mutationFn: async (data) => {
       const res = await axiosInstance.post(`/item/bulk/${business?._id}`, data);
-      console.log(res);
     },
   });
 
   const handleFileUpload = async (e) => {
     const selectedFile = e.target.files[0];
     const sanitizedData = await uploadExcel(selectedFile);
-    console.log(sanitizedData);
     if (sanitizedData) {
       bulkMutation.mutate(sanitizedData);
     }
@@ -112,33 +110,11 @@ const DashboardItemsPage = () => {
           animate="show"
           className="grid grid-cols-2 gap-2 "
         >
-          {/* {dashboardItemsCardDetails?.map((details) => (
-            <motion.div
-              onClick={() =>
-                navigate(`/dashboard/reports?type=${details.label}`)
-              }
-              variants={dashboardLinksItems}
-              key={details.id}
-              className={`border rounded-md p-3 mt-5 shadow-md border-${details?.color} bg-${details.color}/10 hover:-translate-y-1 transition-all ease-in-out duration-200 cursor-pointer`}
-            >
-              <p className={`flex items-center gap-3 text-${details.color}`}>
-                {details.icon} {details.label}
-              </p>
-              <span className="font-medium text-2xl flex gap-2 items-center">
-                {details?.label === "Stock Value" && (
-                  <FaIndianRupeeSign size={14} />
-                )}
-                1
-              </span>
-            </motion.div>
-          ))} */}
-
           <div
             onClick={() => navigate(`/dashboard/reports?type=Stock Value`)}
             className={`border rounded-md p-3 mt-5 bg-error/10 border-error shadow-md  hover:-translate-y-1 transition-all ease-in-out duration-200 cursor-pointer`}
           >
             <p className={`flex items-center gap-3`}>
-              {" "}
               <AiOutlineStock /> Stock Value
             </p>
             <span className="font-medium text-2xl flex gap-2 items-center">
@@ -152,7 +128,6 @@ const DashboardItemsPage = () => {
             className={`border rounded-md p-3 mt-5 border-warning bg-warning/10 shadow-md hover:-translate-y-1 transition-all ease-in-out duration-200 cursor-pointer`}
           >
             <p className={`flex items-center gap-3`}>
-              {" "}
               <BsFillBoxSeamFill /> Low Stock
             </p>
             <span className="font-medium text-2xl flex gap-2 items-center">
@@ -197,9 +172,7 @@ const DashboardItemsPage = () => {
           </div>
 
           {/* CREATE ITEM */}
-
           <button
-            // to={"/dashboard/items/basic-details"}
             onClick={() => document.getElementById("my_modal_3").showModal()}
             className="btn btn-sm bg-[var(--primary-btn)]"
           >
@@ -209,11 +182,6 @@ const DashboardItemsPage = () => {
           <dialog id="my_modal_3" className="modal">
             <div className="modal-box w-11/12 max-w-5xl h-3/4">
               <DashboardItemsSidebar data={items} modalId={"my_modal_3"} />
-              {/* <div className="modal-action">
-                  <form method="dialog">
-                    <button className="btn">Close</button>
-                  </form>
-                </div> */}
             </div>
           </dialog>
         </motion.div>
@@ -247,31 +215,33 @@ const DashboardItemsPage = () => {
                 className="flex items-center justify-center  flex-col"
               >
                 <img src={no_items} alt="no_items" width={250} loading="lazy" />
-                <h3 className="font-semibold">Create Items!</h3>
+                <h3 className="font-semibold">No items found</h3>
                 <p className="text-zinc-500 text-xs">
-                  For quicker and easier experience of creating sales invoices
+                  Start by creating your first item or upload items in bulk
+                  using Excel for faster setup.
                 </p>
-                {/* <button className="btn btn-soft btn-sm mt-4 bg-[var(--primary-btn)]">
-                  {" "}
-                  <PiMicrosoftExcelLogoFill size={15} /> Add Items
-                </button> */}
               </motion.div>
             )}
           </>
         )}
 
         {/* HANDLING BULK UPLOAD */}
-        <div className="p-5 w-full border mb-5 border-zinc-300 shadow-md bg-gradient-to-r from-zinc-100 to-sky-200">
+        <div className="p-5 w-full border mb-5 border-zinc-300 shadow-md bg-gradient-to-r from-zinc-100 to-sky-200 ">
           <h1 className="font-semibold">Add Multiple Items at once</h1>
           <p className="text-zinc-500 text-sm">
             Bulk upload all your items to Byapar using excel
           </p>
+          <small className="mt-1 text-red-500">
+            Note* You must follow the sample items excel.
+          </small>
+          <br />
           <input
             type="file"
             className="file-input file-input-sm hidden"
             ref={fileRef}
             onChange={handleFileUpload}
           />
+
           <button
             onClick={() => fileRef.current.click()}
             disabled={bulkMutation.isPending}
@@ -303,6 +273,30 @@ const DashboardItemsPage = () => {
                 Upload Excel
               </>
             )}
+          </button>
+
+          <button
+            onClick={() => window.open("/sample-items.xlsx", "_blank")}
+            className="btn text-neutral btn-link btn-xs mt-3 ml-3"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              className="icon icon-tabler icons-tabler-outline icon-tabler-download"
+            >
+              <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+              <path d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2 -2v-2" />
+              <path d="M7 11l5 5l5 -5" />
+              <path d="M12 4l0 12" />
+            </svg>
+            Download Sample
           </button>
         </div>
       </div>

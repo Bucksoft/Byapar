@@ -223,7 +223,8 @@ export async function updateStock(req, res) {
 export async function addBulkItems(req, res) {
   try {
     const data = req.body;
-    return res.status(200).json({ success: false, msg: "OK" });
+    console.log("DATA", data);
+    return res.status(200).json({ success: true, msg: "OK" });
   } catch (error) {
     return res
       .status(500)

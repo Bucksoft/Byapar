@@ -224,19 +224,19 @@ const SalesInvoicePartyDetailsSection = ({
                     {/* SHIPPING ADDRESS TABLE */}
                     {party?.fullShippingAddress && (
                       <div className="overflow-x-auto">
-                        <table className="table table-zebra table-sm mt-5">
-                          {/* head */}
-                          <thead>
-                            <tr className="bg-zinc-100">
-                              <th>Address</th>
-                              <th className="text-center">Edit</th>
-                              <th className="text-right">Select</th>
-                            </tr>
-                          </thead>
-                          <tbody>
-                            {/* row 1 */}
-                            {party?.fullShippingAddress.length &&
-                              party.fullShippingAddress.map((address) => (
+                        {party?.fullShippingAddress.length > 0 && (
+                          <table className="table table-zebra table-sm mt-5">
+                            {/* head */}
+                            <thead>
+                              <tr className="bg-zinc-100">
+                                <th>Address</th>
+                                <th className="text-center">Edit</th>
+                                <th className="text-right">Select</th>
+                              </tr>
+                            </thead>
+                            <tbody>
+                              {/* row 1 */}
+                              {party.fullShippingAddress.map((address) => (
                                 <tr key={address?.id}>
                                   <td className="py-2">
                                     {address?.streetAddress || "-"}
@@ -261,7 +261,11 @@ const SalesInvoicePartyDetailsSection = ({
                                       type="radio"
                                       name="radio-2"
                                       className="radio radio-xs"
-                                      defaultChecked={false}
+                                      value={address?.id}
+                                      checked={
+                                        party?.shippingAddress ===
+                                        address?.streetAddress
+                                      }
                                       onChange={() => {
                                         setParty((prev) => ({
                                           ...prev,
@@ -273,8 +277,9 @@ const SalesInvoicePartyDetailsSection = ({
                                   </td>
                                 </tr>
                               ))}
-                          </tbody>
-                        </table>
+                            </tbody>
+                          </table>
+                        )}
                       </div>
                     )}
                     <>
@@ -459,7 +464,7 @@ const SalesInvoicePartyDetailsSection = ({
                   <span className="text-black">{party?.mobileNumber}</span>
                 </p>
               )}
-              {party?.fullShippingAddress.length && (
+              {party?.fullShippingAddress.length > 0 && (
                 <p className="text-xs pt-1 text-zinc-400">
                   Address:{" "}
                   <span className="text-black">{party?.shippingAddress}</span>{" "}

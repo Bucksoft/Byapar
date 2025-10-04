@@ -75,6 +75,7 @@ import DashboardUpdateInvoicesPage from "./pages/DashboardUpdateInvoicesPage";
 import CreditNote from "./components/Invoices/CreditNote";
 import PreviewExcel from "./components/PreviewExcel";
 import PurchaseOrder from "./components/Invoices/PurchaseOrder";
+import DebitNote from "./components/Invoices/DebitNote";
 
 function App() {
   const { setUser } = useAuthStore();
@@ -218,6 +219,8 @@ function App() {
             path="/dashboard/parties/create-debit-note"
             element={<DashboardCreateDebitNotePage />}
           />
+
+          <Route path="/dashboard/debit-note/:id" element={<DebitNote />} />
 
           <Route
             path="/dashboard/purchase-return"

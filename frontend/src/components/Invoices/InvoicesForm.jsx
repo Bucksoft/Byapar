@@ -20,6 +20,7 @@ import { useChallanStore } from "../../store/challanStore";
 import { useProformaInvoiceStore } from "../../store/proformaStore";
 import { usePurchaseInvoiceStore } from "../../store/purchaseInvoiceStore";
 import { usePurchaseOrderStore } from "../../store/purchaseOrderStore";
+import { useDebitNoteStore } from "../../store/debitNoteStore";
 
 const InvoicesForm = ({
   title,
@@ -38,6 +39,7 @@ const InvoicesForm = ({
   const { totalProformaInvoices } = useProformaInvoiceStore();
   const { totalPurchaseInvoices } = usePurchaseInvoiceStore();
   const { totalPurchaseOrders } = usePurchaseOrderStore();
+  const { totalDebitNotes } = useDebitNoteStore();
 
   const [quantities, setQuantities] = useState({});
 
@@ -67,7 +69,9 @@ const InvoicesForm = ({
         ? totalPurchaseInvoices + 1
         : title === "Purchase Order"
         ? totalPurchaseOrders + 1
-        : "",
+        : title === "Debit Note"
+        ? totalDebitNotes + 1
+        : 1,
     partyName: party?.partyName || "",
     items: [],
     discountSubtotal: 0,
@@ -151,6 +155,9 @@ const InvoicesForm = ({
         case "Purchase Order":
           endpoint = `/purchase-order/${business?._id}`;
           break;
+        case "Debit Note":
+          endpoint = `/debit-note/${business?._id}`;
+          break;
         default:
           toast.error("Invalid invoice type");
           return;
@@ -197,6 +204,8 @@ const InvoicesForm = ({
         navigate(`/dashboard/credit-note/${data?.creditNoteNumber?._id}`);
       } else if (data?.purchaseOrder?._id) {
         navigate(`/dashboard/purchase-order/${data?.purchaseOrder?._id}`);
+      } else if (data?.debitNote?._id) {
+        navigate(`/dashboard/debit-note/${data?.debitNote?._id}`);
       }
     },
     onError: (err) => {

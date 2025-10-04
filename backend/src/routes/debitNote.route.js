@@ -1,6 +1,7 @@
 import express from "express";
 import {
   createDebitNote,
+  deleteDebitNote,
   getAllDebitNotes,
   getDebitNoteById,
 } from "../controllers/debitNote.controller.js";
@@ -11,5 +12,6 @@ const router = express.Router();
 router.route("/invoice/:id").get(isAuth, getDebitNoteById);
 router.route("/:id").post(isAuth, createDebitNote);
 router.route("/:id").get(isAuth, getAllDebitNotes);
+router.route("/:id").delete(isAuth, deleteDebitNote);
 
 export default router;

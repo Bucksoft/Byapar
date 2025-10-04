@@ -12,30 +12,30 @@ import { queryClient } from "../../main";
 import CustomLoader from "../Loader";
 import { handlePrint } from "../../../helpers/print";
 
-const PurchaseInvoice = () => {
+const DebitNote = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const printRef = useRef();
   const [invoiceIdToDownload, setInvoiceIdToDownload] = useState("invoice");
 
-  // THIS IS THE QUERY TO GET THE INVOICE BASED ON ID
+  // THIS IS THE QUERY TO GET THE DEBIT NOTE BASED ON ID
   const { isLoading, data: invoice } = useQuery({
     queryFn: async () => {
-      const res = await axiosInstance.get(`/purchase-invoice/invoice/${id}`);
-      console.log(res);
-      return res.data?.invoice;
+      const res = await axiosInstance.get(`/debit-note/invoice/${id}`);
+      console.log(res.data?.debitNote);
+      return res.data?.debitNote;
     },
   });
 
-  // THIS IS THE MUTATION TO DELETE THE INVOICE
+  // THIS IS THE MUTATION TO DELETE THE DEBIT NOTE
   const mutation = useMutation({
     mutationFn: async (invoiceId) => {
-      const res = await axiosInstance.delete(`/purchase-invoice/${invoiceId}`);
+      const res = await axiosInstance.delete(`/debit-note/${invoiceId}`);
       return res.data;
     },
     onSuccess: (data) => {
       toast.success(data?.msg);
-      queryClient.invalidateQueries({ queryKey: ["purchaseInvoice"] });
+      queryClient.invalidateQueries({ queryKey: ["debitNotes"] });
       document.getElementById("my_modal_3").close();
     },
   });
@@ -47,7 +47,7 @@ const PurchaseInvoice = () => {
         <header className="flex items-center justify-between">
           <div className="flex items-center gap-3">
             <ArrowLeft onClick={() => navigate(-1)} />
-            <h1 className="font-medium">Purchase Invoice</h1>
+            <h1 className="font-medium">Debit Note</h1>
             <div className="badge badge-success badge-soft">
               {invoice?.status}
             </div>
@@ -64,7 +64,7 @@ const PurchaseInvoice = () => {
               <Printer size={15} /> Print PDF
             </button>
             <button
-              onClick={() => downloadPDF(invoiceIdToDownload, "sales invoice")}
+              onClick={() => downloadPDF(invoiceIdToDownload, "Debit Note")}
               className="btn btn-sm"
             >
               <Download size={15} /> Download PDF
@@ -81,7 +81,7 @@ const PurchaseInvoice = () => {
                   <button
                     onClick={() =>
                       navigate(
-                        `/dashboard/update/${invoice?._id}?type=purchase invoice`
+                        `/dashboard/update/${invoice?._id}?type=debit note`
                       )
                     }
                   >
@@ -147,9 +147,9 @@ const PurchaseInvoice = () => {
           <section className="mt-3 bg-sky-50 flex justify-center py-1 overflow-y-scroll flex-1">
             {/* Invoice template */}
             <InvoiceTemplate
-              color={"#48B3AF"}
+              color={"#1E93AB"}
               invoice={invoice}
-              type={"Purchase Invoice"}
+              type={"Debit Note"}
               setInvoiceIdToDownload={setInvoiceIdToDownload}
             />
           </section>
@@ -181,4 +181,4 @@ const PurchaseInvoice = () => {
   );
 };
 
-export default PurchaseInvoice;
+export default DebitNote;

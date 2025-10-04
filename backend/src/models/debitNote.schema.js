@@ -44,7 +44,11 @@ const debitNoteSchema = new mongoose.Schema(
     },
     invoiceId: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "SalesInvoice",
+      ref: "PurchaseInvoice",
+    },
+    type: {
+      type: String,
+      default: "Debit Note",
     },
     status: {
       type: String,
