@@ -2,7 +2,12 @@ import DashboardNavbar from "../components/DashboardNavbar";
 import { dashboardSaledCardsDetails } from "../lib/dashboardSalesCards";
 import { FaIndianRupeeSign } from "react-icons/fa6";
 import { EllipsisVertical, Plus, Search } from "lucide-react";
-import { FaFileInvoice, FaRegEdit } from "react-icons/fa";
+import {
+  FaArrowLeft,
+  FaArrowRight,
+  FaFileInvoice,
+  FaRegEdit,
+} from "react-icons/fa";
 import { motion } from "framer-motion";
 import { container, dashboardLinksItems } from "../components/Sidebar";
 import { Link, useNavigate } from "react-router-dom";
@@ -26,6 +31,8 @@ const DashboardSalesPage = () => {
   const { business } = useBusinessStore();
   const navigate = useNavigate();
   const fileRef = useRef(null);
+  const [page, setPage] = useState(1);
+  const limit = 10;
 
   // to get all the invoices
   const {
@@ -33,14 +40,17 @@ const DashboardSalesPage = () => {
     data: invoices,
     isSuccess,
   } = useQuery({
-    queryKey: ["invoices", business?._id],
+    queryKey: ["invoices", business?._id, page],
     queryFn: async () => {
       if (!business) return [];
-      const res = await axiosInstance.get(`/sales-invoice/${business._id}`);
+      const res = await axiosInstance.get(
+        `/sales-invoice/${business._id}?page=${page}&limit=${limit}`
+      );
       setTotalInvoices(res.data?.totalInvoices);
-      return res.data?.invoices || [];
+      return res.data || [];
     },
     enabled: !!business,
+    keepPreviousData: true,
   });
 
   // mutation to delete an invoice
@@ -67,7 +77,7 @@ const DashboardSalesPage = () => {
 
   const searchedInvoices =
     invoices && searchQuery
-      ? invoices.filter(
+      ? invoices?.invoices.filter(
           (invoice) =>
             invoice?.partyId?.partyName
               ?.toLowerCase()
@@ -77,16 +87,15 @@ const DashboardSalesPage = () => {
               .toLowerCase()
               .includes(searchQuery.toString().toLowerCase())
         )
-      : invoices;
+      : invoices?.invoices;
 
   // MUTATION TO UPLOAD ITEMS IN BULK
   const bulkMutation = useMutation({
     mutationFn: async (data) => {
       const res = await axiosInstance.post(
-        `/sales/bulk/${business?._id}`,
+        `/sales-invoice/bulk/${business?._id}`,
         data
       );
-      console.log("SALES BULK MUTATION ", res);
       return res.data;
     },
     onSuccess: (data) => {
@@ -101,6 +110,7 @@ const DashboardSalesPage = () => {
     if (sanitizedData) {
       bulkMutation.mutate(sanitizedData);
     }
+    e.target.value = null;
   };
 
   return (
@@ -125,7 +135,7 @@ const DashboardSalesPage = () => {
               <FaIndianRupeeSign size={15} />
               {invoices
                 ? Number(
-                    invoices
+                    invoices?.invoices
                       .reduce(
                         (acc, invoice) =>
                           acc + Number(invoice?.totalAmount || 0),
@@ -149,7 +159,7 @@ const DashboardSalesPage = () => {
               <FaIndianRupeeSign size={15} />
               {invoices
                 ? Number(
-                    invoices.reduce(
+                    invoices?.invoices.reduce(
                       (sum, invoice) => sum + (invoice.settledAmount || 0),
                       0
                     )
@@ -170,7 +180,7 @@ const DashboardSalesPage = () => {
               <FaIndianRupeeSign size={15} />
               {invoices
                 ? Number(
-                    invoices.reduce(
+                    invoices?.invoices.reduce(
                       (sum, invoice) =>
                         sum +
                         (invoice.pendingAmount ??
@@ -227,7 +237,10 @@ const DashboardSalesPage = () => {
               <CustomLoader text={"Getting all invoices..."} />
             </div>
           ) : (
-            (searchedInvoices || invoices) && (
+            <div
+              className="relative z-10 bg-base-100 mt-8 
+             h-[460px] overflow-y-auto overflow-x-auto border border-[var(--table-border)] "
+            >
               <motion.table
                 initial={{
                   opacity: 0,
@@ -242,7 +255,7 @@ const DashboardSalesPage = () => {
                   duration: 0.2,
                   delay: 0.3,
                 }}
-                className="table table-zebra border border-[var(--table-border)] "
+                className="table table-zebra  table-sm min-w-full"
               >
                 {/* head */}
                 <thead>
@@ -266,9 +279,13 @@ const DashboardSalesPage = () => {
                         }}
                         className={`cursor-pointer hover:bg-zinc-50 `}
                       >
-                        <td>{invoice?.salesInvoiceDate.split("T")[0]}</td>
+                        <td>
+                          {invoice?.salesInvoiceDate
+                            ? invoice?.salesInvoiceDate.split("T")[0]
+                            : "-"}
+                        </td>
                         <td>{invoice?.salesInvoiceNumber}</td>
-                        <td>{invoice?.partyId?.partyName}</td>
+                        <td>{invoice?.partyId?.partyName || "-"}</td>
                         <td>{invoice?.dueDate.split("T")[0]}</td>
                         <td className="flex  flex-col gap-1">
                           <div className="flex items-center">
@@ -380,7 +397,7 @@ const DashboardSalesPage = () => {
                   )}
                 </tbody>
               </motion.table>
-            )
+            </div>
           )}
 
           {(!searchedInvoices || !invoices) && (
@@ -409,8 +426,35 @@ const DashboardSalesPage = () => {
           )}
         </div>
 
+        {/* PAGINATION  */}
+        <div className="w-full flex items-center justify-end p-4">
+          <div className="join join-sm">
+            <button
+              className="join-item btn btn-neutral btn-sm"
+              onClick={() => setPage((old) => Math.max(old - 1, 1))}
+              disabled={page === 1}
+            >
+              <FaArrowLeft />
+            </button>
+
+            <button className="join-item btn btn-sm">{page}</button>
+
+            <button
+              onClick={() => {
+                if (invoices && page < invoices.totalPages) {
+                  setPage((old) => old + 1);
+                }
+              }}
+              disabled={!invoices || page >= invoices.totalPages}
+              className="join-item btn btn-neutral btn-sm"
+            >
+              <FaArrowRight />
+            </button>
+          </div>
+        </div>
+
         {/* HANDLING BULK UPLOAD */}
-        <div className="p-5 w-full border mb-5 border-zinc-300 shadow-md bg-gradient-to-r from-zinc-100 to-sky-200 ">
+        <div className="p-5 w-full border mt-3 border-zinc-300 shadow-md bg-gradient-to-r from-zinc-100 to-sky-200 ">
           <h1 className="font-semibold">
             Add Multiple Sales information at once
           </h1>

@@ -206,7 +206,7 @@ const DashboardPartiesPage = () => {
              h-[460px] overflow-y-auto overflow-x-auto border border-[var(--table-border)] "
           >
             {parties ? (
-              <table className="table table-zebra text-xs min-w-full">
+              <table className="table table-zebra table-sm min-w-full">
                 <thead className="sticky top-0 bg-[var(--primary-background)] z-20">
                   <tr>
                     <th>Party Name</th>
@@ -279,6 +279,7 @@ const DashboardPartiesPage = () => {
                 </Link>
               </div>
             )}
+
           </motion.div>
 
           {/* PAGINATION  */}

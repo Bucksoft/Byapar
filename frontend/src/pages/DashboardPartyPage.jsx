@@ -32,9 +32,9 @@ const DashboardPartyPage = () => {
   });
 
   useEffect(() => {
-    const partyInvoices = invoices?.filter(
-      (invoice) => invoice?.partyId?._id === id
-    );
+    const partyInvoices =
+      invoices &&
+      invoices?.invoices.filter((invoice) => invoice?.partyId?._id === id);
     setPartyInvoices(partyInvoices);
   }, [id, invoices]);
 

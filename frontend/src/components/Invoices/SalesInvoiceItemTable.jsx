@@ -19,7 +19,7 @@ const SalesInvoiceItemTable = ({ title, data, setData, isEditing }) => {
   const { purchaseInvoices } = usePurchaseInvoiceStore();
   const { items } = useItemStore();
 
-  const searchedItems = items?.filter((item) =>
+  const searchedItems = items?.items.filter((item) =>
     item?.itemName.toLowerCase().includes(searchItemQuery.toLowerCase())
   );
 
@@ -456,11 +456,11 @@ const SalesInvoiceItemTable = ({ title, data, setData, isEditing }) => {
                   </div>
                 </div>
 
-                <div className="overflow-x-auto mt-4  rounded-box border border-base-content/5 bg-base-100">
+                <div className="overflow-x-auto mt-4 h-[450px] overflow-y-scroll rounded-box border border-base-content/5 ">
                   <table className="table table-zebra bg-zinc-300 ">
                     {/* head */}
                     <thead>
-                      <tr className="text-xs bg-zinc-100">
+                      <tr className="text-xs bg-zinc-100 ">
                         <th>Item Name</th>
                         <th>Item Code</th>
                         <th>Sales Price</th>
@@ -573,7 +573,7 @@ const SalesInvoiceItemTable = ({ title, data, setData, isEditing }) => {
                 <button
                   className="btn btn-sm w-32 bg-[var(--primary-btn)]"
                   onClick={() => {
-                    const selected = items
+                    const selected = items?.items
                       .filter((item) => (quantities[item._id] || 0) > 0)
                       .map((item) => {
                         if (

@@ -2,6 +2,8 @@ import { salesInvoiceSchema } from "../config/validation.js";
 import SalesInvoice from "../models/salesInvoiceSchema.js";
 import Party from "../models/party.schema.js";
 import { Item } from "../models/item.schema.js";
+import mongoose from "mongoose";
+import { parseDate } from "../../src/utils/date.js";
 
 // CONTROLLER TO CREATE A SALES INVOICE
 export async function createSalesInvoice(req, res) {
@@ -97,20 +99,46 @@ export async function createSalesInvoice(req, res) {
 // CONTROLLER TO GET ALL THE SALES INVOICES
 export async function getAllInvoices(req, res) {
   try {
-    const totalInvoices = await SalesInvoice.countDocuments({});
-    const invoices = await SalesInvoice.find({
-      $and: [{ businessId: req.params?.id, clientId: req.user?.id }],
-    })
-      .populate("partyId")
-      .sort("salesInvoiceDate");
+    const businessId = req.params?.id;
 
-    if (!invoices) {
+    if (!businessId) {
+      return res.status(400).json({
+        success: false,
+        msg: "Business ID is required",
+      });
+    }
+
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
+    const skip = (page - 1) * limit;
+
+    const filter = {
+      businessId: new mongoose.Types.ObjectId(businessId),
+      clientId: req.user?.id,
+    };
+
+    const invoices = await SalesInvoice.find(filter)
+      .skip(skip)
+      .limit(limit)
+      .sort({ createdAt: -1 })
+      .populate("partyId");
+
+    if (!invoices || invoices.length === 0) {
       return res
         .status(400)
         .json({ success: false, msg: "Invoices not found" });
     }
+    const totalInvoices = await SalesInvoice.countDocuments(filter);
+    const totalPages = Math.ceil(totalInvoices / limit);
 
-    return res.status(200).json({ success: true, invoices, totalInvoices });
+    return res.status(200).json({
+      success: true,
+      invoices,
+      totalInvoices,
+      totalPages,
+      page,
+      limit,
+    });
   } catch (error) {
     console.log("ERROR IN GETTING  SALES INVOICE ");
     return res.status(500).json({ err: "Internal server error", error });
@@ -191,6 +219,7 @@ export async function deleteInvoice(req, res) {
   }
 }
 
+// CONTROLLER TO GET A SINGLE INVOICE BY ID
 export async function getInvoiceById(req, res) {
   try {
     const { id } = req.params;
@@ -223,6 +252,7 @@ export async function getInvoiceById(req, res) {
   }
 }
 
+// CONTROLLER TO UPDATE A SALES INVOICE
 export async function updatedSalesInvoice(req, res) {
   try {
     const data = req.body;
@@ -230,6 +260,102 @@ export async function updatedSalesInvoice(req, res) {
     console.log(data);
     return res.status(200).json({ success: false, msg: "OK" });
   } catch (error) {
+    return res
+      .status(500)
+      .json({ success: false, msg: "Internal Server Error" });
+  }
+}
+
+// CONRTOLLER TO BULK UPLOAD SALES INVOICES
+export async function bulkUploadSalesInvoices(req, res) {
+  const session = await mongoose.startSession();
+  session.startTransaction();
+  try {
+    const businessId = req.params?.businessId;
+    if (!businessId) {
+      return res
+        .status(400)
+        .json({ success: false, msg: "Business id is required" });
+    }
+    const bulkInvoices = req.body || [];
+    // FIND THE ITEMS AND PARTIES AND VALIDATE THEM BEFORE CREATING THE INVOICES
+    // ALSO CHECK IF THE INVOICE NUMBER ALREADY EXISTS FOR THAT BUSINESS
+    // IF ALL OKAY THEN CREATE THE INVOICES
+    // USE TRANSACTIONS TO ENSURE DATA INTEGRITY
+
+    if (!Array.isArray(bulkInvoices) || bulkInvoices.length === 0) {
+      return res
+        .status(400)
+        .json({ success: false, msg: "No invoices provided" });
+    }
+
+    const invoicesToInsert = [];
+    let duplicateCount = 0;
+
+    for (const invoiceData of bulkInvoices) {
+      const existingInvoice = await SalesInvoice.findOne(
+        {
+          salesInvoiceNumber: invoiceData?.InvoiceNo,
+          businessId,
+        },
+        null,
+        { session }
+      );
+      if (existingInvoice) {
+        duplicateCount++;
+        continue;
+      }
+
+      const items = await Item.find(
+        {
+          invoiceNo: invoiceData?.InvoiceNo,
+          businessId,
+        },
+        null,
+        { session }
+      );
+
+      const party = await Party.findOne(
+        { partyName: invoiceData?.PartyName, businessId },
+        null,
+        { session }
+      );
+      const newInovice = {
+        businessId,
+        clientId: req.user?.id,
+        salesInvoiceDate: parseDate(invoiceData?.Date),
+        salesInvoiceNumber: Number(invoiceData?.InvoiceNo),
+        partyName: invoiceData?.PartyName,
+        type: "sales invoice",
+        items,
+        partyId: party?._id || null,
+        totalAmount: invoiceData?.TotalAmount || 0,
+        balanceAmount: invoiceData?.BalanceDue || 0,
+        amountSubTotal: invoiceData?.totalAmount || 0,
+      };
+      invoicesToInsert.push(newInovice);
+    }
+
+    // BULK INSERT THE INVOICES
+    let inserted = [];
+    if (invoicesToInsert.length > 0) {
+      inserted = await SalesInvoice.insertMany(invoicesToInsert, {
+        session,
+      });
+    }
+
+    await session.commitTransaction();
+    session.endSession();
+
+    return res.status(200).json({
+      success: true,
+      msg: "Inserted successfully",
+      insertedCount: invoicesToInsert.length,
+      duplicateCount,
+      inserted,
+    });
+  } catch (error) {
+    console.log("ERROR IN BULK UPLOADING SALES INVOICES", error);
     return res
       .status(500)
       .json({ success: false, msg: "Internal Server Error" });

@@ -14,9 +14,11 @@ const PartyTransactions = ({ party, filter }) => {
   const [transactions, setTransactions] = useState([]);
 
   useEffect(() => {
-    const partyInvoices = invoices
-      .filter((invoice) => invoice.partyName === party?.partyName)
-      .map((invoice) => ({ ...invoice, type: "sales invoice" }));
+    const partyInvoices =
+      invoices &&
+      invoices?.invoices
+        .filter((invoice) => invoice.partyName === party?.partyName)
+        .map((invoice) => ({ ...invoice, type: "sales invoice" }));
 
     const partyQuotations = quotations
       .filter((quotation) => quotation.partyName === party?.partyName)

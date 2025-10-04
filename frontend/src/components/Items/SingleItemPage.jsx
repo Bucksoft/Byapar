@@ -29,7 +29,7 @@ const SingleItemPage = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    const singleItem = items.find((item) => item?._id === id);
+    const singleItem = items?.items.find((item) => item?._id === id);
     setItem(singleItem);
   }, [id]);
 
@@ -80,7 +80,11 @@ const SingleItemPage = () => {
 
               <dialog id="my_modal_3" className="modal">
                 <div className="modal-box w-11/12 max-w-5xl h-3/4">
-                  <DashboardItemsSidebar data={items} modalId={"my_modal_3"} itemIdToEdit={item?._id}/>
+                  <DashboardItemsSidebar
+                    data={items}
+                    modalId={"my_modal_3"}
+                    itemIdToEdit={item?._id}
+                  />
                   {/* <div className="modal-action">
                   <form method="dialog">
                     <button className="btn">Close</button>

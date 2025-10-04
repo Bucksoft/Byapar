@@ -121,9 +121,9 @@ const ItemsList = ({ showLowStock, items }) => {
       )}
       <div
         className="relative z-10 bg-base-100 mt-8 
-             h-[460px] overflow-y-auto overflow-x-auto mb-5 border-y border-[var(--table-border)] "
+             h-[460px] overflow-y-auto overflow-x-auto  border border-[var(--table-border)] "
       >
-        <table className="table border border-[var(--table-border)]  mb-5  w-full table-zebra">
+        <table className="table table-sm w-full table-zebra">
           {/* head */}
           <thead className="">
             <tr className="bg-[var(--primary-background)]">
@@ -164,7 +164,7 @@ const ItemsList = ({ showLowStock, items }) => {
                   <td>
                     {item.itemType === "product" ? (
                       <>
-                        {item?.currentStock} {item?.measuringUnit}
+                        {item?.currentStock || "-"} {item?.measuringUnit}
                       </>
                     ) : (
                       <>-</>

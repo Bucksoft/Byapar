@@ -61,23 +61,25 @@ const DashboardItemsPage = () => {
     isLoading,
     isSuccess,
   } = useQuery({
-    queryKey: ["items"],
+    queryKey: ["items", page],
     queryFn: async () => {
       if (!business) {
-        return;
+        return [];
       }
       const res = await axiosInstance.get(
         `/item/all/${business?._id}?page=${page}&limit=${limit}`
       );
-      console.log(res);
-      return res.data?.items;
+      return res.data;
     },
+    keepPreviousData: true,
   });
 
   // CALCULATING STOCK VALUE AND LOW STOCK ITEMS
   useEffect(() => {
     if (isSuccess && items) {
-      const products = items.filter((item) => item?.itemType === "product");
+      const products = items?.items.filter(
+        (item) => item?.itemType === "product"
+      );
 
       const totalStockValue = products.reduce(
         (sum, product) =>
@@ -97,21 +99,23 @@ const DashboardItemsPage = () => {
     }
   }, [isSuccess, items]);
 
-  const searchedItems = items
-    ?.filter((item) =>
-      item?.itemName.toLowerCase().includes(searchQuery.toLowerCase())
-    )
+  const searchedItems =
+    items &&
+    items.items
+      ?.filter((item) =>
+        item?.itemName.toLowerCase().includes(searchQuery.toLowerCase())
+      )
 
-    ?.filter((item) => {
-      if (showLowStock) {
-        return (
-          item?.itemType === "product" &&
-          typeof item?.lowStockQuantity === "number" &&
-          item?.currentStock < item?.lowStockQuantity
-        );
-      }
-      return true;
-    });
+      ?.filter((item) => {
+        if (showLowStock) {
+          return (
+            item?.itemType === "product" &&
+            typeof item?.lowStockQuantity === "number" &&
+            item?.currentStock < item?.lowStockQuantity
+          );
+        }
+        return true;
+      });
 
   return (
     <main className="h-screen overflow-y-scroll p-2">
