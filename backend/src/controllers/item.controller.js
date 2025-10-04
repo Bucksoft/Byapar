@@ -1,3 +1,4 @@
+import mongoose from "mongoose";
 import { itemSchema } from "../config/validation.js";
 import { Item } from "../models/item.schema.js";
 
@@ -145,10 +146,19 @@ export async function getAllItems(req, res) {
       });
     }
 
-    const items = await Item.find({
-      businessId,
+    const page = parseInt(req.query.page) || 1;
+    const limit = parseInt(req.query.limit) || 10;
+    const skip = (page - 1) * limit;
+
+    const filter = {
+      businessId: new mongoose.Types.ObjectId(businessId),
       clientId: req.user?.id,
-    });
+    };
+
+    const items = await Item.find(filter)
+      .skip(skip)
+      .limit(limit)
+      .sort({ createdAt: -1 });
 
     if (!items || items.length === 0) {
       return res.status(404).json({
@@ -157,10 +167,15 @@ export async function getAllItems(req, res) {
       });
     }
 
+    const totalItems = await Item.countDocuments(filter);
+    const totalPages = Math.ceil(totalItems / limit);
+
     return res.status(200).json({
       success: true,
-      count: items.length,
+      page,
       items,
+      totalPages,
+      limit,
     });
   } catch (error) {
     console.error("❌ Error in fetching items:", error.message);
@@ -223,8 +238,41 @@ export async function updateStock(req, res) {
 export async function addBulkItems(req, res) {
   try {
     const data = req.body;
-    console.log("DATA", data);
-    return res.status(200).json({ success: true, msg: "OK" });
+    const businessId = req.params.id;
+    const transformItems = (data, businessId, clientId) => {
+      return data
+        .filter((item) => item.ItemName && item.ItemName.trim() !== "")
+        .map((item) => {
+          return {
+            itemName: item?.ItemName?.trim(),
+            itemCode: item?.ItemCode?.trim() || "",
+            description: item?.Description?.trim() || "",
+            category: item?.Category?.trim() || "",
+            quantity: Number(item?.Quantity) || 0,
+            salesPrice: Number(item?.UnitPrice) || 0,
+            HSNCode: item?.HSNSAC?.trim() || "",
+            SACCode: item?.HSNSAC?.trim() || "",
+            gstTaxRate: item?.TaxPercent.toString() || "0%",
+            invoiceNo: item?.InvoiceNoTxnNo?.trim() || "",
+            businessId,
+            clientId,
+          };
+        });
+    };
+
+    const itemsToBeAdded = transformItems(data, businessId, req.user?.id);
+    if (itemsToBeAdded.length === 0) {
+      return res
+        .status(400)
+        .json({ success: false, msg: "No valid items to be added" });
+    }
+    const inserted = await Item.insertMany(itemsToBeAdded);
+    if (!inserted) {
+      return res.status(400).json({ success: false, msg: "Failed to insert!" });
+    }
+    return res
+      .status(200)
+      .json({ success: true, msg: "Inserted successfully", inserted });
   } catch (error) {
     return res
       .status(500)

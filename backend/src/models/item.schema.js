@@ -85,6 +85,9 @@ const itemSchema = new mongoose.Schema(
       type: String,
       trim: true,
     },
+    invoiceNo: {
+      type: String,
+    },
     businessId: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Business",

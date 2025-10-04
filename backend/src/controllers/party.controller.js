@@ -408,7 +408,6 @@ export async function bulkAddParties(req, res) {
   try {
     const data = req.body;
     const businessId = req.params.id;
-    console.log("DATA", data);
 
     const transformParties = (data, businessId, clientId) => {
       return data

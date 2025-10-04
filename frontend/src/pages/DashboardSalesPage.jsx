@@ -13,9 +13,10 @@ import CustomLoader from "../components/Loader";
 import { LiaRupeeSignSolid } from "react-icons/lia";
 import { BsTrash3 } from "react-icons/bs";
 import { useInvoiceStore } from "../store/invoicesStore";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import toast from "react-hot-toast";
 import { useBusinessStore } from "../store/businessStore";
+import { uploadExcel } from "../../helpers/uploadExcel";
 
 const DashboardSalesPage = () => {
   const { setInvoices, setTotalInvoices } = useInvoiceStore();
@@ -24,6 +25,7 @@ const DashboardSalesPage = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const { business } = useBusinessStore();
   const navigate = useNavigate();
+  const fileRef = useRef(null);
 
   // to get all the invoices
   const {
@@ -40,6 +42,7 @@ const DashboardSalesPage = () => {
     },
     enabled: !!business,
   });
+
   // mutation to delete an invoice
   const mutation = useMutation({
     mutationFn: async () => {
@@ -75,6 +78,30 @@ const DashboardSalesPage = () => {
               .includes(searchQuery.toString().toLowerCase())
         )
       : invoices;
+
+  // MUTATION TO UPLOAD ITEMS IN BULK
+  const bulkMutation = useMutation({
+    mutationFn: async (data) => {
+      const res = await axiosInstance.post(
+        `/sales/bulk/${business?._id}`,
+        data
+      );
+      console.log("SALES BULK MUTATION ", res);
+      return res.data;
+    },
+    onSuccess: (data) => {
+      toast.success(data.msg || "Uploaded successfully");
+      queryClient.invalidateQueries({ queryKey: ["invoices"] });
+    },
+  });
+
+  const handleFileUpload = async (e) => {
+    const selectedFile = e.target.files[0];
+    const sanitizedData = await uploadExcel(selectedFile);
+    if (sanitizedData) {
+      bulkMutation.mutate(sanitizedData);
+    }
+  };
 
   return (
     <main className="h-full p-2 ">
@@ -381,7 +408,85 @@ const DashboardSalesPage = () => {
             </div>
           )}
         </div>
+
+        {/* HANDLING BULK UPLOAD */}
+        <div className="p-5 w-full border mb-5 border-zinc-300 shadow-md bg-gradient-to-r from-zinc-100 to-sky-200 ">
+          <h1 className="font-semibold">
+            Add Multiple Sales information at once
+          </h1>
+          <p className="text-zinc-500 text-sm">
+            Bulk upload all your sales report to Byapar using excel
+          </p>
+          {/* <small className="mt-1 text-red-500">
+            Note* You must follow the sample items excel.
+          </small> */}
+          <br />
+          <input
+            type="file"
+            className="file-input file-input-sm hidden"
+            ref={fileRef}
+            onChange={handleFileUpload}
+          />
+
+          <button
+            onClick={() => fileRef.current.click()}
+            disabled={bulkMutation.isPending}
+            className="btn btn-success btn-sm mt-3 "
+          >
+            {bulkMutation.isPending ? (
+              <CustomLoader text={"Adding items..."} />
+            ) : (
+              <>
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="20"
+                  height="20"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  className="icon icon-tabler icons-tabler-outline icon-tabler-file-spreadsheet"
+                >
+                  <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                  <path d="M14 3v4a1 1 0 0 0 1 1h4" />
+                  <path d="M17 21h-10a2 2 0 0 1 -2 -2v-14a2 2 0 0 1 2 -2h7l5 5v11a2 2 0 0 1 -2 2z" />
+                  <path d="M8 11h8v7h-8z" />
+                  <path d="M8 15h8" />
+                  <path d="M11 11v7" />
+                </svg>{" "}
+                Upload Excel
+              </>
+            )}
+          </button>
+
+          {/* <button
+            onClick={() => window.open("/sample-sales.xlsx", "_blank")}
+            className="btn text-neutral btn-link btn-xs mt-3 ml-3"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              className="icon icon-tabler icons-tabler-outline icon-tabler-download"
+            >
+              <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+              <path d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2 -2v-2" />
+              <path d="M7 11l5 5l5 -5" />
+              <path d="M12 4l0 12" />
+            </svg>
+            Download Sample
+          </button> */}
+        </div>
       </div>
+
       {!showDeletePopup && (
         <>
           <dialog id="my_modal_2" className="modal">

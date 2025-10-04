@@ -1,6 +1,6 @@
 import DashboardNavbar from "../components/DashboardNavbar";
 import { Plus, Search } from "lucide-react";
-import { FaIndianRupeeSign } from "react-icons/fa6";
+import { FaArrowLeft, FaArrowRight, FaIndianRupeeSign } from "react-icons/fa6";
 import { LuPackageSearch } from "react-icons/lu";
 import no_items from "../assets/no_items.jpg";
 import { PiMicrosoftExcelLogoFill } from "react-icons/pi";
@@ -19,6 +19,8 @@ import { BsFillBoxSeamFill } from "react-icons/bs";
 import DashboardItemsBasicDetailPage from "./Items/DashboardItemsBasicDetailPage";
 import DashboardItemsSidebar from "./Items/DashboardItemsSidebar";
 import { uploadExcel } from "../../helpers/uploadExcel";
+import toast from "react-hot-toast";
+import { queryClient } from "../main";
 
 const DashboardItemsPage = () => {
   const navigate = useNavigate();
@@ -28,12 +30,19 @@ const DashboardItemsPage = () => {
   const [stockValue, setStockValue] = useState(0);
   const [showLowStock, setShowLowStock] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
+  const [page, setPage] = useState(1);
   const fileRef = useRef();
+  const limit = 10;
 
   // MUTATION TO UPLOAD ITEMS IN BULK
   const bulkMutation = useMutation({
     mutationFn: async (data) => {
       const res = await axiosInstance.post(`/item/bulk/${business?._id}`, data);
+      return res.data;
+    },
+    onSuccess: (data) => {
+      toast.success(data.msg || "Uploaded successfully");
+      queryClient.invalidateQueries({ queryKey: ["items"] });
     },
   });
 
@@ -43,8 +52,10 @@ const DashboardItemsPage = () => {
     if (sanitizedData) {
       bulkMutation.mutate(sanitizedData);
     }
+    e.target.value = null;
   };
 
+  // FETCHING ALL ITEMS FOR THE BUSINESS
   const {
     data: items,
     isLoading,
@@ -55,7 +66,10 @@ const DashboardItemsPage = () => {
       if (!business) {
         return;
       }
-      const res = await axiosInstance.get(`/item/all/${business?._id}`);
+      const res = await axiosInstance.get(
+        `/item/all/${business?._id}?page=${page}&limit=${limit}`
+      );
+      console.log(res);
       return res.data?.items;
     },
   });
@@ -224,6 +238,33 @@ const DashboardItemsPage = () => {
             )}
           </>
         )}
+
+        {/* PAGINATION  */}
+        <div className="w-full flex items-center justify-end p-4">
+          <div className="join join-sm">
+            <button
+              className="join-item btn btn-neutral btn-sm"
+              onClick={() => setPage((old) => Math.max(old - 1, 1))}
+              disabled={page === 1}
+            >
+              <FaArrowLeft />
+            </button>
+
+            <button className="join-item btn btn-sm">{page}</button>
+
+            <button
+              onClick={() => {
+                if (items && page < items.totalPages) {
+                  setPage((old) => old + 1);
+                }
+              }}
+              disabled={!items || page >= items.totalPages}
+              className="join-item btn btn-neutral btn-sm"
+            >
+              <FaArrowRight />
+            </button>
+          </div>
+        </div>
 
         {/* HANDLING BULK UPLOAD */}
         <div className="p-5 w-full border mb-5 border-zinc-300 shadow-md bg-gradient-to-r from-zinc-100 to-sky-200 ">
