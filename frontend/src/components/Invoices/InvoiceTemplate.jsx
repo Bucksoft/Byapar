@@ -2,7 +2,7 @@ import { BsTelephone } from "react-icons/bs";
 import { useBusinessStore } from "../../store/businessStore";
 import { LiaRupeeSignSolid } from "react-icons/lia";
 import { useEffect, useRef } from "react";
-import converter from "number-to-words";
+import { toWords } from "../../../helpers/wordsToCurrency";
 
 const InvoiceTemplate = ({
   type,
@@ -27,6 +27,12 @@ const InvoiceTemplate = ({
     Number(invoice?.taxableAmount || 0) +
     parseAmount(invoice?.cgst) +
     parseAmount(invoice?.sgst);
+
+  const getGSTPercentage = (rateString) => {
+    console.log(rateString);
+    const match = rateString?.match(/(\d+)%/);
+    return match ? parseFloat(match[1]) : rateString;
+  };
 
   return (
     <main
@@ -61,9 +67,24 @@ const InvoiceTemplate = ({
             alignItems: "center",
           }}
         >
-          <h2 style={{ fontWeight: 600, fontSize: "20px" }}>
-            {business?.businessName}
-          </h2>
+          <div className="flex flex-col w-1/2">
+            <h2 style={{ fontWeight: 600, fontSize: "20px" }}>
+              {business?.businessName}
+            </h2>
+            <p className="text-sm text-gray-600">{business?.billingAddress}</p>
+            {business?.gstNumber.length > 0 && (
+              <p className="flex text-sm text-gray-600">
+                {" "}
+                <span className="font-semibold mr-2">GSTIN </span>
+                {business?.gstNumber}
+              </p>
+            )}
+            {business?.companyEmail.length > 0 && (
+              <p className="flex text-sm text-gray-600">
+                {business?.companyEmail}
+              </p>
+            )}
+          </div>
           <h1 style={{ textTransform: "uppercase", fontSize: "18px" }}>
             {type === "Sales Return"
               ? "Sales Return"
@@ -240,9 +261,9 @@ const InvoiceTemplate = ({
         <hr style={{ margin: "16px 0", borderColor: "#d4d4d8" }} />
 
         {/* Bill to */}
-        <div className="w-full flex items-center justify-between">
-          <section style={{ fontSize: "14px" }}>
-            <h3 style={{ fontWeight: 500 }}>
+        <div className="w-full flex items-start justify-between">
+          <section style={{ fontSize: "14px", width: "50%" }}>
+            <h3 style={{ fontWeight: "bold" }}>
               {type === "Credit Note"
                 ? "PARTY NAME"
                 : type === "Purchase Order"
@@ -255,12 +276,22 @@ const InvoiceTemplate = ({
                 ? invoice?.partyId?.shippingAddress
                 : invoice?.partyId?.billingAddress}
             </p>
-            <p style={{ fontWeight: 600 }}>
-              Mobile{" "}
-              <span style={{ fontWeight: "normal" }}>
-                {invoice?.partyId?.mobileNumber}
-              </span>
-            </p>
+            {invoice?.partyId?.mobileNumber.length > 0 && (
+              <p style={{ fontWeight: 600 }}>
+                Mobile{" "}
+                <span style={{ fontWeight: "normal" }}>
+                  {invoice?.partyId?.mobileNumber}
+                </span>
+              </p>
+            )}
+            {invoice?.partyId?.GSTIN.length > 0 && (
+              <p style={{ fontWeight: 600 }}>
+                GSTIN{" "}
+                <span style={{ fontWeight: "normal" }}>
+                  {invoice?.partyId?.GSTIN}
+                </span>
+              </p>
+            )}
           </section>
           {/* {type === "Delivery Challan" && (
             <section style={{ fontSize: "14px" }}>
@@ -279,6 +310,17 @@ const InvoiceTemplate = ({
               </p>
             </section>
           )} */}
+          <section style={{ fontSize: "14px", width: "50%" }}>
+            {invoice?.partyId?.shippingAddress &&
+              invoice?.partyId?.shippingAddress?.length > 0 && (
+                <>
+                  <h3 style={{ fontWeight: "bold" }}>SHIP TO</h3>
+                  <p style={{ fontSize: "14px", color: "#3f3f46" }}>
+                    {invoice?.partyId?.shippingAddress}
+                  </p>
+                </>
+              )}
+          </section>
         </div>
 
         {/* Items table */}
@@ -294,8 +336,12 @@ const InvoiceTemplate = ({
               <tr style={{ backgroundColor: color, color: "#fff" }}>
                 <th style={{ padding: "8px", textAlign: "left" }}>No</th>
                 <th style={{ padding: "8px", textAlign: "left" }}>Items</th>
+                <th style={{ padding: "8px", textAlign: "left" }}>HSN/SAC</th>
                 <th style={{ padding: "8px", textAlign: "left" }}>Qty.</th>
                 <th style={{ padding: "8px", textAlign: "left" }}>Rate</th>
+                <th style={{ padding: "8px", textAlign: "left" }}>
+                  Taxable Amount
+                </th>
                 <th style={{ padding: "8px", textAlign: "left" }}>Tax</th>
                 <th style={{ padding: "8px", textAlign: "right" }}>Total</th>
               </tr>
@@ -305,19 +351,69 @@ const InvoiceTemplate = ({
                 <tr key={index}>
                   <td style={{ padding: "6px" }}>{index + 1}</td>
                   <td style={{ padding: "6px" }}>{item?.itemName}</td>
+                  <td style={{ padding: "6px" }}>
+                    {item?.HSNCode.length > 0
+                      ? item?.HSNCode
+                      : item?.SACCode || "-"}
+                  </td>
                   <td style={{ padding: "6px" }}>{item?.quantity}</td>
+
+                  {/* Price */}
+                  <td style={{ padding: "6px" }}>
+                    {Number(
+                      item?.basePrice || item?.salesPrice || 0
+                    ).toLocaleString("en-IN", {
+                      minimumFractionDigits: 2,
+                      maximumFractionDigits: 2,
+                    })}
+                  </td>
+
+                  {/* Taxable value */}
                   <td style={{ padding: "6px" }}>
                     <div style={{ display: "flex", alignItems: "center" }}>
                       <LiaRupeeSignSolid />
-                      {Number(item?.basePrice || 0).toLocaleString("en-IN")}
+                      {Number(
+                        item?.taxableValue ||
+                          item?.salesPrice * item.quantity ||
+                          0
+                      ).toLocaleString("en-IN", {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2,
+                      })}
                     </div>
                   </td>
+
+                  {/* Tax */}
                   <td style={{ padding: "6px" }}>
-                    <div style={{ display: "flex", alignItems: "center" }}>
-                      <LiaRupeeSignSolid />
-                      {Number(item?.gstAmount || 0).toLocaleString("en-IN")}
+                    <div
+                      style={{
+                        display: "flex",
+                        alignItems: "start",
+                        flexDirection: "row",
+                      }}
+                    >
+                      <div style={{ display: "flex", alignItems: "center" }}>
+                        <LiaRupeeSignSolid />
+                        {Number(
+                          item?.gstAmount ||
+                            (item?.salesPrice * Number(item?.gstTaxRate)) / 100
+                        ).toLocaleString("en-IN", {
+                          minimumFractionDigits: 2,
+                          maximumFractionDigits: 2,
+                        })}
+                      </div>
+                      {item?.gstTaxRate && (
+                        <span style={{ marginLeft: "4px", color: "#52525c" }}>
+                          ({getGSTPercentage(item?.gstTaxRate)}%)
+                        </span>
+                        // <span className="ml-2 text-zinc-500">
+                        //   {"("}
+                        //   {item?.gstTaxRate}%{")"}
+                        // </span>
+                      )}
                     </div>
                   </td>
+
                   <td style={{ padding: "6px" }}>
                     <div
                       style={{
@@ -329,9 +425,17 @@ const InvoiceTemplate = ({
                       <LiaRupeeSignSolid />
                       {(
                         Number(item?.quantity || 0) *
-                          Number(item?.basePrice || 0) +
-                        Number(item?.gstAmount || 0)
-                      ).toLocaleString("en-IN")}
+                          Number(item?.basePrice || item?.salesPrice || 0) +
+                        Number(
+                          item?.gstAmount ||
+                            (item?.salesPrice * Number(item?.gstTaxRate)) /
+                              100 ||
+                            0
+                        )
+                      ).toLocaleString("en-IN", {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2,
+                      })}
                     </div>
                   </td>
                 </tr>
@@ -341,6 +445,7 @@ const InvoiceTemplate = ({
               <tr style={{ backgroundColor: "#e1e1e3", fontWeight: 600 }}>
                 <td></td>
                 <td style={{ padding: "6px" }}>Subtotal</td>
+                <td></td>
                 <td style={{ padding: "6px" }}>
                   {invoice?.items?.reduce(
                     (acc, item) => acc + (Number(item?.quantity) || 0),
@@ -351,12 +456,42 @@ const InvoiceTemplate = ({
                 <td style={{ padding: "6px" }}>
                   <div style={{ display: "flex", alignItems: "center" }}>
                     <LiaRupeeSignSolid />
+                    {typeof invoice?.taxableAmount === "number" &&
+                    !isNaN(invoice.taxableAmount)
+                      ? invoice.taxableAmount.toLocaleString("en-IN", {
+                          minimumFractionDigits: 2,
+                          maximumFractionDigits: 2,
+                        })
+                      : (
+                          invoice?.items?.reduce((acc, item) => {
+                            const price =
+                              Number(item?.basePrice || item?.salesPrice) || 0;
+                            const quantity = Number(item?.quantity) || 0;
+                            return acc + price * quantity;
+                          }, 0) || 0
+                        ).toLocaleString("en-IN", {
+                          minimumFractionDigits: 2,
+                          maximumFractionDigits: 2,
+                        })}
+                  </div>
+                </td>
+                <td style={{ padding: "6px" }}>
+                  <div style={{ display: "flex", alignItems: "center" }}>
+                    <LiaRupeeSignSolid />
                     {invoice?.items
                       ?.reduce(
-                        (acc, item) => acc + (Number(item?.gstAmount) || 0),
+                        (acc, item) =>
+                          acc +
+                          (Number(item?.gstAmount) ||
+                            (item?.salesPrice * Number(item?.gstTaxRate)) /
+                              100 ||
+                            0),
                         0
                       )
-                      .toLocaleString("en-IN")}
+                      .toLocaleString("en-IN", {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2,
+                      })}
                   </div>
                 </td>
                 <td style={{ padding: "6px" }}>
@@ -373,11 +508,18 @@ const InvoiceTemplate = ({
                         (acc, item) =>
                           acc +
                           ((Number(item?.quantity) || 0) *
-                            (Number(item?.basePrice) || 0) +
-                            (Number(item?.gstAmount) || 0)),
+                            (Number(item?.basePrice || item?.salesPrice) || 0) +
+                            (Number(
+                              item?.gstAmount ||
+                                (item?.salesPrice * Number(item?.gstTaxRate)) /
+                                  100
+                            ) || 0)),
                         0
                       )
-                      .toLocaleString("en-IN")}
+                      .toLocaleString("en-IN", {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2,
+                      })}
                   </div>
                 </td>
               </tr>
@@ -408,21 +550,71 @@ const InvoiceTemplate = ({
                 <p>Taxable Amount</p>
                 <span style={{ display: "flex", alignItems: "center" }}>
                   <LiaRupeeSignSolid />
-                  {Number(invoice?.taxableAmount).toLocaleString("en-IN")}
+                  {typeof invoice?.taxableAmount === "number" &&
+                  !isNaN(invoice.taxableAmount)
+                    ? invoice.taxableAmount.toLocaleString("en-IN", {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2,
+                      })
+                    : (
+                        invoice?.items?.reduce((acc, item) => {
+                          const price =
+                            Number(item?.basePrice || item?.salesPrice) || 0;
+                          const quantity = Number(item?.quantity) || 0;
+                          return acc + price * quantity;
+                        }, 0) || 0
+                      ).toLocaleString("en-IN", {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2,
+                      })}
                 </span>
               </div>
               <div style={{ display: "flex", justifyContent: "space-between" }}>
                 <p>CGST </p>
                 <span style={{ display: "flex", alignItems: "center" }}>
                   <LiaRupeeSignSolid />
-                  {Number(invoice?.cgst).toLocaleString("en-IN")}
+                  {typeof invoice?.cgst === "number" && !isNaN(invoice?.sgst)
+                    ? invoice.sgst.toLocaleString("en-IN", {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2,
+                      })
+                    : (
+                        invoice?.items?.reduce((acc, item) => {
+                          const gstRate = Number(item?.gstTaxRate) || 0;
+                          const gstAmount =
+                            Number(item?.gstAmount) ||
+                            (Number(item?.salesPrice) * gstRate) / 100 ||
+                            0;
+                          return acc + gstAmount / 2;
+                        }, 0) || 0
+                      ).toLocaleString("en-IN", {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2,
+                      })}
                 </span>
               </div>
               <div style={{ display: "flex", justifyContent: "space-between" }}>
                 <p>SGST</p>
                 <span style={{ display: "flex", alignItems: "center" }}>
                   <LiaRupeeSignSolid />
-                  {Number(invoice?.sgst).toLocaleString("en-IN")}
+                  {typeof invoice?.sgst === "number" && !isNaN(invoice?.sgst)
+                    ? invoice.sgst.toLocaleString("en-IN", {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2,
+                      })
+                    : (
+                        invoice?.items?.reduce((acc, item) => {
+                          const gstRate = Number(item?.gstTaxRate) || 0;
+                          const gstAmount =
+                            Number(item?.gstAmount) ||
+                            (Number(item?.salesPrice) * gstRate) / 100 ||
+                            0;
+                          return acc + gstAmount / 2;
+                        }, 0) || 0
+                      ).toLocaleString("en-IN", {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2,
+                      })}
                 </span>
               </div>
 
@@ -457,7 +649,10 @@ const InvoiceTemplate = ({
                 <p>Total Amount</p>
                 <span style={{ display: "flex", alignItems: "center" }}>
                   <LiaRupeeSignSolid />
-                  {Math.round(invoice?.totalAmount).toLocaleString("en-IN")}
+                  {Number(invoice?.totalAmount).toLocaleString("en-IN", {
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2,
+                  })}
                 </span>
               </div>
               <div
@@ -477,7 +672,13 @@ const InvoiceTemplate = ({
               >
                 <p style={{ fontWeight: 600 }}>Total Amount (in words)</p>
                 <span>
-                  {converter.toWords(Math.round(total)).toUpperCase()} ONLY
+                  {toWords
+                    .convert(invoice?.totalAmount)
+                    .toLocaleString("en-IN", {
+                      minimumFractionDigits: 2,
+                      maximumFractionDigits: 2,
+                    })
+                    .toUpperCase()}{" "}
                 </span>
               </div>
             </div>

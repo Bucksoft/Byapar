@@ -32,7 +32,7 @@ const DashboardUpdateInvoicesPage = () => {
       setParty(quotationToUpdate?.partyId);
       setInvoiceToUpdate(quotationToUpdate[0]);
     } else if (type === "sales invoice") {
-      const salesInvoiceToUpdate = invoices.filter(
+      const salesInvoiceToUpdate = invoices?.invoices.filter(
         (invoice) => invoice?._id === id
       );
       setParty(salesInvoiceToUpdate?.partyId);

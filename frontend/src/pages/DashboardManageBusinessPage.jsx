@@ -31,7 +31,7 @@ const DashboardManageBusinessPage = () => {
           {/* right sidebar end */}
 
           <footer className="w-full pb-8">
-            <div className="border-b border-t border-[var(--primary-border)]">
+            {/* <div className="border-b border-t border-[var(--primary-border)]">
               <p className="text-[14px]  p-2">Company Settings</p>
             </div>
 
@@ -57,12 +57,12 @@ const DashboardManageBusinessPage = () => {
                   </p>
                 </div>
               </button>
-            </div>
+            </div> */}
 
-            <div className="border-b border-t border-[var(--primary-border)]">
+            {/* <div className="border-b border-t border-[var(--primary-border)]">
               <p className="text-[14px]  p-2">Add New Business</p>
-            </div>
-
+            </div> */}
+            {/* 
             <div className="flex flex-col items-center justify-center">
               <img
                 src={store}
@@ -76,7 +76,7 @@ const DashboardManageBusinessPage = () => {
               <button className="btn btn-sm btn-soft font-bold text-success-content rounded bg-success  cursor-pointer">
                 Create New Business
               </button>
-            </div>
+            </div> */}
           </footer>
         </div>
 

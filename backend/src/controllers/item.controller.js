@@ -253,6 +253,7 @@ export async function addBulkItems(req, res) {
             HSNCode: item?.HSNSAC?.trim() || "",
             SACCode: item?.HSNSAC?.trim() || "",
             gstTaxRate: item?.TaxPercent.toString() || "0%",
+            gstAmount: item?.Tax || 0,
             invoiceNo: item?.InvoiceNoTxnNo?.trim() || "",
             businessId,
             clientId,

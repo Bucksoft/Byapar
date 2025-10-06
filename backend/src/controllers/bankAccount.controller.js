@@ -1,5 +1,5 @@
-import { BankAccount } from "../models/bankAccount.schema.js";
 import { bankAccountSchema } from "../config/validation.js";
+import BankAccount from "../models/bankAccount.schema.js";
 
 export async function createBankAccount(req, res) {
   try {
@@ -27,7 +27,7 @@ export async function createBankAccount(req, res) {
       accountHolderName,
       ifscCode,
     });
-    
+
     // IF EXISTS, RETURN FAILURE RESPONSE
     if (customerExists) {
       return res
@@ -36,7 +36,10 @@ export async function createBankAccount(req, res) {
     }
 
     // CREATE BANK ACCOUNT
-    const bankAccount = await BankAccount.create(validatedResult.data);
+    const bankAccount = await BankAccount.create({
+      ...validatedResult.data,
+      businessId: req?.params?.businessId,
+    });
     if (!bankAccount) {
       return res
         .status(400)

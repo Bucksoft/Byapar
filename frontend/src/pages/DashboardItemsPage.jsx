@@ -120,7 +120,6 @@ const DashboardItemsPage = () => {
   return (
     <main className="h-screen overflow-y-scroll p-2">
       <div className="h-full w-full bg-gradient-to-b from-white to-transparent rounded-lg p-3">
-        
         <DashboardNavbar title={"Items"} isReport={"true"} />
 
         <motion.section

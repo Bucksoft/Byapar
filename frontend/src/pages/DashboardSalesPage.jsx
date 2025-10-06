@@ -18,7 +18,7 @@ import CustomLoader from "../components/Loader";
 import { LiaRupeeSignSolid } from "react-icons/lia";
 import { BsTrash3 } from "react-icons/bs";
 import { useInvoiceStore } from "../store/invoicesStore";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import toast from "react-hot-toast";
 import { useBusinessStore } from "../store/businessStore";
 import { uploadExcel } from "../../helpers/uploadExcel";
@@ -28,11 +28,19 @@ const DashboardSalesPage = () => {
   const [showDeletePopup, setShowDeletePopup] = useState(false);
   const [invoiceId, setInvoiceId] = useState();
   const [searchQuery, setSearchQuery] = useState("");
+  const [debouncedQuery, setDebouncedQuery] = useState(searchQuery);
   const { business } = useBusinessStore();
   const navigate = useNavigate();
   const fileRef = useRef(null);
   const [page, setPage] = useState(1);
   const limit = 10;
+
+  useEffect(() => {
+    const timeout = setTimeout(() => {
+      setDebouncedQuery(searchQuery);
+    }, 400);
+    return () => clearTimeout(timeout);
+  }, [searchQuery]);
 
   // to get all the invoices
   const {
@@ -75,19 +83,20 @@ const DashboardSalesPage = () => {
     }
   }, [isSuccess, invoices]);
 
-  const searchedInvoices =
-    invoices && searchQuery
-      ? invoices?.invoices.filter(
-          (invoice) =>
-            invoice?.partyId?.partyName
-              ?.toLowerCase()
-              .includes(searchQuery.toLowerCase()) ||
-            invoice?.salesInvoiceNumber
-              .toString()
-              .toLowerCase()
-              .includes(searchQuery.toString().toLowerCase())
-        )
-      : invoices?.invoices;
+  const searchedInvoices = useMemo(() => {
+    if (!invoices?.invoices) return [];
+
+    return invoices?.invoices.filter(
+      (invoice) =>
+        invoice?.partyId?.partyName
+          ?.toLowerCase()
+          .includes(searchQuery.toLowerCase()) ||
+        invoice?.salesInvoiceNumber
+          ?.toString()
+          ?.toLowerCase()
+          .includes(searchQuery.toLowerCase())
+    );
+  }, [invoices]);
 
   // MUTATION TO UPLOAD ITEMS IN BULK
   const bulkMutation = useMutation({
@@ -133,17 +142,7 @@ const DashboardSalesPage = () => {
             </p>
             <span className="font-medium text-2xl flex items-center gap-2">
               <FaIndianRupeeSign size={15} />
-              {invoices
-                ? Number(
-                    invoices?.invoices
-                      .reduce(
-                        (acc, invoice) =>
-                          acc + Number(invoice?.totalAmount || 0),
-                        0
-                      )
-                      .toFixed(2)
-                  ).toLocaleString("en-IN")
-                : 0}
+              {invoices?.totalSales || 0}
             </span>
           </div>
 
@@ -157,14 +156,7 @@ const DashboardSalesPage = () => {
             </p>
             <span className="font-medium text-2xl flex items-center gap-2">
               <FaIndianRupeeSign size={15} />
-              {invoices
-                ? Number(
-                    invoices?.invoices.reduce(
-                      (sum, invoice) => sum + (invoice.settledAmount || 0),
-                      0
-                    )
-                  ).toLocaleString("en-IN")
-                : 0}
+              {invoices?.totalPaid || 0}
             </span>
           </div>
 
@@ -178,17 +170,7 @@ const DashboardSalesPage = () => {
             </p>
             <span className="font-medium text-2xl flex items-center gap-2">
               <FaIndianRupeeSign size={15} />
-              {invoices
-                ? Number(
-                    invoices?.invoices.reduce(
-                      (sum, invoice) =>
-                        sum +
-                        (invoice.pendingAmount ??
-                          invoice.totalAmount - (invoice.settledAmount || 0)),
-                      0
-                    )
-                  ).toLocaleString("en-IN")
-                : 0}
+              {invoices?.totalUnpaid || 0}
             </span>
           </div>
         </motion.div>

@@ -60,7 +60,7 @@ const DashboardAddPartyPage = () => {
     }));
   };
 
-  // get all categories
+  // FETCH ALL CATEGORIES
   const { data: categories } = useQuery({
     queryKey: ["category"],
     queryFn: async () => {
@@ -94,6 +94,7 @@ const DashboardAddPartyPage = () => {
     },
   });
 
+  // ADD A CATEGORY
   const categoryMutation = useMutation({
     mutationFn: async (data) => {
       const res = await axiosInstance.post(`/category/${business?._id}`, {

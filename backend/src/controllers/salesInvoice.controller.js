@@ -120,7 +120,7 @@ export async function getAllInvoices(req, res) {
     const invoices = await SalesInvoice.find(filter)
       .skip(skip)
       .limit(limit)
-      .sort({ createdAt: -1 })
+      .sort({ salesInvoiceNumber: -1 })
       .populate("partyId");
 
     if (!invoices || invoices.length === 0) {
@@ -131,6 +131,43 @@ export async function getAllInvoices(req, res) {
     const totalInvoices = await SalesInvoice.countDocuments(filter);
     const totalPages = Math.ceil(totalInvoices / limit);
 
+    // CALCULATE THE TOTAL UNPAID, PAID AND TOTAL SALES
+    // this is the paginated invoices I want it from all the invoices present
+
+    const allInvoices = await SalesInvoice.find();
+
+    let totalSales = allInvoices
+      ? Number(
+          allInvoices
+            .reduce(
+              (acc, invoice) => acc + Number(invoice?.totalAmount || 0),
+              0
+            )
+            .toFixed(2)
+        ).toLocaleString("en-IN")
+      : 0;
+
+    let totalPaid = allInvoices
+      ? Number(
+          allInvoices?.reduce(
+            (sum, invoice) => sum + (invoice.settledAmount || 0),
+            0
+          )
+        ).toLocaleString("en-IN")
+      : 0;
+
+    let totalUnpaid = allInvoices
+      ? Number(
+          allInvoices?.reduce(
+            (sum, invoice) =>
+              sum +
+              (invoice.pendingAmount ??
+                invoice.totalAmount - (invoice.settledAmount || 0)),
+            0
+          )
+        ).toLocaleString("en-IN")
+      : 0;
+
     return res.status(200).json({
       success: true,
       invoices,
@@ -138,6 +175,9 @@ export async function getAllInvoices(req, res) {
       totalPages,
       page,
       limit,
+      totalSales,
+      totalPaid,
+      totalUnpaid,
     });
   } catch (error) {
     console.log("ERROR IN GETTING  SALES INVOICE ");
@@ -278,10 +318,6 @@ export async function bulkUploadSalesInvoices(req, res) {
         .json({ success: false, msg: "Business id is required" });
     }
     const bulkInvoices = req.body || [];
-    // FIND THE ITEMS AND PARTIES AND VALIDATE THEM BEFORE CREATING THE INVOICES
-    // ALSO CHECK IF THE INVOICE NUMBER ALREADY EXISTS FOR THAT BUSINESS
-    // IF ALL OKAY THEN CREATE THE INVOICES
-    // USE TRANSACTIONS TO ENSURE DATA INTEGRITY
 
     if (!Array.isArray(bulkInvoices) || bulkInvoices.length === 0) {
       return res
@@ -331,7 +367,7 @@ export async function bulkUploadSalesInvoices(req, res) {
         partyId: party?._id || null,
         totalAmount: invoiceData?.TotalAmount || 0,
         balanceAmount: invoiceData?.BalanceDue || 0,
-        amountSubTotal: invoiceData?.totalAmount || 0,
+        amountSubTotal: invoiceData?.TotalAmount || 0,
       };
       invoicesToInsert.push(newInovice);
     }

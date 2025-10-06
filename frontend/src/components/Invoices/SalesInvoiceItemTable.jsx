@@ -78,7 +78,7 @@ const SalesInvoiceItemTable = ({ title, data, setData, isEditing }) => {
   useEffect(() => {
     if (!addedItems?.length) return;
 
-    const getGSTPercentage = (rateString) => {
+     const getGSTPercentage = (rateString) => {
       const match = rateString?.match(/(\d+)%/);
       return match ? parseFloat(match[1]) : 0;
     };
