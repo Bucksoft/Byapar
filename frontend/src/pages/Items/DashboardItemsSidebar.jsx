@@ -145,10 +145,10 @@ const DashboardItemsSidebar = ({ modalId, itemIdToEdit }) => {
             >
               {data?.itemType === "product" ? (
                 <div
-                  style={{
-                    boxShadow:
-                      "rgba(0, 0, 0, 0.16) 0px 3px 6px, rgba(0, 0, 0, 0.23) 0px 3px 6px",
-                  }}
+                  // style={{
+                  //   boxShadow:
+                  //     "rgba(0, 0, 0, 0.16) 0px 3px 6px, rgba(0, 0, 0, 0.23) 0px 3px 6px",
+                  // }}
                   className="flex items-center h-full rounded-md flex-col p-3 bg-white"
                 >
                   {newItemsSidebarDetails?.map((item) => (
@@ -212,14 +212,14 @@ const DashboardItemsSidebar = ({ modalId, itemIdToEdit }) => {
                 ease: "easeInOut",
                 duration: 0.3,
               }}
-              style={{
-                boxShadow:
-                  "rgba(0, 0, 0, 0.16) 0px 3px 6px, rgba(0, 0, 0, 0.23) 0px 3px 6px",
-              }}
-              className="shadow-lg rounded-md w-full bg-white p-5 flex flex-col ml-2"
+              // style={{
+              //   boxShadow:
+              //     "rgba(0, 0, 0, 0.16) 0px 3px 6px, rgba(0, 0, 0, 0.23) 0px 3px 6px",
+              // }}
+              className=" rounded-md w-full bg-white p-5 flex flex-col ml-2"
             >
               {/* Scrollable fixed-height content */}
-              <div className="flex-1 overflow-auto ">
+              <div className="flex-1 overflow-auto">
                 <div className="">
                   {currentField === "Basic Details" ? (
                     <DashboardItemsBasicDetailPage

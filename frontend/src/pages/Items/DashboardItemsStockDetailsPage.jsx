@@ -140,9 +140,9 @@ const DashboardItemsStockDetailsPage = ({ data, setData }) => {
               placeholder="eg: 85214"
               className="input input-sm w-full"
             />
-            <p className="text-xs text-info mt-1 cursor-pointer absolute right-2 top-5">
+            {/* <p className="text-xs text-info mt-1 cursor-pointer absolute right-2 top-5">
               Find HSN Code
-            </p>
+            </p> */}
           </div>
 
           <div className="flex flex-col relative ">

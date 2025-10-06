@@ -92,7 +92,7 @@ const DashboardItemsBasicDetailPage = ({ data, setData, err }) => {
               </>
             )}
           </p>
-          <div className="">
+          <div>
             <input
               type="text"
               value={data?.itemName}
@@ -165,14 +165,43 @@ const DashboardItemsBasicDetailPage = ({ data, setData, err }) => {
       </div>
 
       {/* right container */}
-      <div className="flex flex-col justify-between">
-        <div className="flex flex-col">
-          <div className="flex flex-col mt-1">
-            <label htmlFor="category" className="text-xs text-zinc-700 ">
-              Category
-            </label>
+      <div className="flex flex-col justify-start">
+        <div className="flex flex-col ">
+          <label
+            htmlFor="category"
+            className="text-xs text-zinc-700 flex items-center justify-between w-full "
+          >
+            Category
+            <button
+              onClick={() => setShowAddCategoryPopup(true)}
+              className="text-[var(--primary-btn)] cursor-pointer"
+            >
+              + Add Category
+            </button>
+          </label>
 
-            <details ref={dropdownRef} className="dropdown mt-1 z-10">
+          <select
+            name="category"
+            className="select select-sm w-full"
+            onChange={(e) =>
+              setData((prev) => ({ ...prev, category: e.target.value }))
+            }
+          >
+            {categories?.length > 0 &&
+              categories?.map((category) => (
+                <option key={category?._id} value={category?.categoryName}>
+                  {category?.categoryName}
+                </option>
+              ))}
+          </select>
+          <small className="text-xs text-[var(--error-text-color)] mt-1 ">
+            {
+              categoryMutation.error?.response?.data?.validationError
+                ?.categoryName?._errors[0]
+            }
+          </small>
+
+          {/* <details ref={dropdownRef} className="dropdown z-10">
               <summary className="select select-sm">
                 {data?.category || "Category"}
               </summary>
@@ -195,34 +224,20 @@ const DashboardItemsBasicDetailPage = ({ data, setData, err }) => {
                     {category?.categoryName}
                   </li>
                 ))}
-
-                <button
-                  onClick={() => setShowAddCategoryPopup(true)}
-                  className="btn btn-sm btn-dash btn-info mt-2"
-                >
-                  Add Category
-                </button>
               </ul>
-            </details>
-            {/* <small className="text-xs text-[var(--error-text-color)] mt-1 ">
-              {
-                categoryMutation.error?.response?.data?.validationError?.categoryName
-                  ?._errors[0]
-              }
-            </small> */}
-          </div>
+            </details> */}
         </div>
 
-        <div className="w-full h-8 mt-10 flex items-center justify-between">
+        {/* <div className="w-full h-8 mt-10 flex items-center justify-between">
           <p className="text-xs text-gray-600">Show Item in Online Store </p>
           <input
             type="checkbox"
             defaultChecked
             className="toggle mr-5 text-gray-600 toggle-sm"
           />
-        </div>
+        </div> */}
 
-        <div className="flex flex-col mt-5">
+        <div className="flex flex-col mt-4">
           <span className="text-xs text-gray-600">GST Tax Rate (%)</span>
           <div className="">
             {/* <Search size={16} className="w-10 text-gray-600" />
