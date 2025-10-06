@@ -2,6 +2,7 @@ import { salesInvoiceSchema } from "../config/validation.js";
 import Party from "../models/party.schema.js";
 import ProformaInvoice from "../models/proformaInvoice.schema.js";
 
+// CREATING PROFORMA INVOICE
 export async function createProformaInvoice(req, res) {
   try {
     const data = req.body;
@@ -71,6 +72,7 @@ export async function createProformaInvoice(req, res) {
   }
 }
 
+// GETTING ALL PROFORMA INVOICES
 export async function getAllProformaInvoices(req, res) {
   try {
     const businessId = req.params?.id;
@@ -101,6 +103,7 @@ export async function getAllProformaInvoices(req, res) {
   }
 }
 
+// GETTING PROFORMA BY ID
 export async function getProformaById(req, res) {
   try {
     const id = req.params.id;
@@ -126,6 +129,7 @@ export async function getProformaById(req, res) {
   }
 }
 
+// DELETING PROFORMA INVOICE
 export async function deleteProformaInvoice(req, res) {
   try {
     const id = req.params.id;
@@ -135,12 +139,14 @@ export async function deleteProformaInvoice(req, res) {
         msg: "Please provide the proforma invoice id",
       });
     }
-    const proformaInvoice = await ProformaInvoice.findByIdAndDelete(id);
+    const proformaInvoice = await ProformaInvoice.findById(id);
     if (!proformaInvoice) {
       return res
         .status(400)
         .json({ success: false, msg: "Proforma invoice not found" });
     }
+    proformaInvoice.status = "expired";
+    await proformaInvoice.save();
     return res
       .status(200)
       .json({ success: true, msg: "Proforma invoice deleted successfully" });

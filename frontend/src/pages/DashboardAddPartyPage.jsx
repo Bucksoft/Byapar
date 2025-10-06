@@ -17,6 +17,7 @@ const DashboardAddPartyPage = () => {
   const navigate = useNavigate();
   const [isAddedBankInfo, setIsAddedBankInfo] = useState(false);
   const { setParty } = usePartyStore();
+  const [sameAsBillingAddress, setSameAsBillingAddress] = useState(false);
   const [addCategoryPopup, setAddCategoryPopup] = useState(false);
   const { business } = useBusinessStore();
   const [cities, setCities] = useState([]);
@@ -59,7 +60,7 @@ const DashboardAddPartyPage = () => {
     }));
   };
 
-  // get all categories
+  // FETCH ALL CATEGORIES
   const { data: categories } = useQuery({
     queryKey: ["category"],
     queryFn: async () => {
@@ -93,6 +94,7 @@ const DashboardAddPartyPage = () => {
     },
   });
 
+  // ADD A CATEGORY
   const categoryMutation = useMutation({
     mutationFn: async (data) => {
       const res = await axiosInstance.post(`/category/${business?._id}`, {
@@ -328,12 +330,39 @@ const DashboardAddPartyPage = () => {
             <div className="flex flex-col mt-1">
               <label
                 htmlFor="Party_category"
-                className="text-xs text-zinc-700 "
+                className="text-xs text-zinc-700 flex items-center justify-between"
               >
                 Party Category
+                <button
+                  onClick={() => setAddCategoryPopup(true)}
+                  className=" text-[var(--primary-btn)] cursor-pointer"
+                >
+                  + Add Category
+                </button>
               </label>
 
-              <details ref={dropdownRef} className="dropdown mt-1 z-10">
+              <select
+                name="category"
+                className="select select-sm w-full mt-1"
+                onChange={(e) =>
+                  setData((prev) => ({ ...prev, categoryName: e.target.value }))
+                }
+              >
+                <option value="Party Category" className="hidden">
+                  Party Category
+                </option>
+                <option value="Party Category" disabled>
+                  Party Category
+                </option>
+                {newCategories?.length > 0 &&
+                  newCategories?.map((category) => (
+                    <option key={category?._id} value={category?.categoryName}>
+                      {category?.categoryName}
+                    </option>
+                  ))}
+              </select>
+
+              {/* <details ref={dropdownRef} className="dropdown mt-1 z-10">
                 <summary className="select select-sm">
                   {data.categoryName || "Party Category"}
                 </summary>
@@ -355,15 +384,8 @@ const DashboardAddPartyPage = () => {
                       {category?.categoryName}
                     </li>
                   ))}
-
-                  <button
-                    onClick={() => setAddCategoryPopup(true)}
-                    className="btn btn-sm btn-dash btn-info mt-2"
-                  >
-                    Add Category
-                  </button>
                 </ul>
-              </details>
+              </details> */}
               <small className="text-xs text-[var(--error-text-color)] mt-1 ">
                 {
                   mutation.error?.response?.data?.validationError?.categoryName
@@ -479,9 +501,34 @@ const DashboardAddPartyPage = () => {
               }
             </small>
           </div>
-          <div className="flex flex-col gap-2">
-            <label htmlFor="Billing_address" className="text-xs text-zinc-700">
+          <div className="flex flex-col gap-1">
+            <label
+              htmlFor="Billing_address"
+              className="text-xs text-zinc-700 flex items-center justify-between"
+            >
               Shipping Address
+              <div>
+                <input
+                  checked={sameAsBillingAddress}
+                  onChange={(e) => {
+                    setSameAsBillingAddress(e.target.checked);
+                    if (e.target.checked) {
+                      setData((prev) => ({
+                        ...prev,
+                        shippingAddress: prev.billingAddress,
+                      }));
+                    } else {
+                      setData((prev) => ({
+                        ...prev,
+                        shippingAddress: "",
+                      }));
+                    }
+                  }}
+                  type="checkbox"
+                  className="checkbox checkbox-sm mr-1 checkbox-info"
+                />
+                Same as Billing address
+              </div>
             </label>
             <textarea
               name="shippingAddress"

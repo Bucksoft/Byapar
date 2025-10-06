@@ -31,13 +31,18 @@ const DashboardManageBusinessPage = () => {
           {/* right sidebar end */}
 
           <footer className="w-full pb-8">
-            <div className="border-b border-t border-[var(--primary-border)]">
+            {/* <div className="border-b border-t border-[var(--primary-border)]">
               <p className="text-[14px]  p-2">Company Settings</p>
             </div>
 
             <div className="m-4">
               <button className="px-3 flex items-center gap-6 rounded-2xl p-2 border border-zinc-200 hover:shadow-md cursor-pointer ">
-                <img src={tally} alt="/src/assets/tally" className="w-10" />
+                <img
+                  src={tally}
+                  alt="/src/assets/tally"
+                  className="w-10"
+                  loading="lazy"
+                />
                 <div className="flex flex-col justify-between">
                   <div className="flex items-center justify-between">
                     <p className="text-sm font-semibold">
@@ -52,21 +57,26 @@ const DashboardManageBusinessPage = () => {
                   </p>
                 </div>
               </button>
-            </div>
+            </div> */}
 
-            <div className="border-b border-t border-[var(--primary-border)]">
+            {/* <div className="border-b border-t border-[var(--primary-border)]">
               <p className="text-[14px]  p-2">Add New Business</p>
-            </div>
-
+            </div> */}
+            {/* 
             <div className="flex flex-col items-center justify-center">
-              <img src={store} alt="/src/assets/tally" className="w-100" />
+              <img
+                src={store}
+                alt="/src/assets/tally"
+                className="w-100"
+                loading="lazy"
+              />
               <p className="text-[13px] mb-3">
                 Easily Manage all your businesses in one place on myBillBook app
               </p>
               <button className="btn btn-sm btn-soft font-bold text-success-content rounded bg-success  cursor-pointer">
                 Create New Business
               </button>
-            </div>
+            </div> */}
           </footer>
         </div>
 

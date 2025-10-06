@@ -1,7 +1,7 @@
 import DashboardNavbar from "../components/DashboardNavbar";
 import { dashboardPurchaseDetails } from "../lib/dashboardPurhaseCards";
 import { Calendar, EllipsisVertical, Plus, Search } from "lucide-react";
-import { FaFileInvoice } from "react-icons/fa6";
+import { FaFileInvoice, FaIndianRupeeSign } from "react-icons/fa6";
 import { motion } from "framer-motion";
 import { container, dashboardLinksItems } from "../components/Sidebar";
 import { Link, useNavigate } from "react-router-dom";
@@ -24,18 +24,22 @@ const DashboardPurchasesPage = () => {
   const [invoiceId, setInvoiceId] = useState();
   const navigate = useNavigate();
   const [showDeletePopup, setShowDeletePopup] = useState(false);
-  const { setPurchaseInvoices, purchaseInvoices: ad } =
-    usePurchaseInvoiceStore();
+  const {
+    setPurchaseInvoices,
+    purchaseInvoices: ad,
+    setTotalPurchaseInvoices,
+  } = usePurchaseInvoiceStore();
 
   // MUTATION TO DELETE INVOICE
   const mutation = useMutation({
-    mutationFn: async (id) => {
+    mutationFn: async () => {
       const res = await axiosInstance.delete(`/purchase-invoice/${invoiceId}`);
       return res.data;
     },
     onSuccess: (data) => {
       toast.success(data?.msg);
       queryClient.invalidateQueries({ queryKey: ["purchaseInvoice"] });
+      document.getElementById("my_modal_2").close();
     },
   });
 
@@ -45,6 +49,7 @@ const DashboardPurchasesPage = () => {
     queryFn: async () => {
       const res = await axiosInstance.get(`/purchase-invoice/${business?._id}`);
       setPurchaseInvoices(res.data?.purchaseInvoices);
+      setTotalPurchaseInvoices(res.data?.totalPurchaseInvoices);
       return res.data?.purchaseInvoices;
     },
   });
@@ -71,26 +76,76 @@ const DashboardPurchasesPage = () => {
           variants={container}
           initial="hidden"
           animate="show"
-          className="grid grid-cols-3 gap-2 mt-4 text-sm"
+          className="grid grid-cols-3 gap-2"
         >
-          {dashboardPurchaseDetails?.map((details) => (
-            <motion.div
-              variants={dashboardLinksItems}
-              key={details.id}
-              className={`border rounded-md p-3 shadow-md border-${details.color} bg-${details.color}/10 hover:-translate-y-1 transition-all ease-in-out duration-200 cursor-pointer`}
-            >
-              <p className={`flex items-center gap-3 text-${details.color}`}>
-                {details.icon} {details.label}
-              </p>
-              <span className="font-medium text-2xl flex items-center gap-2">
-                {details.label === "To Collect" && (
-                  <FaIndianRupeeSign size={15} />
-                )}
-                {details.label === "To Pay" && <FaIndianRupeeSign size={15} />}
-                {details.value}
-              </span>
-            </motion.div>
-          ))}
+          {/* TOTAL SALES */}
+          <div
+            className={`border border-[#456882] shadow-zinc-500 mt-5 rounded-md p-3  shadow-md hover:-translate-y-1 transition-all ease-in-out duration-200 cursor-pointer`}
+          >
+            <p className={`flex items-center gap-3 text-[#456882]`}>
+              <FaFileInvoice />
+              Total Purchases
+            </p>
+            <span className="font-medium text-2xl flex items-center gap-2">
+              <FaIndianRupeeSign size={15} />
+              {purchaseInvoices
+                ? Number(
+                    purchaseInvoices
+                      .reduce(
+                        (acc, invoice) =>
+                          acc + Number(invoice?.totalAmount || 0),
+                        0
+                      )
+                      .toFixed(2)
+                  ).toLocaleString("en-IN")
+                : 0}
+            </span>
+          </div>
+
+          {/* PAID */}
+          <div
+            className={`border border-[#456882] mt-5 shadow-zinc-500 rounded-md p-3  shadow-md hover:-translate-y-1 transition-all ease-in-out duration-200 cursor-pointer`}
+          >
+            <p className={`flex items-center gap-3 text-[#456882]`}>
+              <FaFileInvoice />
+              Paid
+            </p>
+            <span className="font-medium text-2xl flex items-center gap-2">
+              <FaIndianRupeeSign size={15} />
+              {purchaseInvoices
+                ? Number(
+                    purchaseInvoices.reduce(
+                      (sum, invoice) => sum + (invoice.settledAmount || 0),
+                      0
+                    )
+                  ).toLocaleString("en-IN")
+                : 0}
+            </span>
+          </div>
+
+          {/* UNPAID */}
+          <div
+            className={`border border-[#456882] shadow-zinc-500 mt-5 rounded-md p-3  shadow-md hover:-translate-y-1 transition-all ease-in-out duration-200 cursor-pointer`}
+          >
+            <p className={`flex items-center gap-3 text-[#456882]`}>
+              <FaFileInvoice />
+              Unpaid
+            </p>
+            <span className="font-medium text-2xl flex items-center gap-2">
+              <FaIndianRupeeSign size={15} />
+              {purchaseInvoices
+                ? Number(
+                    purchaseInvoices.reduce(
+                      (sum, invoice) =>
+                        sum +
+                        (invoice.pendingAmount ??
+                          invoice.totalAmount - (invoice.settledAmount || 0)),
+                      0
+                    )
+                  ).toLocaleString("en-IN")
+                : 0}
+            </span>
+          </div>
         </motion.div>
 
         <motion.div
@@ -175,18 +230,18 @@ const DashboardPurchasesPage = () => {
                   duration: 0.2,
                   delay: 0.3,
                 }}
-                className="table table-sm table-zebra"
+                className="table table-zebra border border-[var(--table-border)] "
               >
                 {/* head */}
                 <thead>
-                  <tr className="bg-zinc-200">
+                  <tr className="bg-[var(--primary-background)]">
                     <th>Date</th>
                     <th>Purchase Invoice Number</th>
                     <th>Party Name</th>
                     <th>Due In</th>
                     <th>Amount</th>
                     <th>Status</th>
-                    <th></th>
+                    <th>Action</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -203,7 +258,7 @@ const DashboardPurchasesPage = () => {
                       >
                         <td>{invoice?.purchaseInvoiceDate.split("T")[0]}</td>
                         <td>{invoice?.purchaseInvoiceNumber}</td>
-                        <td>{invoice?.partyName}</td>
+                        <td>{invoice?.partyId?.partyName}</td>
                         <td>{"-"}</td>
                         <td>
                           <div className="flex items-center">
@@ -214,7 +269,14 @@ const DashboardPurchasesPage = () => {
                           </div>
                         </td>
                         <td>
-                          <div className="badge badge-soft badge-sm badge-primary">
+                          <div
+                            className={`badge badge-soft badge-sm  ${
+                              invoice.status === "unpaid" ||
+                              invoice.status === "cancelled"
+                                ? "badge-error"
+                                : "badge-success"
+                            }`}
+                          >
                             {invoice?.status}
                           </div>
                         </td>
@@ -230,25 +292,21 @@ const DashboardPurchasesPage = () => {
                             </div>
                             <ul
                               tabIndex={0}
-                              className="dropdown-content menu bg-base-100 rounded-box z-10 w-52 p-2 shadow-sm"
+                              className="dropdown-content menu bg-base-100 rounded-box shadow-sm z-[9999] w-52 p-2 fixed"
+                              style={{ top: "auto", left: "auto" }}
                               onClick={(e) => e.stopPropagation()}
                             >
                               <li>
-                                <a>
+                                <button
+                                  onClick={() =>
+                                    navigate(
+                                      `/dashboard/update/${invoice?._id}?type=sales invoice`
+                                    )
+                                  }
+                                  className="flex items-center gap-2"
+                                >
                                   <FaRegEdit /> Edit
-                                </a>
-                              </li>
-                              <li>
-                                <a>
-                                  <MdOutlineHistory />
-                                  Edit History
-                                </a>
-                              </li>
-                              <li>
-                                <a>
-                                  <BiDuplicate />
-                                  Duplicate
-                                </a>
+                                </button>
                               </li>
                               <li>
                                 <a
@@ -260,8 +318,7 @@ const DashboardPurchasesPage = () => {
                                   }}
                                   className="text-[var(--error-text-color)]"
                                 >
-                                  <BsTrash3 />
-                                  Delete
+                                  <BsTrash3 /> Delete
                                 </a>
                               </li>
                             </ul>
@@ -270,7 +327,19 @@ const DashboardPurchasesPage = () => {
                       </tr>
                     ))
                   ) : (
-                    <tr className="text-zinc-500">No data found</tr>
+                    <tr>
+                      <td
+                        colSpan="7"
+                        className="text-center py-4 text-gray-500"
+                      >
+                        <div className="w-full flex items-center justify-center py-20 flex-col gap-3 text-zinc-400">
+                          <FaFileInvoice size={40} />
+                          <span className="text-sm">
+                            No transactions matching the current filter
+                          </span>
+                        </div>
+                      </td>
+                    </tr>
                   )}
                 </tbody>
               </motion.table>

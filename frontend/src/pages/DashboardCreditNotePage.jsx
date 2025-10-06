@@ -128,9 +128,16 @@ const DashboardCreditNotePage = () => {
                                 onClick={(e) => e.stopPropagation()}
                               >
                                 <li>
-                                  <a>
+                                  <button
+                                    onClick={() =>
+                                      navigate(
+                                        `/dashboard/update/${creditNote?._id}?type=credit note`
+                                      )
+                                    }
+                                    className="flex items-center gap-2"
+                                  >
                                     <FaRegEdit /> Edit
-                                  </a>
+                                  </button>
                                 </li>
                                 <li>
                                   <a

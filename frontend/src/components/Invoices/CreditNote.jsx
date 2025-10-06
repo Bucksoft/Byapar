@@ -81,7 +81,7 @@ const CreditNote = () => {
                   <button
                     onClick={() =>
                       navigate(
-                        `/dashboard/update/${creditNote?._id}?type=sales invoice`
+                        `/dashboard/update/${creditNote?._id}?type=credit note`
                       )
                     }
                   >

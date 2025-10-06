@@ -35,7 +35,7 @@ const itemSchema = new mongoose.Schema(
     purchasePriceType: {
       type: String,
       enum: ["with tax", "without tax"],
-      default: "with tax",
+      default: "without tax",
     },
     salesPrice: {
       type: Number,
@@ -47,6 +47,10 @@ const itemSchema = new mongoose.Schema(
     },
     gstTaxRate: {
       type: String,
+    },
+    gstAmount: {
+      type: String,
+      default: "0",
     },
     measuringUnit: {
       type: String,
@@ -84,6 +88,9 @@ const itemSchema = new mongoose.Schema(
     description: {
       type: String,
       trim: true,
+    },
+    invoiceNo: {
+      type: String,
     },
     businessId: {
       type: mongoose.Schema.Types.ObjectId,

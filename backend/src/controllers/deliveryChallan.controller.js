@@ -2,6 +2,7 @@ import Party from "../models/party.schema.js";
 import DeliveryChallan from "../models/deliveryChallan.schema.js";
 import { salesInvoiceSchema } from "../config/validation.js";
 
+// CREATE DELIVERY CHALLAN
 export async function createDeliveryChallan(req, res) {
   try {
     const data = req.body;
@@ -71,6 +72,7 @@ export async function createDeliveryChallan(req, res) {
   }
 }
 
+// GET ALL DELIVERY CHALLAN
 export async function getAllDeliveryChallan(req, res) {
   try {
     const businessId = req.params?.id;
@@ -99,6 +101,7 @@ export async function getAllDeliveryChallan(req, res) {
   }
 }
 
+// GET CHALLAN BY ID
 export async function getChallanById(req, res) {
   try {
     const id = req.params.id;
@@ -122,6 +125,7 @@ export async function getChallanById(req, res) {
   }
 }
 
+// DELIVERY CHALLAN
 export async function deleteDeliveryChallan(req, res) {
   try {
     const id = req.params.id;
@@ -130,10 +134,12 @@ export async function deleteDeliveryChallan(req, res) {
         .status(400)
         .json({ success: false, msg: "Please provide the challan id" });
     }
-    const deletedChallan = await DeliveryChallan.findByIdAndDelete(id);
+    const deletedChallan = await DeliveryChallan.findById(id);
     if (!deletedChallan) {
       return res.status(400).json({ success: false, msg: "Challan not found" });
     }
+    deletedChallan.status = "expired";
+    await deletedChallan.save();
     return res
       .status(200)
       .json({ success: true, msg: "Challan deleted successfully" });

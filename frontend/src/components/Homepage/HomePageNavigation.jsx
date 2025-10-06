@@ -6,7 +6,7 @@ import { Link } from "react-router-dom";
 const HomePageNavigation = () => {
   return (
     <div className="relative">
-      <img src={wave} alt="wave.png" />
+      <img src={wave} alt="wave.png" loading="lazy" />
       <header className="absolute top-0 w-full p-5">
         <nav className="w-3/4 mx-auto flex items-center justify-between bg-white/10 rounded-full backdrop-blur-xl p-2  shadow-md px-3 border border-white/30">
           {/* Logo */}

@@ -7,10 +7,11 @@ import { IoMdCheckmarkCircleOutline } from "react-icons/io";
 import { PenSquare, Plus } from "lucide-react";
 import { Link, useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { queryClient } from "../main";
 import { BsTrash3 } from "react-icons/bs";
 import businessImg from "../assets/business.svg";
+import { useAuthStore } from "../store/authStore";
 
 const DashboardMyBusinesses = () => {
   const {
@@ -257,7 +258,12 @@ const DashboardMyBusinesses = () => {
         <div className="w-full flex justify-center py-16">
           {businesses && businesses.length <= 0 && (
             <div className="flex flex-col items-center">
-              <img src={businessImg} alt="businessBackground" width={400} />
+              <img
+                src={businessImg}
+                alt="businessBackground"
+                width={400}
+                loading="lazy"
+              />
               <h1 className="text-xl font-semibold text-zinc-600">
                 Create your first business
               </h1>

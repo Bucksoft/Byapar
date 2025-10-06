@@ -47,6 +47,10 @@ const purchaseInvoiceSchema = new mongoose.Schema(
       enum: ["paid", "unpaid", "draft", "partially paid", "cancelled"],
       default: "unpaid",
     },
+    type: {
+      type: String,
+      default: "purchase invoice",
+    },
   },
   {
     strict: false,

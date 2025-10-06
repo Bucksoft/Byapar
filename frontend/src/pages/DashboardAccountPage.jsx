@@ -119,7 +119,12 @@ const DashboardAccountPage = () => {
               Help us make Byapar better
             </span>
             <button className="btn bg-[var(--primary-btn)] btn-sm">
-              <img src={suggestion} alt="" className="h-5 font-black" />
+              <img
+                src={suggestion}
+                alt=""
+                className="h-5 font-black"
+                loading="lazy"
+              />
               <span className=""> Share Suggestion</span>
             </button>
           </motion.div>
@@ -276,22 +281,34 @@ const DashboardAccountPage = () => {
                   <div className="avatar-group -space-x-6 pt-5">
                     <div className="avatar ">
                       <div className="w-7">
-                        <img src="https://img.daisyui.com/images/profile/demo/batperson@192.webp" />
+                        <img
+                          src="https://img.daisyui.com/images/profile/demo/batperson@192.webp"
+                          loading="lazy"
+                        />
                       </div>
                     </div>
                     <div className="avatar">
                       <div className="w-7">
-                        <img src="https://img.daisyui.com/images/profile/demo/spiderperson@192.webp" />
+                        <img
+                          src="https://img.daisyui.com/images/profile/demo/spiderperson@192.webp"
+                          loading="lazy"
+                        />
                       </div>
                     </div>
                     <div className="avatar">
                       <div className="w-7">
-                        <img src="https://img.daisyui.com/images/profile/demo/averagebulk@192.webp" />
+                        <img
+                          src="https://img.daisyui.com/images/profile/demo/averagebulk@192.webp"
+                          loading="lazy"
+                        />
                       </div>
                     </div>
                     <div className="avatar">
                       <div className="w-7">
-                        <img src="https://img.daisyui.com/images/profile/demo/wonderperson@192.webp" />
+                        <img
+                          src="https://img.daisyui.com/images/profile/demo/wonderperson@192.webp"
+                          loading="lazy"
+                        />
                       </div>
                     </div>
                   </div>
@@ -315,6 +332,7 @@ const DashboardAccountPage = () => {
                       src={personhandshake}
                       alt=""
                       className="h-10 w-10 pr-2"
+                      loading="lazy"
                     />
                     <span>Multi User and Staff Access</span>
                   </div>
@@ -323,26 +341,47 @@ const DashboardAccountPage = () => {
                       src={truckwithinvoice}
                       alt=""
                       className="h-10 w-10 pr-2"
+                      loading="lazy"
                     />
                     <span>Way Bill Generation</span>
                   </div>
                   <div className="flex items-center py-1">
-                    <img src={phonesms} alt="" className="h-10 w-10 pr-2" />
+                    <img
+                      src={phonesms}
+                      alt=""
+                      className="h-10 w-10 pr-2"
+                      loading="lazy"
+                    />
                     <span>SMS Marketing</span>
                   </div>
                 </div>
                 {/* right icon */}
                 <div className="px-3 py-1 text-sm">
                   <div className="flex items-center py-1">
-                    <img src={warehouse} alt="" className="h-10 w-10 pr-2" />
+                    <img
+                      src={warehouse}
+                      alt=""
+                      className="h-10 w-10 pr-2"
+                      loading="lazy"
+                    />
                     <span>Multiple Businesses</span>
                   </div>
                   <div className="flex items-center py-1">
-                    <img src={desktop} alt="" className="h-10 w-10 pr-2" />
+                    <img
+                      src={desktop}
+                      alt=""
+                      className="h-10 w-10 pr-2"
+                      loading="lazy"
+                    />
                     <span>Desktop App</span>
                   </div>
                   <div className="flex items-center py-1">
-                    <img src={scanner} alt="" className="h-10 w-10 pr-2" />
+                    <img
+                      src={scanner}
+                      alt=""
+                      className="h-10 w-10 pr-2"
+                      loading="lazy"
+                    />
                     <span>Scan & Print Barcode</span>
                   </div>
                 </div>

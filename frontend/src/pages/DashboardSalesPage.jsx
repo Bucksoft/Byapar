@@ -2,7 +2,12 @@ import DashboardNavbar from "../components/DashboardNavbar";
 import { dashboardSaledCardsDetails } from "../lib/dashboardSalesCards";
 import { FaIndianRupeeSign } from "react-icons/fa6";
 import { EllipsisVertical, Plus, Search } from "lucide-react";
-import { FaFileInvoice, FaRegEdit } from "react-icons/fa";
+import {
+  FaArrowLeft,
+  FaArrowRight,
+  FaFileInvoice,
+  FaRegEdit,
+} from "react-icons/fa";
 import { motion } from "framer-motion";
 import { container, dashboardLinksItems } from "../components/Sidebar";
 import { Link, useNavigate } from "react-router-dom";
@@ -13,17 +18,29 @@ import CustomLoader from "../components/Loader";
 import { LiaRupeeSignSolid } from "react-icons/lia";
 import { BsTrash3 } from "react-icons/bs";
 import { useInvoiceStore } from "../store/invoicesStore";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import toast from "react-hot-toast";
 import { useBusinessStore } from "../store/businessStore";
+import { uploadExcel } from "../../helpers/uploadExcel";
 
 const DashboardSalesPage = () => {
   const { setInvoices, setTotalInvoices } = useInvoiceStore();
   const [showDeletePopup, setShowDeletePopup] = useState(false);
   const [invoiceId, setInvoiceId] = useState();
   const [searchQuery, setSearchQuery] = useState("");
+  const [debouncedQuery, setDebouncedQuery] = useState(searchQuery);
   const { business } = useBusinessStore();
   const navigate = useNavigate();
+  const fileRef = useRef(null);
+  const [page, setPage] = useState(1);
+  const limit = 10;
+
+  useEffect(() => {
+    const timeout = setTimeout(() => {
+      setDebouncedQuery(searchQuery);
+    }, 400);
+    return () => clearTimeout(timeout);
+  }, [searchQuery]);
 
   // to get all the invoices
   const {
@@ -31,15 +48,19 @@ const DashboardSalesPage = () => {
     data: invoices,
     isSuccess,
   } = useQuery({
-    queryKey: ["invoices", business?._id],
+    queryKey: ["invoices", business?._id, page],
     queryFn: async () => {
       if (!business) return [];
-      const res = await axiosInstance.get(`/sales-invoice/${business._id}`);
+      const res = await axiosInstance.get(
+        `/sales-invoice/${business._id}?page=${page}&limit=${limit}`
+      );
       setTotalInvoices(res.data?.totalInvoices);
-      return res.data?.invoices || [];
+      return res.data || [];
     },
     enabled: !!business,
+    keepPreviousData: true,
   });
+
   // mutation to delete an invoice
   const mutation = useMutation({
     mutationFn: async () => {
@@ -62,23 +83,48 @@ const DashboardSalesPage = () => {
     }
   }, [isSuccess, invoices]);
 
-  const searchedInvoices =
-    invoices && searchQuery
-      ? invoices.filter(
-          (invoice) =>
-            invoice?.partyId?.partyName
-              ?.toLowerCase()
-              .includes(searchQuery.toLowerCase()) ||
-            invoice?.salesInvoiceNumber
-              .toString()
-              .toLowerCase()
-              .includes(searchQuery.toString().toLowerCase())
-        )
-      : invoices;
+  const searchedInvoices = useMemo(() => {
+    if (!invoices?.invoices) return [];
+
+    return invoices?.invoices.filter(
+      (invoice) =>
+        invoice?.partyId?.partyName
+          ?.toLowerCase()
+          .includes(searchQuery.toLowerCase()) ||
+        invoice?.salesInvoiceNumber
+          ?.toString()
+          ?.toLowerCase()
+          .includes(searchQuery.toLowerCase())
+    );
+  }, [invoices]);
+
+  // MUTATION TO UPLOAD ITEMS IN BULK
+  const bulkMutation = useMutation({
+    mutationFn: async (data) => {
+      const res = await axiosInstance.post(
+        `/sales-invoice/bulk/${business?._id}`,
+        data
+      );
+      return res.data;
+    },
+    onSuccess: (data) => {
+      toast.success(data.msg || "Uploaded successfully");
+      queryClient.invalidateQueries({ queryKey: ["invoices"] });
+    },
+  });
+
+  const handleFileUpload = async (e) => {
+    const selectedFile = e.target.files[0];
+    const sanitizedData = await uploadExcel(selectedFile);
+    if (sanitizedData) {
+      bulkMutation.mutate(sanitizedData);
+    }
+    e.target.value = null;
+  };
 
   return (
-    <main className="h-full p-2 ">
-      <div className="h-full w-full flex flex-col bg-gradient-to-b from-white to-transparent rounded-lg p-3">
+    <main className="h-screen overflow-y-scroll p-2 ">
+      <div className="h-full w-full mb-3 flex flex-col bg-gradient-to-b from-white to-transparent rounded-lg p-3 ">
         <DashboardNavbar title={"Sales Invoice"} isReport={"true"} />
         <motion.div
           variants={container}
@@ -96,17 +142,7 @@ const DashboardSalesPage = () => {
             </p>
             <span className="font-medium text-2xl flex items-center gap-2">
               <FaIndianRupeeSign size={15} />
-              {invoices
-                ? Number(
-                    invoices
-                      .reduce(
-                        (acc, invoice) =>
-                          acc + Number(invoice?.totalAmount || 0),
-                        0
-                      )
-                      .toFixed(2)
-                  ).toLocaleString("en-IN")
-                : 0}
+              {invoices?.totalSales || 0}
             </span>
           </div>
 
@@ -120,14 +156,7 @@ const DashboardSalesPage = () => {
             </p>
             <span className="font-medium text-2xl flex items-center gap-2">
               <FaIndianRupeeSign size={15} />
-              {invoices
-                ? Number(
-                    invoices.reduce(
-                      (sum, invoice) => sum + (invoice.settledAmount || 0),
-                      0
-                    )
-                  ).toLocaleString("en-IN")
-                : 0}
+              {invoices?.totalPaid || 0}
             </span>
           </div>
 
@@ -141,17 +170,7 @@ const DashboardSalesPage = () => {
             </p>
             <span className="font-medium text-2xl flex items-center gap-2">
               <FaIndianRupeeSign size={15} />
-              {invoices
-                ? Number(
-                    invoices.reduce(
-                      (sum, invoice) =>
-                        sum +
-                        (invoice.pendingAmount ??
-                          invoice.totalAmount - (invoice.settledAmount || 0)),
-                      0
-                    )
-                  ).toLocaleString("en-IN")
-                : 0}
+              {invoices?.totalUnpaid || 0}
             </span>
           </div>
         </motion.div>
@@ -194,13 +213,16 @@ const DashboardSalesPage = () => {
           </div>
         </motion.div>
 
-        <div className="overflow-x-auto flex-1 bg-base-100 mt-5 ">
+        <div className="flex-1 bg-base-100 mt-5 rounded-md border border-[var(--table-border)] shadow-sm">
           {isLoading ? (
             <div className="w-full py-3 flex justify-center">
               <CustomLoader text={"Getting all invoices..."} />
             </div>
           ) : (
-            (searchedInvoices || invoices) && (
+            <div
+              className="relative z-10 bg-base-100 
+             h-[460px] overflow-y-auto overflow-x-auto  border border-[var(--table-border)]"
+            >
               <motion.table
                 initial={{
                   opacity: 0,
@@ -215,7 +237,7 @@ const DashboardSalesPage = () => {
                   duration: 0.2,
                   delay: 0.3,
                 }}
-                className="table table-zebra border border-[var(--table-border)] "
+                className="table table-zebra table-sm min-w-full"
               >
                 {/* head */}
                 <thead>
@@ -230,7 +252,7 @@ const DashboardSalesPage = () => {
                   </tr>
                 </thead>
                 <tbody>
-                  {searchedInvoices.length > 0 ? (
+                  {searchedInvoices && searchedInvoices?.length > 0 ? (
                     searchedInvoices.map((invoice) => (
                       <tr
                         key={invoice?._id}
@@ -239,9 +261,13 @@ const DashboardSalesPage = () => {
                         }}
                         className={`cursor-pointer hover:bg-zinc-50 `}
                       >
-                        <td>{invoice?.salesInvoiceDate.split("T")[0]}</td>
+                        <td>
+                          {invoice?.salesInvoiceDate
+                            ? invoice?.salesInvoiceDate.split("T")[0]
+                            : "-"}
+                        </td>
                         <td>{invoice?.salesInvoiceNumber}</td>
-                        <td>{invoice?.partyId?.partyName}</td>
+                        <td>{invoice?.partyId?.partyName || "-"}</td>
                         <td>{invoice?.dueDate.split("T")[0]}</td>
                         <td className="flex  flex-col gap-1">
                           <div className="flex items-center">
@@ -303,9 +329,16 @@ const DashboardSalesPage = () => {
                                 onClick={(e) => e.stopPropagation()}
                               >
                                 <li>
-                                  <a>
+                                  <button
+                                    onClick={() =>
+                                      navigate(
+                                        `/dashboard/update/${invoice?._id}?type=sales invoice`
+                                      )
+                                    }
+                                    className="flex items-center gap-2"
+                                  >
                                     <FaRegEdit /> Edit
-                                  </a>
+                                  </button>
                                 </li>
                                 <li>
                                   <a
@@ -346,10 +379,10 @@ const DashboardSalesPage = () => {
                   )}
                 </tbody>
               </motion.table>
-            )
+            </div>
           )}
 
-          {(!searchedInvoices || !invoices) && (
+          {/* {(!searchedInvoices || !invoices?.invoices) && (
             <div className="w-full flex justify-center py-19 flex-col items-center gap-4">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -372,21 +405,116 @@ const DashboardSalesPage = () => {
                 You haven't generated any invoices yet.
               </h1>
             </div>
-          )}
+          )} */}
+        </div>
 
-          {invoices?.length <= 0 && (
-            <motion.div
-              initial={{ opacity: 0, scale: 0 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ ease: "easeInOut", duration: 0.2, delay: 0.4 }}
-              className="w-full flex items-center justify-center my-8 flex-col gap-3 text-zinc-400"
+        {/* PAGINATION  */}
+        <div className="w-full flex items-center justify-end p-4">
+          <div className="join join-sm">
+            <button
+              className="join-item btn btn-neutral btn-sm"
+              onClick={() => setPage((old) => Math.max(old - 1, 1))}
+              disabled={page === 1}
             >
-              <FaFileInvoice size={40} />
-              No transactions matching the current filter
-            </motion.div>
-          )}
+              <FaArrowLeft />
+            </button>
+
+            <button className="join-item btn btn-sm">
+              {page}/{invoices?.totalPages || 1}
+            </button>
+
+            <button
+              onClick={() => {
+                if (invoices && page < invoices?.totalPages) {
+                  setPage((old) => old + 1);
+                }
+              }}
+              disabled={!invoices || page >= invoices.totalPages}
+              className="join-item btn btn-neutral btn-sm"
+            >
+              <FaArrowRight />
+            </button>
+          </div>
+        </div>
+
+        {/* HANDLING BULK UPLOAD */}
+        <div className="p-5 w-full border mt-3 border-zinc-300 shadow-md bg-gradient-to-r from-zinc-100 to-sky-200 ">
+          <h1 className="font-semibold">
+            Add Multiple Sales information at once
+          </h1>
+          <p className="text-zinc-500 text-sm">
+            Bulk upload all your sales report to Byapar using excel
+          </p>
+          {/* <small className="mt-1 text-red-500">
+            Note* You must follow the sample items excel.
+          </small> */}
+          <br />
+          <input
+            type="file"
+            className="file-input file-input-sm hidden"
+            ref={fileRef}
+            onChange={handleFileUpload}
+          />
+
+          <button
+            onClick={() => fileRef.current.click()}
+            disabled={bulkMutation.isPending}
+            className="btn btn-success btn-sm mt-3 "
+          >
+            {bulkMutation.isPending ? (
+              <CustomLoader text={"Adding items..."} />
+            ) : (
+              <>
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  width="20"
+                  height="20"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  className="icon icon-tabler icons-tabler-outline icon-tabler-file-spreadsheet"
+                >
+                  <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                  <path d="M14 3v4a1 1 0 0 0 1 1h4" />
+                  <path d="M17 21h-10a2 2 0 0 1 -2 -2v-14a2 2 0 0 1 2 -2h7l5 5v11a2 2 0 0 1 -2 2z" />
+                  <path d="M8 11h8v7h-8z" />
+                  <path d="M8 15h8" />
+                  <path d="M11 11v7" />
+                </svg>{" "}
+                Upload Excel
+              </>
+            )}
+          </button>
+
+          {/* <button
+            onClick={() => window.open("/sample-sales.xlsx", "_blank")}
+            className="btn text-neutral btn-link btn-xs mt-3 ml-3"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              className="icon icon-tabler icons-tabler-outline icon-tabler-download"
+            >
+              <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+              <path d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2 -2v-2" />
+              <path d="M7 11l5 5l5 -5" />
+              <path d="M12 4l0 12" />
+            </svg>
+            Download Sample
+          </button> */}
         </div>
       </div>
+
       {!showDeletePopup && (
         <>
           <dialog id="my_modal_2" className="modal">

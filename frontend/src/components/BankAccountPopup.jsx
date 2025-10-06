@@ -1,4 +1,7 @@
+import { useMutation } from "@tanstack/react-query";
 import { FaPlus } from "react-icons/fa6";
+import { axiosInstance } from "../config/axios";
+import toast from "react-hot-toast";
 
 const BankAccountPopup = ({
   data,
@@ -6,6 +9,27 @@ const BankAccountPopup = ({
   setIsAddedBankInfo,
   mutation,
 }) => {
+  const bankMutation = useMutation({
+    mutationFn: async () => {
+      if (data?.bankAccountNumber?.length === 0) {
+        throw new Error("Bank Account Number is required");
+      }
+      const res = await axiosInstance.post("/bank-account", data);
+      if (res.data.success) {
+        toast.success(res.data.msg);
+        document.getElementById("my_modal_3").close();
+        setIsAddedBankInfo(false);
+      }
+      return res.data;
+    },
+    onError: (err) => {
+      console.log(err);
+      toast.error(
+        err.response.data.msg ?? err.message ?? "Something went wrong"
+      );
+    },
+  });
+
   return (
     <>
       <button
@@ -17,7 +41,7 @@ const BankAccountPopup = ({
       </button>
 
       <dialog id="my_modal_3" className="modal text-xs">
-        <div className="modal-box ">
+        <div className="modal-box">
           <form method="dialog">
             {/* if there is a button in form, it will close the modal */}
             <button className="btn btn-sm btn-circle btn-ghost absolute right-2 top-4">
@@ -41,6 +65,11 @@ const BankAccountPopup = ({
                   placeholder="ex-123456789"
                   className="border border-gray-200  rounded w-full p-1"
                 />
+                <small className="text-red-500">
+                  {bankMutation?.error?.response?.data?.errors
+                    ?.bankAccountNumber?._errors[0] ||
+                    bankMutation?.error?.message}
+                </small>
               </div>
             </div>
 
@@ -55,6 +84,12 @@ const BankAccountPopup = ({
                   onChange={handleInputChange}
                   className="border border-gray-200  rounded w-full p-1"
                 />
+                <small className="text-red-500">
+                  {
+                    bankMutation?.error?.response?.data?.errors?.IFSCCode
+                      ?._errors[0]
+                  }
+                </small>
               </div>
               <div className="flex flex-col  w-1/2 gap-1">
                 <p className="text-gray-600 text-xs">Bank & Branch Name</p>
@@ -66,6 +101,12 @@ const BankAccountPopup = ({
                   onChange={handleInputChange}
                   className="border border-gray-200  rounded w-full p-1"
                 />
+                <small className="text-red-500">
+                  {
+                    bankMutation?.error?.response?.data?.errors
+                      ?.bankAndBranchName?._errors[0]
+                  }
+                </small>
               </div>
             </div>
 
@@ -80,6 +121,12 @@ const BankAccountPopup = ({
                   placeholder="ex-Manish"
                   className="border border-gray-200  rounded w-full p-1"
                 />
+                <small className="text-red-500">
+                  {
+                    bankMutation?.error?.response?.data?.errors
+                      ?.accountHoldersName?._errors[0]
+                  }
+                </small>
               </div>
               <div className="flex flex-col  w-1/2 gap-1">
                 <p className="text-gray-600 text-xs">UPI ID</p>
@@ -91,18 +138,24 @@ const BankAccountPopup = ({
                   placeholder="ex:manis@upi"
                   className="border border-gray-200  rounded w-full p-1"
                 />
+                <small className="text-red-500">
+                  {
+                    bankMutation?.error?.response?.data?.errors?.upiId
+                      ?._errors[0]
+                  }
+                </small>
               </div>
             </div>
           </div>
 
-          <form method="dialog" className="flex justify-end mt-2 gap-3 ">
+          <div className="flex justify-end mt-2 gap-3 ">
             <button
-              onClick={() => setIsAddedBankInfo(true)}
+              onClick={() => bankMutation.mutate()}
               className="btn btn-sm bg-[var(--primary-btn)]"
             >
               Add
             </button>
-          </form>
+          </div>
         </div>
       </dialog>
     </>

@@ -1,6 +1,6 @@
 import DashboardNavbar from "../components/DashboardNavbar";
 import { Plus, Search } from "lucide-react";
-import { FaIndianRupeeSign } from "react-icons/fa6";
+import { FaArrowLeft, FaArrowRight, FaIndianRupeeSign } from "react-icons/fa6";
 import { LuPackageSearch } from "react-icons/lu";
 import no_items from "../assets/no_items.jpg";
 import { PiMicrosoftExcelLogoFill } from "react-icons/pi";
@@ -19,6 +19,8 @@ import { BsFillBoxSeamFill } from "react-icons/bs";
 import DashboardItemsBasicDetailPage from "./Items/DashboardItemsBasicDetailPage";
 import DashboardItemsSidebar from "./Items/DashboardItemsSidebar";
 import { uploadExcel } from "../../helpers/uploadExcel";
+import toast from "react-hot-toast";
+import { queryClient } from "../main";
 
 const DashboardItemsPage = () => {
   const navigate = useNavigate();
@@ -28,82 +30,92 @@ const DashboardItemsPage = () => {
   const [stockValue, setStockValue] = useState(0);
   const [showLowStock, setShowLowStock] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
+  const [page, setPage] = useState(1);
   const fileRef = useRef();
+  const limit = 10;
 
   // MUTATION TO UPLOAD ITEMS IN BULK
   const bulkMutation = useMutation({
     mutationFn: async (data) => {
       const res = await axiosInstance.post(`/item/bulk/${business?._id}`, data);
-      console.log(res);
+      return res.data;
+    },
+    onSuccess: (data) => {
+      toast.success(data.msg || "Uploaded successfully");
+      queryClient.invalidateQueries({ queryKey: ["items"] });
     },
   });
 
   const handleFileUpload = async (e) => {
     const selectedFile = e.target.files[0];
     const sanitizedData = await uploadExcel(selectedFile);
-    console.log(sanitizedData);
     if (sanitizedData) {
       bulkMutation.mutate(sanitizedData);
     }
+    e.target.value = null;
   };
 
+  // FETCHING ALL ITEMS FOR THE BUSINESS
   const {
     data: items,
     isLoading,
     isSuccess,
   } = useQuery({
-    queryKey: ["items"],
+    queryKey: ["items", page],
     queryFn: async () => {
       if (!business) {
-        return;
+        return [];
       }
-      const res = await axiosInstance.get(`/item/all/${business?._id}`);
-      return res.data?.items;
+      const res = await axiosInstance.get(
+        `/item/all/${business?._id}?page=${page}&limit=${limit}`
+      );
+      return res.data;
     },
+    keepPreviousData: true,
   });
 
+  // CALCULATING STOCK VALUE AND LOW STOCK ITEMS
   useEffect(() => {
     if (isSuccess && items) {
-      const products = items.filter((item) => item?.itemType === "product");
-      const totalInventoryValue = products.reduce(
-        (acc, product) =>
-          acc + (product?.purchasePrice || 0) * (product?.currentStock || 0),
+      const products = items?.items.filter(
+        (item) => item?.itemType === "product"
+      );
+
+      const totalStockValue = products.reduce(
+        (sum, product) =>
+          sum + (product?.purchasePrice || 0) * (product?.currentStock || 0),
         0
       );
-      // 15000000
-      const totalUnits = products.reduce(
-        (acc, product) => acc + (product?.currentStock || 0),
-        0
-      );
-      // 500
-      const wacPerUnit = totalUnits > 0 ? totalInventoryValue / totalUnits : 0;
-      const stockValue = wacPerUnit * totalUnits;
-      const lowStockProducts = products.filter(
+
+      const lowStockCount = products.filter(
         (product) =>
           typeof product?.lowStockQuantity === "number" &&
           product?.currentStock < product?.lowStockQuantity
-      );
-      setStockValue(stockValue);
-      setLowStockItems(lowStockProducts.length);
+      ).length;
+
+      setStockValue(totalStockValue);
+      setLowStockItems(lowStockCount);
       setItems(items);
     }
   }, [isSuccess, items]);
 
-  const searchedItems = items
-    ?.filter((item) =>
-      item?.itemName.toLowerCase().includes(searchQuery.toLowerCase())
-    )
+  const searchedItems =
+    items &&
+    items.items
+      ?.filter((item) =>
+        item?.itemName.toLowerCase().includes(searchQuery.toLowerCase())
+      )
 
-    ?.filter((item) => {
-      if (showLowStock) {
-        return (
-          item?.itemType === "product" &&
-          typeof item?.lowStockQuantity === "number" &&
-          item?.currentStock < item?.lowStockQuantity
-        );
-      }
-      return true;
-    });
+      ?.filter((item) => {
+        if (showLowStock) {
+          return (
+            item?.itemType === "product" &&
+            typeof item?.lowStockQuantity === "number" &&
+            item?.currentStock < item?.lowStockQuantity
+          );
+        }
+        return true;
+      });
 
   return (
     <main className="h-screen overflow-y-scroll p-2">
@@ -116,33 +128,11 @@ const DashboardItemsPage = () => {
           animate="show"
           className="grid grid-cols-2 gap-2 "
         >
-          {/* {dashboardItemsCardDetails?.map((details) => (
-            <motion.div
-              onClick={() =>
-                navigate(`/dashboard/reports?type=${details.label}`)
-              }
-              variants={dashboardLinksItems}
-              key={details.id}
-              className={`border rounded-md p-3 mt-5 shadow-md border-${details?.color} bg-${details.color}/10 hover:-translate-y-1 transition-all ease-in-out duration-200 cursor-pointer`}
-            >
-              <p className={`flex items-center gap-3 text-${details.color}`}>
-                {details.icon} {details.label}
-              </p>
-              <span className="font-medium text-2xl flex gap-2 items-center">
-                {details?.label === "Stock Value" && (
-                  <FaIndianRupeeSign size={14} />
-                )}
-                1
-              </span>
-            </motion.div>
-          ))} */}
-
           <div
             onClick={() => navigate(`/dashboard/reports?type=Stock Value`)}
             className={`border rounded-md p-3 mt-5 bg-error/10 border-error shadow-md  hover:-translate-y-1 transition-all ease-in-out duration-200 cursor-pointer`}
           >
             <p className={`flex items-center gap-3`}>
-              {" "}
               <AiOutlineStock /> Stock Value
             </p>
             <span className="font-medium text-2xl flex gap-2 items-center">
@@ -156,7 +146,6 @@ const DashboardItemsPage = () => {
             className={`border rounded-md p-3 mt-5 border-warning bg-warning/10 shadow-md hover:-translate-y-1 transition-all ease-in-out duration-200 cursor-pointer`}
           >
             <p className={`flex items-center gap-3`}>
-              {" "}
               <BsFillBoxSeamFill /> Low Stock
             </p>
             <span className="font-medium text-2xl flex gap-2 items-center">
@@ -201,9 +190,7 @@ const DashboardItemsPage = () => {
           </div>
 
           {/* CREATE ITEM */}
-
           <button
-            // to={"/dashboard/items/basic-details"}
             onClick={() => document.getElementById("my_modal_3").showModal()}
             className="btn btn-sm bg-[var(--primary-btn)]"
           >
@@ -213,11 +200,6 @@ const DashboardItemsPage = () => {
           <dialog id="my_modal_3" className="modal ">
             <div className="modal-box w-11/12 max-w-5xl h-3/4">
               <DashboardItemsSidebar data={items} modalId={"my_modal_3"} />
-              {/* <div className="modal-action">
-                  <form method="dialog">
-                    <button className="btn">Close</button>
-                  </form>
-                </div> */}
             </div>
           </dialog>
         </motion.div>
@@ -251,31 +233,62 @@ const DashboardItemsPage = () => {
                 className="flex items-center justify-center  flex-col"
               >
                 <img src={no_items} alt="no_items" width={250} loading="lazy" />
-                <h3 className="font-semibold">Create Items!</h3>
+                <h3 className="font-semibold">No items found</h3>
                 <p className="text-zinc-500 text-xs">
-                  For quicker and easier experience of creating sales invoices
+                  Start by creating your first item or upload items in bulk
+                  using Excel for faster setup.
                 </p>
-                {/* <button className="btn btn-soft btn-sm mt-4 bg-[var(--primary-btn)]">
-                  {" "}
-                  <PiMicrosoftExcelLogoFill size={15} /> Add Items
-                </button> */}
               </motion.div>
             )}
           </>
         )}
 
+        {/* PAGINATION  */}
+        <div className="w-full flex items-center justify-end p-4">
+          <div className="join join-sm">
+            <button
+              className="join-item btn btn-neutral btn-sm"
+              onClick={() => setPage((old) => Math.max(old - 1, 1))}
+              disabled={page === 1}
+            >
+              <FaArrowLeft />
+            </button>
+
+            <button className="join-item btn btn-sm">
+              {page}/{items?.totalPages || 1}
+            </button>
+
+            <button
+              onClick={() => {
+                if (items && page < items.totalPages) {
+                  setPage((old) => old + 1);
+                }
+              }}
+              disabled={!items || page >= items.totalPages}
+              className="join-item btn btn-neutral btn-sm"
+            >
+              <FaArrowRight />
+            </button>
+          </div>
+        </div>
+
         {/* HANDLING BULK UPLOAD */}
-        <div className="p-5 w-full border mb-5 border-zinc-300 shadow-md bg-gradient-to-r from-zinc-100 to-sky-200">
+        <div className="p-5 w-full border mb-5 border-zinc-300 shadow-md bg-gradient-to-r from-zinc-100 to-sky-200 ">
           <h1 className="font-semibold">Add Multiple Items at once</h1>
           <p className="text-zinc-500 text-sm">
             Bulk upload all your items to Byapar using excel
           </p>
+          <small className="mt-1 text-red-500">
+            Note* You must follow the sample items excel.
+          </small>
+          <br />
           <input
             type="file"
             className="file-input file-input-sm hidden"
             ref={fileRef}
             onChange={handleFileUpload}
           />
+
           <button
             onClick={() => fileRef.current.click()}
             disabled={bulkMutation.isPending}
@@ -307,6 +320,30 @@ const DashboardItemsPage = () => {
                 Upload Excel
               </>
             )}
+          </button>
+
+          <button
+            onClick={() => window.open("/sample-items.xlsx", "_blank")}
+            className="btn text-neutral btn-link btn-xs mt-3 ml-3"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              className="icon icon-tabler icons-tabler-outline icon-tabler-download"
+            >
+              <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+              <path d="M4 17v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2 -2v-2" />
+              <path d="M7 11l5 5l5 -5" />
+              <path d="M12 4l0 12" />
+            </svg>
+            Download Sample
           </button>
         </div>
       </div>

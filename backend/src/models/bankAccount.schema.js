@@ -17,15 +17,15 @@ export const bankAccountSchema = new mongoose.Schema({
   },
   IFSCCode: {
     type: String,
-    required: [true, "IFSC code is required"],
+    // required: [true, "IFSC code is required"],
   },
   bankAndBranchName: {
     type: String,
-    required: [true, "Bank name & Branch name are required"],
+    // required: [true, "Bank name & Branch name are required"],
   },
   accountHoldersName: {
     type: String,
-    required: [true, "Account holder name is required"],
+    // required: [true, "Account holder name is required"],
   },
   upiId: {
     type: String,

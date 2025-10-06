@@ -5,9 +5,37 @@ import { useQuery } from "@tanstack/react-query";
 import { axiosInstance } from "../config/axios";
 import { useBusinessStore } from "../store/businessStore";
 import { RiMenu2Fill } from "react-icons/ri";
+import { useAuthStore } from "../store/authStore";
+import CustomLoader from "../components/Loader";
 
 const DashboardLayout = () => {
   const [showSidebar, setShowSidebar] = useState(false);
+
+  const { setUser } = useAuthStore();
+  const { setBusiness, business } = useBusinessStore();
+
+  const {
+    data: userData,
+    isSuccess,
+    isLoading,
+  } = useQuery({
+    queryKey: ["user"],
+    queryFn: async () => {
+      const res = await axiosInstance.get("/user/me");
+
+      setUser(res.data?.user);
+      setBusiness(res.data?.user?.activeBusinessId || null);
+      return res.data?.user;
+    },
+  });
+
+  if (isLoading) {
+    return (
+      <div className="h-screen w-full flex items-center justify-center">
+        <CustomLoader text={"Loading...."} />
+      </div>
+    );
+  }
 
   return (
     <main className="flex min-h-screen w-full bg-zinc-100 overflow-x-hidden relative">

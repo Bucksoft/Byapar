@@ -50,7 +50,7 @@ const DashboardPricingPage = () => {
             interruption
           </p>
           <div className="flex items-center justify-center">
-            <img src={guarantee} alt="" className="h-10 w-10 " />
+            <img src={guarantee} alt="" className="h-10 w-10 " loading="lazy" />
             <p className="text-xs">7 days moneyback guarantee</p>
           </div>
         </motion.div>
@@ -127,6 +127,7 @@ const DashboardPricingPage = () => {
                       src={gst}
                       alt="File"
                       className="ml-15 w-12 h-12 mr-5"
+                      loading="lazy"
                     />
                     <p className="">Unlimited Reports</p>
                   </div>
@@ -135,6 +136,7 @@ const DashboardPricingPage = () => {
                       src={handshake}
                       alt="File"
                       className="ml-15 w-12 h-12 mr-5"
+                      loading="lazy"
                     />
                     <p className="">Customer Relation Management (CRM)</p>
                   </div>
@@ -143,6 +145,7 @@ const DashboardPricingPage = () => {
                       src={foreigncurrency}
                       alt="File"
                       className="ml-15 w-12 h-12 mr-5"
+                      loading="lazy"
                     />
                     <p className="">Foreign Currency</p>
                   </div>
@@ -152,6 +155,7 @@ const DashboardPricingPage = () => {
                       src={bank}
                       alt="File"
                       className="ml-15 w-12 h-12 mr-5"
+                      loading="lazy"
                     />
                     <p className="">Manage Multiple Bank Accounts</p>
                   </div>
@@ -160,6 +164,7 @@ const DashboardPricingPage = () => {
                       src={invoice}
                       alt="File"
                       className="ml-15 w-12 h-12 mr-5"
+                      loading="lazy"
                     />
                     <p className="">Create Unlimited Invoices</p>
                   </div>
@@ -168,6 +173,7 @@ const DashboardPricingPage = () => {
                       src={json}
                       alt="File"
                       className="ml-15 w-12 h-12 mr-5"
+                      loading="lazy"
                     />
                     <p className="">GSTR in JSON Format</p>
                   </div>
@@ -176,6 +182,7 @@ const DashboardPricingPage = () => {
                       src={inventory}
                       alt="File"
                       className="ml-15 w-12 h-12 mr-5"
+                      loading="lazy"
                     />
                     <p className="">
                       Manage Inventory easily with Stock Adjustments
@@ -190,6 +197,7 @@ const DashboardPricingPage = () => {
                       src={inventory}
                       alt="File"
                       className="ml-15 w-12 h-12 mr-5"
+                      loading="lazy"
                     />
                     <p className="">
                       Remove Byapar Branding from Invoice & Online store
@@ -200,6 +208,7 @@ const DashboardPricingPage = () => {
                       src={AdvancedGstImage}
                       alt="File"
                       className="ml-15 w-12 h-12 mr-5"
+                      loading="lazy"
                     />
                     <p className="">Use Advanced GST themes for Bills</p>
                   </div>
@@ -208,6 +217,7 @@ const DashboardPricingPage = () => {
                       src={recycle}
                       alt="File"
                       className="ml-15 w-12 h-12 mr-5"
+                      loading="lazy"
                     />
                     <p className="">Recover Deleted Invoices</p>
                   </div>
@@ -216,6 +226,7 @@ const DashboardPricingPage = () => {
                       src={printer}
                       alt="File"
                       className="ml-15 w-12 h-12 mr-5"
+                      loading="lazy"
                     />
                     <p className="">Take Thermal Printouts</p>
                   </div>
@@ -224,6 +235,7 @@ const DashboardPricingPage = () => {
                       src={scanner}
                       alt="File"
                       className="ml-15 w-12 h-12 mr-5"
+                      loading="lazy"
                     />
                     <p className="">Create Invoices by scanning barcodes</p>
                   </div>
@@ -232,6 +244,7 @@ const DashboardPricingPage = () => {
                       src={proforma}
                       alt="File"
                       className="ml-15 w-12 h-12 mr-5"
+                      loading="lazy"
                     />
                     <p className="">Create unlimited Proforma Invoices</p>
                   </div>
@@ -240,6 +253,7 @@ const DashboardPricingPage = () => {
                       src={support}
                       alt="File"
                       className="ml-15 w-12 h-12 mr-5"
+                      loading="lazy"
                     />
                     <p className="">Get priority support from our team</p>
                   </div>
@@ -248,6 +262,7 @@ const DashboardPricingPage = () => {
                       src={excel}
                       alt="File"
                       className="ml-15 w-12 h-12 mr-5"
+                      loading="lazy"
                     />
                     <p className="">Bulk Edit your items on Byapar Desktop</p>
                   </div>

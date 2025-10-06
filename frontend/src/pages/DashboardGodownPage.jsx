@@ -8,7 +8,12 @@ const DashboardGodownPage = () => {
         <div className=" border border-zinc-300 h-full rounded-md bg-white">
           <p className="font-semibold p-3 text-normal">Godwon Management</p>
           <div className="flex flex-col items-center mt-20">
-            <img src={warehouse} alt="Warehouse image" className="h-50 " />
+            <img
+              src={warehouse}
+              alt="Warehouse image"
+              className="h-50 "
+              loading="lazy"
+            />
             <p className="font-semibold text-md mt-5">
               Start managing multiple Godowns!
             </p>

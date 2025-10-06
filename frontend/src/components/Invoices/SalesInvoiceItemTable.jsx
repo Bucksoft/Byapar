@@ -19,10 +19,11 @@ const SalesInvoiceItemTable = ({ title, data, setData, isEditing }) => {
   const { purchaseInvoices } = usePurchaseInvoiceStore();
   const { items } = useItemStore();
 
-  const searchedItems = items?.filter((item) =>
+  const searchedItems = items?.items.filter((item) =>
     item?.itemName.toLowerCase().includes(searchItemQuery.toLowerCase())
   );
 
+  // HANDLE GST TYPE CHANGE
   const handleSetGstTaxRateType = (e, itemId) => {
     const { value } = e.target;
     setAddedItems((prevItems) =>
@@ -32,6 +33,7 @@ const SalesInvoiceItemTable = ({ title, data, setData, isEditing }) => {
     );
   };
 
+  // HANDLE DISCOUNT CHANGE
   const handleSetDiscountPercent = (percent, itemId) => {
     setAddedItems((prev) =>
       prev.map((item) => {
@@ -52,6 +54,7 @@ const SalesInvoiceItemTable = ({ title, data, setData, isEditing }) => {
     );
   };
 
+  // HANDLE DISCOUNT CHANGE
   const handleSetDiscountAmount = (amount, itemId) => {
     setAddedItems((prev) =>
       prev.map((item) => {
@@ -75,21 +78,28 @@ const SalesInvoiceItemTable = ({ title, data, setData, isEditing }) => {
   useEffect(() => {
     if (!addedItems?.length) return;
 
-    const getGSTPercentage = (rateString) => {
+     const getGSTPercentage = (rateString) => {
       const match = rateString?.match(/(\d+)%/);
       return match ? parseFloat(match[1]) : 0;
     };
 
     let updatedItems = addedItems.map((item) => {
       const qty = quantities[item._id] || 1;
-      const salesPrice = Number(item.salesPrice) || 0;
+      // PURCHASE KE LIYE ITEMS KI PURCHASE PRICE LAGANI HAI, AUR SALES KE LIYE SALES PRICE
+      const price =
+        title === "Purchase Invoice" ||
+        title === "Purchase Return" ||
+        title === "Purchase Order" ||
+        title === "Debit Note"
+          ? Number(item.purchasePrice) || 0
+          : Number(item.salesPrice) || 0;
       const gstRate = getGSTPercentage(item.gstTaxRate);
 
       // Step 1: Get Base Price (without tax)
       const basePrice =
         item.gstTaxRateType === "without tax"
-          ? salesPrice
-          : salesPrice * (100 / (100 + gstRate));
+          ? price
+          : price * (100 / (100 + gstRate));
 
       // Step 2: Discount (either % or fixed amount)
       let discountAmount = 0;
@@ -163,7 +173,7 @@ const SalesInvoiceItemTable = ({ title, data, setData, isEditing }) => {
       totalTaxableAmount -= discountValue;
 
       // Recalculate GST after discount
-      totalGstAmount = (totalTaxableAmount * getGSTPercentage("18%")) / 100; // 👈 replace with dynamic GST logic if mixed
+      totalGstAmount = (totalTaxableAmount * getGSTPercentage("18%")) / 100;
       totalAmount = totalTaxableAmount + totalGstAmount;
 
       balanceAmount = totalAmount;
@@ -276,7 +286,7 @@ const SalesInvoiceItemTable = ({ title, data, setData, isEditing }) => {
             <input
               type="number"
               min={0}
-              value={quantities[addedItem._id] || 0}
+              value={quantities[addedItem._id] || addedItem?.quantity}
               onChange={(e) =>
                 setQuantities((prev) => ({
                   ...prev,
@@ -446,11 +456,11 @@ const SalesInvoiceItemTable = ({ title, data, setData, isEditing }) => {
                   </div>
                 </div>
 
-                <div className="overflow-x-auto mt-4  rounded-box border border-base-content/5 bg-base-100">
+                <div className="overflow-x-auto mt-4 h-[450px] overflow-y-scroll rounded-box border border-base-content/5 ">
                   <table className="table table-zebra bg-zinc-300 ">
                     {/* head */}
                     <thead>
-                      <tr className="text-xs bg-zinc-100">
+                      <tr className="text-xs bg-zinc-100 ">
                         <th>Item Name</th>
                         <th>Item Code</th>
                         <th>Sales Price</th>
@@ -563,12 +573,41 @@ const SalesInvoiceItemTable = ({ title, data, setData, isEditing }) => {
                 <button
                   className="btn btn-sm w-32 bg-[var(--primary-btn)]"
                   onClick={() => {
-                    const selected = items
+                    const selected = items?.items
                       .filter((item) => (quantities[item._id] || 0) > 0)
-                      .map((item) => ({
-                        ...item,
-                        quantity: quantities[item._id],
-                      }));
+                      .map((item) => {
+                        if (
+                          title === "Purchase Invoice" ||
+                          title === "Purchase Return" ||
+                          title === "Purchase Order"
+                        ) {
+                          return {
+                            ...item,
+                            quantity: quantities[item._id],
+                            priceType: "purchase",
+                            basePrice: item.purchasePrice,
+                            purchasePrice: item.purchasePrice,
+                            gstTaxRate:
+                              item.purchaseGstTaxRate || item.gstTaxRate,
+                            gstTaxRateType: "with tax",
+                            discountPercent: 0,
+                            discountAmount: 0,
+                          };
+                        } else {
+                          // Sales Invoice or Sales Return
+                          return {
+                            ...item,
+                            quantity: quantities[item._id],
+                            priceType: "sales",
+                            basePrice: item.salesPrice,
+                            salesPrice: item.salesPrice,
+                            gstTaxRate: item.gstTaxRate,
+                            gstTaxRateType: "with tax",
+                            discountPercent: 0,
+                            discountAmount: 0,
+                          };
+                        }
+                      });
                     setAddedItems(selected);
                     setData((prev) => ({ ...prev, items: selected }));
                     document.getElementById("my_modal_10").close();

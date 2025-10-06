@@ -17,7 +17,10 @@ import proformaInvoiceRoutes from "./routes/proformaInvoice.routes.js";
 import purchaseInvoiceRoutes from "./routes/purchaseInvoice.routes.js";
 import paymentOutRoutes from "./routes/paymentOut.routes.js";
 import purchaseReturnRoutes from "./routes/purchaseReturn.routes.js";
+import purchaseOrderRoutes from "./routes/purchaseOrder.routes.js";
 import categoryRoutes from "./routes/category.routes.js";
+import debitNoteRoutes from "./routes/debitNote.route.js";
+import bankAccountRoutes from "./routes/bankAccount.js";
 import { loginViaGoogleCallback } from "./controllers/user.controller.js";
 import cookieParser from "cookie-parser";
 import path from "path";
@@ -29,7 +32,11 @@ const app = express();
 
 app.use(
   cors({
-    origin: ["https://byapar-frontend.onrender.com", "http://localhost:5173"],
+    origin: [
+      "https://byapar-frontend.onrender.com",
+      "http://localhost:5173",
+      "https://byapar.bucksoftech.top/",
+    ],
     credentials: true,
   })
 );
@@ -38,6 +45,14 @@ app.use(cookieParser());
 
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+
+app.use("/health", (req, res) => {
+  res.status(200).json({
+    msg: "server is healthy",
+    uptime: process.uptime(),
+    timestamp: Date.now(),
+  });
+});
 
 app.use("/api/v1/business", businessRoutes);
 app.use("/api/v1/user", userRoutes);
@@ -56,6 +71,9 @@ app.use("/api/v1/purchase-invoice", purchaseInvoiceRoutes);
 app.use("/api/v1/payment-out", paymentOutRoutes);
 app.use("/api/v1/purchase-return", purchaseReturnRoutes);
 app.use("/api/v1/category", categoryRoutes);
+app.use("/api/v1/purchase-order", purchaseOrderRoutes);
+app.use("/api/v1/debit-note", debitNoteRoutes);
+app.use("/api/v1/bank-account", bankAccountRoutes);
 
 // const __dirname = path.resolve();
 // app.use(express.static(path.join(__dirname, "../frontend/dist")));

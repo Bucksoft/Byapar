@@ -28,6 +28,7 @@ const DashboardDeliveryChallanPage = () => {
   const [filterDate, setFilterDate] = useState("");
   const [invoiceId, setInvoiceId] = useState();
 
+  // QUERY TO GET ALL THE DELIVERY CHALLANS
   const { isLoading, data: deliveryChallans } = useQuery({
     queryKey: ["deliveryChallan"],
     queryFn: async () => {
@@ -38,6 +39,7 @@ const DashboardDeliveryChallanPage = () => {
     },
   });
 
+  // MUTATION TO DELETE THE DELIVERY CHALLAN INVOICE
   const mutation = useMutation({
     mutationFn: async (id) => {
       const res = await axiosInstance.delete(`/delivery-challan/${invoiceId}`);
@@ -46,9 +48,11 @@ const DashboardDeliveryChallanPage = () => {
     onSuccess: (data) => {
       toast.success(data?.msg);
       queryClient.invalidateQueries({ queryKey: ["deliveryChallan"] });
+      document.getElementById("my_modal_2").close();
     },
   });
-
+  
+  // FILTERING THE DELIVERY CHALLANS BASED ON THE TYPE AND SEARCH QUERY
   const filteredChallans =
     deliveryChallans &&
     deliveryChallans.filter((challan) => {
@@ -161,7 +165,13 @@ const DashboardDeliveryChallanPage = () => {
                       </div>
                     </td>
                     <td>
-                      <div className="badge badge-soft badge-sm badge-success">
+                      <div
+                        className={`badge badge-soft badge-sm  ${
+                          challan?.status === "expired"
+                            ? "badge-error"
+                            : "badge-success"
+                        } `}
+                      >
                         {challan?.status}
                       </div>
                     </td>
@@ -181,11 +191,18 @@ const DashboardDeliveryChallanPage = () => {
                           onClick={(e) => e.stopPropagation()}
                         >
                           <li>
-                            <a>
+                            <button
+                              onClick={() =>
+                                navigate(
+                                  `/dashboard/update/${challan?._id}?type=delivery challan`
+                                )
+                              }
+                              className="flex items-center gap-2"
+                            >
                               <FaRegEdit /> Edit
-                            </a>
+                            </button>
                           </li>
-                          <li>
+                          {/* <li>
                             <a>
                               <MdOutlineHistory />
                               Edit History
@@ -196,7 +213,7 @@ const DashboardDeliveryChallanPage = () => {
                               <BiDuplicate />
                               Duplicate
                             </a>
-                          </li>
+                          </li> */}
                           <li>
                             <a
                               onClick={() => {

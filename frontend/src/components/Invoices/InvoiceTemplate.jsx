@@ -2,7 +2,7 @@ import { BsTelephone } from "react-icons/bs";
 import { useBusinessStore } from "../../store/businessStore";
 import { LiaRupeeSignSolid } from "react-icons/lia";
 import { useEffect, useRef } from "react";
-import converter from "number-to-words";
+import { toWords } from "../../../helpers/wordsToCurrency";
 
 const InvoiceTemplate = ({
   type,
@@ -28,6 +28,12 @@ const InvoiceTemplate = ({
     parseAmount(invoice?.cgst) +
     parseAmount(invoice?.sgst);
 
+  const getGSTPercentage = (rateString) => {
+    console.log(rateString);
+    const match = rateString?.match(/(\d+)%/);
+    return match ? parseFloat(match[1]) : rateString;
+  };
+
   return (
     <main
       style={{
@@ -36,51 +42,207 @@ const InvoiceTemplate = ({
         height: "100vh",
       }}
       ref={printRef}
-      className="print-invoice"
+      className="print-invoice flex justify-center items-start w-full min-h-screen bg-zinc-50 py-4 overflow-x-hidden overflow-y-auto"
     >
       <div
         ref={invoiceIdToDownload}
         id="invoice"
+        className="invoice-content w-full max-w-[800px] bg-white shadow-lg p-4 sm:p-6 md:p-8 rounded-lg"
         style={{
-          maxWidth: "800px",
-          height: "100%",
-          backgroundColor: "#fff",
           margin: "auto",
-          padding: "16px",
-          // boxShadow:
-          //   "5px 5px 5px rgba(0,0,0,0.5), -5px -5px 5px rgba(0,0,0,0.5)",
-          // boxShadow: "0 4px 12px rgba(0,0,0,0.2)",
+          boxSizing: "border-box",
         }}
-        className="invoice-content"
       >
         {/* Header */}
         <div
           style={{
             display: "flex",
+            // flexDirection: "column",
             justifyContent: "space-between",
             alignItems: "center",
           }}
         >
-          <h2 style={{ fontWeight: 600, fontSize: "20px" }}>
-            {business?.businessName}
-          </h2>
-          <h1 style={{ textTransform: "uppercase", fontSize: "18px" }}>
-            {type === "Sales Return"
-              ? "Sales Return"
-              : type === "Sales Invoice"
-              ? "Sales Invoice"
-              : type === "Quotation"
-              ? "Quotation"
-              : type === "Delivery Challan"
-              ? "Delivery Challan"
-              : type === "Proforma Invoice"
-              ? "Proforma Invoice"
-              : type === "Purchase Invoice"
-              ? "Purchase Invoice"
-              : type === "Credit Note"
-              ? "Credit Note"
-              : ""}
-          </h1>
+          <div className="flex flex-col w-1/2">
+            <div className="w-9 h-9 rounded-full flex items-center justify-center bg-red-200 overflow-hidden">
+              {business?.logo ? (
+                <img
+                  src={`data:image/png;base64,${business.logo}`}
+                  alt="Logo"
+                  className="w-full h-full object-cover"
+                />
+              ) : (
+                <span className="text-sm font-semibold text-white">
+                  {business?.businessName?.[0]?.toUpperCase()}
+                </span>
+              )}
+            </div>
+            <h2 style={{ fontWeight: 600, fontSize: "20px" }}>
+              {business?.businessName}
+            </h2>
+            <p className="text-sm text-gray-600">{business?.billingAddress}</p>
+            {business?.gstNumber.length > 0 && (
+              <p className="flex text-sm text-gray-600">
+                {" "}
+                <span className="font-semibold mr-2">GSTIN </span>
+                {business?.gstNumber}
+              </p>
+            )}
+            {business?.companyEmail.length > 0 && (
+              <p className="flex text-sm text-gray-600">
+                {business?.companyEmail}
+              </p>
+            )}
+          </div>
+          <div>
+            <h1
+              style={{
+                textTransform: "uppercase",
+                fontSize: "18px",
+                textAlign: "right",
+              }}
+            >
+              {type === "Sales Return"
+                ? "Sales Return"
+                : type === "Sales Invoice"
+                ? "Sales Invoice"
+                : type === "Quotation"
+                ? "Quotation"
+                : type === "Delivery Challan"
+                ? "Delivery Challan"
+                : type === "Proforma Invoice"
+                ? "Proforma Invoice"
+                : type === "Purchase Invoice"
+                ? "Purchase Invoice"
+                : type === "Credit Note"
+                ? "Credit Note"
+                : type === "Purchase Order"
+                ? "Purchase Order"
+                : type === "Debit Note"
+                ? "Debit Note"
+                : ""}
+            </h1>
+            {/* NUMBER */}
+            <div className="text-xs mt-1 flex items-center justify-between">
+              <p style={{ color: color, fontWeight: "600" }}>
+                {type === "Sales Return"
+                  ? "Sales Return No."
+                  : type === "Sales Invoice"
+                  ? "Sales Invoice No."
+                  : type === "Quotation"
+                  ? "Quotation No."
+                  : type === "Delivery Challan"
+                  ? "Delivery Challan No."
+                  : type === "Proforma Invoice"
+                  ? "Proforma Invoice No."
+                  : type === "Purchase Invoice"
+                  ? "Purchase Invoice No."
+                  : type === "Credit Note"
+                  ? "Credit Note No."
+                  : type === "Purchase Order"
+                  ? "Purchase Order No."
+                  : type === "Debit Note"
+                  ? "Debit Note No."
+                  : ""}
+              </p>
+              <span>
+                {type === "Sales Return"
+                  ? invoice?.salesReturnNumber
+                  : type === "Sales Invoice"
+                  ? invoice?.salesInvoiceNumber
+                  : type === "Quotation"
+                  ? invoice?.quotationNumber
+                  : type === "Delivery Challan"
+                  ? invoice?.deliveryChallanNumber
+                  : type === "Proforma Invoice"
+                  ? invoice?.proformaInvoiceNumber
+                  : type === "Purchase Invoice"
+                  ? invoice?.purchaseInvoiceNumber
+                  : type === "Credit Note"
+                  ? invoice?.creditNoteNumber
+                  : type === "Purchase Order"
+                  ? invoice?.purchaseOrderNumber
+                  : type === "Debit Note"
+                  ? invoice?.debitNoteNumber
+                  : ""}
+              </span>
+            </div>
+            {/* DATE */}
+            <div className="text-xs mt-1 flex items-center justify-between gap-8">
+              <p style={{ color: color, fontWeight: "600" }}>
+                {type === "Sales Return"
+                  ? "Sales Return Date"
+                  : type === "Sales Invoice"
+                  ? "Sales Invoice Date"
+                  : type === "Quotation"
+                  ? "Quotation Date"
+                  : type === "Delivery Challan"
+                  ? "Delivery Challan Date"
+                  : type === "Proforma Invoice"
+                  ? "Proforma Invoice Date"
+                  : type === "Purchase Invoice"
+                  ? "Purchase Invoice Date"
+                  : type === "Credit Note"
+                  ? "Credit Note Date"
+                  : type === "Purchase Order"
+                  ? "Purchase Order Date"
+                  : type === "Debit Note"
+                  ? "Debit Note Date"
+                  : ""}
+              </p>
+              <span>
+                {type === "Sales Return"
+                  ? invoice?.salesReturnDate?.split("T")[0]
+                  : type === "Sales Invoice"
+                  ? invoice?.salesInvoiceDate?.split("T")[0]
+                  : type === "Quotation"
+                  ? invoice?.quotationDate?.split("T")[0]
+                  : type === "Delivery Challan"
+                  ? invoice?.deliveryChallanDate?.split("T")[0]
+                  : type === "Proforma Invoice"
+                  ? invoice?.proformaInvoiceDate?.split("T")[0]
+                  : type === "Purchase Invoice"
+                  ? invoice?.purchaseInvoiceDate?.split("T")[0]
+                  : type === "Credit Note"
+                  ? invoice?.creditNoteDate?.split("T")[0]
+                  : type === "Purchase Order"
+                  ? invoice?.purchaseOrderDate?.split("T")[0]
+                  : type === "Debit Note"
+                  ? invoice?.debitNoteDate?.split("T")[0]
+                  : ""}
+              </span>
+            </div>
+            {/* DUE DATE */}
+            <div className="text-xs mt-1 flex items-center justify-between gap-8">
+              <p style={{ color: color, fontWeight: "600" }}>
+                {type === "Quotation" ||
+                type === "Proforma Invoice" ||
+                type === "Purchase Order"
+                  ? "Expiry Date"
+                  : type === "Credit Note"
+                  ? ""
+                  : type === "Debit Note"
+                  ? ""
+                  : "Due Date"}
+              </p>
+              <span>
+                {type === "Sales Return"
+                  ? invoice?.dueDate?.split("T")[0]
+                  : type === "Sales Invoice"
+                  ? invoice?.dueDate?.split("T")[0]
+                  : type === "Quotation"
+                  ? invoice?.validityDate?.split("T")[0]
+                  : type === "Delivery Challan"
+                  ? invoice?.dueDate?.split("T")[0]
+                  : type === "Proforma Invoice"
+                  ? invoice?.dueDate?.split("T")[0]
+                  : type === "Purchase Invoice"
+                  ? invoice?.dueDate?.split("T")[0]
+                  : type === "Purchase Order"
+                  ? invoice?.validityDate?.split("T")[0]
+                  : ""}
+              </span>
+            </div>
+          </div>
         </div>
 
         {/* Phone */}
@@ -102,133 +264,38 @@ const InvoiceTemplate = ({
 
         <hr style={{ margin: "16px 0", borderColor: "#d4d4d8" }} />
 
-        {/* Invoice details */}
-        <section
-          style={{
-            display: "flex",
-            gap: "40px",
-            fontSize: "12px",
-            padding: "0 12px",
-          }}
-        >
-          <div>
-            <p style={{ color: color, fontWeight: "600" }}>
-              {type === "Sales Return"
-                ? "Sales Return No."
-                : type === "Sales Invoice"
-                ? "Sales Invoice No."
-                : type === "Quotation"
-                ? "Quotation No."
-                : type === "Delivery Challan"
-                ? "Delivery Challan No."
-                : type === "Proforma Invoice"
-                ? "Proforma Invoice No."
-                : type === "Purchase Invoice"
-                ? "Purchase Invoice No."
-                : type === "Credit Note"
-                ? "Credit Note No."
-                : ""}
-            </p>
-            <span>
-              {type === "Sales Return"
-                ? invoice?.salesReturnNumber
-                : type === "Sales Invoice"
-                ? invoice?.salesInvoiceNumber
-                : type === "Quotation"
-                ? invoice?.quotationNumber
-                : type === "Delivery Challan"
-                ? invoice?.deliveryChallanNumber
-                : type === "Proforma Invoice"
-                ? invoice?.proformaInvoiceNumber
-                : type === "Purchase Invoice"
-                ? invoice?.purchaseInvoiceNumber
-                : type === "Credit Note"
-                ? invoice?.creditNoteNumber
-                : ""}
-            </span>
-          </div>
-
-          <div>
-            <p style={{ color: color, fontWeight: "600" }}>
-              {type === "Sales Return"
-                ? "Sales Return Date"
-                : type === "Sales Invoice"
-                ? "Sales Invoice Date"
-                : type === "Quotation"
-                ? "Quotation Date"
-                : type === "Delivery Challan"
-                ? "Delivery Challan Date"
-                : type === "Proforma Invoice"
-                ? "Proforma Invoice Date"
-                : type === "Purchase Invoice"
-                ? "Purchase Invoice Date"
-                : type === "Credit Note"
-                ? "Credit Note Date"
-                : ""}
-            </p>
-            <span>
-              {type === "Sales Return"
-                ? invoice?.salesReturnDate?.split("T")[0]
-                : type === "Sales Invoice"
-                ? invoice?.salesInvoiceDate?.split("T")[0]
-                : type === "Quotation"
-                ? invoice?.quotationDate?.split("T")[0]
-                : type === "Delivery Challan"
-                ? invoice?.deliveryChallanDate?.split("T")[0]
-                : type === "Proforma Invoice"
-                ? invoice?.proformaInvoiceDate?.split("T")[0]
-                : type === "Purchase Invoice"
-                ? invoice?.purchaseInvoiceDate?.split("T")[0]
-                : type === "Credit Note"
-                ? invoice?.creditNoteDate?.split("T")[0]
-                : ""}
-            </span>
-          </div>
-
-          <div>
-            <p style={{ color: color, fontWeight: "600" }}>
-              {type === "Quotation" || type === "Proforma Invoice"
-                ? "Expiry Date"
-                : type === "Credit Note"
-                ? ""
-                : "Due Date"}
-            </p>
-            <span>
-              {type === "Sales Return"
-                ? invoice?.salesReturnDate?.split("T")[0]
-                : type === "Sales Invoice"
-                ? invoice?.dueDate?.split("T")[0]
-                : type === "Quotation"
-                ? invoice?.validityDate?.split("T")[0]
-                : type === "Delivery Challan"
-                ? invoice?.deliveryChallanDate?.split("T")[0]
-                : type === "Proforma Invoice"
-                ? invoice?.proformaInvoiceDate?.split("T")[0]
-                : type === "Purchase Invoice"
-                ? invoice?.purchaseInvoiceDate?.split("T")[0]
-                : ""}
-            </span>
-          </div>
-        </section>
-
-        <hr style={{ margin: "16px 0", borderColor: "#d4d4d8" }} />
-
         {/* Bill to */}
-        <div className="w-full flex items-center justify-between">
-          <section style={{ fontSize: "14px" }}>
-            <h3 style={{ fontWeight: 500 }}>
-              {type === "Credit Note" ? "PARTY NAME" : "BILL TO"}
+        <div className="w-full flex items-start justify-between">
+          <section style={{ fontSize: "14px", width: "50%" }}>
+            <h3 style={{ fontWeight: "bold" }}>
+              {type === "Credit Note"
+                ? "PARTY NAME"
+                : type === "Purchase Order"
+                ? "BILL FROM"
+                : "BILL TO"}
             </h3>
             <p style={{ fontWeight: "bold" }}>{invoice?.partyId?.partyName}</p>
             <p style={{ fontSize: "14px", color: "#3f3f46" }}>
-              {invoice?.partyId?.billingAddress}
+              {type === "Purchase Order"
+                ? invoice?.partyId?.shippingAddress
+                : invoice?.partyId?.billingAddress}
             </p>
-            <p style={{ fontWeight: 600 }}>
-              Mobile{" "}
-              <span style={{ fontWeight: "normal" }}>
-                {invoice?.partyId?.mobileNumber}
-              </span>
-            </p>
+            {invoice?.partyId?.mobileNumber.length > 0 && (
+              <p style={{ fontWeight: 600 }}>
+                Mobile{" "}
+                <span style={{ fontWeight: "normal" }}>
+                  {invoice?.partyId?.mobileNumber}
+                </span>
+              </p>
+            )}
+            {invoice?.partyId?.GSTIN.length > 0 && (
+              <p style={{ fontWeight: 600 }}>
+                GSTIN{" "}
+                <span style={{ fontWeight: "normal" }}>
+                  {invoice?.partyId?.GSTIN}
+                </span>
+              </p>
+            )}
           </section>
           {/* {type === "Delivery Challan" && (
             <section style={{ fontSize: "14px" }}>
@@ -247,6 +314,17 @@ const InvoiceTemplate = ({
               </p>
             </section>
           )} */}
+          <section style={{ fontSize: "14px", width: "50%" }}>
+            {invoice?.partyId?.shippingAddress &&
+              invoice?.partyId?.shippingAddress?.length > 0 && (
+                <>
+                  <h3 style={{ fontWeight: "bold" }}>SHIP TO</h3>
+                  <p style={{ fontSize: "14px", color: "#3f3f46" }}>
+                    {invoice?.partyId?.shippingAddress}
+                  </p>
+                </>
+              )}
+          </section>
         </div>
 
         {/* Items table */}
@@ -262,8 +340,12 @@ const InvoiceTemplate = ({
               <tr style={{ backgroundColor: color, color: "#fff" }}>
                 <th style={{ padding: "8px", textAlign: "left" }}>No</th>
                 <th style={{ padding: "8px", textAlign: "left" }}>Items</th>
+                <th style={{ padding: "8px", textAlign: "left" }}>HSN/SAC</th>
                 <th style={{ padding: "8px", textAlign: "left" }}>Qty.</th>
                 <th style={{ padding: "8px", textAlign: "left" }}>Rate</th>
+                <th style={{ padding: "8px", textAlign: "left" }}>
+                  Taxable Amount
+                </th>
                 <th style={{ padding: "8px", textAlign: "left" }}>Tax</th>
                 <th style={{ padding: "8px", textAlign: "right" }}>Total</th>
               </tr>
@@ -273,19 +355,69 @@ const InvoiceTemplate = ({
                 <tr key={index}>
                   <td style={{ padding: "6px" }}>{index + 1}</td>
                   <td style={{ padding: "6px" }}>{item?.itemName}</td>
+                  <td style={{ padding: "6px" }}>
+                    {item?.HSNCode.length > 0
+                      ? item?.HSNCode
+                      : item?.SACCode || "-"}
+                  </td>
                   <td style={{ padding: "6px" }}>{item?.quantity}</td>
+
+                  {/* Price */}
+                  <td style={{ padding: "6px" }}>
+                    {Number(
+                      item?.basePrice || item?.salesPrice || 0
+                    ).toLocaleString("en-IN", {
+                      minimumFractionDigits: 2,
+                      maximumFractionDigits: 2,
+                    })}
+                  </td>
+
+                  {/* Taxable value */}
                   <td style={{ padding: "6px" }}>
                     <div style={{ display: "flex", alignItems: "center" }}>
                       <LiaRupeeSignSolid />
-                      {Number(item?.basePrice || 0).toLocaleString("en-IN")}
+                      {Number(
+                        item?.taxableValue ||
+                          item?.salesPrice * item.quantity ||
+                          0
+                      ).toLocaleString("en-IN", {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2,
+                      })}
                     </div>
                   </td>
+
+                  {/* Tax */}
                   <td style={{ padding: "6px" }}>
-                    <div style={{ display: "flex", alignItems: "center" }}>
-                      <LiaRupeeSignSolid />
-                      {Number(item?.gstAmount || 0).toLocaleString("en-IN")}
+                    <div
+                      style={{
+                        display: "flex",
+                        alignItems: "start",
+                        flexDirection: "row",
+                      }}
+                    >
+                      <div style={{ display: "flex", alignItems: "center" }}>
+                        <LiaRupeeSignSolid />
+                        {Number(
+                          item?.gstAmount ||
+                            (item?.salesPrice * Number(item?.gstTaxRate)) / 100
+                        ).toLocaleString("en-IN", {
+                          minimumFractionDigits: 2,
+                          maximumFractionDigits: 2,
+                        })}
+                      </div>
+                      {item?.gstTaxRate && (
+                        <span style={{ marginLeft: "4px", color: "#52525c" }}>
+                          ({getGSTPercentage(item?.gstTaxRate)}%)
+                        </span>
+                        // <span className="ml-2 text-zinc-500">
+                        //   {"("}
+                        //   {item?.gstTaxRate}%{")"}
+                        // </span>
+                      )}
                     </div>
                   </td>
+
                   <td style={{ padding: "6px" }}>
                     <div
                       style={{
@@ -297,9 +429,17 @@ const InvoiceTemplate = ({
                       <LiaRupeeSignSolid />
                       {(
                         Number(item?.quantity || 0) *
-                          Number(item?.basePrice || 0) +
-                        Number(item?.gstAmount || 0)
-                      ).toLocaleString("en-IN")}
+                          Number(item?.basePrice || item?.salesPrice || 0) +
+                        Number(
+                          item?.gstAmount ||
+                            (item?.salesPrice * Number(item?.gstTaxRate)) /
+                              100 ||
+                            0
+                        )
+                      ).toLocaleString("en-IN", {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2,
+                      })}
                     </div>
                   </td>
                 </tr>
@@ -309,6 +449,7 @@ const InvoiceTemplate = ({
               <tr style={{ backgroundColor: "#e1e1e3", fontWeight: 600 }}>
                 <td></td>
                 <td style={{ padding: "6px" }}>Subtotal</td>
+                <td></td>
                 <td style={{ padding: "6px" }}>
                   {invoice?.items?.reduce(
                     (acc, item) => acc + (Number(item?.quantity) || 0),
@@ -319,12 +460,42 @@ const InvoiceTemplate = ({
                 <td style={{ padding: "6px" }}>
                   <div style={{ display: "flex", alignItems: "center" }}>
                     <LiaRupeeSignSolid />
+                    {typeof invoice?.taxableAmount === "number" &&
+                    !isNaN(invoice.taxableAmount)
+                      ? invoice.taxableAmount.toLocaleString("en-IN", {
+                          minimumFractionDigits: 2,
+                          maximumFractionDigits: 2,
+                        })
+                      : (
+                          invoice?.items?.reduce((acc, item) => {
+                            const price =
+                              Number(item?.basePrice || item?.salesPrice) || 0;
+                            const quantity = Number(item?.quantity) || 0;
+                            return acc + price * quantity;
+                          }, 0) || 0
+                        ).toLocaleString("en-IN", {
+                          minimumFractionDigits: 2,
+                          maximumFractionDigits: 2,
+                        })}
+                  </div>
+                </td>
+                <td style={{ padding: "6px" }}>
+                  <div style={{ display: "flex", alignItems: "center" }}>
+                    <LiaRupeeSignSolid />
                     {invoice?.items
                       ?.reduce(
-                        (acc, item) => acc + (Number(item?.gstAmount) || 0),
+                        (acc, item) =>
+                          acc +
+                          (Number(item?.gstAmount) ||
+                            (item?.salesPrice * Number(item?.gstTaxRate)) /
+                              100 ||
+                            0),
                         0
                       )
-                      .toLocaleString("en-IN")}
+                      .toLocaleString("en-IN", {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2,
+                      })}
                   </div>
                 </td>
                 <td style={{ padding: "6px" }}>
@@ -341,11 +512,18 @@ const InvoiceTemplate = ({
                         (acc, item) =>
                           acc +
                           ((Number(item?.quantity) || 0) *
-                            (Number(item?.basePrice) || 0) +
-                            (Number(item?.gstAmount) || 0)),
+                            (Number(item?.basePrice || item?.salesPrice) || 0) +
+                            (Number(
+                              item?.gstAmount ||
+                                (item?.salesPrice * Number(item?.gstTaxRate)) /
+                                  100
+                            ) || 0)),
                         0
                       )
-                      .toLocaleString("en-IN")}
+                      .toLocaleString("en-IN", {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2,
+                      })}
                   </div>
                 </td>
               </tr>
@@ -376,21 +554,71 @@ const InvoiceTemplate = ({
                 <p>Taxable Amount</p>
                 <span style={{ display: "flex", alignItems: "center" }}>
                   <LiaRupeeSignSolid />
-                  {Number(invoice?.taxableAmount).toLocaleString("en-IN")}
+                  {typeof invoice?.taxableAmount === "number" &&
+                  !isNaN(invoice.taxableAmount)
+                    ? invoice.taxableAmount.toLocaleString("en-IN", {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2,
+                      })
+                    : (
+                        invoice?.items?.reduce((acc, item) => {
+                          const price =
+                            Number(item?.basePrice || item?.salesPrice) || 0;
+                          const quantity = Number(item?.quantity) || 0;
+                          return acc + price * quantity;
+                        }, 0) || 0
+                      ).toLocaleString("en-IN", {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2,
+                      })}
                 </span>
               </div>
               <div style={{ display: "flex", justifyContent: "space-between" }}>
                 <p>CGST </p>
                 <span style={{ display: "flex", alignItems: "center" }}>
                   <LiaRupeeSignSolid />
-                  {invoice?.cgst}
+                  {typeof invoice?.cgst === "number" && !isNaN(invoice?.sgst)
+                    ? invoice.sgst.toLocaleString("en-IN", {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2,
+                      })
+                    : (
+                        invoice?.items?.reduce((acc, item) => {
+                          const gstRate = Number(item?.gstTaxRate) || 0;
+                          const gstAmount =
+                            Number(item?.gstAmount) ||
+                            (Number(item?.salesPrice) * gstRate) / 100 ||
+                            0;
+                          return acc + gstAmount / 2;
+                        }, 0) || 0
+                      ).toLocaleString("en-IN", {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2,
+                      })}
                 </span>
               </div>
               <div style={{ display: "flex", justifyContent: "space-between" }}>
                 <p>SGST</p>
                 <span style={{ display: "flex", alignItems: "center" }}>
                   <LiaRupeeSignSolid />
-                  {invoice?.sgst}
+                  {typeof invoice?.sgst === "number" && !isNaN(invoice?.sgst)
+                    ? invoice.sgst.toLocaleString("en-IN", {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2,
+                      })
+                    : (
+                        invoice?.items?.reduce((acc, item) => {
+                          const gstRate = Number(item?.gstTaxRate) || 0;
+                          const gstAmount =
+                            Number(item?.gstAmount) ||
+                            (Number(item?.salesPrice) * gstRate) / 100 ||
+                            0;
+                          return acc + gstAmount / 2;
+                        }, 0) || 0
+                      ).toLocaleString("en-IN", {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2,
+                      })}
                 </span>
               </div>
 
@@ -425,7 +653,10 @@ const InvoiceTemplate = ({
                 <p>Total Amount</p>
                 <span style={{ display: "flex", alignItems: "center" }}>
                   <LiaRupeeSignSolid />
-                  {Math.round(invoice?.totalAmount).toLocaleString("en-IN")}
+                  {Number(invoice?.totalAmount).toLocaleString("en-IN", {
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2,
+                  })}
                 </span>
               </div>
               <div
@@ -444,7 +675,15 @@ const InvoiceTemplate = ({
                 }}
               >
                 <p style={{ fontWeight: 600 }}>Total Amount (in words)</p>
-                <span>{converter.toWords(total).toUpperCase()} ONLY</span>
+                <span>
+                  {toWords
+                    .convert(invoice?.totalAmount)
+                    .toLocaleString("en-IN", {
+                      minimumFractionDigits: 2,
+                      maximumFractionDigits: 2,
+                    })
+                    .toUpperCase()}{" "}
+                </span>
               </div>
             </div>
           </section>

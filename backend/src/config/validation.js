@@ -230,7 +230,6 @@ export const bankAccountSchema = z.object({
 
   bankAccountNumber: z
     .string()
-    .optional()
     .refine((val) => !val || /^\d{9,18}$/.test(val), {
       message: "Bank account number must be 9–18 digits",
     }),

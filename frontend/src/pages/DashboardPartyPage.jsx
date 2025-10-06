@@ -32,9 +32,9 @@ const DashboardPartyPage = () => {
   });
 
   useEffect(() => {
-    const partyInvoices = invoices?.filter(
-      (invoice) => invoice?.partyId?._id === id
-    );
+    const partyInvoices =
+      invoices &&
+      invoices?.invoices.filter((invoice) => invoice?.partyId?._id === id);
     setPartyInvoices(partyInvoices);
   }, [id, invoices]);
 
@@ -52,8 +52,6 @@ const DashboardPartyPage = () => {
       navigate("/dashboard/parties/sales-return", { state: { id: id } });
     }
   };
-
-  console.log(filter);
 
   return (
     <main className="h-full p-2">

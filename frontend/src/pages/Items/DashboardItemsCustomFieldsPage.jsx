@@ -5,7 +5,7 @@ const DashboardItemsCustomFieldsPage = () => {
   return (
     <main className="flex flex-col justify-center items-center  h-full">
       <div className="h-40 w-50">
-        <img src={dcsearch} alt="" className="h-40" />
+        <img src={dcsearch} alt="" className="h-40" loading="lazy" />
       </div>
       <p>You don't have any custom field created yet</p>
       <button className="btn btn-sm mt-5 bg-[var(--primary-btn)]">

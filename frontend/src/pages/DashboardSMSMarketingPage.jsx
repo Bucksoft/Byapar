@@ -59,7 +59,7 @@ const DashboardSMSMarketingPage = () => {
           }}
           className="flex items-center justify-center"
         >
-          <img src={graph} alt="/src/assets/graph" width={300} />
+          <img src={graph} alt="/src/assets/graph" width={300} loading="lazy" />
         </motion.div>
         <motion.p
           initial={{
@@ -125,14 +125,29 @@ const DashboardSMSMarketingPage = () => {
                 Campaign
               </p>
             </div>
-            <img src={holi} alt="/src/assets/holi" className="w-14" />
+            <img
+              src={holi}
+              alt="/src/assets/holi"
+              className="w-14"
+              loading="lazy"
+            />
           </div>
 
           <div className="flex items-center w-full justify-between pl-4">
             <button className="btn btn-sm ">Select Template</button>
             <div className="gap-1 flex ">
-              <img src={newyear} alt="/src/assets/newyear" className="w-14" />
-              <img src={dewali} alt="/src/assets/dewali" className="w-14" />
+              <img
+                src={newyear}
+                alt="/src/assets/newyear"
+                className="w-14"
+                loading="lazy"
+              />
+              <img
+                src={dewali}
+                alt="/src/assets/dewali"
+                className="w-14"
+                loading="lazy"
+              />
             </div>
           </div>
         </motion.section>
@@ -167,7 +182,12 @@ const DashboardSMSMarketingPage = () => {
               <button className="btn btn-sm mt-2 w-1/4">Select Template</button>
             </div>
 
-            <img src={discount} alt="src/assets/discount" className=" w-42" />
+            <img
+              src={discount}
+              alt="src/assets/discount"
+              className=" w-42"
+              loading="lazy"
+            />
           </div>
         </motion.section>
       </section>

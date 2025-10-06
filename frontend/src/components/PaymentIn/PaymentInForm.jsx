@@ -37,7 +37,9 @@ const PaymentInForm = () => {
     settledInvoices: {},
   });
 
+  // fetching all parties
   const { data: allParties } = useQuery({
+    queryKey: ["allParties", business?._id],
     queryFn: async () => {
       const res = await axiosInstance.get(
         `/parties/all-parties/${business?._id}`
@@ -223,11 +225,12 @@ const PaymentInForm = () => {
               }}
             >
               <option className="hidden">Select Party</option>
-              {allParties?.map((party) => (
-                <option value={party?.partyName} key={party?._id}>
-                  {party?.partyName}
-                </option>
-              ))}
+              {allParties &&
+                allParties?.map((party) => (
+                  <option value={party?.partyName} key={party?._id}>
+                    {party?.partyName}
+                  </option>
+                ))}
             </select>
 
             {selectedParty && (

@@ -90,6 +90,7 @@ const DashboardReferAndEarnPage = () => {
                 src={referandearn}
                 alt="/src/assets/referandearn"
                 className="w-60"
+                loading="lazy"
               />
             </div>
           </div>
