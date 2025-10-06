@@ -47,7 +47,7 @@ const DashboardItemsBasicDetailPage = ({ data, setData, err }) => {
   });
 
   return (
-    <main className="grid grid-cols-2 gap-15">
+    <main className="grid grid-cols-2 gap-15 h-full">
       {/* left container */}
       <div className="">
         <div className=" flex flex-col">

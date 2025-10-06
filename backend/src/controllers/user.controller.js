@@ -37,7 +37,7 @@ export async function login(req, res) {
     await OTP.create({
       email,
       otp,
-      expiresIn: Date.now() + 5 * 60 * 1000,
+      expiresIn: Date.now() + 60 * 1000,
     });
     // 2. Send OTP via email to user.
     await sendOTPviaMail(email, otp);

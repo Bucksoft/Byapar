@@ -25,7 +25,7 @@ const DashboardItemsStockDetailsPage = ({ data, setData }) => {
   // };
 
   return (
-    <main className="">
+    <main className="h-full">
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {/* Left section */}
         <div className="space-y-5">

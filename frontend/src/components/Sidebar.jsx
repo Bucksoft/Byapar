@@ -121,12 +121,9 @@ const Sidebar = () => {
 
         {/* business details */}
         <div className="flex gap-3 px-5 py-3 items-center border-b border-b-zinc-200 ">
-          <div className="avatar avatar-sm">
-            <div className="w-9 rounded-full">
-              <img
-                src="https://img.daisyui.com/images/profile/demo/superperson@192.webp"
-                alt="Tailwind-CSS-Avatar-component"
-              />
+          <div className="">
+            <div className="w-9 h-9 rounded-full flex items-center justify-center bg-red-200">
+              {business?.businessName[0].toUpperCase()}
             </div>
           </div>
 

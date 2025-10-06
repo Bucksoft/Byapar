@@ -210,7 +210,7 @@ const DashboardItemsPage = () => {
             <Plus size={14} /> Create Item
           </button>
 
-          <dialog id="my_modal_3" className="modal">
+          <dialog id="my_modal_3" className="modal ">
             <div className="modal-box w-11/12 max-w-5xl h-3/4">
               <DashboardItemsSidebar data={items} modalId={"my_modal_3"} />
               {/* <div className="modal-action">
