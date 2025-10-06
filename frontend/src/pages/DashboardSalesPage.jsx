@@ -400,7 +400,7 @@ const DashboardSalesPage = () => {
             </div>
           )}
 
-          {(!searchedInvoices || !invoices) && (
+          {/* {(!searchedInvoices || !invoices?.invoices) && (
             <div className="w-full flex justify-center py-19 flex-col items-center gap-4">
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -423,7 +423,7 @@ const DashboardSalesPage = () => {
                 You haven't generated any invoices yet.
               </h1>
             </div>
-          )}
+          )} */}
         </div>
 
         {/* PAGINATION  */}
@@ -437,11 +437,13 @@ const DashboardSalesPage = () => {
               <FaArrowLeft />
             </button>
 
-            <button className="join-item btn btn-sm">{page}</button>
+            <button className="join-item btn btn-sm">
+              {page}/{invoices?.totalPages || 1}
+            </button>
 
             <button
               onClick={() => {
-                if (invoices && page < invoices.totalPages) {
+                if (invoices && page < invoices?.totalPages) {
                   setPage((old) => old + 1);
                 }
               }}

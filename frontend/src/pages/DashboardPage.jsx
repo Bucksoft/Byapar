@@ -83,7 +83,7 @@ const DashboardPage = () => {
                       </thead>
                       <tbody>
                         {invoices &&
-                          invoices?.invoices.slice(0, 3).map((invoice) => (
+                          invoices?.invoices?.slice(0, 3).map((invoice) => (
                             <tr key={invoice?._id}>
                               <td>
                                 {(invoice?.salesInvoiceDate &&

@@ -209,6 +209,7 @@ const DashboardPartiesPage = () => {
               <table className="table table-zebra table-sm min-w-full">
                 <thead className="sticky top-0 bg-[var(--primary-background)] z-20">
                   <tr>
+                    <th>S.No.</th>
                     <th>Party Name</th>
                     <th className="text-center">Category</th>
                     <th className="text-center">Mobile Number</th>
@@ -218,7 +219,7 @@ const DashboardPartiesPage = () => {
                   </tr>
                 </thead>
                 <tbody className="text-center">
-                  {parties.map((party) => (
+                  {parties.map((party, index) => (
                     <motion.tr
                       className="cursor-pointer hover:bg-zinc-50"
                       onClick={() => navigate(party?._id)}
@@ -231,6 +232,7 @@ const DashboardPartiesPage = () => {
                         delay: 0.2,
                       }}
                     >
+                      <td>{index + 1}</td>
                       <td className="text-left">{party?.partyName || "-"}</td>
                       <td>{party?.categoryName || "-"}</td>
                       <td>{party?.mobileNumber || "-"}</td>
@@ -279,7 +281,6 @@ const DashboardPartiesPage = () => {
                 </Link>
               </div>
             )}
-
           </motion.div>
 
           {/* PAGINATION  */}
@@ -293,7 +294,9 @@ const DashboardPartiesPage = () => {
                 <FaArrowLeft />
               </button>
 
-              <button className="join-item btn btn-sm">{page}</button>
+              <button className="join-item btn btn-sm">
+                {page}/{data?.totalPages || 1}
+              </button>
 
               <button
                 onClick={() => {

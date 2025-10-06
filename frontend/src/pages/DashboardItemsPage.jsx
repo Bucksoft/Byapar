@@ -254,7 +254,9 @@ const DashboardItemsPage = () => {
               <FaArrowLeft />
             </button>
 
-            <button className="join-item btn btn-sm">{page}</button>
+            <button className="join-item btn btn-sm">
+              {page}/{items?.totalPages || 1}
+            </button>
 
             <button
               onClick={() => {

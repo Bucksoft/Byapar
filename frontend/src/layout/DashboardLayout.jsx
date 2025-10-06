@@ -21,7 +21,6 @@ const DashboardLayout = () => {
   } = useQuery({
     queryKey: ["user"],
     queryFn: async () => {
-      console.log("Fetching user data...");
       const res = await axiosInstance.get("/user/me");
       setUser(res.data?.user);
       setBusiness(res.data?.user?.activeBusinessId || null);
