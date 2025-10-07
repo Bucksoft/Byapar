@@ -1,7 +1,8 @@
 import { axiosInstance } from "../src/config/axios";
 
-export const downloadPDF = async (id, title = "invoice") => {
+export const downloadPDF = async (id, title = "invoice", setIsDownloading) => {
   try {
+    setIsDownloading(true);
     const input = document.getElementById(id);
     const element = input.outerHTML;
 
@@ -35,5 +36,7 @@ export const downloadPDF = async (id, title = "invoice") => {
     link.remove();
   } catch (error) {
     console.error("Error downloading PDF:", error);
+  } finally {
+    setIsDownloading(false);
   }
 };

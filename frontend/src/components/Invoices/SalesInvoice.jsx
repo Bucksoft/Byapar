@@ -5,17 +5,18 @@ import { useNavigate, useParams } from "react-router-dom";
 import InvoiceTemplate from "./InvoiceTemplate";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { axiosInstance } from "../../config/axios";
-import { downloadPDF } from "../../../helpers/downloadPdf";
 import { useRef, useState } from "react";
 import toast from "react-hot-toast";
 import { queryClient } from "../../main";
 import CustomLoader from "../Loader";
 import { handlePrint } from "../../../helpers/print";
+import { downloadPDF } from "../../../helpers/downloadPdf";
 
 const SalesInvoice = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const printRef = useRef();
+  const [isDownloading, setIsDownloading] = useState(false);
   const [invoiceIdToDownload, setInvoiceIdToDownload] = useState();
 
   // THIS IS THE QUERY TO GET THE INVOICE BASED ON ID
@@ -65,10 +66,23 @@ const SalesInvoice = () => {
               <Printer size={15} /> Print PDF
             </button>
             <button
-              onClick={() => downloadPDF(invoiceIdToDownload, "sales invoice")}
+              disabled={mutation.isPending}
+              onClick={() =>
+                downloadPDF(
+                  invoiceIdToDownload,
+                  "sales invoice",
+                  setIsDownloading
+                )
+              }
               className="btn btn-sm"
             >
-              <Download size={15} /> Download PDF
+              {isDownloading ? (
+                <CustomLoader text={"Downloading..."} />
+              ) : (
+                <>
+                  <Download size={15} /> Download PDF
+                </>
+              )}
             </button>
             <div className="dropdown dropdown-end">
               <div tabIndex={0} role="button" className="btn btn-sm">

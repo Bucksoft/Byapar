@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { IoCloseCircle } from "react-icons/io5";
 import BankAccountPopup from "../BankAccountPopup";
+import BankAccountPopupForBusiness from "../BankAccountPopupForBusiness";
 
 const SalesInvoiceFooterSection = ({ data, setData, title }) => {
   const [notes, setNotes] = useState(false);
@@ -94,7 +95,7 @@ const SalesInvoiceFooterSection = ({ data, setData, title }) => {
         </div>
 
         {/* add new account */}
-        <BankAccountPopup />
+        <BankAccountPopupForBusiness />
       </div>
 
       {/* Right Grid Part */}
@@ -315,6 +316,7 @@ const SalesInvoiceFooterSection = ({ data, setData, title }) => {
             )}
           </div>
         </div>
+
         {/* balance amount */}
         {(title === "Sales Invoice" || title === "Sales Return") && (
           <div className="p-2 border-b border-b-zinc-300 pb-2">
