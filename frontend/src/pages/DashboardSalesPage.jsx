@@ -224,7 +224,7 @@ const DashboardSalesPage = () => {
           ) : (
             <div
               className="relative z-10 bg-base-100 
-             h-[460px] overflow-y-auto overflow-x-auto  border border-[var(--table-border)]"
+             h-[460px] overflow-y-auto overflow-x-auto "
             >
               <motion.table
                 initial={{
