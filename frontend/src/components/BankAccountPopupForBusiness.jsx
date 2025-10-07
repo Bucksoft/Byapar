@@ -3,33 +3,54 @@ import { FaPlus } from "react-icons/fa6";
 import { axiosInstance } from "../config/axios";
 import toast from "react-hot-toast";
 import { useState } from "react";
+import { useBusinessStore } from "../store/businessStore";
+import { queryClient } from "../main";
 
 const BankAccountPopupForBusiness = () => {
-    const [accountName, setAccountName] = useState("");
-    const [bankAccountNumber, setBankAccountNumber] = useState("");
-    
+  const [accountName, setAccountName] = useState("");
+  const [bankAccountNumber, setBankAccountNumber] = useState("");
+  const [ifscCode, setIfscCode] = useState("");
+  const [openingBalance, setOpeningBalance] = useState(0);
+  const [bankAndBranchName, setBankAndBranchName] = useState("");
+  const [accountHoldersName, setAccountHoldersName] = useState("");
+  const [upiId, setUpiId] = useState("");
+  const [asOfDate, setAsOfDate] = useState(new Date());
 
-
-
-
+  const { business } = useBusinessStore();
   const bankMutation = useMutation({
     mutationFn: async () => {
-      if (data?.bankAccountNumber?.length === 0) {
-        throw new Error("Bank Account Number is required");
-      }
-      const res = await axiosInstance.post("/bank-account/:id", data);
+      // Validation
+
+      // API request
+      const res = await axiosInstance.post(`/bank-account/${business?._id}`, {
+        accountName,
+        bankAccountNumber,
+        ifscCode,
+        openingBalance,
+        bankAndBranchName,
+        accountHoldersName,
+        upiId,
+        asOfDate,
+      });
       if (res.data.success) {
         toast.success(res.data.msg);
-        document.getElementById("my_modal_3").close();
-        setIsAddedBankInfo(false);
+        document.getElementById("bank-modal").close();
+        queryClient.invalidateQueries({
+          queryKey: ["businessBankAccounts", business?._id],
+        });
       }
       return res.data;
     },
     onError: (err) => {
-      console.log(err);
-      toast.error(
-        err.response.data.msg ?? err.message ?? "Something went wrong"
-      );
+      // // Check if it's an Axios error
+      // if (err.response?.data?.msg) {
+      //   toast.error(err.response.data.msg);
+      // } else if (err.message) {
+      //   toast.error(err.message); // JS error (like validation)
+      // } else {
+      //   toast.error("Something went wrong");
+      // }
+      console.error(err);
     },
   });
 
@@ -61,18 +82,19 @@ const BankAccountPopupForBusiness = () => {
                   <span className="text-red-500"> *</span>
                 </p>
                 <input
-                  type="number"
+                  type="text"
                   name="acountName"
-                  //   value={data?.bankAccountNumber}
-                  //   onChange={handleInputChange}
-                  placeholder="ex-123456789"
+                  value={accountName}
+                  onChange={(e) => setAccountName(e.target.value)}
+                  placeholder="Personal Account"
                   className="border border-gray-200  rounded w-full p-1"
                 />
-                {/* <small className="text-red-500">
-                  {bankMutation?.error?.response?.data?.errors
-                    ?.bankAccountNumber?._errors[0] ||
-                    bankMutation?.error?.message}
-                </small> */}
+                <small className="text-red-500">
+                  {
+                    bankMutation?.error?.response?.data?.errors?.accountName
+                      ?._errors[0]
+                  }
+                </small>
               </div>
             </div>
             <div className="flex justify-between gap-2">
@@ -84,16 +106,17 @@ const BankAccountPopupForBusiness = () => {
                 <input
                   type="number"
                   name="bankAccountNumber"
-                  //   value={data?.bankAccountNumber}
-                  //   onChange={handleInputChange}
+                  value={bankAccountNumber}
+                  onChange={(e) => setBankAccountNumber(e.target.value)}
                   placeholder="ex-123456789"
                   className="border border-gray-200  rounded w-full p-1"
                 />
-                {/* <small className="text-red-500">
-                  {bankMutation?.error?.response?.data?.errors
-                    ?.bankAccountNumber?._errors[0] ||
-                    bankMutation?.error?.message}
-                </small> */}
+                <small className="text-red-500">
+                  {
+                    bankMutation?.error?.response?.data?.errors
+                      ?.bankAccountNumber?._errors[0]
+                  }
+                </small>
               </div>
             </div>
             <div className="flex justify-between gap-2">
@@ -102,16 +125,17 @@ const BankAccountPopupForBusiness = () => {
                 <input
                   type="number"
                   name="openingbalance"
-                  //   value={data?.bankAccountNumber}
-                  //   onChange={handleInputChange}
+                  value={openingBalance}
+                  onChange={(e) => setOpeningBalance(e.target.value)}
                   placeholder="ex-123456789"
                   className="border border-gray-200  rounded w-full p-1"
                 />
-                {/* <small className="text-red-500">
-                  {bankMutation?.error?.response?.data?.errors
-                    ?.bankAccountNumber?._errors[0] ||
-                    bankMutation?.error?.message}
-                </small> */}
+                <small className="text-red-500">
+                  {
+                    bankMutation?.error?.response?.data?.errors?.openingBalance
+                      ?._errors[0]
+                  }
+                </small>
               </div>
               <div className="flex justify-between w-1/2 gap-2">
                 <div className="flex flex-col  w-full gap-1">
@@ -119,16 +143,17 @@ const BankAccountPopupForBusiness = () => {
                   <input
                     type="date"
                     name="asofDate"
-                    //   value={data?.bankAccountNumber}
-                    //   onChange={handleInputChange}
+                    value={asOfDate}
+                    onChange={(e) => setAsOfDate(e.target.value)}
                     placeholder="ex-123456789"
                     className="border border-gray-200  rounded w-full p-1"
                   />
-                  {/* <small className="text-red-500">
-                  {bankMutation?.error?.response?.data?.errors
-                    ?.bankAccountNumber?._errors[0] ||
-                    bankMutation?.error?.message}
-                </small> */}
+                  <small className="text-red-500">
+                    {
+                      bankMutation?.error?.response?.data?.errors?.asOfDate
+                        ?._errors[0]
+                    }
+                  </small>
                 </div>
               </div>
             </div>
@@ -143,16 +168,16 @@ const BankAccountPopupForBusiness = () => {
                   type="text"
                   placeholder="ex-ICIC0001234"
                   name="IFSCCode"
-                  //   value={data?.IFSCCode}
-                  //   onChange={handleInputChange}
+                  value={ifscCode}
+                  onChange={(e) => setIfscCode(e.target.value)}
                   className="border border-gray-200  rounded w-full p-1"
                 />
-                {/* <small className="text-red-500">
+                <small className="text-red-500">
                   {
-                    bankMutation?.error?.response?.data?.errors?.IFSCCode
+                    bankMutation?.error?.response?.data?.errors?.ifscCode
                       ?._errors[0]
                   }
-                </small> */}
+                </small>
               </div>
               <div className="flex flex-col  w-1/2 gap-1">
                 <p className="text-gray-600 text-xs">
@@ -163,16 +188,16 @@ const BankAccountPopupForBusiness = () => {
                   type="text"
                   placeholder="ex-ICICI Bank, Jharkhand"
                   name="bankAndBranchName"
-                  //   value={data?.bankAndBranchName}
-                  //   onChange={handleInputChange}
+                  value={bankAndBranchName}
+                  onChange={(e) => setBankAndBranchName(e.target.value)}
                   className="border border-gray-200  rounded w-full p-1"
                 />
-                {/* <small className="text-red-500">
+                <small className="text-red-500">
                   {
                     bankMutation?.error?.response?.data?.errors
                       ?.bankAndBranchName?._errors[0]
                   }
-                </small> */}
+                </small>
               </div>
             </div>
 
@@ -185,34 +210,34 @@ const BankAccountPopupForBusiness = () => {
                 <input
                   type="text"
                   name="accountHoldersName"
-                  //   value={data?.accountHoldersName}
-                  //   onChange={handleInputChange}
+                  value={accountHoldersName}
+                  onChange={(e) => setAccountHoldersName(e.target.value)}
                   placeholder="ex-Manish"
                   className="border border-gray-200  rounded w-full p-1"
                 />
-                {/* <small className="text-red-500">
+                <small className="text-red-500">
                   {
                     bankMutation?.error?.response?.data?.errors
                       ?.accountHoldersName?._errors[0]
                   }
-                </small> */}
+                </small>
               </div>
               <div className="flex flex-col  w-1/2 gap-1">
                 <p className="text-gray-600 text-xs">UPI ID</p>
                 <input
                   type="text"
                   name="upiId"
-                  //   value={data?.upiId}
-                  //   onChange={handleInputChange}
+                  value={upiId}
+                  onChange={(e) => setUpiId(e.target.value)}
                   placeholder="ex:manis@upi"
                   className="border border-gray-200  rounded w-full p-1"
                 />
-                {/* <small className="text-red-500">
+                <small className="text-red-500">
                   {
                     bankMutation?.error?.response?.data?.errors?.upiId
                       ?._errors[0]
                   }
-                </small> */}
+                </small>
               </div>
             </div>
           </div>

@@ -130,7 +130,7 @@ const Sidebar = () => {
             <div className="w-9 h-9 rounded-full flex items-center justify-center bg-red-200 overflow-hidden">
               {business?.logo !== "null" ? (
                 <img
-                  src={`data:image/png;base64,${business.logo}`}
+                  src={business.logo}
                   alt="Logo"
                   className="w-full h-full object-cover"
                 />

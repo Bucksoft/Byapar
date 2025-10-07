@@ -31,8 +31,6 @@ const DashboardMyBusinesses = () => {
     },
   });
 
-  console.log("BUSINESSES ", businesses);
-
   // handle active business
   const mutation = useMutation({
     mutationFn: async (data) => {
@@ -103,10 +101,22 @@ const DashboardMyBusinesses = () => {
                   <div className="card-body">
                     <div className="flex items-center gap-3">
                       {/* Business Logo */}
-                      {/* <img src={business?.logo} alt="logo" loading="lazy" /> */}
-                      <span className="bg-success/10 p-3 rounded-md">
-                        <IoBusinessSharp size={16} className="text-success" />
-                      </span>
+                      <div className="w-9 h-9 rounded-full flex items-center justify-center bg-red-200 overflow-hidden">
+                        {business?.logo !== "null" ? (
+                          <img
+                            src={business.logo}
+                            alt="Logo"
+                            className="w-full h-full object-cover"
+                          />
+                        ) : (
+                          <span className="bg-success/10 p-3 rounded-md">
+                            <IoBusinessSharp
+                              size={16}
+                              className="text-success"
+                            />
+                          </span>
+                        )}
+                      </div>
 
                       <div className="leading-4 flex-1">
                         <h2 className="card-title">{business?.businessName}</h2>

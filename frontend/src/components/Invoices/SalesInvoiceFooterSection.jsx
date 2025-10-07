@@ -2,6 +2,11 @@ import { useState } from "react";
 import { IoCloseCircle } from "react-icons/io5";
 import BankAccountPopup from "../BankAccountPopup";
 import BankAccountPopupForBusiness from "../BankAccountPopupForBusiness";
+import { useMutation, useQuery } from "@tanstack/react-query";
+import { axiosInstance } from "../../config/axios";
+import { useBusinessStore } from "../../store/businessStore";
+import { useBusinessBankAccountStore } from "../../store/businessBankAccount";
+import toast from "react-hot-toast";
 
 const SalesInvoiceFooterSection = ({ data, setData, title }) => {
   const [notes, setNotes] = useState(false);
@@ -10,6 +15,32 @@ const SalesInvoiceFooterSection = ({ data, setData, title }) => {
   const [discount, setDiscount] = useState(false);
   const [selectCheckBox, setSelectCheckBox] = useState(false);
   const [markAsPaid, setMarkedAsPaid] = useState(false);
+  const { business } = useBusinessStore();
+  const { setBankAccounts } = useBusinessBankAccountStore();
+  const [isDeletePopup, setIsDeletePopup] = useState(false);
+  const [accountId, setAccountId] = useState("");
+
+  const { isLoading, data: bankAccounts } = useQuery({
+    queryKey: ["businessBankAccounts"],
+    queryFn: async () => {
+      const res = await axiosInstance.get(`/bank-account/${business?._id}`);
+      setBankAccounts(res.data);
+      return res.data;
+    },
+  });
+
+  const mutation = useMutation({
+    mutationFn: async () => {
+      const res = await axiosInstance.delete(`/bank-account/${accountId}`);
+      if (res.data.success) {
+        toast.success(res.data.msg);
+        queryClient.invalidateQueries({
+          queryKey: ["businessBankAccounts"],
+        });
+        document.getElementById("delete-modal").close();
+      }
+    },
+  });
 
   return (
     <div className="grid grid-cols-2 w-full ">
@@ -96,6 +127,50 @@ const SalesInvoiceFooterSection = ({ data, setData, title }) => {
 
         {/* add new account */}
         <BankAccountPopupForBusiness />
+        {bankAccounts &&
+          bankAccounts.map((bankAccount) => (
+            <div
+              key={bankAccount._id}
+              className=" mt-2 border border-zinc-200 mx-5 p-2"
+            >
+              {/* ACCOUNT NAME */}
+              <div className="flex items-center gap-2 text-sm">
+                <h2 className="font-semibold">Account Name</h2>
+                <p>{bankAccount?.accountName}</p>
+              </div>
+
+              {/* ACCOUNT NUMBER */}
+              <div className="flex items-center gap-2 text-sm">
+                <h2 className="font-semibold">Account Number</h2>
+                <p>{bankAccount?.bankAccountNumber}</p>
+              </div>
+
+              {/* IFSC Code */}
+              <div className="flex items-center gap-2 text-sm">
+                <h2 className="font-semibold">IFSC Code</h2>
+                <p>{bankAccount?.IFSCCode}</p>
+              </div>
+
+              {/* Account Holder's Name */}
+              <div className="flex items-center gap-2 text-sm">
+                <h2 className="font-semibold">Account Holder's Name</h2>
+                <p>{bankAccount?.accountHoldersName}</p>
+              </div>
+
+              <div className="flex gap-2 clear-start mt-2">
+                <button
+                  className="btn btn-xs btn-error"
+                  onClick={() => {
+                    document.getElementById("delete-modal").showModal();
+                    setAccountId(bankAccount?._id);
+                  }}
+                >
+                  Remove
+                </button>
+                <button className="btn btn-xs btn-neutral">Edit</button>
+              </div>
+            </div>
+          ))}
       </div>
 
       {/* Right Grid Part */}
@@ -356,6 +431,30 @@ const SalesInvoiceFooterSection = ({ data, setData, title }) => {
           </div>
         </div> */}
       </div>
+      {
+        <>
+          <dialog id="delete-modal" className="modal">
+            <div className="modal-box">
+              <h3 className="font-bold text-lg">Confirm Deletion</h3>
+              <p className="py-4 text-sm">
+                Are you sure you want to remove the selected account ? This
+                action cannot be undone.
+              </p>
+              <div className="flex w-full">
+                <button
+                  onClick={() => mutation.mutate()}
+                  className="btn btn-sm btn-ghost  ml-auto text-[var(--error-text-color)]"
+                >
+                  Delete
+                </button>
+              </div>
+            </div>
+            <form method="dialog" className="modal-backdrop">
+              <button>close</button>
+            </form>
+          </dialog>
+        </>
+      }
     </div>
   );
 };

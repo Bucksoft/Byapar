@@ -3,6 +3,8 @@ import { useBusinessStore } from "../../store/businessStore";
 import { LiaRupeeSignSolid } from "react-icons/lia";
 import { useEffect, useRef } from "react";
 import { toWords } from "../../../helpers/wordsToCurrency";
+import { useQuery } from "@tanstack/react-query";
+import { axiosInstance } from "../../config/axios";
 
 const InvoiceTemplate = ({
   type,
@@ -13,6 +15,16 @@ const InvoiceTemplate = ({
 }) => {
   const { business } = useBusinessStore();
   const invoiceIdToDownload = useRef();
+
+  const { isLoading, data: bankAccounts } = useQuery({
+    queryKey: ["businessBankAccounts"],
+    queryFn: async () => {
+      const res = await axiosInstance.get(`/bank-account/${business?._id}`);
+      return res.data;
+    },
+  });
+
+  console.log(bankAccounts);
 
   useEffect(() => {
     setInvoiceIdToDownload(invoiceIdToDownload?.current?.id);
@@ -29,7 +41,6 @@ const InvoiceTemplate = ({
     parseAmount(invoice?.sgst);
 
   const getGSTPercentage = (rateString) => {
-    console.log(rateString);
     const match = rateString?.match(/(\d+)%/);
     return match ? parseFloat(match[1]) : rateString;
   };
@@ -94,7 +105,7 @@ const InvoiceTemplate = ({
                 }}
               >
                 <img
-                  src={`data:image/png;base64,${business.logo}`}
+                  src={business?.logo}
                   alt="Logo"
                   style={{
                     width: "100%",
@@ -160,7 +171,7 @@ const InvoiceTemplate = ({
               {type === "Sales Return"
                 ? "Sales Return"
                 : type === "Sales Invoice"
-                ? "Sales Invoice"
+                ? "Tax Invoice"
                 : type === "Quotation"
                 ? "Quotation"
                 : type === "Delivery Challan"
@@ -626,18 +637,10 @@ const InvoiceTemplate = ({
               display: "grid",
               gridTemplateColumns: "1fr 1fr",
               fontSize: "12px",
+              gap: "20px",
             }}
           >
-            <div style={{ marginTop: "12px" }}>
-              {invoice?.termsAndCondition && (
-                <div>
-                  <h4 style={{ fontWeight: 600 }}>Terms & Conditions</h4>
-                  <p style={{ whiteSpace: "pre-line" }}>
-                    {invoice?.termsAndCondition}
-                  </p>
-                </div>
-              )}
-            </div>
+            {/* FOOTER RIGHT SECTION */}
             <div style={{ marginTop: "12px" }}>
               <div style={{ display: "flex", justifyContent: "space-between" }}>
                 <p>Taxable Amount</p>
@@ -774,6 +777,139 @@ const InvoiceTemplate = ({
                     .toUpperCase()}{" "}
                 </span>
               </div>
+            </div>
+
+            {bankAccounts &&
+              bankAccounts?.map((bankAccount) => (
+                <div style={{ marginTop: "12px" }}>
+                  <div>
+                    <h4 style={{ fontWeight: 600 }}>Bank Details</h4>
+
+                    {/* ACCOUNT HOLDER'S NAME */}
+                    <div
+                      style={{
+                        display: "flex",
+                        justifyContent: "space-between",
+                        alignItems: "center",
+                      }}
+                    >
+                      <h1
+                        style={{
+                          color: "#52525c",
+                        }}
+                      >
+                        Account holder's name
+                      </h1>
+                      <p style={{ whiteSpace: "pre-line" }}>
+                        {bankAccount?.accountHoldersName}
+                      </p>
+                    </div>
+
+                    {/* BANK ACCOUNT NUMBER */}
+                    <div
+                      style={{
+                        display: "flex",
+                        justifyContent: "space-between",
+                        alignItems: "center",
+                      }}
+                    >
+                      <h1
+                        style={{
+                          color: "#52525c",
+                        }}
+                      >
+                        Bank account number
+                      </h1>
+                      <p style={{ whiteSpace: "pre-line" }}>
+                        {bankAccount?.bankAccountNumber}
+                      </p>
+                    </div>
+
+                    {/* IFSC Code */}
+                    <div
+                      style={{
+                        display: "flex",
+                        justifyContent: "space-between",
+                        alignItems: "center",
+                      }}
+                    >
+                      <h1
+                        style={{
+                          color: "#52525c",
+                        }}
+                      >
+                        IFSC Code
+                      </h1>
+                      <p style={{ whiteSpace: "pre-line" }}>
+                        {bankAccount?.IFSCCode}
+                      </p>
+                    </div>
+
+                    {/* BANK AND BRANCH NAME */}
+                    <div
+                      style={{
+                        display: "flex",
+                        justifyContent: "space-between",
+                        alignItems: "center",
+                      }}
+                    >
+                      <h1
+                        style={{
+                          color: "#52525c",
+                        }}
+                      >
+                        Bank and Branch
+                      </h1>
+                      <p style={{ whiteSpace: "pre-line" }}>
+                        {bankAccount?.bankAndBranchName}
+                      </p>
+                    </div>
+
+                    <p style={{ whiteSpace: "pre-line" }}>
+                      {bankAccount?.ifscCode}
+                    </p>
+                    <p style={{ whiteSpace: "pre-line" }}>
+                      {bankAccount?.bankName}
+                    </p>
+                  </div>
+                </div>
+              ))}
+          </section>
+
+          {/* <hr style={{ margin: "16px 0", borderColor: "#d4d4d8" }} /> */}
+          <section
+            style={{
+              display: "grid",
+              gridTemplateColumns: "1fr 1fr",
+              fontSize: "12px",
+              marginTop: "20px",
+            }}
+          >
+            {/* TERMS AND CONDITION BLOCK */}
+            <div style={{ marginTop: "12px" }}>
+              {invoice?.termsAndCondition && (
+                <div>
+                  <h4 style={{ fontWeight: 600 }}>Terms & Conditions</h4>
+                  <p style={{ whiteSpace: "pre-line" }}>
+                    {invoice?.termsAndCondition}
+                  </p>
+                </div>
+              )}
+            </div>
+
+            {/* SIGNATURE BLOCK */}
+            <div style={{ marginTop: "50px" }}>
+              <img src={business?.signature} alt="signature" width={"400px"}/>
+              <hr style={{ margin: "16px 0", borderColor: "#d4d4d8" }} />
+              <h1
+                style={{
+                  fontWeight: 600,
+                  fontSize: "12px",
+                  textAlign: "right",
+                }}
+              >
+                Signature
+              </h1>
             </div>
           </section>
         </div>

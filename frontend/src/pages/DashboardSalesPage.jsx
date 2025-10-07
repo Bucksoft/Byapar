@@ -59,6 +59,8 @@ const DashboardSalesPage = () => {
     },
     enabled: !!business,
     keepPreviousData: true,
+    refetchOnWindowFocus: false,
+    staleTime: Infinity,
   });
 
   // mutation to delete an invoice
@@ -116,6 +118,7 @@ const DashboardSalesPage = () => {
   const handleFileUpload = async (e) => {
     const selectedFile = e.target.files[0];
     const sanitizedData = await uploadExcel(selectedFile);
+
     if (sanitizedData) {
       bulkMutation.mutate(sanitizedData);
     }

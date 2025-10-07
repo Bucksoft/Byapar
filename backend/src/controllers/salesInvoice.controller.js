@@ -328,7 +328,6 @@ export async function bulkUploadSalesInvoices(req, res) {
         .json({ success: false, msg: "Business id is required" });
     }
     const bulkInvoices = req.body || [];
-
     if (!Array.isArray(bulkInvoices) || bulkInvoices.length === 0) {
       return res
         .status(400)

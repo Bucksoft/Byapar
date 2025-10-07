@@ -251,6 +251,38 @@ export const bankAccountSchema = z.object({
     }),
 });
 
+export const businessBankAccount = z.object({
+  accountName: z.string().min(1, "Account Name is required"),
+
+  bankAccountNumber: z
+    .string()
+    .min(1, "Bank Account Number is required")
+    .regex(/^\d{9,18}$/, "Bank account number must be 9–18 digits"),
+
+  asOfDate: z
+    .string()
+    .optional()
+    .refine((val) => !val || !isNaN(Date.parse(val)), {
+      message: "Invalid date format",
+    }),
+
+  ifscCode: z
+    .string()
+    .min(1, "IFSC Code is required")
+    .regex(/^[A-Z]{4}0[A-Z0-9]{6}$/, "Invalid IFSC code format"),
+
+  bankAndBranchName: z.string().min(1, "Bank and Branch Name is required"),
+
+  accountHoldersName: z.string().min(1, "Account Holder's Name is required"),
+
+  upiId: z
+    .string()
+    .optional()
+    .refine((val) => !val || /^[\w.-]{2,256}@[a-zA-Z]{2,64}$/.test(val), {
+      message: "Invalid UPI ID format",
+    }),
+});
+
 export const paymentInSchema = z.object({
   partyName: z
     .string()

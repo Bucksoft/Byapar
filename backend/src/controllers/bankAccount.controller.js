@@ -1,5 +1,9 @@
-import { bankAccountSchema } from "../config/validation.js";
+import {
+  bankAccountSchema,
+  businessBankAccount,
+} from "../config/validation.js";
 import BankAccount from "../models/bankAccount.schema.js";
+import BusinessBankAccount from "../models/businessBankAccount.js";
 
 export async function createBankAccount(req, res) {
   try {
@@ -167,5 +171,83 @@ export async function getBankAccountDetails(req, res) {
     return res
       .status(500)
       .json({ success: false, msg: "Internal server error" });
+  }
+}
+
+// create bank account for business
+export async function createBankAccountForBusiness(req, res) {
+  try {
+    const {
+      accountName,
+      bankAccountNumber,
+      ifscCode,
+      openingBalance,
+      bankAndBranchName,
+      accountHoldersName,
+      upiId,
+      asOfDate,
+    } = req.body;
+    const businessId = req.params?.id;
+    const validatedResult = businessBankAccount.safeParse(req.body);
+    if (!validatedResult.success) {
+      const errors = validatedResult.error.format();
+      return res
+        .status(400)
+        .json({ success: false, msg: "Validation failed", errors });
+    }
+
+    const bankAccount = await BusinessBankAccount.create({
+      accountName,
+      bankAccountNumber,
+      IFSCCode: ifscCode,
+      openingBalance,
+      bankAndBranchName,
+      accountHoldersName,
+      upiId,
+      asOfDate,
+      businessId: businessId,
+      clientId: req.user?.id,
+    });
+
+    return res.status(200).json({
+      success: true,
+      msg: "Bank account created successfully",
+      bankAccount,
+    });
+  } catch (error) {
+    console.log(error);
+    return res.status(500).json({ msg: "Internal server error" });
+  }
+}
+
+// get business bank account
+export async function getBusinessBankAccounts(req, res) {
+  try {
+    const id = req.params.id;
+    const businessBankAccounts = await BusinessBankAccount.find({
+      businessId: id,
+    });
+    if (!businessBankAccounts) {
+      return res.status(400).json({ msg: "Business bank accounts not found" });
+    }
+    return res.status(200).json(businessBankAccounts);
+  } catch (error) {
+    return res.status(500).json({ msg: "Internal Server Error" });
+  }
+}
+
+export async function deleteBusinessBankAccount(req, res) {
+  try {
+    const id = req.params.id;
+    console.log(id);
+    const deletedBankAccount = await BusinessBankAccount.findByIdAndDelete({
+      _id: id,
+    });
+    if (!deletedBankAccount) {
+      return res.status(400).json({ msg: "Bank account not found" });
+    }
+    return res.status(200).json({ msg: "Bank account removed successfully" });
+  } catch (error) {
+    return res.status(500).json({ msg: "Internal Server Error" });
   }
 }

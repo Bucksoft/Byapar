@@ -427,6 +427,7 @@ export async function bulkAddParties(req, res) {
             email: item.Email || "",
             billingAddress: item.Address || "",
             GSTIN: item.GSTIN || "",
+            currentBalance: item?.ReceivableBalance,
             businessId,
             clientId,
           };

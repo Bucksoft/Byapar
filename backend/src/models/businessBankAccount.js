@@ -14,8 +14,7 @@ const businessBankAccountSchema = new mongoose.Schema({
     required: true,
   },
   asOfDate: {
-    type: Date,
-    default: Date.now,
+    type: String,
   },
   IFSCCode: {
     type: String,
@@ -31,6 +30,14 @@ const businessBankAccountSchema = new mongoose.Schema({
   },
   upiId: {
     type: String,
+  },
+  businessId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Business",
+  },
+  clientId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "UserCredential",
   },
 });
 
