@@ -21,6 +21,7 @@ import DashboardItemsSidebar from "./Items/DashboardItemsSidebar";
 import { uploadExcel } from "../../helpers/uploadExcel";
 import toast from "react-hot-toast";
 import { queryClient } from "../main";
+import { useDebounce } from "../../helpers/useDebounce";
 
 const DashboardItemsPage = () => {
   const navigate = useNavigate();
@@ -55,22 +56,27 @@ const DashboardItemsPage = () => {
     e.target.value = null;
   };
 
+  const debouncedSearch = useDebounce(searchQuery, 400);
+
   // FETCHING ALL ITEMS FOR THE BUSINESS
   const {
     data: items,
     isLoading,
     isSuccess,
   } = useQuery({
-    queryKey: ["items", page],
+    queryKey: ["items", page, business?._id, debouncedSearch],
     queryFn: async () => {
-      if (!business) {
-        return [];
-      }
+      if (!business?._id) return [];
       const res = await axiosInstance.get(
-        `/item/all/${business?._id}?page=${page}&limit=${limit}`
+        `/item/all/${
+          business._id
+        }?page=${page}&limit=${limit}&search=${encodeURIComponent(
+          debouncedSearch || ""
+        )}`
       );
       return res.data;
     },
+    enabled: !!business?._id,
     keepPreviousData: true,
   });
 
@@ -99,6 +105,7 @@ const DashboardItemsPage = () => {
     }
   }, [isSuccess, items]);
 
+  // SEARCH ITEMS
   const searchedItems =
     items &&
     items.items

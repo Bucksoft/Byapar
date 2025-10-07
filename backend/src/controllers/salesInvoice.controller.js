@@ -110,12 +110,24 @@ export async function getAllInvoices(req, res) {
 
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 10;
+    const search = req.query.search?.trim() || "";
     const skip = (page - 1) * limit;
 
     const filter = {
       businessId: new mongoose.Types.ObjectId(businessId),
       clientId: req.user?.id,
     };
+
+    if (search.length > 0) {
+      const searchRegex = new RegExp(search, "i");
+      const searchNumber = Number(search);
+
+      filter.$or = [{ partyName: { $regex: searchRegex } }];
+
+      if (!isNaN(searchNumber)) {
+        filter.$or.push({ salesInvoiceNumber: searchNumber });
+      }
+    }
 
     const invoices = await SalesInvoice.find(filter)
       .skip(skip)
@@ -125,18 +137,16 @@ export async function getAllInvoices(req, res) {
 
     if (!invoices || invoices.length === 0) {
       return res
-        .status(400)
+        .status(404)
         .json({ success: false, msg: "Invoices not found" });
     }
+
     const totalInvoices = await SalesInvoice.countDocuments(filter);
     const totalPages = Math.ceil(totalInvoices / limit);
 
-    // CALCULATE THE TOTAL UNPAID, PAID AND TOTAL SALES
-    // this is the paginated invoices I want it from all the invoices present
+    const allInvoices = await SalesInvoice.find(filter);
 
-    const allInvoices = await SalesInvoice.find();
-
-    let totalSales = allInvoices
+    const totalSales = allInvoices
       ? Number(
           allInvoices
             .reduce(
@@ -147,18 +157,18 @@ export async function getAllInvoices(req, res) {
         ).toLocaleString("en-IN")
       : 0;
 
-    let totalPaid = allInvoices
+    const totalPaid = allInvoices
       ? Number(
-          allInvoices?.reduce(
+          allInvoices.reduce(
             (sum, invoice) => sum + (invoice.settledAmount || 0),
             0
           )
         ).toLocaleString("en-IN")
       : 0;
 
-    let totalUnpaid = allInvoices
+    const totalUnpaid = allInvoices
       ? Number(
-          allInvoices?.reduce(
+          allInvoices.reduce(
             (sum, invoice) =>
               sum +
               (invoice.pendingAmount ??
@@ -180,7 +190,7 @@ export async function getAllInvoices(req, res) {
       totalUnpaid,
     });
   } catch (error) {
-    console.log("ERROR IN GETTING  SALES INVOICE ");
+    console.error("❌ ERROR IN GETTING SALES INVOICE:", error);
     return res.status(500).json({ err: "Internal server error", error });
   }
 }

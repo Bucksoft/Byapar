@@ -31,6 +31,8 @@ const DashboardMyBusinesses = () => {
     },
   });
 
+  console.log("BUSINESSES ", businesses);
+
   // handle active business
   const mutation = useMutation({
     mutationFn: async (data) => {

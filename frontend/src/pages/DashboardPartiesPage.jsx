@@ -33,6 +33,7 @@ import { v4 as uuid } from "uuid";
 import { uploadExcel } from "../../helpers/uploadExcel.js";
 import { IoMdArrowDown, IoMdArrowUp } from "react-icons/io";
 import { IoArrowDownSharp } from "react-icons/io5";
+import { useDebounce } from "../../helpers/useDebounce.jsx";
 
 const DashboardPartiesPage = () => {
   const [searchQuery, setSearchQuery] = useState("");
@@ -73,15 +74,21 @@ const DashboardPartiesPage = () => {
     },
   });
 
+  const debouncedSearch = useDebounce(searchQuery, 400);
+
   // FETCHING ALL PARTIES OF A PARTICULAR BUSINESS
   const { isLoading, data } = useQuery({
-    queryKey: ["parties", page],
+    queryKey: ["parties", page, debouncedSearch, business?._id],
     queryFn: async () => {
       if (!business) {
         return [];
       }
       const res = await axiosInstance.get(
-        `/parties/all/${business?._id}?page=${page}&limit=${limit}`
+        `/parties/all/${
+          business?._id
+        }?page=${page}&limit=${limit}&search=${encodeURIComponent(
+          debouncedSearch || ""
+        )}`
       );
       setToCollect(res.data.toCollect);
       setToPay(res.data.toPay);
@@ -89,6 +96,7 @@ const DashboardPartiesPage = () => {
       setParties(res.data?.data);
       return res.data;
     },
+    enabled: !!business?._id,
     keepPreviousData: true,
   });
 
@@ -201,7 +209,8 @@ const DashboardPartiesPage = () => {
           initial={{ opacity: 0, scale: 0 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ ease: "easeInOut", duration: 0.2 }}
-          className="relative z-10 bg-base-100 mt-8 border border-[var(--table-border)] rounded-md overflow-x-auto"
+          className="relative z-10 h-[400px] bg-base-100 mt-8 border border-[var(--table-border)] rounded-md overflow-x-auto"
+          key="party-table-container "
         >
           {parties ? (
             <table className="table table-zebra table-sm min-w-[600px] w-full">
@@ -218,17 +227,10 @@ const DashboardPartiesPage = () => {
               </thead>
               <tbody className="text-center text-xs sm:text-sm">
                 {parties.map((party, index) => (
-                  <motion.tr
+                  <tr
                     key={party._id}
                     className="cursor-pointer hover:bg-zinc-50"
                     onClick={() => navigate(party?._id)}
-                    initial={{ opacity: 0, scaleY: 0 }}
-                    animate={{ opacity: 1, scaleY: 1 }}
-                    transition={{
-                      ease: "easeInOut",
-                      duration: 0.2,
-                      delay: 0.2,
-                    }}
                   >
                     <td>{index + 1}</td>
                     <td className="text-left">{party?.partyName || "-"}</td>
@@ -265,7 +267,7 @@ const DashboardPartiesPage = () => {
                         />
                       </button>
                     </td>
-                  </motion.tr>
+                  </tr>
                 ))}
               </tbody>
             </table>

@@ -160,42 +160,42 @@ export async function getAllParties(req, res) {
     const page = parseInt(req.query.page) || 1;
     const limit = parseInt(req.query.limit) || 10;
     const skip = (page - 1) * limit;
+    const search = req.query.search?.trim() || "";
 
     const filter = {
       businessId: new mongoose.Types.ObjectId(businessId),
       clientId: req.user?.id,
     };
 
+    if (search.length > 0) {
+      filter.$or = [
+        { partyName: { $regex: search, $options: "i" } },
+        { mobileNumber: { $regex: search, $options: "i" } },
+        { GSTIN: { $regex: search, $options: "i" } },
+        { billingAddress: { $regex: search, $options: "i" } },
+      ];
+    }
+
     const parties = await Party.find(filter)
       .skip(skip)
       .limit(limit)
       .sort({ createdAt: -1 });
 
-    if (!parties || parties.length === 0) {
-      return res.status(404).json({
-        success: false,
-        msg: "No parties found for this business",
-      });
-    }
+    const totalParties = await Party.countDocuments(filter);
+    const totalPages = Math.ceil(totalParties / limit);
 
-    // Calculating total 'to collect' & 'to pay'
     let toCollect = 0;
     let toPay = 0;
 
-    const allParties = await Party.find(filter);
-
-    allParties.forEach((party) => {
-      const balance = party?.currentBalance || 0;
-
-      if (balance > 0) {
-        toCollect += balance;
-      } else if (balance < 0) {
-        toPay += Math.abs(balance);
-      }
+    const allFilteredParties = await Party.find({
+      businessId: new mongoose.Types.ObjectId(businessId),
+      clientId: req.user?.id,
     });
-
-    const totalParties = await Party.countDocuments(filter);
-    const totalPages = Math.ceil(totalParties / limit);
+    allFilteredParties.forEach((party) => {
+      const balance = party?.currentBalance || 0;
+      if (balance > 0) toCollect += balance;
+      else if (balance < 0) toPay += Math.abs(balance);
+    });
 
     return res.status(200).json({
       success: true,

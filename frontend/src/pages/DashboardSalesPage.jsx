@@ -22,6 +22,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import toast from "react-hot-toast";
 import { useBusinessStore } from "../store/businessStore";
 import { uploadExcel } from "../../helpers/uploadExcel";
+import { useDebounce } from "../../helpers/useDebounce";
 
 const DashboardSalesPage = () => {
   const { setInvoices, setTotalInvoices } = useInvoiceStore();
@@ -35,12 +36,7 @@ const DashboardSalesPage = () => {
   const [page, setPage] = useState(1);
   const limit = 10;
 
-  useEffect(() => {
-    const timeout = setTimeout(() => {
-      setDebouncedQuery(searchQuery);
-    }, 400);
-    return () => clearTimeout(timeout);
-  }, [searchQuery]);
+  const debouncedSearch = useDebounce(searchQuery, 400);
 
   // to get all the invoices
   const {
@@ -48,11 +44,15 @@ const DashboardSalesPage = () => {
     data: invoices,
     isSuccess,
   } = useQuery({
-    queryKey: ["invoices", business?._id, page],
+    queryKey: ["invoices", business?._id, page, debouncedSearch],
     queryFn: async () => {
       if (!business) return [];
       const res = await axiosInstance.get(
-        `/sales-invoice/${business._id}?page=${page}&limit=${limit}`
+        `/sales-invoice/${
+          business._id
+        }?page=${page}&limit=${limit}&search=${encodeURIComponent(
+          debouncedSearch || ""
+        )}`
       );
       setTotalInvoices(res.data?.totalInvoices);
       return res.data || [];

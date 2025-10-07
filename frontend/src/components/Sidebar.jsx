@@ -93,7 +93,6 @@ const Sidebar = () => {
       toast.success("Logged out");
     },
   });
-  console.log("BUSINESS ", business);
 
   return (
     <>
@@ -129,7 +128,7 @@ const Sidebar = () => {
         <div className="flex gap-3 px-5 py-3 items-center border-b border-b-zinc-200 ">
           <div className="">
             <div className="w-9 h-9 rounded-full flex items-center justify-center bg-red-200 overflow-hidden">
-              {business?.logo ? (
+              {business?.logo !== "null" ? (
                 <img
                   src={`data:image/png;base64,${business.logo}`}
                   alt="Logo"

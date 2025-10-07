@@ -40,17 +40,28 @@ const InvoiceTemplate = ({
         display: "flex",
         width: "100%",
         height: "100vh",
+        justifyContent: "center",
+        alignItems: "start",
+        minHeight: "100vh",
+        padding: "1rem 0",
+        overflowX: "hidden",
+        overflowY: "auto",
       }}
       ref={printRef}
-      className="print-invoice flex justify-center items-start w-full min-h-screen bg-zinc-50 py-4 overflow-x-hidden overflow-y-auto"
+      class="print-invoice"
     >
       <div
         ref={invoiceIdToDownload}
         id="invoice"
-        className="invoice-content w-full max-w-[800px] bg-white shadow-lg p-4 sm:p-6 md:p-8 rounded-lg"
+        class="invoice-content"
         style={{
           margin: "auto",
           boxSizing: "border-box",
+          width: "100%",
+          maxWidth: "800px",
+          backgroundColor: "#fff",
+          boxShadow: "0 0 10px rgba(0,0,0,0.1)",
+          padding: "30px",
         }}
       >
         {/* Header */}
@@ -62,33 +73,78 @@ const InvoiceTemplate = ({
             alignItems: "center",
           }}
         >
-          <div className="flex flex-col w-1/2">
-            <div className="w-9 h-9 rounded-full flex items-center justify-center bg-red-200 overflow-hidden">
-              {business?.logo ? (
+          <div
+            style={{
+              display: "flex",
+              flexDirection: "column",
+              width: "50%",
+            }}
+          >
+            {business?.logo !== "null" && (
+              <div
+                style={{
+                  width: "2.25rem",
+                  height: "2.25rem",
+                  borderRadius: "9999px",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  backgroundColor: "#fecaca",
+                  overflow: "hidden",
+                }}
+              >
                 <img
                   src={`data:image/png;base64,${business.logo}`}
                   alt="Logo"
-                  className="w-full h-full object-cover"
+                  style={{
+                    width: "100%",
+                    height: "100%",
+                    objectFit: "cover",
+                  }}
                 />
-              ) : (
-                <span className="text-sm font-semibold text-white">
-                  {business?.businessName?.[0]?.toUpperCase()}
-                </span>
-              )}
-            </div>
+              </div>
+            )}
+
             <h2 style={{ fontWeight: 600, fontSize: "20px" }}>
               {business?.businessName}
             </h2>
-            <p className="text-sm text-gray-600">{business?.billingAddress}</p>
+            <p
+              style={{
+                fontSize: "0.875rem", // text-sm
+                color: "#52525b", // text-gray-600
+              }}
+            >
+              {business?.billingAddress}
+            </p>
+
             {business?.gstNumber.length > 0 && (
-              <p className="flex text-sm text-gray-600">
-                {" "}
-                <span className="font-semibold mr-2">GSTIN </span>
+              <p
+                style={{
+                  display: "flex",
+                  fontSize: "0.875rem",
+                  color: "#52525b",
+                }}
+              >
+                <span
+                  style={{
+                    fontWeight: 600,
+                    marginRight: "0.5rem",
+                  }}
+                >
+                  GSTIN
+                </span>
                 {business?.gstNumber}
               </p>
             )}
+
             {business?.companyEmail.length > 0 && (
-              <p className="flex text-sm text-gray-600">
+              <p
+                style={{
+                  display: "flex",
+                  fontSize: "0.875rem",
+                  color: "#52525b",
+                }}
+              >
                 {business?.companyEmail}
               </p>
             )}
@@ -122,7 +178,15 @@ const InvoiceTemplate = ({
                 : ""}
             </h1>
             {/* NUMBER */}
-            <div className="text-xs mt-1 flex items-center justify-between">
+            <div
+              style={{
+                fontSize: "12px",
+                marginTop: "4px",
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+              }}
+            >
               <p style={{ color: color, fontWeight: "600" }}>
                 {type === "Sales Return"
                   ? "Sales Return No."
@@ -167,7 +231,16 @@ const InvoiceTemplate = ({
               </span>
             </div>
             {/* DATE */}
-            <div className="text-xs mt-1 flex items-center justify-between gap-8">
+            <div
+              style={{
+                fontSize: "12px",
+                marginTop: "4px",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "space-between",
+                gap: "32px",
+              }}
+            >
               <p style={{ color: color, fontWeight: "600" }}>
                 {type === "Sales Return"
                   ? "Sales Return Date"
@@ -212,7 +285,16 @@ const InvoiceTemplate = ({
               </span>
             </div>
             {/* DUE DATE */}
-            <div className="text-xs mt-1 flex items-center justify-between gap-8">
+            <div
+              style={{
+                fontSize: "12px",
+                marginTop: "4px",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "space-between",
+                gap: "32px",
+              }}
+            >
               <p style={{ color: color, fontWeight: "600" }}>
                 {type === "Quotation" ||
                 type === "Proforma Invoice" ||
@@ -265,7 +347,14 @@ const InvoiceTemplate = ({
         <hr style={{ margin: "16px 0", borderColor: "#d4d4d8" }} />
 
         {/* Bill to */}
-        <div className="w-full flex items-start justify-between">
+        <div
+          style={{
+            width: "100%",
+            display: "flex",
+            alignItems: "flex-start",
+            justifyContent: "space-between",
+          }}
+        >
           <section style={{ fontSize: "14px", width: "50%" }}>
             <h3 style={{ fontWeight: "bold" }}>
               {type === "Credit Note"

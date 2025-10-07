@@ -13,6 +13,8 @@ const PartyTransactions = ({ party, filter }) => {
   const { paymentIns } = usePaymentInStore();
   const [transactions, setTransactions] = useState([]);
 
+  console.log("QUOTATIONS ", quotations);
+
   useEffect(() => {
     const partyInvoices =
       invoices &&
@@ -21,11 +23,11 @@ const PartyTransactions = ({ party, filter }) => {
         .map((invoice) => ({ ...invoice, type: "sales invoice" }));
 
     const partyQuotations = quotations
-      .filter((quotation) => quotation.partyName === party?.partyName)
+      ?.filter((quotation) => quotation?.partyName === party?.partyName)
       .map((quotation) => ({ ...quotation, type: "quotation" }));
 
     const partyPaymentIns = paymentIns
-      .filter((paymentIn) => paymentIn.partyName === party?.partyName)
+      ?.filter((paymentIn) => paymentIn.partyName === party?.partyName)
       .map((paymentIn) => ({ ...paymentIn, type: "payment in" }));
 
     setTransactions([...partyInvoices, ...partyPaymentIns, ...partyQuotations]);
