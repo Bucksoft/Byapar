@@ -494,7 +494,7 @@ const DashboardAddPartyPage = () => {
               className="textarea w-full"
               placeholder="Enter Billing Address"
             ></textarea>
-            <small className="text-xs text-[var(--error-text-color)] ">
+            <small className="text-xs text-[var(--error-text-color)]">
               {
                 mutation.error?.response?.data?.validationError?.billingAddress
                   ?._errors[0]
