@@ -12,7 +12,13 @@ export async function createBankAccount(req, res) {
     }
 
     // VALIDATE THE DATA
-    const validatedResult = bankAccountSchema.safeParse(data);
+    const validatedResult = bankAccountSchema.safeParse({
+      accountName: data?.accountHoldersName,
+      bankAccountNumber: data?.bankAccountNumber,
+      IFSCCode: data?.IFSCCode,
+      bankAndBranchName: data?.bankAndBranchName,
+      upiId: data?.upiId,
+    });
     if (!validatedResult.success) {
       const errors = validatedResult.error.format();
       return res
@@ -38,7 +44,6 @@ export async function createBankAccount(req, res) {
     // CREATE BANK ACCOUNT
     const bankAccount = await BankAccount.create({
       ...validatedResult.data,
-      businessId: req?.params?.businessId,
     });
     if (!bankAccount) {
       return res

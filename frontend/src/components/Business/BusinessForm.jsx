@@ -140,6 +140,7 @@ const BusinessForm = ({ businessToBeUpdated }) => {
         `/business/${businessToBeUpdated?._id}`,
         formData
       );
+      console.log(res);
       return res.data.business;
     },
     onSuccess: (data) => {

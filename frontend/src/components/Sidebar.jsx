@@ -93,6 +93,7 @@ const Sidebar = () => {
       toast.success("Logged out");
     },
   });
+  console.log("BUSINESS ", business);
 
   return (
     <>
@@ -126,12 +127,19 @@ const Sidebar = () => {
 
         {/* business details */}
         <div className="flex gap-3 px-5 py-3 items-center border-b border-b-zinc-200 ">
-          <div className="avatar avatar-sm">
-            <div className="w-9 rounded-full">
-              <img
-                src="https://img.daisyui.com/images/profile/demo/superperson@192.webp"
-                alt="Tailwind-CSS-Avatar-component"
-              />
+          <div className="">
+            <div className="w-9 h-9 rounded-full flex items-center justify-center bg-red-200 overflow-hidden">
+              {business?.logo ? (
+                <img
+                  src={`data:image/png;base64,${business.logo}`}
+                  alt="Logo"
+                  className="w-full h-full object-cover"
+                />
+              ) : (
+                <span className="text-sm font-semibold text-white">
+                  {business?.businessName?.[0]?.toUpperCase()}
+                </span>
+              )}
             </div>
           </div>
 

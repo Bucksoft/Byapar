@@ -22,6 +22,7 @@ const DashboardLayout = () => {
     queryKey: ["user"],
     queryFn: async () => {
       const res = await axiosInstance.get("/user/me");
+
       setUser(res.data?.user);
       setBusiness(res.data?.user?.activeBusinessId || null);
       return res.data?.user;

@@ -135,6 +135,11 @@ const LoginPage = () => {
                 size={15}
               /> */}
             </div>
+            {mutation.isError && (
+              <p className="text-xs text-error mt-3">
+                {mutation.error.response?.data?.err}
+              </p>
+            )}
             <button
               onClick={() => mutation.mutate(email)}
               className={`btn rounded-2xl shadow-md border-b-2 inset-shadow-[0px_4px_2px_rgba(0,0,0,0.2)] btn-lg mt-5 bg-[var(--primary-btn)] hover:bg-[var(--primary-btn)]/80 w-full shadow-zinc-300 ${

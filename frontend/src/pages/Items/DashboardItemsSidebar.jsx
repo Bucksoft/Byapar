@@ -173,7 +173,7 @@ const DashboardItemsSidebar = ({ modalId, itemIdToEdit }) => {
                   ))}
                 </div>
               ) : (
-                <div className="flex items-center shadow-lg rounded-md flex-col p-3 h-full bg-white">
+                <div className="flex items-center flex-col p-3 h-full bg-white">
                   {newServiceSidebarDetails?.map((item) => (
                     <div
                       onClick={() => handleSidebar(item?.title)}

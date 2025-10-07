@@ -10,6 +10,8 @@ export async function createBusiness(req, res) {
     const logoFile = req.files?.logo?.[0];
     const signatureFile = req.files?.signature?.[0];
 
+    console.log(logoFile);
+
     if (data.gstRegistered) {
       data.gstRegistered = Boolean(data.gstRegistered);
     }
@@ -96,13 +98,11 @@ export async function updateBusiness(req, res) {
     }
 
     // RETURN SUCCESS RESPONSE
-    return res
-      .status(200)
-      .json({
-        success: true,
-        msg: "Business details updated",
-        updatedBusiness,
-      });
+    return res.status(200).json({
+      success: true,
+      msg: "Business details updated",
+      updatedBusiness,
+    });
   } catch (error) {
     console.log("Error in updating business details", error);
     return res

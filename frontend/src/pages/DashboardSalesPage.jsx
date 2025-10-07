@@ -123,8 +123,8 @@ const DashboardSalesPage = () => {
   };
 
   return (
-    <main className="h-full p-2 ">
-      <div className="h-full w-full flex flex-col bg-gradient-to-b from-white to-transparent rounded-lg p-3">
+    <main className="h-screen overflow-y-scroll p-2 ">
+      <div className="h-full w-full mb-3 flex flex-col bg-gradient-to-b from-white to-transparent rounded-lg p-3 ">
         <DashboardNavbar title={"Sales Invoice"} isReport={"true"} />
         <motion.div
           variants={container}
@@ -213,15 +213,15 @@ const DashboardSalesPage = () => {
           </div>
         </motion.div>
 
-        <div className="overflow-x-auto flex-1 bg-base-100 mt-5 ">
+        <div className="flex-1 bg-base-100 mt-5 rounded-md border border-[var(--table-border)] shadow-sm">
           {isLoading ? (
             <div className="w-full py-3 flex justify-center">
               <CustomLoader text={"Getting all invoices..."} />
             </div>
           ) : (
             <div
-              className="relative z-10 bg-base-100 mt-8 
-             h-[460px] overflow-y-auto overflow-x-auto border border-[var(--table-border)] "
+              className="relative z-10 bg-base-100 
+             h-[460px] overflow-y-auto overflow-x-auto  border border-[var(--table-border)]"
             >
               <motion.table
                 initial={{
@@ -237,7 +237,7 @@ const DashboardSalesPage = () => {
                   duration: 0.2,
                   delay: 0.3,
                 }}
-                className="table table-zebra  table-sm min-w-full"
+                className="table table-zebra table-sm min-w-full"
               >
                 {/* head */}
                 <thead>

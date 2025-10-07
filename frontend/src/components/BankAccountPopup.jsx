@@ -11,9 +11,13 @@ const BankAccountPopup = ({
 }) => {
   const bankMutation = useMutation({
     mutationFn: async () => {
+      if (data?.bankAccountNumber?.length === 0) {
+        throw new Error("Bank Account Number is required");
+      }
       const res = await axiosInstance.post("/bank-account", data);
       if (res.data.success) {
         toast.success(res.data.msg);
+        document.getElementById("my_modal_3").close();
         setIsAddedBankInfo(false);
       }
       return res.data;
@@ -21,7 +25,7 @@ const BankAccountPopup = ({
     onError: (err) => {
       console.log(err);
       toast.error(
-        err.response.data.msg || err.message || "Something went wrong"
+        err.response.data.msg ?? err.message ?? "Something went wrong"
       );
     },
   });
@@ -37,7 +41,7 @@ const BankAccountPopup = ({
       </button>
 
       <dialog id="my_modal_3" className="modal text-xs">
-        <div className="modal-box ">
+        <div className="modal-box">
           <form method="dialog">
             {/* if there is a button in form, it will close the modal */}
             <button className="btn btn-sm btn-circle btn-ghost absolute right-2 top-4">
@@ -62,10 +66,9 @@ const BankAccountPopup = ({
                   className="border border-gray-200  rounded w-full p-1"
                 />
                 <small className="text-red-500">
-                  {
-                    bankMutation?.error?.response?.data?.errors
-                      ?.bankAccountNumber?._errors[0]
-                  }
+                  {bankMutation?.error?.response?.data?.errors
+                    ?.bankAccountNumber?._errors[0] ||
+                    bankMutation?.error?.message}
                 </small>
               </div>
             </div>

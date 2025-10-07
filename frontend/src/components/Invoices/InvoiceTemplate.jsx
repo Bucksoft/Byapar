@@ -42,32 +42,40 @@ const InvoiceTemplate = ({
         height: "100vh",
       }}
       ref={printRef}
-      className="print-invoice py-5"
+      className="print-invoice flex justify-center items-start w-full min-h-screen bg-zinc-50 py-4 overflow-x-hidden overflow-y-auto"
     >
       <div
         ref={invoiceIdToDownload}
         id="invoice"
+        className="invoice-content w-full max-w-[800px] bg-white shadow-lg p-4 sm:p-6 md:p-8 rounded-lg"
         style={{
-          width: "800px",
-          height: "100%",
-          backgroundColor: "#fff",
           margin: "auto",
-          padding: "16px",
-          // boxShadow:
-          //   "5px 5px 5px rgba(0,0,0,0.5), -5px -5px 5px rgba(0,0,0,0.5)",
-          // boxShadow: "0 4px 12px rgba(0,0,0,0.2)",
+          boxSizing: "border-box",
         }}
-        className="invoice-content"
       >
         {/* Header */}
         <div
           style={{
             display: "flex",
+            // flexDirection: "column",
             justifyContent: "space-between",
             alignItems: "center",
           }}
         >
           <div className="flex flex-col w-1/2">
+            <div className="w-9 h-9 rounded-full flex items-center justify-center bg-red-200 overflow-hidden">
+              {business?.logo ? (
+                <img
+                  src={`data:image/png;base64,${business.logo}`}
+                  alt="Logo"
+                  className="w-full h-full object-cover"
+                />
+              ) : (
+                <span className="text-sm font-semibold text-white">
+                  {business?.businessName?.[0]?.toUpperCase()}
+                </span>
+              )}
+            </div>
             <h2 style={{ fontWeight: 600, fontSize: "20px" }}>
               {business?.businessName}
             </h2>
@@ -85,27 +93,156 @@ const InvoiceTemplate = ({
               </p>
             )}
           </div>
-          <h1 style={{ textTransform: "uppercase", fontSize: "18px" }}>
-            {type === "Sales Return"
-              ? "Sales Return"
-              : type === "Sales Invoice"
-              ? "Sales Invoice"
-              : type === "Quotation"
-              ? "Quotation"
-              : type === "Delivery Challan"
-              ? "Delivery Challan"
-              : type === "Proforma Invoice"
-              ? "Proforma Invoice"
-              : type === "Purchase Invoice"
-              ? "Purchase Invoice"
-              : type === "Credit Note"
-              ? "Credit Note"
-              : type === "Purchase Order"
-              ? "Purchase Order"
-              : type === "Debit Note"
-              ? "Debit Note"
-              : ""}
-          </h1>
+          <div>
+            <h1
+              style={{
+                textTransform: "uppercase",
+                fontSize: "18px",
+                textAlign: "right",
+              }}
+            >
+              {type === "Sales Return"
+                ? "Sales Return"
+                : type === "Sales Invoice"
+                ? "Sales Invoice"
+                : type === "Quotation"
+                ? "Quotation"
+                : type === "Delivery Challan"
+                ? "Delivery Challan"
+                : type === "Proforma Invoice"
+                ? "Proforma Invoice"
+                : type === "Purchase Invoice"
+                ? "Purchase Invoice"
+                : type === "Credit Note"
+                ? "Credit Note"
+                : type === "Purchase Order"
+                ? "Purchase Order"
+                : type === "Debit Note"
+                ? "Debit Note"
+                : ""}
+            </h1>
+            {/* NUMBER */}
+            <div className="text-xs mt-1 flex items-center justify-between">
+              <p style={{ color: color, fontWeight: "600" }}>
+                {type === "Sales Return"
+                  ? "Sales Return No."
+                  : type === "Sales Invoice"
+                  ? "Sales Invoice No."
+                  : type === "Quotation"
+                  ? "Quotation No."
+                  : type === "Delivery Challan"
+                  ? "Delivery Challan No."
+                  : type === "Proforma Invoice"
+                  ? "Proforma Invoice No."
+                  : type === "Purchase Invoice"
+                  ? "Purchase Invoice No."
+                  : type === "Credit Note"
+                  ? "Credit Note No."
+                  : type === "Purchase Order"
+                  ? "Purchase Order No."
+                  : type === "Debit Note"
+                  ? "Debit Note No."
+                  : ""}
+              </p>
+              <span>
+                {type === "Sales Return"
+                  ? invoice?.salesReturnNumber
+                  : type === "Sales Invoice"
+                  ? invoice?.salesInvoiceNumber
+                  : type === "Quotation"
+                  ? invoice?.quotationNumber
+                  : type === "Delivery Challan"
+                  ? invoice?.deliveryChallanNumber
+                  : type === "Proforma Invoice"
+                  ? invoice?.proformaInvoiceNumber
+                  : type === "Purchase Invoice"
+                  ? invoice?.purchaseInvoiceNumber
+                  : type === "Credit Note"
+                  ? invoice?.creditNoteNumber
+                  : type === "Purchase Order"
+                  ? invoice?.purchaseOrderNumber
+                  : type === "Debit Note"
+                  ? invoice?.debitNoteNumber
+                  : ""}
+              </span>
+            </div>
+            {/* DATE */}
+            <div className="text-xs mt-1 flex items-center justify-between gap-8">
+              <p style={{ color: color, fontWeight: "600" }}>
+                {type === "Sales Return"
+                  ? "Sales Return Date"
+                  : type === "Sales Invoice"
+                  ? "Sales Invoice Date"
+                  : type === "Quotation"
+                  ? "Quotation Date"
+                  : type === "Delivery Challan"
+                  ? "Delivery Challan Date"
+                  : type === "Proforma Invoice"
+                  ? "Proforma Invoice Date"
+                  : type === "Purchase Invoice"
+                  ? "Purchase Invoice Date"
+                  : type === "Credit Note"
+                  ? "Credit Note Date"
+                  : type === "Purchase Order"
+                  ? "Purchase Order Date"
+                  : type === "Debit Note"
+                  ? "Debit Note Date"
+                  : ""}
+              </p>
+              <span>
+                {type === "Sales Return"
+                  ? invoice?.salesReturnDate?.split("T")[0]
+                  : type === "Sales Invoice"
+                  ? invoice?.salesInvoiceDate?.split("T")[0]
+                  : type === "Quotation"
+                  ? invoice?.quotationDate?.split("T")[0]
+                  : type === "Delivery Challan"
+                  ? invoice?.deliveryChallanDate?.split("T")[0]
+                  : type === "Proforma Invoice"
+                  ? invoice?.proformaInvoiceDate?.split("T")[0]
+                  : type === "Purchase Invoice"
+                  ? invoice?.purchaseInvoiceDate?.split("T")[0]
+                  : type === "Credit Note"
+                  ? invoice?.creditNoteDate?.split("T")[0]
+                  : type === "Purchase Order"
+                  ? invoice?.purchaseOrderDate?.split("T")[0]
+                  : type === "Debit Note"
+                  ? invoice?.debitNoteDate?.split("T")[0]
+                  : ""}
+              </span>
+            </div>
+            {/* DUE DATE */}
+            <div className="text-xs mt-1 flex items-center justify-between gap-8">
+              <p style={{ color: color, fontWeight: "600" }}>
+                {type === "Quotation" ||
+                type === "Proforma Invoice" ||
+                type === "Purchase Order"
+                  ? "Expiry Date"
+                  : type === "Credit Note"
+                  ? ""
+                  : type === "Debit Note"
+                  ? ""
+                  : "Due Date"}
+              </p>
+              <span>
+                {type === "Sales Return"
+                  ? invoice?.dueDate?.split("T")[0]
+                  : type === "Sales Invoice"
+                  ? invoice?.dueDate?.split("T")[0]
+                  : type === "Quotation"
+                  ? invoice?.validityDate?.split("T")[0]
+                  : type === "Delivery Challan"
+                  ? invoice?.dueDate?.split("T")[0]
+                  : type === "Proforma Invoice"
+                  ? invoice?.dueDate?.split("T")[0]
+                  : type === "Purchase Invoice"
+                  ? invoice?.dueDate?.split("T")[0]
+                  : type === "Purchase Order"
+                  ? invoice?.validityDate?.split("T")[0]
+                  : ""}
+              </span>
+            </div>
+          </div>
         </div>
 
         {/* Phone */}
@@ -124,139 +261,6 @@ const InvoiceTemplate = ({
           </span>
           {business?.companyPhoneNo}
         </div>
-
-        <hr style={{ margin: "16px 0", borderColor: "#d4d4d8" }} />
-
-        {/* Invoice details */}
-        <section
-          style={{
-            display: "flex",
-            gap: "40px",
-            fontSize: "12px",
-            padding: "0 12px",
-          }}
-        >
-          <div>
-            <p style={{ color: color, fontWeight: "600" }}>
-              {type === "Sales Return"
-                ? "Sales Return No."
-                : type === "Sales Invoice"
-                ? "Sales Invoice No."
-                : type === "Quotation"
-                ? "Quotation No."
-                : type === "Delivery Challan"
-                ? "Delivery Challan No."
-                : type === "Proforma Invoice"
-                ? "Proforma Invoice No."
-                : type === "Purchase Invoice"
-                ? "Purchase Invoice No."
-                : type === "Credit Note"
-                ? "Credit Note No."
-                : type === "Purchase Order"
-                ? "Purchase Order No."
-                : type === "Debit Note"
-                ? "Debit Note No."
-                : ""}
-            </p>
-            <span>
-              {type === "Sales Return"
-                ? invoice?.salesReturnNumber
-                : type === "Sales Invoice"
-                ? invoice?.salesInvoiceNumber
-                : type === "Quotation"
-                ? invoice?.quotationNumber
-                : type === "Delivery Challan"
-                ? invoice?.deliveryChallanNumber
-                : type === "Proforma Invoice"
-                ? invoice?.proformaInvoiceNumber
-                : type === "Purchase Invoice"
-                ? invoice?.purchaseInvoiceNumber
-                : type === "Credit Note"
-                ? invoice?.creditNoteNumber
-                : type === "Purchase Order"
-                ? invoice?.purchaseOrderNumber
-                : type === "Debit Note"
-                ? invoice?.debitNoteNumber
-                : ""}
-            </span>
-          </div>
-
-          <div>
-            <p style={{ color: color, fontWeight: "600" }}>
-              {type === "Sales Return"
-                ? "Sales Return Date"
-                : type === "Sales Invoice"
-                ? "Sales Invoice Date"
-                : type === "Quotation"
-                ? "Quotation Date"
-                : type === "Delivery Challan"
-                ? "Delivery Challan Date"
-                : type === "Proforma Invoice"
-                ? "Proforma Invoice Date"
-                : type === "Purchase Invoice"
-                ? "Purchase Invoice Date"
-                : type === "Credit Note"
-                ? "Credit Note Date"
-                : type === "Purchase Order"
-                ? "Purchase Order Date"
-                : type === "Debit Note"
-                ? "Debit Note Date"
-                : ""}
-            </p>
-            <span>
-              {type === "Sales Return"
-                ? invoice?.salesReturnDate?.split("T")[0]
-                : type === "Sales Invoice"
-                ? invoice?.salesInvoiceDate?.split("T")[0]
-                : type === "Quotation"
-                ? invoice?.quotationDate?.split("T")[0]
-                : type === "Delivery Challan"
-                ? invoice?.deliveryChallanDate?.split("T")[0]
-                : type === "Proforma Invoice"
-                ? invoice?.proformaInvoiceDate?.split("T")[0]
-                : type === "Purchase Invoice"
-                ? invoice?.purchaseInvoiceDate?.split("T")[0]
-                : type === "Credit Note"
-                ? invoice?.creditNoteDate?.split("T")[0]
-                : type === "Purchase Order"
-                ? invoice?.purchaseOrderDate?.split("T")[0]
-                : type === "Debit Note"
-                ? invoice?.debitNoteDate?.split("T")[0]
-                : ""}
-            </span>
-          </div>
-
-          <div>
-            <p style={{ color: color, fontWeight: "600" }}>
-              {type === "Quotation" ||
-              type === "Proforma Invoice" ||
-              type === "Purchase Order"
-                ? "Expiry Date"
-                : type === "Credit Note"
-                ? ""
-                : type === "Debit Note"
-                ? ""
-                : "Due Date"}
-            </p>
-            <span>
-              {type === "Sales Return"
-                ? invoice?.dueDate?.split("T")[0]
-                : type === "Sales Invoice"
-                ? invoice?.dueDate?.split("T")[0]
-                : type === "Quotation"
-                ? invoice?.validityDate?.split("T")[0]
-                : type === "Delivery Challan"
-                ? invoice?.dueDate?.split("T")[0]
-                : type === "Proforma Invoice"
-                ? invoice?.dueDate?.split("T")[0]
-                : type === "Purchase Invoice"
-                ? invoice?.dueDate?.split("T")[0]
-                : type === "Purchase Order"
-                ? invoice?.validityDate?.split("T")[0]
-                : ""}
-            </span>
-          </div>
-        </section>
 
         <hr style={{ margin: "16px 0", borderColor: "#d4d4d8" }} />
 
