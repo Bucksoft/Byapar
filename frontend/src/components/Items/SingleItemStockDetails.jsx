@@ -9,11 +9,13 @@ const SingleItemStockDetails = ({ item }) => {
   const [invoicesWithItem, setInvoicesWithItem] = useState([]);
 
   useEffect(() => {
-    const invoiceWithItem = invoices.filter((invoice) =>
+    const invoiceWithItem = invoices?.invoices.filter((invoice) =>
       invoice?.items?.filter((i) => i?.itemName === item?.itemName)
     );
     setInvoicesWithItem([...invoiceWithItem]);
   }, [item, invoices]);
+
+  console.log(invoicesWithItem);
 
   return (
     <main className="px-5 py-4">
@@ -47,7 +49,11 @@ const SingleItemStockDetails = ({ item }) => {
               invoicesWithItem &&
                 invoicesWithItem.map((invoice) => (
                   <tr>
-                    <td>{invoice?.salesInvoiceDate.split("T")[0] || "-"}</td>
+                    <td>
+                      {(invoice?.salesInvoiceDate &&
+                        invoice?.salesInvoiceDate.split("T")[0]) ||
+                        "-"}
+                    </td>
                     <td>{invoice?.type || "-"}</td>
                     <td>-</td>
                     <td>{invoice?.salesInvoiceNumber || "-"}</td>

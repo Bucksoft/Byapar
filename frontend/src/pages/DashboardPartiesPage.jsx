@@ -135,14 +135,14 @@ const DashboardPartiesPage = () => {
           variants={container}
           initial="hidden"
           animate="show"
-          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-4 mt-4 text-sm"
+          className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 gap-3 sm:gap-4 mt-4 text-sm"
         >
           {dashboardPartiesCardDetails?.map((details) => (
             <motion.div
               variants={dashboardLinksItems}
               key={details.id}
               style={{ borderColor: dashboardPartiesCardDetails[0].color }}
-              className="border rounded-md p-3 sm:p-4 shadow-md shadow-zinc-300 hover:-translate-y-1 hover:bg-emerald-100/10 transition-all duration-200 cursor-pointer"
+              className="border rounded-md  p-3 sm:p-4 shadow-md shadow-zinc-300 hover:-translate-y-1 hover:bg-emerald-100/10 transition-all duration-200 cursor-pointer"
             >
               <p
                 style={{ color: dashboardPartiesCardDetails[0].color }}

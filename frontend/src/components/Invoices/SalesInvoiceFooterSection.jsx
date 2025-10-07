@@ -7,6 +7,8 @@ import { axiosInstance } from "../../config/axios";
 import { useBusinessStore } from "../../store/businessStore";
 import { useBusinessBankAccountStore } from "../../store/businessBankAccount";
 import toast from "react-hot-toast";
+import { Pen, Trash } from "lucide-react";
+import BusinessBankAccount from "../../../../backend/src/models/businessBankAccount";
 
 const SalesInvoiceFooterSection = ({ data, setData, title }) => {
   const [notes, setNotes] = useState(false);
@@ -19,6 +21,7 @@ const SalesInvoiceFooterSection = ({ data, setData, title }) => {
   const { setBankAccounts } = useBusinessBankAccountStore();
   const [isDeletePopup, setIsDeletePopup] = useState(false);
   const [accountId, setAccountId] = useState("");
+  const [isEditingAccount, setIsEditingAccount] = useState(false);
 
   const { isLoading, data: bankAccounts } = useQuery({
     queryKey: ["businessBankAccounts"],
@@ -135,44 +138,50 @@ const SalesInvoiceFooterSection = ({ data, setData, title }) => {
             >
               {/* ACCOUNT NAME */}
               <div className="flex items-center gap-2 text-sm">
-                <h2 className="font-semibold">Account Name</h2>
+                <h2 className="font-semibold text-zinc-700">Account Name</h2>
                 <p>{bankAccount?.accountName}</p>
               </div>
 
               {/* ACCOUNT NUMBER */}
               <div className="flex items-center gap-2 text-sm">
-                <h2 className="font-semibold">Account Number</h2>
+                <h2 className="font-semibold text-zinc-700">Account Number</h2>
                 <p>{bankAccount?.bankAccountNumber}</p>
               </div>
 
               {/* IFSC Code */}
               <div className="flex items-center gap-2 text-sm">
-                <h2 className="font-semibold">IFSC Code</h2>
+                <h2 className="font-semibold text-zinc-700">IFSC Code</h2>
                 <p>{bankAccount?.IFSCCode}</p>
               </div>
 
               {/* Account Holder's Name */}
               <div className="flex items-center gap-2 text-sm">
-                <h2 className="font-semibold">Account Holder's Name</h2>
+                <h2 className="font-semibold text-zinc-700">
+                  Account Holder's Name
+                </h2>
                 <p>{bankAccount?.accountHoldersName}</p>
               </div>
 
               <div className="flex gap-2 clear-start mt-2">
                 <button
-                  className="btn btn-xs btn-error"
+                  className="btn btn-xs btn-error btn-outline"
                   onClick={() => {
                     document.getElementById("delete-modal").showModal();
                     setAccountId(bankAccount?._id);
                   }}
                 >
-                  Remove
+                  <Trash size={14} />
                 </button>
-                <button className="btn btn-xs btn-neutral">Edit</button>
+                {/* <button
+                  onClick={() => setIsEditingAccount(true)}
+                  className="btn btn-xs btn-success btn-outline"
+                >
+                  <Pen size={14} />
+                </button> */}
               </div>
             </div>
           ))}
       </div>
-
       {/* Right Grid Part */}
       <div className="border-l border-l-zinc-300 py-2">
         {/* add additional charges */}

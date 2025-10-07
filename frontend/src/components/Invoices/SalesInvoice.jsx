@@ -77,7 +77,9 @@ const SalesInvoice = () => {
               className="btn btn-sm"
             >
               {isDownloading ? (
-                <CustomLoader text={"Downloading..."} />
+                <div className="">
+                  <CustomLoader text={"Downloading..."} />
+                </div>
               ) : (
                 <>
                   <Download size={15} /> Download PDF
@@ -157,7 +159,9 @@ const SalesInvoice = () => {
         </section>
 
         {isLoading ? (
-          <CustomLoader text={"Loading..."} />
+          <div className="w-full flex items-center py-16">
+            <CustomLoader text={"Loading..."} />
+          </div>
         ) : (
           <section className="mt-3 bg-sky-50 flex justify-center py-1 overflow-y-scroll flex-1">
             {/* Invoice template */}

@@ -9,6 +9,10 @@ import { useInvoiceStore } from "../../store/invoicesStore";
 import { usePurchaseInvoiceStore } from "../../store/purchaseInvoiceStore";
 import DashboardItemsSidebar from "../../pages/Items/DashboardItemsSidebar";
 import { HiMiniMinusSmall, HiOutlinePlus } from "react-icons/hi2";
+import { useQuery } from "@tanstack/react-query";
+import { axiosInstance } from "../../config/axios";
+import { useDebounce } from "../../../helpers/useDebounce";
+import { useBusinessStore } from "../../store/businessStore";
 
 const SalesInvoiceItemTable = ({ title, data, setData, isEditing }) => {
   const [searchItemQuery, setSearchItemQuery] = useState("");
@@ -16,12 +20,48 @@ const SalesInvoiceItemTable = ({ title, data, setData, isEditing }) => {
   const [addedItems, setAddedItems] = useState([]);
   const [quantities, setQuantities] = useState({});
   const { invoices } = useInvoiceStore();
+  const { business } = useBusinessStore();
   const { purchaseInvoices } = usePurchaseInvoiceStore();
-  const { items } = useItemStore();
+  // const { items } = useItemStore();
 
-  const searchedItems = items?.items.filter((item) =>
-    item?.itemName.toLowerCase().includes(searchItemQuery.toLowerCase())
-  );
+  // const searchedItems = items?.items.filter((item) =>
+  //   item?.itemName.toLowerCase().includes(searchItemQuery.toLowerCase())
+  // );
+
+  const debouncedSearch = useDebounce(searchItemQuery, 400);
+
+  // FETCHING ALL ITEMS FOR THE BUSINESS
+  const {
+    data: items,
+    isLoading,
+    isSuccess,
+  } = useQuery({
+    queryKey: ["items", business?._id, debouncedSearch],
+    queryFn: async () => {
+      if (!business?._id) return [];
+      const res = await axiosInstance.get(
+        `/item/all/${
+          business._id
+        }?page=${1}&limit=${10}&search=${encodeURIComponent(
+          debouncedSearch || ""
+        )}`
+      );
+      return res.data.items;
+    },
+    enabled: !!business?._id,
+    keepPreviousData: true,
+  });
+
+  // handle base price change
+  const handleBasePriceChange = (itemId, newValue) => {
+    setAddedItems((prevItems) =>
+      prevItems.map((item) =>
+        item._id === itemId
+          ? { ...item, basePrice: Number(newValue), isManualBase: true }
+          : item
+      )
+    );
+  };
 
   // HANDLE GST TYPE CHANGE
   const handleSetGstTaxRateType = (e, itemId) => {
@@ -75,10 +115,11 @@ const SalesInvoiceItemTable = ({ title, data, setData, isEditing }) => {
     );
   };
 
+  // MAIN USE EFFECT WHICH CALCULATES EVERYTHING
   useEffect(() => {
     if (!addedItems?.length) return;
 
-     const getGSTPercentage = (rateString) => {
+    const getGSTPercentage = (rateString) => {
       const match = rateString?.match(/(\d+)%/);
       return match ? parseFloat(match[1]) : 0;
     };
@@ -96,10 +137,18 @@ const SalesInvoiceItemTable = ({ title, data, setData, isEditing }) => {
       const gstRate = getGSTPercentage(item.gstTaxRate);
 
       // Step 1: Get Base Price (without tax)
-      const basePrice =
-        item.gstTaxRateType === "without tax"
-          ? price
-          : price * (100 / (100 + gstRate));
+      let basePrice;
+
+      if (item.isManualBase) {
+        // Use manually entered base price
+        basePrice = Number(item.basePrice) || 0;
+      } else {
+        // Auto-calculate base price
+        basePrice =
+          item.gstTaxRateType === "without tax"
+            ? price
+            : price * (100 / (100 + gstRate));
+      }
 
       // Step 2: Discount (either % or fixed amount)
       let discountAmount = 0;
@@ -186,6 +235,7 @@ const SalesInvoiceItemTable = ({ title, data, setData, isEditing }) => {
     ) {
       const discountValue = (totalAmount * addlDiscountPercent) / 100;
       balanceAmount -= discountValue;
+      totalAmount -= discountValue;
     }
 
     const cgst = Number((totalGstAmount / 2).toFixed(2));
@@ -274,6 +324,7 @@ const SalesInvoiceItemTable = ({ title, data, setData, isEditing }) => {
           {/* Item Name */}
           <span className="border-t border-l p-2 border-[var(--primary-border)] col-span-3">
             {addedItem?.itemName}
+            <small>{addedItem?.description}</small>
           </span>
 
           {/* HSN */}
@@ -301,9 +352,12 @@ const SalesInvoiceItemTable = ({ title, data, setData, isEditing }) => {
           {/* Price */}
           <span className="border-l text-nowrap border-t p-2 border-[var(--primary-border)]">
             <input
+              type="text"
               className="input input-xs bg-zinc-100 text-right"
-              value={Number(addedItem?.basePrice || 0).toLocaleString("en-IN")}
-              readOnly
+              value={addedItem?.basePrice ?? ""}
+              onChange={(e) =>
+                handleBasePriceChange(addedItem._id, e.target.value)
+              }
             />
           </span>
 
@@ -471,7 +525,7 @@ const SalesInvoiceItemTable = ({ title, data, setData, isEditing }) => {
                     </thead>
                     <tbody>
                       {items &&
-                        searchedItems.map((item) => (
+                        items?.map((item) => (
                           <tr key={item?._id}>
                             <td>{item?.itemName || "-"}</td>
                             <td>{item?.itemCode || "-"}</td>
@@ -573,8 +627,8 @@ const SalesInvoiceItemTable = ({ title, data, setData, isEditing }) => {
                 <button
                   className="btn btn-sm w-32 bg-[var(--primary-btn)]"
                   onClick={() => {
-                    const selected = items?.items
-                      .filter((item) => (quantities[item._id] || 0) > 0)
+                    const selected = items
+                      ?.filter((item) => (quantities[item._id] || 0) > 0)
                       .map((item) => {
                         if (
                           title === "Purchase Invoice" ||

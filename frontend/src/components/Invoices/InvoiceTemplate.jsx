@@ -24,8 +24,6 @@ const InvoiceTemplate = ({
     },
   });
 
-  console.log(bankAccounts);
-
   useEffect(() => {
     setInvoiceIdToDownload(invoiceIdToDownload?.current?.id);
   }, [invoiceIdToDownload]);
@@ -769,8 +767,8 @@ const InvoiceTemplate = ({
                 <p style={{ fontWeight: 600 }}>Total Amount (in words)</p>
                 <span>
                   {toWords
-                    .convert(invoice?.totalAmount)
-                    .toLocaleString("en-IN", {
+                    ?.convert(invoice?.totalAmount)
+                    ?.toLocaleString("en-IN", {
                       minimumFractionDigits: 2,
                       maximumFractionDigits: 2,
                     })
@@ -899,7 +897,7 @@ const InvoiceTemplate = ({
 
             {/* SIGNATURE BLOCK */}
             <div style={{ marginTop: "50px" }}>
-              <img src={business?.signature} alt="signature" width={"400px"}/>
+              <img src={business?.signature} alt="signature" width={"400px"} />
               <hr style={{ margin: "16px 0", borderColor: "#d4d4d8" }} />
               <h1
                 style={{

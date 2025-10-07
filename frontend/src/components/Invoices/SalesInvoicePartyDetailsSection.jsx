@@ -8,12 +8,13 @@ import { LiaFileInvoiceSolid, LiaRupeeSignSolid } from "react-icons/lia";
 import { usePurchaseInvoiceStore } from "../../store/purchaseInvoiceStore";
 import { FaPen } from "react-icons/fa6";
 import { GoPlus } from "react-icons/go";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { states } from "../../utils/constants";
 import { axiosInstance } from "../../config/axios";
 import { useBusinessStore } from "../../store/businessStore";
 import toast from "react-hot-toast";
 import { queryClient } from "../../main";
+import { useDebounce } from "../../../helpers/useDebounce";
 
 const SalesInvoicePartyDetailsSection = ({
   title,
@@ -52,10 +53,32 @@ const SalesInvoicePartyDetailsSection = ({
     });
   }, [editShippingAddress]);
 
-  const { parties } = usePartyStore();
+  // const { parties } = usePartyStore();
   const { invoices } = useInvoiceStore(); // FOR SALES RETURN
   const { purchaseInvoices } = usePurchaseInvoiceStore(); //  FOR PURCHASE RETURN
   const { business } = useBusinessStore();
+
+  const debouncedSearch = useDebounce(searchPartyQuery, 400);
+
+  const { isLoading, data: parties } = useQuery({
+    queryKey: ["parties", debouncedSearch, business?._id],
+    queryFn: async () => {
+      if (!business) {
+        return [];
+      }
+      const res = await axiosInstance.get(
+        `/parties/all/${
+          business?._id
+        }?page=${1}&limit=${10}&search=${encodeURIComponent(
+          debouncedSearch || ""
+        )}`
+      );
+      return res.data.data;
+      // setParties(res.data?.data);
+    },
+    enabled: !!business?._id,
+    keepPreviousData: true,
+  });
 
   const searchedParties = parties?.filter((party) =>
     party?.partyName.toLowerCase().includes(searchPartyQuery.toLowerCase())
@@ -157,11 +180,12 @@ const SalesInvoicePartyDetailsSection = ({
                   placeholder="Search parties"
                   onChange={(e) => setSearchPartyQuery(e.target.value)}
                 />
-                {searchedParties.map((party) => (
-                  <li key={party?._id} onClick={() => setParty(party)}>
-                    <a>{party?.partyName}</a>
-                  </li>
-                ))}
+                {parties &&
+                  parties?.map((party) => (
+                    <li key={party?._id} onClick={() => setParty(party)}>
+                      <a>{party?.partyName}</a>
+                    </li>
+                  ))}
                 <li>
                   <Link
                     to={"/dashboard/add-party"}

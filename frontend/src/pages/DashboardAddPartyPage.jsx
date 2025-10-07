@@ -117,17 +117,17 @@ const DashboardAddPartyPage = () => {
 
   return (
     <>
-      <main className="h-screen overflow-y-scroll w-full relative">
+      <main className="h-screen overflow-y-scroll w-full relative border-l border-[var(--primary-border)]">
         {/* navigation */}
-        <header className="flex items-center justify-between p-3 bg-white">
+        <header className="flex items-center justify-between p-3 bg-white sticky top-0 z-50 border-b border-[var(--primary-border)]">
           <h1 className="flex items-center gap-2">
             <ArrowLeft size={20} onClick={() => navigate(-1)} />
             Create Party
           </h1>
           <div className="space-x-3">
-            <button className="btn btn-sm">
+            {/* <button className="btn btn-sm">
               Party Settings <Settings size="16" />{" "}
-            </button>
+            </button> */}
             <button
               className={`btn btn-sm bg-[var(--primary-btn)] ${
                 mutation.isPending && ""
@@ -362,30 +362,6 @@ const DashboardAddPartyPage = () => {
                   ))}
               </select>
 
-              {/* <details ref={dropdownRef} className="dropdown mt-1 z-10">
-                <summary className="select select-sm">
-                  {data.categoryName || "Party Category"}
-                </summary>
-                <ul className="menu dropdown-content bg-base-100 rounded-box  w-52 p-2 shadow-sm">
-                  {newCategories?.map((category) => (
-                    <li
-                      onClick={(e) => {
-                        setData((prev) => ({
-                          ...prev,
-                          categoryName: e.target.innerHTML,
-                        }));
-                        setAddCategoryPopup(false);
-                        if (dropdownRef.current) {
-                          dropdownRef.current.open = false;
-                        }
-                      }}
-                      className="text-xs hover:bg-zinc-100 p-2 cursor-pointer"
-                    >
-                      {category?.categoryName}
-                    </li>
-                  ))}
-                </ul>
-              </details> */}
               <small className="text-xs text-[var(--error-text-color)] mt-1 ">
                 {
                   mutation.error?.response?.data?.validationError?.categoryName
