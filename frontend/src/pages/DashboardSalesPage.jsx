@@ -59,8 +59,7 @@ const DashboardSalesPage = () => {
     },
     enabled: !!business,
     keepPreviousData: true,
-    refetchOnWindowFocus: false,
-    staleTime: Infinity,
+    retry: 1,
   });
 
   // mutation to delete an invoice

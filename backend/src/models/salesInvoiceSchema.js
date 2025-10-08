@@ -44,6 +44,9 @@ const salesInvoiceSchema = new mongoose.Schema(
     additionalDiscountAmount: {
       type: Number,
     },
+    additionalDiscountPercent:{
+      type:Number
+    },
     settledAmount: {
       type: Number,
       default: 0,

@@ -327,11 +327,11 @@ const SalesInvoiceFooterSection = ({ data, setData, title }) => {
                   <input
                     type="text"
                     placeholder="0"
-                    value={data?.additionalDiscountAmount}
+                    value={data?.additionalDiscountPercent}
                     onChange={(e) =>
                       setData((prev) => ({
                         ...prev,
-                        additionalDiscountAmount: Number(e.target.value) || 0,
+                        additionalDiscountPercent: Number(e.target.value) || 0,
                       }))
                     }
                     className="input input-xs border-none w-fit text-xs bg-zinc-200 items-center px-5"

@@ -18,6 +18,7 @@ const SalesInvoice = () => {
   const printRef = useRef();
   const [isDownloading, setIsDownloading] = useState(false);
   const [invoiceIdToDownload, setInvoiceIdToDownload] = useState();
+  const [invoiceIdToDelete, setInvoiceIdToDelete] = useState();
 
   // THIS IS THE QUERY TO GET THE INVOICE BASED ON ID
   const { isLoading, data: invoice } = useQuery({
@@ -31,12 +32,13 @@ const SalesInvoice = () => {
   const mutation = useMutation({
     mutationFn: async () => {
       const res = await axiosInstance.delete(
-        `/sales-invoice/${invoiceIdToDownload}`
+        `/sales-invoice/${invoiceIdToDelete}`
       );
       return res.data;
     },
     onSuccess: (data) => {
       toast.success(data?.msg);
+      navigate("/dashboard/sales");
       queryClient.invalidateQueries({ queryKey: ["invoices"] });
       document.getElementById("my_modal_3").close();
     },
@@ -50,7 +52,13 @@ const SalesInvoice = () => {
           <div className="flex items-center gap-3">
             <ArrowLeft onClick={() => navigate(-1)} />
             <h1 className="font-medium">Sales Invoice</h1>
-            <div className="badge badge-success badge-soft">
+            <div
+              className={`badge  ${
+                invoice?.status === "cancelled"
+                  ? "badge-primary"
+                  : "badge-success"
+              }  badge-soft`}
+            >
               {invoice?.status}
             </div>
           </div>

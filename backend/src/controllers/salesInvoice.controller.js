@@ -61,6 +61,13 @@ export async function createSalesInvoice(req, res) {
       }
     }
 
+    // calculate additional discount amount based on the percent
+    if(data?.additionalDiscountPercent) {
+      const additionalDiscountAmount =
+        (data?.additionalDiscountPercent * data?.totalAmount) / 100;
+      data.additionalDiscountAmount = additionalDiscountAmount;
+    }
+
     const salesInvoice = await SalesInvoice.create({
       partyId: party?._id,
       businessId: req.params?.id,
@@ -146,37 +153,34 @@ export async function getAllInvoices(req, res) {
 
     const allInvoices = await SalesInvoice.find(filter);
 
-    const totalSales = allInvoices
-      ? Number(
-          allInvoices
-            .reduce(
-              (acc, invoice) => acc + Number(invoice?.totalAmount || 0),
-              0
-            )
-            .toFixed(2)
-        ).toLocaleString("en-IN")
-      : 0;
+    // CALCULATE THE TOTALS OF ONLY THOSE INVOICES WHICH ARE NOT CANCELLED.
+    const validInvoices =
+      allInvoices?.filter(
+        (invoice) => invoice.status?.toLowerCase() !== "cancelled"
+      ) || [];
 
-    const totalPaid = allInvoices
-      ? Number(
-          allInvoices.reduce(
-            (sum, invoice) => sum + (invoice.settledAmount || 0),
-            0
-          )
-        ).toLocaleString("en-IN")
-      : 0;
+    const totalSales = Number(
+      validInvoices
+        .reduce((acc, invoice) => acc + Number(invoice?.totalAmount || 0), 0)
+        .toFixed(2)
+    ).toLocaleString("en-IN");
 
-    const totalUnpaid = allInvoices
-      ? Number(
-          allInvoices.reduce(
-            (sum, invoice) =>
-              sum +
-              (invoice.pendingAmount ??
-                invoice.totalAmount - (invoice.settledAmount || 0)),
-            0
-          )
-        ).toLocaleString("en-IN")
-      : 0;
+    const totalPaid = Number(
+      validInvoices.reduce(
+        (sum, invoice) => sum + (invoice.settledAmount || 0),
+        0
+      )
+    ).toLocaleString("en-IN");
+
+    const totalUnpaid = Number(
+      validInvoices.reduce(
+        (sum, invoice) =>
+          sum +
+          (invoice.pendingAmount ??
+            invoice.totalAmount - (invoice.settledAmount || 0)),
+        0
+      )
+    ).toLocaleString("en-IN");
 
     return res.status(200).json({
       success: true,
@@ -198,14 +202,16 @@ export async function getAllInvoices(req, res) {
 // CONTROLLER TO DELETE INVOICE (MARK STATUS AS CANCELLED AND INCREMENT THE STOCK OF THAT ITEM)
 export async function deleteInvoice(req, res) {
   try {
-    const { id } = req.params;
+    let { id } = req.params;
     const userId = req.user?.id;
-
     if (!id) {
       return res
         .status(400)
         .json({ success: false, msg: "Please provide invoice id" });
     }
+
+    // convert id into mongoose id
+    id = new mongoose.Types.ObjectId(id);
 
     const invoice = await SalesInvoice.findById(id).populate("partyId");
     if (!invoice) {

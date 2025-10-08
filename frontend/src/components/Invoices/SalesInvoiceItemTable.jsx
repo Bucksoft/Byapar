@@ -94,7 +94,7 @@ const SalesInvoiceItemTable = ({ title, data, setData, isEditing }) => {
     );
   };
 
-  // HANDLE DISCOUNT CHANGE
+  // HANDLE DISCOUNT AMOUNT CHANGE
   const handleSetDiscountAmount = (amount, itemId) => {
     setAddedItems((prev) =>
       prev.map((item) => {
@@ -205,13 +205,13 @@ const SalesInvoiceItemTable = ({ title, data, setData, isEditing }) => {
       );
       const additionalChargeTaxAmount =
         (additionalChargeAmount * additionalChargeTaxRate) / 100;
-      totalTaxableAmount += additionalChargeAmount;
+      // totalTaxableAmount += additionalChargeAmount;
       totalGstAmount += additionalChargeTaxAmount;
       totalAmount += additionalChargeAmount + additionalChargeTaxAmount;
     }
 
     // === Additional Discount (Before Tax) ===
-    const addlDiscountPercent = Number(data?.additionalDiscountAmount || 0);
+    const addlDiscountPercent = Number(data?.additionalDiscountPercent || 0);
     let balanceAmount = totalAmount;
 
     if (
@@ -258,7 +258,7 @@ const SalesInvoiceItemTable = ({ title, data, setData, isEditing }) => {
     quantities,
     data?.additionalChargeAmount,
     data?.additionalChargeTax,
-    data?.additionalDiscountAmount,
+    data?.additionalDiscountPercent,
     data?.additionalDiscountType,
     isEditing,
   ]);

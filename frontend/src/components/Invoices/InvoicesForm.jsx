@@ -88,7 +88,7 @@ const InvoicesForm = ({
     additionalChargeAmount: 0,
     additionalChargeTax: "",
     additionalDiscountType: "after tax",
-    additionalDiscountAmount: 0,
+    additionalDiscountPercent: 0,
   };
 
   const navigate = useNavigate();
@@ -259,9 +259,9 @@ const InvoicesForm = ({
             prev.additionalChargeAmount ??
             0
         ),
-        additionalDiscountAmount: Number(
-          invoiceToUpdate?.additionalDiscountAmount ??
-            prev.additionalDiscountAmount ??
+        additionalDiscountPercent: Number(
+          invoiceToUpdate?.additionalDiscountPercent ??
+            prev.additionalDiscountPercent ??
             0
         ),
         additionalChargeTax:

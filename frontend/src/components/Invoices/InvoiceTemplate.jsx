@@ -43,6 +43,8 @@ const InvoiceTemplate = ({
     return match ? parseFloat(match[1]) : rateString;
   };
 
+  console.log(invoice);
+
   return (
     <main
       style={{
@@ -445,6 +447,7 @@ const InvoiceTemplate = ({
                   Taxable Amount
                 </th>
                 <th style={{ padding: "8px", textAlign: "left" }}>Tax</th>
+                <th style={{ padding: "8px", textAlign: "left" }}>Discount</th>
                 <th style={{ padding: "8px", textAlign: "right" }}>Total</th>
               </tr>
             </thead>
@@ -515,7 +518,7 @@ const InvoiceTemplate = ({
                       )}
                     </div>
                   </td>
-
+                  <td>-</td>
                   <td style={{ padding: "6px" }}>
                     <div
                       style={{
@@ -596,6 +599,7 @@ const InvoiceTemplate = ({
                       })}
                   </div>
                 </td>
+                <td>-</td>
                 <td style={{ padding: "6px" }}>
                   <div
                     style={{
@@ -638,8 +642,9 @@ const InvoiceTemplate = ({
               gap: "20px",
             }}
           >
-            {/* FOOTER RIGHT SECTION */}
+            {/* FOOTER LEFT SECTION */}
             <div style={{ marginTop: "12px" }}>
+              {/* TAXABLE AMOUNT */}
               <div style={{ display: "flex", justifyContent: "space-between" }}>
                 <p>Taxable Amount</p>
                 <span style={{ display: "flex", alignItems: "center" }}>
@@ -663,6 +668,7 @@ const InvoiceTemplate = ({
                       })}
                 </span>
               </div>
+              {/* CGST */}
               <div style={{ display: "flex", justifyContent: "space-between" }}>
                 <p>CGST </p>
                 <span style={{ display: "flex", alignItems: "center" }}>
@@ -687,6 +693,7 @@ const InvoiceTemplate = ({
                       })}
                 </span>
               </div>
+              {/* SGST */}
               <div style={{ display: "flex", justifyContent: "space-between" }}>
                 <p>SGST</p>
                 <span style={{ display: "flex", alignItems: "center" }}>
@@ -712,6 +719,7 @@ const InvoiceTemplate = ({
                 </span>
               </div>
 
+              {/* ADDITIONAL CHARGE AMOUNT EG. TRANSPORT ETC.... */}
               {invoice?.additionalChargeAmount > 0 && (
                 <div
                   style={{ display: "flex", justifyContent: "space-between" }}
@@ -720,6 +728,32 @@ const InvoiceTemplate = ({
                   <span style={{ display: "flex", alignItems: "center" }}>
                     <LiaRupeeSignSolid />
                     {invoice?.additionalChargeAmount}
+                  </span>
+                </div>
+              )}
+
+              {/* DISCOUNT PERCENTAGE */}
+              {invoice?.additionalDiscountPercent > 0 && (
+                <div
+                  style={{ display: "flex", justifyContent: "space-between" }}
+                >
+                  <p>Discount</p>
+                  <span style={{ display: "flex", alignItems: "center" }}>
+                    {/* <LiaRupeeSignSolid /> */}
+                    {invoice?.additionalDiscountPercent}%
+                  </span>
+                </div>
+              )}
+
+              {/* DISCOUNT AMOUNT */}
+              {invoice?.additionalDiscountAmount > 0 && (
+                <div
+                  style={{ display: "flex", justifyContent: "space-between" }}
+                >
+                  <p>Discount Amount</p>
+                  <span style={{ display: "flex", alignItems: "center" }}>
+                    <LiaRupeeSignSolid />
+                    {invoice?.additionalDiscountAmount}
                   </span>
                 </div>
               )}
@@ -897,7 +931,14 @@ const InvoiceTemplate = ({
 
             {/* SIGNATURE BLOCK */}
             <div style={{ marginTop: "50px" }}>
-              <img src={business?.signature} alt="signature" width={"400px"} />
+              {business?.signature !== "null" && (
+                <img
+                  src={business?.signature}
+                  alt="signature"
+                  width={"400px"}
+                />
+              )}
+
               <hr style={{ margin: "16px 0", borderColor: "#d4d4d8" }} />
               <h1
                 style={{
