@@ -43,8 +43,6 @@ const InvoiceTemplate = ({
     return match ? parseFloat(match[1]) : rateString;
   };
 
-  console.log(invoice);
-
   return (
     <main
       style={{

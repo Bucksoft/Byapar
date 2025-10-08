@@ -23,6 +23,8 @@ const SalesInvoicePartyDetailsSection = ({
   party,
   setParty,
   invoiceNoRef,
+  isEditing,
+  invoiceToUpdate,
 }) => {
   const [searchPartyQuery, setSearchPartyQuery] = useState("");
   const [invoiceSearchQuery, setInvoiceSearchQuery] = useState("");
@@ -145,6 +147,12 @@ const SalesInvoicePartyDetailsSection = ({
       document.getElementById("my_modal_2").close();
     },
   });
+
+  useEffect(() => {
+    if (isEditing) {
+      setParty(invoiceToUpdate?.partyId);
+    }
+  }, [isEditing, invoiceToUpdate]);
 
   return (
     <>

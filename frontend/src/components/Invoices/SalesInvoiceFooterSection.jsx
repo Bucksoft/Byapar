@@ -10,7 +10,7 @@ import toast from "react-hot-toast";
 import { Pen, Trash } from "lucide-react";
 import BusinessBankAccount from "../../../../backend/src/models/businessBankAccount";
 
-const SalesInvoiceFooterSection = ({ data, setData, title }) => {
+const SalesInvoiceFooterSection = ({ data, setData, title, isEditing }) => {
   const [notes, setNotes] = useState(false);
   const [termCondition, setTermCondition] = useState(false);
   const [charges, setCharges] = useState(false);

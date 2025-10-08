@@ -14,7 +14,13 @@ import { axiosInstance } from "../../config/axios";
 import { useDebounce } from "../../../helpers/useDebounce";
 import { useBusinessStore } from "../../store/businessStore";
 
-const SalesInvoiceItemTable = ({ title, data, setData, isEditing }) => {
+const SalesInvoiceItemTable = ({
+  title,
+  data,
+  setData,
+  isEditing,
+  invoiceToUpdate,
+}) => {
   const [searchItemQuery, setSearchItemQuery] = useState("");
   const [showCounterId, setShowCounterId] = useState();
   const [addedItems, setAddedItems] = useState([]);
@@ -126,46 +132,31 @@ const SalesInvoiceItemTable = ({ title, data, setData, isEditing }) => {
 
     let updatedItems = addedItems.map((item) => {
       const qty = quantities[item._id] || 1;
-      // PURCHASE KE LIYE ITEMS KI PURCHASE PRICE LAGANI HAI, AUR SALES KE LIYE SALES PRICE
-      const price =
-        title === "Purchase Invoice" ||
-        title === "Purchase Return" ||
-        title === "Purchase Order" ||
-        title === "Debit Note"
-          ? Number(item.purchasePrice) || 0
-          : Number(item.salesPrice) || 0;
+      const price = [
+        "Purchase Invoice",
+        "Purchase Return",
+        "Purchase Order",
+        "Debit Note",
+      ].includes(title)
+        ? Number(item.purchasePrice) || 0
+        : Number(item.salesPrice) || 0;
       const gstRate = getGSTPercentage(item.gstTaxRate);
+      let basePrice = item.isManualBase
+        ? Number(item.basePrice) || 0
+        : item.gstTaxRateType === "without tax"
+        ? price
+        : price * (100 / (100 + gstRate));
 
-      // Step 1: Get Base Price (without tax)
-      let basePrice;
-
-      if (item.isManualBase) {
-        // Use manually entered base price
-        basePrice = Number(item.basePrice) || 0;
-      } else {
-        // Auto-calculate base price
-        basePrice =
-          item.gstTaxRateType === "without tax"
-            ? price
-            : price * (100 / (100 + gstRate));
-      }
-
-      // Step 2: Discount (either % or fixed amount)
       let discountAmount = 0;
-      if (item.discountPercent) {
+      if (item.discountPercent)
         discountAmount = ((basePrice * item.discountPercent) / 100) * qty;
-      } else if (item.discountAmount) {
+      else if (item.discountAmount)
         discountAmount = Number(item.discountAmount);
-      }
+
       discountAmount = Math.min(discountAmount, basePrice * qty);
 
-      // Step 3: Taxable Value after discount
       const taxableValue = basePrice * qty - discountAmount;
-
-      // Step 4: GST
       const gstAmount = (taxableValue * gstRate) / 100;
-
-      // Step 5: Final Amount
       const finalAmount = taxableValue + gstAmount;
 
       return {
@@ -175,65 +166,49 @@ const SalesInvoiceItemTable = ({ title, data, setData, isEditing }) => {
         discountAmount: discountAmount.toFixed(2),
         gstAmount: gstAmount.toFixed(2),
         taxableValue: taxableValue.toFixed(2),
-        totalAmount: finalAmount.toFixed(2), // per item total
+        totalAmount: finalAmount.toFixed(2),
       };
     });
 
-    // === Totals ===
+    // Totals
     let totalTaxableAmount = updatedItems.reduce(
-      (acc, item) => acc + Number(item?.taxableValue),
+      (acc, i) => acc + Number(i.taxableValue),
       0
     );
     let totalGstAmount = updatedItems.reduce(
-      (acc, item) => acc + Number(item?.gstAmount),
+      (acc, i) => acc + Number(i.gstAmount),
       0
     );
     let totalAmount = updatedItems.reduce(
-      (acc, item) => acc + Number(item?.totalAmount),
+      (acc, i) => acc + Number(i.totalAmount),
       0
     );
     let discountTotal = updatedItems.reduce(
-      (acc, item) => acc + Number(item?.discountAmount),
+      (acc, i) => acc + Number(i.discountAmount),
       0
     );
 
-    // === Additional Charges (with GST) ===
-    const additionalChargeAmount = Number(data?.additionalChargeAmount || 0);
-    if (additionalChargeAmount > 0) {
-      const additionalChargeTaxRate = getGSTPercentage(
-        data?.additionalChargeTax
-      );
-      const additionalChargeTaxAmount =
-        (additionalChargeAmount * additionalChargeTaxRate) / 100;
-      // totalTaxableAmount += additionalChargeAmount;
-      totalGstAmount += additionalChargeTaxAmount;
-      totalAmount += additionalChargeAmount + additionalChargeTaxAmount;
+    const addCharge = Number(data?.additionalChargeAmount || 0);
+    if (addCharge > 0) {
+      const addChargeTaxRate = getGSTPercentage(data?.additionalChargeTax);
+      const addChargeTax = (addCharge * addChargeTaxRate) / 100;
+      totalGstAmount += addChargeTax;
+      totalAmount += addCharge + addChargeTax;
     }
 
-    // === Additional Discount (Before Tax) ===
-    const addlDiscountPercent = Number(data?.additionalDiscountPercent || 0);
+    const addlDiscPercent = Number(data?.additionalDiscountPercent || 0);
     let balanceAmount = totalAmount;
 
-    if (
-      addlDiscountPercent > 0 &&
-      data?.additionalDiscountType === "before tax"
-    ) {
-      const discountValue = (totalTaxableAmount * addlDiscountPercent) / 100;
+    if (addlDiscPercent > 0 && data?.additionalDiscountType === "before tax") {
+      const discountValue = (totalTaxableAmount * addlDiscPercent) / 100;
       totalTaxableAmount -= discountValue;
-
-      // Recalculate GST after discount
       totalGstAmount = (totalTaxableAmount * getGSTPercentage("18%")) / 100;
       totalAmount = totalTaxableAmount + totalGstAmount;
-
       balanceAmount = totalAmount;
     }
 
-    // === Additional Discount (After Tax) ===
-    if (
-      addlDiscountPercent > 0 &&
-      data?.additionalDiscountType === "after tax"
-    ) {
-      const discountValue = (totalAmount * addlDiscountPercent) / 100;
+    if (addlDiscPercent > 0 && data?.additionalDiscountType === "after tax") {
+      const discountValue = (totalAmount * addlDiscPercent) / 100;
       balanceAmount -= discountValue;
       totalAmount -= discountValue;
     }
@@ -241,15 +216,14 @@ const SalesInvoiceItemTable = ({ title, data, setData, isEditing }) => {
     const cgst = Number((totalGstAmount / 2).toFixed(2));
     const sgst = Number((totalGstAmount / 2).toFixed(2));
 
-    // === Update state ===
     setData((prev) => ({
       ...prev,
       items: updatedItems,
       amountSubTotal: parseFloat(totalAmount.toFixed(2)),
       taxableAmount: parseFloat(totalTaxableAmount.toFixed(2)),
       totalGstAmount: parseFloat(totalGstAmount.toFixed(2)),
-      totalAmount: parseFloat(totalAmount.toFixed(2)), // before final discounts
-      balanceAmount: parseFloat(balanceAmount.toFixed(2)), // final payable
+      totalAmount: parseFloat(totalAmount.toFixed(2)),
+      balanceAmount: parseFloat(balanceAmount.toFixed(2)),
       cgst: String(cgst),
       sgst: String(sgst),
     }));
@@ -260,10 +234,9 @@ const SalesInvoiceItemTable = ({ title, data, setData, isEditing }) => {
     data?.additionalChargeTax,
     data?.additionalDiscountPercent,
     data?.additionalDiscountType,
-    isEditing,
   ]);
 
-  // THIS USE EFFECT CALCULATES
+  // THIS USE EFFECT CALCULATES FOR SALES RETURN AND PURCHASE RETURN
   useEffect(() => {
     if (title === "Sales Return") {
       const invoice = invoices.find(
@@ -282,7 +255,7 @@ const SalesInvoiceItemTable = ({ title, data, setData, isEditing }) => {
         setData((prev) => ({ ...invoice, invoiceId: invoice?._id }));
       }
     }
-  }, [data?.invoiceId, invoices, isEditing]);
+  }, [data?.invoiceId, invoices]);
 
   return (
     <>
@@ -322,9 +295,13 @@ const SalesInvoiceItemTable = ({ title, data, setData, isEditing }) => {
           </span>
 
           {/* Item Name */}
-          <span className="border-t border-l p-2 border-[var(--primary-border)] col-span-3">
+          <span className="border-t flex flex-col  border-l p-2 border-[var(--primary-border)] col-span-3">
             {addedItem?.itemName}
-            <small>{addedItem?.description}</small>
+            {addedItem?.description.length > 0 && (
+              <p className="text-xs mt-2 text-zinc-600">
+                ({addedItem?.description})
+              </p>
+            )}
           </span>
 
           {/* HSN */}

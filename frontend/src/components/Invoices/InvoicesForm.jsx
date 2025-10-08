@@ -95,20 +95,6 @@ const InvoicesForm = ({
   const [addedItems, setAddedItems] = useState([]);
   const [data, setData] = useState(invoiceData);
 
-  // THIS USE EFFECT IS FOR SETTING THE INVOICE WHICH NEEDS TO BE UPDATED
-  useEffect(() => {
-    if (isEditing && invoiceToUpdate) {
-      setData((prev) => ({
-        ...prev,
-        ...invoiceToUpdate,
-        partyName: invoiceToUpdate?.partyName || prev.partyName,
-        partyId: { ...invoiceToUpdate?.partyId },
-      }));
-
-      setAddedItems(invoiceToUpdate?.items || []);
-    }
-  }, [isEditing, invoiceToUpdate]);
-
   // MUTATION FOR CREATING & UPDATING INVOICE
   const mutation = useMutation({
     mutationFn: async (formData) => {
@@ -222,9 +208,9 @@ const InvoicesForm = ({
     },
   });
 
+  // THIS USE EFFECT IS FOR SETTING THE INVOICE WHICH NEEDS TO BE UPDATED
   useEffect(() => {
     if (isEditing && invoiceToUpdate) {
-      // Normalize items coming from backend (ensure numeric fields & quantity)
       const normalizedItems = (invoiceToUpdate.items || []).map((it, idx) => {
         const id = it._id || it.itemId || `item-${idx}`;
         const qty = Number(it.quantity ?? it.qty ?? 1);
@@ -240,7 +226,7 @@ const InvoicesForm = ({
         };
       });
 
-      // seed quantities map
+      // Seed quantities
       const qtyMap = {};
       normalizedItems.forEach((it) => {
         qtyMap[it._id] = it.quantity;
@@ -249,33 +235,26 @@ const InvoicesForm = ({
       setAddedItems(normalizedItems);
       setQuantities(qtyMap);
 
-      // normalize top-level numeric fields as well before setting data
+      // Set main data
       setData((prev) => ({
         ...prev,
         ...invoiceToUpdate,
         partyName: invoiceToUpdate?.partyName ?? prev.partyName,
         additionalChargeAmount: Number(
-          invoiceToUpdate?.additionalChargeAmount ??
-            prev.additionalChargeAmount ??
-            0
+          invoiceToUpdate?.additionalChargeAmount ?? 0
         ),
         additionalDiscountPercent: Number(
-          invoiceToUpdate?.additionalDiscountPercent ??
-            prev.additionalDiscountPercent ??
-            0
+          invoiceToUpdate?.additionalDiscountPercent ?? 0
         ),
-        additionalChargeTax:
-          invoiceToUpdate?.additionalChargeTax ?? prev.additionalChargeTax,
+        additionalChargeTax: invoiceToUpdate?.additionalChargeTax ?? "0%",
         additionalDiscountType:
-          invoiceToUpdate?.additionalDiscountType ??
-          prev.additionalDiscountType,
+          invoiceToUpdate?.additionalDiscountType ?? "before tax",
         items: normalizedItems,
-        balanceAmount: Number(
-          invoiceToUpdate?.balanceAmount ?? prev.balanceAmount ?? 0
-        ),
+        balanceAmount: Number(invoiceToUpdate?.balanceAmount ?? 0),
       }));
     }
-  }, [isEditing, invoiceToUpdate]);
+    // Run only when invoiceToUpdate changes from null → object
+  }, [invoiceToUpdate, isEditing]);
 
   return (
     <main className="max-h-screen w-full">
@@ -315,6 +294,7 @@ const InvoicesForm = ({
         title={title}
         invoiceNoRef={invoiceNoRef}
         isEditing={isEditing}
+        invoiceToUpdate={invoiceToUpdate}
       />
 
       <SalesInvoiceItemTable
