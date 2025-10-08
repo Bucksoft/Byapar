@@ -62,7 +62,7 @@ export async function createSalesInvoice(req, res) {
     }
 
     // calculate additional discount amount based on the percent
-    if(data?.additionalDiscountPercent) {
+    if (data?.additionalDiscountPercent) {
       const additionalDiscountAmount =
         (data?.additionalDiscountPercent * data?.totalAmount) / 100;
       data.additionalDiscountAmount = additionalDiscountAmount;
@@ -312,9 +312,21 @@ export async function getInvoiceById(req, res) {
 export async function updatedSalesInvoice(req, res) {
   try {
     const data = req.body;
-    console.log("REQUEST PARAMETERS", req.params);
-    console.log(data);
-    return res.status(200).json({ success: false, msg: "OK" });
+    const invoiceId = req.params.id;
+    if (!invoiceId) {
+      return res
+        .status(400)
+        .json({ success: false, msg: "Please provide a valid invoice id" });
+    }
+    const invoice = await SalesInvoice.findByIdAndUpdate(invoiceId, data, {
+      new: true,
+    });
+    if (!invoice) {
+      return res.status(404).json({ success: false, msg: "Invoice not found" });
+    }
+    return res
+      .status(200)
+      .json({ success: true, msg: "Invoice updated successfully" });
   } catch (error) {
     return res
       .status(500)

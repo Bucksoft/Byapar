@@ -165,13 +165,12 @@ const InvoicesForm = ({
           partyName: party?.partyName,
         });
       }
-
       return res.data;
     },
     onSuccess: (data) => {
       toast.success(data?.msg);
       queryClient.invalidateQueries({ queryKey: ["invoices"] });
-      console.log(data);
+      navigate("/dashboard/sales");
       if (data?.quotation?._id) {
         navigate(`/dashboard/quotations/${data?.quotation?._id}`);
       } else if (data?.salesInvoice?._id) {
@@ -212,8 +211,8 @@ const InvoicesForm = ({
   useEffect(() => {
     if (isEditing && invoiceToUpdate) {
       const normalizedItems = (invoiceToUpdate.items || []).map((it, idx) => {
-        const id = it._id || it.itemId || `item-${idx}`;
-        const qty = Number(it.quantity ?? it.qty ?? 1);
+        const id = it?._id || it?.itemId || `item-${idx}`;
+        const qty = Number(it?.quantity ?? it?.qty ?? 1);
         return {
           ...it,
           _id: id,
@@ -226,7 +225,7 @@ const InvoicesForm = ({
         };
       });
 
-      // Seed quantities
+      // Add quantities
       const qtyMap = {};
       normalizedItems.forEach((it) => {
         qtyMap[it._id] = it.quantity;
@@ -302,6 +301,7 @@ const InvoicesForm = ({
         data={data}
         setData={setData}
         isEditing={isEditing}
+        invoiceToUpdate={invoiceToUpdate}
       />
 
       {/* bottom grid part */}

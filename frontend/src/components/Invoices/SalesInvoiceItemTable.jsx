@@ -28,11 +28,8 @@ const SalesInvoiceItemTable = ({
   const { invoices } = useInvoiceStore();
   const { business } = useBusinessStore();
   const { purchaseInvoices } = usePurchaseInvoiceStore();
-  // const { items } = useItemStore();
 
-  // const searchedItems = items?.items.filter((item) =>
-  //   item?.itemName.toLowerCase().includes(searchItemQuery.toLowerCase())
-  // );
+ 
 
   const debouncedSearch = useDebounce(searchItemQuery, 400);
 
@@ -59,11 +56,12 @@ const SalesInvoiceItemTable = ({
   });
 
   // handle base price change
-  const handleBasePriceChange = (itemId, newValue) => {
-    setAddedItems((prevItems) =>
-      prevItems.map((item) =>
+  const handleBasePriceChange = (itemId, value) => {
+    console.log(value);
+    setAddedItems((prev) =>
+      prev.map((item) =>
         item._id === itemId
-          ? { ...item, basePrice: Number(newValue), isManualBase: true }
+          ? { ...item, basePrice: Number(value), isManualBase: true }
           : item
       )
     );
