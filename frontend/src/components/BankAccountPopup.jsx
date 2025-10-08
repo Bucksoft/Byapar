@@ -2,26 +2,38 @@ import { useMutation } from "@tanstack/react-query";
 import { FaPlus } from "react-icons/fa6";
 import { axiosInstance } from "../config/axios";
 import toast from "react-hot-toast";
+import { useBusinessStore } from "../store/businessStore";
+import { useEffect } from "react";
 
 const BankAccountPopup = ({
   data,
   handleInputChange,
   setIsAddedBankInfo,
   mutation,
+  id,
+  isEdit,
+  updateBankInfo,
+  setUpdateBankInfo,
 }) => {
+  const { business } = useBusinessStore();
+
   const bankMutation = useMutation({
     mutationFn: async () => {
       if (data?.bankAccountNumber?.length === 0) {
         throw new Error("Bank Account Number is required");
       }
-      const res = await axiosInstance.post("/bank-account", data);
+      const res = await axiosInstance.post(
+        `/bank-account/?businessId=${business?._id}`,
+        data
+      );
       if (res.data.success) {
         toast.success(res.data.msg);
-        document.getElementById("my_modal_3").close();
+        document.getElementById("bank-modal").close();
         setIsAddedBankInfo(false);
       }
       return res.data;
     },
+
     onError: (err) => {
       console.log(err);
       toast.error(
@@ -149,12 +161,27 @@ const BankAccountPopup = ({
           </div>
 
           <div className="flex justify-end mt-2 gap-3 ">
-            <button
-              onClick={() => bankMutation.mutate()}
-              className="btn btn-sm bg-[var(--primary-btn)]"
-            >
-              Add
-            </button>
+            {updateBankInfo ? (
+              <button
+                onClick={() => {
+                  setIsAddedBankInfo(true);
+                  setUpdateBankInfo(false);
+                }}
+                className="btn btn-sm bg-[var(--primary-btn)]"
+              >
+                Update
+              </button>
+            ) : (
+              <button
+                onClick={() => {
+                  setIsAddedBankInfo(true);
+                 
+                }}
+                className="btn btn-sm bg-[var(--primary-btn)]"
+              >
+                Add
+              </button>
+            )}
           </div>
         </div>
       </dialog>

@@ -20,6 +20,7 @@ const DashboardAddPartyPage = () => {
   const [sameAsBillingAddress, setSameAsBillingAddress] = useState(false);
   const [addCategoryPopup, setAddCategoryPopup] = useState(false);
   const { business } = useBusinessStore();
+  const [updateBankInfo, setUpdateBankInfo] = useState(false);
   const [cities, setCities] = useState([]);
   const [data, setData] = useState({
     partyName: "",
@@ -50,14 +51,18 @@ const DashboardAddPartyPage = () => {
   // handling the input field changes
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    if (name === "state") {
-      const stateInfo = statesAndCities.find((s) => s.state === value);
-      setCities(stateInfo ? stateInfo.cities : []);
-    }
-    setData((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
+
+    setData((prev) => {
+      let updated = { ...prev, [name]: value };
+
+      if (name === "state") {
+        const stateInfo = statesAndCities.find((s) => s.state === value);
+        setCities(stateInfo ? stateInfo.cities : []);
+        updated = { ...updated, city: "" };
+      }
+
+      return updated;
+    });
   };
 
   // FETCH ALL CATEGORIES
@@ -584,12 +589,12 @@ const DashboardAddPartyPage = () => {
         <h3 className="p-3 text-sm text-zinc-500">Party Bank Account</h3>
 
         {isAddedBankInfo ? (
-          <div className="flex flex-col items-center justify-center gap-4 py-16 px-5">
-            <section className="w-full grid grid-cols-5 gap-5">
-              <div className=" flex flex-col border rounded-lg border-[var(--gray-text)]/20 p-2 shadow-md  bg-white">
+          <div className="flex flex-col items-center justify-center gap-4 pb-8 pt-1 px-5">
+            <section className="w-full">
+              <div className="flex items-center gap-5 ">
                 <p className="font-medium text-sm">Account Holder's Name</p>
-                <span className="text-[var(--gray-text)]">
-                  {data?.accountHoldersName}
+                <span className="text-[var(--gray-text)] text-xs">
+                  {data?.accountHoldersName || "-"}
                 </span>
                 <small className="text-[var(--error-text-color)]">
                   {
@@ -599,10 +604,10 @@ const DashboardAddPartyPage = () => {
                 </small>
               </div>
 
-              <div className="flex flex-col border rounded-lg border-[var(--gray-text)]/20 p-2 shadow-md bg-white">
+              <div className="flex items-center gap-5">
                 <p className="font-medium text-sm">Bank Account Number</p>
-                <span className="text-[var(--gray-text)]">
-                  {data?.bankAccountNumber}
+                <span className="text-[var(--gray-text)] text-xs">
+                  {data?.bankAccountNumber || "-"}
                 </span>
                 <small className="text-[var(--error-text-color)]">
                   {
@@ -612,10 +617,10 @@ const DashboardAddPartyPage = () => {
                 </small>
               </div>
 
-              <div className="flex flex-col  border rounded-lg border-[var(--gray-text)]/20 p-2 shadow-md bg-white">
+              <div className="flex items-center gap-5">
                 <p className="font-medium text-sm">IFSC Code</p>
-                <span className="text-[var(--gray-text)]">
-                  {data?.IFSCCode}
+                <span className="text-[var(--gray-text)] text-xs">
+                  {data?.IFSCCode || "-"}
                 </span>
                 <small className="text-[var(--error-text-color)]">
                   {
@@ -625,22 +630,24 @@ const DashboardAddPartyPage = () => {
                 </small>
               </div>
 
-              <div className="flex flex-col border rounded-lg border-[var(--gray-text)]/20 p-2 shadow-md bg-white">
+              <div className="flex items-center gap-5">
                 <p className="font-medium text-sm">Bank & Branch Name</p>
-                <span className="text-[var(--gray-text)]">
-                  {data?.accountHoldersName}
+                <span className="text-[var(--gray-text)] text-xs">
+                  {data?.bankAndBranchName || "-"}
                 </span>
                 <small className="text-[var(--error-text-color)]">
                   {
                     mutation?.error?.response?.data?.validationError
-                      ?.accountHoldersName?._errors[0]
+                      ?.bankAndBranchName?._errors[0]
                   }
                 </small>
               </div>
 
-              <div className="flex flex-col border rounded-lg border-[var(--gray-text)]/20 p-2 shadow-md bg-white">
+              <div className="flex items-center gap-5">
                 <p className="font-medium text-sm">UPI Id</p>
-                <span className="text-[var(--gray-text)]">{data?.upiId}</span>
+                <span className="text-[var(--gray-text)] text-xs">
+                  {data?.upiId || "-"}
+                </span>
                 <small className="text-[var(--error-text-color)]">
                   {
                     mutation?.error?.response?.data?.validationError?.upiId
@@ -648,15 +655,46 @@ const DashboardAddPartyPage = () => {
                   }
                 </small>
               </div>
+
+              <div className="flex items-center gap-3 mt-4">
+                <div
+                  className="btn btn-xs btn-outline btn-error"
+                  onClick={() => {
+                    setData({
+                      ...data,
+                      bankAndBranchName: "",
+                      bankAccountNumber: "",
+                      IFSCCode: "",
+                      accountHoldersName: "",
+                      upiId: "",
+                    });
+                    setIsAddedBankInfo(false);
+                  }}
+                >
+                  Remove
+                </div>
+                <div
+                  onClick={() => {
+                    setUpdateBankInfo(true);
+                  }}
+                  className="btn btn-xs btn-outline btn-neutral"
+                >
+                  Update
+                </div>
+              </div>
+              {updateBankInfo && (
+                <BankAccountPopup
+                  partyName={data?.partyName}
+                  setData={setData}
+                  data={data}
+                  handleInputChange={handleInputChange}
+                  setIsAddedBankInfo={setIsAddedBankInfo}
+                  mutation={mutation}
+                  updateBankInfo={updateBankInfo}
+                  setUpdateBankInfo={setUpdateBankInfo}
+                />
+              )}
             </section>
-            <BankAccountPopup
-              partyName={data?.partyName}
-              setData={setData}
-              data={data}
-              handleInputChange={handleInputChange}
-              setIsAddedBankInfo={setIsAddedBankInfo}
-              mutation={mutation}
-            />
           </div>
         ) : (
           <section className="flex flex-col py-16 items-center justify-center bg-white gap-4 text-xs">
@@ -669,6 +707,7 @@ const DashboardAddPartyPage = () => {
               data={data}
               handleInputChange={handleInputChange}
               setIsAddedBankInfo={setIsAddedBankInfo}
+              mutation={mutation}
             />
           </section>
         )}

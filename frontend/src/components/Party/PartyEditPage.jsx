@@ -8,6 +8,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import CustomLoader from "../../components/Loader";
 import { usePartyStore } from "../../store/partyStore";
 import { queryClient } from "../../main";
+import BankAccountPopup from "../BankAccountPopup";
 
 const PartyEditPage = () => {
   const navigate = useNavigate();
@@ -518,9 +519,15 @@ const PartyEditPage = () => {
       <section className="flex flex-col py-16 items-center justify-center bg-white gap-4 text-xs">
         <Landmark size={30} />
         <p>Add party bank information to manage transactions</p>
-        <button className="btn btn-ghost text-[var(--primary-btn)] ">
-          + Add Bank Account
-        </button>
+        <BankAccountPopup
+          partyName={data?.partyName}
+          setData={setData}
+          data={data}
+          handleInputChange={handleInputChange}
+          mutation={mutation}
+          id={id}
+          isEdit={true}
+        />
       </section>
       {addCategoryPopup && (
         <>

@@ -1,3 +1,4 @@
+import mongoose from "mongoose";
 import {
   bankAccountSchema,
   businessBankAccount,
@@ -9,6 +10,10 @@ export async function createBankAccount(req, res) {
   try {
     // GET THE DATA FROM THE FRONTEND
     const data = req.body;
+    console.log(data);
+
+    const businessId = new mongoose.Types.ObjectId(req.query.businessId);
+    console.log("BUSINESS ID", businessId);
     if (!data) {
       return res
         .status(400)
@@ -42,12 +47,14 @@ export async function createBankAccount(req, res) {
     if (customerExists) {
       return res
         .status(400)
-        .json({ success: false, msg: "Customer already exists" });
+        .json({ success: false, msg: "Account already exists" });
     }
 
     // CREATE BANK ACCOUNT
     const bankAccount = await BankAccount.create({
       ...validatedResult.data,
+      businessId,
+      clientId: req.user?.id,
     });
     if (!bankAccount) {
       return res
