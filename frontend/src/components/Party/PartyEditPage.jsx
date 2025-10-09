@@ -1,7 +1,13 @@
-import { ArrowLeft, IndianRupee, Landmark, Settings } from "lucide-react";
+import {
+  ArrowLeft,
+  IndianRupee,
+  Landmark,
+  Settings,
+  Trash,
+} from "lucide-react";
 import { statesAndCities } from "../../utils/constants";
 import { useEffect, useState } from "react";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { axiosInstance } from "../../config/axios";
 import toast from "react-hot-toast";
 import { useNavigate, useParams } from "react-router-dom";
@@ -9,14 +15,29 @@ import CustomLoader from "../../components/Loader";
 import { usePartyStore } from "../../store/partyStore";
 import { queryClient } from "../../main";
 import BankAccountPopup from "../BankAccountPopup";
+import { useBusinessStore } from "../../store/businessStore";
 
 const PartyEditPage = () => {
   const navigate = useNavigate();
   const [party, setParty] = useState();
+  const { business } = useBusinessStore();
   const { id } = useParams();
+  const [sameAsBillingAddress, setSameAsBillingAddress] = useState(false);
   const { parties } = usePartyStore();
   const [addCategoryPopup, setAddCategoryPopup] = useState(false);
   const [cities, setCities] = useState([]);
+  const [isAddedBankInfo, setIsAddedBankInfo] = useState(false);
+
+  // FETCH THE BANK DETAILS OF THE PARTY AS WELL
+  const { data: partyBankAccount } = useQuery({
+    queryKey: ["bank-accounts", id],
+    queryFn: async () => {
+      const res = await axiosInstance.get(`/bank-account/party/${id}`);
+      return res.data;
+    },
+  });
+
+  console.log(partyBankAccount);
 
   const [data, setData] = useState({
     partyName: party?.partyName,
@@ -35,6 +56,11 @@ const PartyEditPage = () => {
     creditPeriod: party?.creditPeriod,
     creditLimit: party?.creditLimit,
     pincode: party?.pincode,
+    bankAccountNumber: "",
+    IFSCCode: "",
+    accountHoldersName: "",
+    bankAndBranchName: "",
+    upiId: "",
   });
 
   useEffect(() => {
@@ -56,9 +82,14 @@ const PartyEditPage = () => {
         creditPeriod: party.creditPeriod || "",
         creditLimit: party.creditLimit || "",
         pincode: party.pincode || "",
+        bankAccountNumber: partyBankAccount?.bankAccountNumber || "",
+        IFSCCode: partyBankAccount?.IFSCCode || "",
+        accountHoldersName: partyBankAccount?.accountHoldersName || "",
+        bankAndBranchName: partyBankAccount?.bankAndBranchName || "",
+        upiId: partyBankAccount?.upiId || "",
       });
     }
-  }, [party]);
+  }, [party, partyBankAccount]);
 
   // Filtering the selected party to be edited from all the parties
   useEffect(() => {
@@ -84,13 +115,35 @@ const PartyEditPage = () => {
   // handling actual form submission
   const mutation = useMutation({
     mutationFn: async (data) => {
-      const res = await axiosInstance.patch(`/parties/${party?._id}`, data);
-      console.log(res);
+      const res = await axiosInstance.patch(
+        `/parties/${party?._id}?businessId=${business?._id}`,
+        data
+      );
     },
     onSuccess: () => {
       toast.success("Party updated");
       navigate("/dashboard/parties");
       queryClient.invalidateQueries({ queryKey: ["parties"] });
+    },
+    onError: (err) => {
+      toast.error(err.response.data.msg || err.response.data.err);
+    },
+  });
+
+  // bank account delete
+  const deleteBankAccount = useMutation({
+    mutationFn: async (id) => {
+      const res = await axiosInstance.delete(`/bank-account/party/${id}`);
+    },
+    onSuccess: () => {
+      toast.success("Bank Account deleted");
+      document.getElementById("delete-account-modal").close();
+      queryClient.invalidateQueries({
+        queryKey: ["bank-accounts", id, party, "parties"],
+      });
+      setTimeout(() => {
+        window.location.reload();
+      }, 500);
     },
     onError: (err) => {
       toast.error(err.response.data.msg || err.response.data.err);
@@ -256,9 +309,7 @@ const PartyEditPage = () => {
               }
             </small>
           </div>
-          <button className="btn btn-sm mt-6 bg-[var(--secondary-btn)]">
-            Get Details
-          </button>
+
           <div>
             <label htmlFor="PAN_number" className="text-xs text-zinc-700">
               PAN Number
@@ -281,11 +332,9 @@ const PartyEditPage = () => {
             </small>
           </div>
         </div>
-        <p className="text-xs text-zinc-500 mt-5">
-          Note: You can auto populate party detauls from GSTIN
-        </p>
+       
 
-        <div className="divider" />
+ 
 
         <div className="grid grid-cols-4 gap-3 mt-2 ">
           <div>
@@ -435,9 +484,34 @@ const PartyEditPage = () => {
             }
           </small>
         </div>
-        <div className="flex flex-col gap-2">
-          <label htmlFor="Billing_address" className="text-xs text-zinc-700">
+        <div className="flex flex-col gap-1">
+          <label
+            htmlFor="Billing_address"
+            className="text-xs text-zinc-700 flex items-center justify-between"
+          >
             Shipping Address
+            <div>
+              <input
+                checked={sameAsBillingAddress}
+                onChange={(e) => {
+                  setSameAsBillingAddress(e.target.checked);
+                  if (e.target.checked) {
+                    setData((prev) => ({
+                      ...prev,
+                      shippingAddress: prev.billingAddress,
+                    }));
+                  } else {
+                    setData((prev) => ({
+                      ...prev,
+                      shippingAddress: "",
+                    }));
+                  }
+                }}
+                type="checkbox"
+                className="checkbox checkbox-sm mr-1 checkbox-info"
+              />
+              Same as Billing address
+            </div>
           </label>
           <textarea
             name="shippingAddress"
@@ -445,7 +519,7 @@ const PartyEditPage = () => {
             value={data.shippingAddress}
             onChange={handleInputChange}
             className="textarea w-full bg-zinc-300"
-            placeholder="Enter shipping address"
+            placeholder="Enter Shipping Address"
           ></textarea>
           <small className="text-xs text-[var(--error-text-color)] ">
             {
@@ -516,19 +590,111 @@ const PartyEditPage = () => {
 
       <h3 className="p-3 text-sm text-zinc-500">Party Bank Account</h3>
 
-      <section className="flex flex-col py-16 items-center justify-center bg-white gap-4 text-xs">
-        <Landmark size={30} />
-        <p>Add party bank information to manage transactions</p>
-        <BankAccountPopup
-          partyName={data?.partyName}
-          setData={setData}
-          data={data}
-          handleInputChange={handleInputChange}
-          mutation={mutation}
-          id={id}
-          isEdit={true}
-        />
-      </section>
+      {partyBankAccount || isAddedBankInfo ? (
+        <>
+          <div className="flex gap-2 items-center justify-center pt-4 pb-16 px-5">
+            <div>
+              <label className="label text-xs">Account Holder's Name</label>
+              <input
+                className="input input-sm"
+                type="text"
+                name="accountHoldersName"
+                onChange={handleInputChange}
+                value={data?.accountHoldersName}
+              />
+            </div>
+            <div>
+              <label className="label text-xs">Bank Account Number</label>
+              <input
+                className="input input-sm"
+                type="text"
+                onChange={handleInputChange}
+                name="bankAccountNumber"
+                value={data?.bankAccountNumber}
+              />
+            </div>
+            <div>
+              <label className="label text-xs">IFSC Code</label>
+              <input
+                className="input input-sm"
+                type="text"
+                name="IFSCCode"
+                onChange={handleInputChange}
+                value={data?.IFSCCode}
+              />
+            </div>
+            <div>
+              <label className="label text-xs">Bank & Branch Name</label>
+              <input
+                className="input input-sm"
+                type="text"
+                name="bankAndBranchName"
+                onChange={handleInputChange}
+                value={data?.bankAndBranchName}
+              />
+            </div>
+            <div>
+              <label className="label text-xs">UPI Id</label>
+              <input
+                className="input input-sm"
+                type="text"
+                name="upiId"
+                onChange={handleInputChange}
+                value={data?.upiId}
+              />
+            </div>
+            <button
+              onClick={() => {
+                // setBankAccountToDeleteid(partyBankAccount._id);
+                document.getElementById("delete-account-modal").showModal();
+              }}
+              className="btn btn-xs btn-error mt-6"
+            >
+              <Trash size={12} />
+            </button>
+            <dialog id="delete-account-modal" className="modal">
+              <div className="modal-box">
+                <h3 className="font-bold text-lg">Confirm Delete</h3>
+                <p className="py-4">
+                  Are you sure you want to delete this account ?
+                </p>
+                <div className="modal-action">
+                  <form method="dialog">
+                    {/* if there is a button in form, it will close the modal */}
+                    <button className="btn btn-sm">Close</button>
+                  </form>
+                  <button
+                    className="btn btn-sm btn-error"
+                    onClick={() =>
+                      deleteBankAccount.mutate(partyBankAccount._id)
+                    }
+                  >
+                    Delete
+                  </button>
+                </div>
+              </div>
+            </dialog>
+          </div>
+        </>
+      ) : (
+        <>
+          <section className="flex flex-col py-16 items-center justify-center bg-white gap-4 text-xs">
+            <Landmark size={30} />
+            <p>Add party bank information to manage transactions</p>
+            <BankAccountPopup
+              partyName={data?.partyName}
+              setData={setData}
+              data={data}
+              handleInputChange={handleInputChange}
+              mutation={mutation}
+              setIsAddedBankInfo={setIsAddedBankInfo}
+              id={id}
+              isEdit={true}
+            />
+          </section>
+        </>
+      )}
+
       {addCategoryPopup && (
         <>
           <div className="h-full z-2000 w-full bg-black/20 backdrop-blur flex items-center justify-center absolute top-0">

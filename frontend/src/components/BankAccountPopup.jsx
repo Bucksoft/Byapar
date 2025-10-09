@@ -14,8 +14,10 @@ const BankAccountPopup = ({
   isEdit,
   updateBankInfo,
   setUpdateBankInfo,
+  ifscError,
 }) => {
   const { business } = useBusinessStore();
+
 
   const bankMutation = useMutation({
     mutationFn: async () => {
@@ -86,7 +88,7 @@ const BankAccountPopup = ({
             </div>
 
             <div className="flex justify-between gap-2">
-              <div className="flex flex-col  w-1/2 gap-1">
+              <div className="flex flex-col w-1/2 gap-1">
                 <p className="text-gray-600 text-xs">IFSC Code</p>
                 <input
                   type="text"
@@ -94,14 +96,13 @@ const BankAccountPopup = ({
                   name="IFSCCode"
                   value={data?.IFSCCode}
                   onChange={handleInputChange}
-                  className="border border-gray-200  rounded w-full p-1"
+                  className={`border rounded w-full p-1 ${
+                    ifscError ? "border-red-500" : "border-gray-200"
+                  }`}
+                  maxLength={11}
+                  style={{ textTransform: "uppercase" }}
                 />
-                <small className="text-red-500">
-                  {
-                    bankMutation?.error?.response?.data?.errors?.IFSCCode
-                      ?._errors[0]
-                  }
-                </small>
+                <small className="text-red-500">{ifscError}</small>
               </div>
               <div className="flex flex-col  w-1/2 gap-1">
                 <p className="text-gray-600 text-xs">Bank & Branch Name</p>
@@ -159,30 +160,41 @@ const BankAccountPopup = ({
               </div>
             </div>
           </div>
-
-          <div className="flex justify-end mt-2 gap-3 ">
-            {updateBankInfo ? (
+          {isEdit ? (
+            <div className="flex justify-end mt-2 gap-3">
               <button
                 onClick={() => {
                   setIsAddedBankInfo(true);
-                  setUpdateBankInfo(false);
                 }}
                 className="btn btn-sm bg-[var(--primary-btn)]"
               >
                 Update
               </button>
-            ) : (
-              <button
-                onClick={() => {
-                  setIsAddedBankInfo(true);
-                 
-                }}
-                className="btn btn-sm bg-[var(--primary-btn)]"
-              >
-                Add
-              </button>
-            )}
-          </div>
+            </div>
+          ) : (
+            <div className="flex justify-end mt-2 gap-3 ">
+              {updateBankInfo ? (
+                <button
+                  onClick={() => {
+                    setIsAddedBankInfo(true);
+                    setUpdateBankInfo(false);
+                  }}
+                  className="btn btn-sm bg-[var(--primary-btn)]"
+                >
+                  Update
+                </button>
+              ) : (
+                <button
+                  onClick={() => {
+                    setIsAddedBankInfo(true);
+                  }}
+                  className="btn btn-sm bg-[var(--primary-btn)]"
+                >
+                  Add
+                </button>
+              )}
+            </div>
+          )}
         </div>
       </dialog>
     </>

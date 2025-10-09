@@ -42,6 +42,7 @@ const DashboardPartiesPage = () => {
   const [toCollect, setToCollect] = useState(0);
   const [toPay, setToPay] = useState(0);
   const [page, setPage] = useState(1);
+  const [partyIdToDelete, setPartyIdToDelete] = useState(null);
   const fileRef = useRef();
   const navigate = useNavigate();
 
@@ -64,12 +65,13 @@ const DashboardPartiesPage = () => {
 
   // DELETE PARTY
   const mutation = useMutation({
-    mutationFn: async (id) => {
-      const res = await axiosInstance.delete(`/parties/${id}`);
+    mutationFn: async () => {
+      const res = await axiosInstance.delete(`/parties/${partyIdToDelete}`);
       return res.data;
     },
     onSuccess: (data) => {
       toast.success(data.msg);
+      document.getElementById("my_modal_3").close();
       queryClient.invalidateQueries({ queryKey: ["parties"] });
     },
   });
@@ -257,9 +259,10 @@ const DashboardPartiesPage = () => {
                         <SquarePen size={14} className="cursor-pointer" />
                       </Link>
                       <button
-                        onClick={() =>
-                          document.getElementById("my_modal_3").showModal()
-                        }
+                        onClick={() => {
+                          setPartyIdToDelete(party?._id);
+                          document.getElementById("my_modal_3").showModal();
+                        }}
                       >
                         <Trash2
                           size={14}

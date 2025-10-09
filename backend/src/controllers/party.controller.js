@@ -215,7 +215,7 @@ export async function getAllParties(req, res) {
   }
 }
 
-// function to get single party details
+// function to get single party detail
 export async function getSingleParty(req, res) {
   try {
     // GET THE ID OF THE PARTY FROM PARMAS
@@ -242,12 +242,42 @@ export async function updatePartyDetails(req, res) {
   try {
     // GET THE ID OF THE PARTY AND DATA
     const { id } = req.params;
+    const businessId = new mongoose.Types.ObjectId(req.params.id);
     if (!id) {
       return res
         .status(400)
         .json({ success: false, msg: "Please provide party ID" });
     }
     const data = req.body;
+    const {
+      bankAccountNumber,
+      IFSCCode,
+      upiId,
+      accountHoldersName,
+      bankAndBranchName,
+    } = req.body;
+    // update the bank details only if they are provided
+    const bankAccount = await BankAccount.findOne({ partyId: id });
+    if (bankAccount) {
+      bankAccount.bankAccountNumber = bankAccountNumber;
+      bankAccount.IFSCCode = IFSCCode;
+      bankAccount.upiId = upiId;
+      bankAccount.accountHoldersName = accountHoldersName;
+      bankAccount.bankAndBranchName = bankAndBranchName;
+      await bankAccount.save();
+    } else {
+      const newBankAccount = new BankAccount({
+        bankAccountNumber,
+        IFSCCode,
+        upiId,
+        accountHoldersName,
+        bankAndBranchName,
+        partyId: id,
+        businessId,
+      });
+      await newBankAccount.save();
+    }
+
     // FIND THE PARTY AND UPDATE ITS FIELDS.
     const updatedParty = await Party.findByIdAndUpdate(id, data, { new: true });
     if (!updatedParty) {

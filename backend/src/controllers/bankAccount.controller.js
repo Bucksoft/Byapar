@@ -258,3 +258,36 @@ export async function deleteBusinessBankAccount(req, res) {
     return res.status(500).json({ msg: "Internal Server Error" });
   }
 }
+
+export async function getSinglePartyBankDetails(req, res) {
+  try {
+    const partyId = req.params.id;
+    if (!partyId) {
+      return res.status(400).json({ msg: "Please provide party id" });
+    }
+    const bankAccount = await BankAccount.findOne({
+      partyId: partyId,
+    });
+    if (!bankAccount) {
+      return res.status(400).json({ msg: "Bank account not found" });
+    }
+    return res.status(200).json(bankAccount);
+  } catch (error) {
+    return res.status(500).json({ msg: "Internal Server Error" });
+  }
+}
+
+export async function deletePartyBankAccount(req, res) {
+  try {
+    const id = req.params.id;
+    const deletedBankAccount = await BankAccount.findByIdAndDelete({
+      _id: id,
+    });
+    if (!deletedBankAccount) {
+      return res.status(400).json({ msg: "Bank account not found" });
+    }
+    return res.status(200).json({ msg: "Bank account removed successfully" });
+  } catch (error) {
+    return res.status(500).json({ msg: "Internal Server Error" });
+  }
+}

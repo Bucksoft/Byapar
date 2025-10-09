@@ -22,6 +22,7 @@ const DashboardAddPartyPage = () => {
   const { business } = useBusinessStore();
   const [updateBankInfo, setUpdateBankInfo] = useState(false);
   const [cities, setCities] = useState([]);
+  const [ifscError, setIfscError] = useState("");
   const [data, setData] = useState({
     partyName: "",
     mobileNumber: "",
@@ -61,6 +62,10 @@ const DashboardAddPartyPage = () => {
         updated = { ...updated, city: "" };
       }
 
+      if (name === "IFSCCode") {
+        validateIFSC(value);
+      }
+
       return updated;
     });
   };
@@ -98,6 +103,18 @@ const DashboardAddPartyPage = () => {
       );
     },
   });
+
+  const validateIFSC = (code) => {
+    const regex = /^[A-Z]{4}0[A-Z0-9]{6}$/;
+
+    if (code === "") {
+      setIfscError("");
+    } else if (!regex.test(code)) {
+      setIfscError("Invalid IFSC Code format");
+    } else {
+      setIfscError("");
+    }
+  };
 
   // ADD A CATEGORY
   const categoryMutation = useMutation({
@@ -589,8 +606,8 @@ const DashboardAddPartyPage = () => {
         <h3 className="p-3 text-sm text-zinc-500">Party Bank Account</h3>
 
         {isAddedBankInfo ? (
-          <div className="flex flex-col items-center justify-center gap-4 pb-8 pt-1 px-5">
-            <section className="w-full">
+          <div className="flex items-center gap-4 pb-8 pt-1 px-5">
+            <section className="bg-white p-2 rounded-md">
               <div className="flex items-center gap-5 ">
                 <p className="font-medium text-sm">Account Holder's Name</p>
                 <span className="text-[var(--gray-text)] text-xs">
@@ -683,16 +700,19 @@ const DashboardAddPartyPage = () => {
                 </div>
               </div>
               {updateBankInfo && (
-                <BankAccountPopup
-                  partyName={data?.partyName}
-                  setData={setData}
-                  data={data}
-                  handleInputChange={handleInputChange}
-                  setIsAddedBankInfo={setIsAddedBankInfo}
-                  mutation={mutation}
-                  updateBankInfo={updateBankInfo}
-                  setUpdateBankInfo={setUpdateBankInfo}
-                />
+                <>
+                  <BankAccountPopup
+                    partyName={data?.partyName}
+                    setData={setData}
+                    data={data}
+                    handleInputChange={handleInputChange}
+                    setIsAddedBankInfo={setIsAddedBankInfo}
+                    mutation={mutation}
+                    updateBankInfo={updateBankInfo}
+                    setUpdateBankInfo={setUpdateBankInfo}
+                    ifscError={ifscError}
+                  />
+                </>
               )}
             </section>
           </div>
