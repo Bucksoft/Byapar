@@ -137,30 +137,48 @@ const SalesInvoiceFooterSection = ({ data, setData, title, isEditing }) => {
               className=" mt-2 border border-zinc-200 mx-5 p-2"
             >
               {/* ACCOUNT NAME */}
-              <div className="flex items-center gap-2 text-sm">
-                <h2 className="font-semibold text-zinc-700">Account Name</h2>
-                <p>{bankAccount?.accountName}</p>
-              </div>
+              {bankAccount?.accountName.length > 0 && (
+                <div className="flex items-center gap-2 text-sm">
+                  <h2 className="font-semibold text-zinc-700">Account Name</h2>
+                  <p>{bankAccount?.accountName}</p>
+                </div>
+              )}
 
               {/* ACCOUNT NUMBER */}
-              <div className="flex items-center gap-2 text-sm">
-                <h2 className="font-semibold text-zinc-700">Account Number</h2>
-                <p>{bankAccount?.bankAccountNumber}</p>
-              </div>
+              {bankAccount?.bankAccountNumber.length > 0 && (
+                <div className="flex items-center gap-2 text-sm">
+                  <h2 className="font-semibold text-zinc-700">
+                    Account Number
+                  </h2>
+                  <p>{bankAccount?.bankAccountNumber}</p>
+                </div>
+              )}
 
               {/* IFSC Code */}
-              <div className="flex items-center gap-2 text-sm">
-                <h2 className="font-semibold text-zinc-700">IFSC Code</h2>
-                <p>{bankAccount?.IFSCCode}</p>
-              </div>
+              {bankAccount?.IFSCCode.length > 0 && (
+                <div className="flex items-center gap-2 text-sm">
+                  <h2 className="font-semibold text-zinc-700">IFSC Code</h2>
+                  <p>{bankAccount?.IFSCCode}</p>
+                </div>
+              )}
+
+              {/* UPI id */}
+              {bankAccount?.upiId.length > 0 && (
+                <div className="flex items-center gap-2 text-sm">
+                  <h2 className="font-semibold text-zinc-700">UPI Id</h2>
+                  <p>{bankAccount?.upiId}</p>
+                </div>
+              )}
 
               {/* Account Holder's Name */}
-              <div className="flex items-center gap-2 text-sm">
-                <h2 className="font-semibold text-zinc-700">
-                  Account Holder's Name
-                </h2>
-                <p>{bankAccount?.accountHoldersName}</p>
-              </div>
+              {bankAccount?.accountHoldersName.length > 0 && (
+                <div className="flex items-center gap-2 text-sm">
+                  <h2 className="font-semibold text-zinc-700">
+                    Account Holder's Name
+                  </h2>
+                  <p>{bankAccount?.accountHoldersName}</p>
+                </div>
+              )}
 
               <div className="flex gap-2 clear-start mt-2">
                 <button

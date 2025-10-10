@@ -109,28 +109,30 @@ const DashboardPartyPage = () => {
           ))}
         </section>
 
-        <section className="flex flex-col">
-          <fieldset className="fieldset">
-            <select
-              value={filter}
-              onChange={(e) => setFilter(e.target.value)}
-              className="select select-sm w-1/5 my-4"
-            >
-              <option disabled hidden>
-                Select Transaction Type
-              </option>
-              <option value="sales_invoice">Sales</option>
-              <option value="payment_in">Payment In</option>
-              <option value="payment_out">Payment Out</option>
-              <option value="quotation">Quotation</option>
-              <option value="sales_return">Sales Return</option>
-              <option value="purchase_return">Purchase Return</option>
-              <option value="credit_note">Credit Note</option>
-              <option value="debit_note">Debit Note</option>
-              <option value="all_transactions">All Transactions</option>
-            </select>
-          </fieldset>
-        </section>
+        {selectedMenu !== "ledger (statement)" && (
+          <section className="flex flex-col">
+            <fieldset className="fieldset">
+              <select
+                value={filter}
+                onChange={(e) => setFilter(e.target.value)}
+                className="select select-sm w-1/5 my-4"
+              >
+                <option disabled hidden>
+                  Select Transaction Type
+                </option>
+                <option value="sales_invoice">Sales</option>
+                <option value="payment_in">Payment In</option>
+                <option value="payment_out">Payment Out</option>
+                <option value="quotation">Quotation</option>
+                <option value="sales_return">Sales Return</option>
+                <option value="purchase_return">Purchase Return</option>
+                <option value="credit_note">Credit Note</option>
+                <option value="debit_note">Debit Note</option>
+                <option value="all_transactions">All Transactions</option>
+              </select>
+            </fieldset>
+          </section>
+        )}
 
         {selectedMenu === "transactions" && (
           <PartyTransactions

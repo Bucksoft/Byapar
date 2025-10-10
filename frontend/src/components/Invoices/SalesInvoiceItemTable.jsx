@@ -29,8 +29,6 @@ const SalesInvoiceItemTable = ({
   const { business } = useBusinessStore();
   const { purchaseInvoices } = usePurchaseInvoiceStore();
 
- 
-
   const debouncedSearch = useDebounce(searchItemQuery, 400);
 
   // FETCHING ALL ITEMS FOR THE BUSINESS
@@ -45,7 +43,7 @@ const SalesInvoiceItemTable = ({
       const res = await axiosInstance.get(
         `/item/all/${
           business._id
-        }?page=${1}&limit=${10}&search=${encodeURIComponent(
+        }?page=${1}&limit=${100}&search=${encodeURIComponent(
           debouncedSearch || ""
         )}`
       );
@@ -138,12 +136,15 @@ const SalesInvoiceItemTable = ({
       ].includes(title)
         ? Number(item.purchasePrice) || 0
         : Number(item.salesPrice) || 0;
-      const gstRate = getGSTPercentage(item.gstTaxRate);
+
+      const gstRate = getGSTPercentage(item?.gstTaxRate);
+      let gstType = item?.gstTaxRateType;
+
       let basePrice = item.isManualBase
-        ? Number(item.basePrice) || 0
-        : item.gstTaxRateType === "without tax"
-        ? price
-        : price * (100 / (100 + gstRate));
+        ? Number(item?.basePrice) || 0
+        : gstType === "without tax"
+        ? Number(price)
+        : Number(price) * (100 / (100 + gstRate));
 
       let discountAmount = 0;
       if (item.discountPercent)
@@ -156,6 +157,9 @@ const SalesInvoiceItemTable = ({
       const taxableValue = basePrice * qty - discountAmount;
       const gstAmount = (taxableValue * gstRate) / 100;
       const finalAmount = taxableValue + gstAmount;
+
+      console.log()
+
 
       return {
         ...item,

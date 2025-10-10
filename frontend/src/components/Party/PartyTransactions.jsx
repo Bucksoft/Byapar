@@ -13,8 +13,6 @@ const PartyTransactions = ({ party, filter }) => {
   const { paymentIns } = usePaymentInStore();
   const [transactions, setTransactions] = useState([]);
 
-  console.log("QUOTATIONS ", quotations);
-
   useEffect(() => {
     const partyInvoices =
       invoices &&

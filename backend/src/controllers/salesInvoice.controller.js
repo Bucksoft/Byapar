@@ -49,12 +49,12 @@ export async function createSalesInvoice(req, res) {
             msg: `Item not found : ${item?.itemName}`,
           });
         }
-        if (item?.currentStock < soldItem.quantity) {
-          return res.status(400).json({
-            success: false,
-            msg: `Insufficient stock for ${item?.itemName}`,
-          });
-        }
+        // if (item?.currentStock < soldItem.quantity) {
+        //   return res.status(400).json({
+        //     success: false,
+        //     msg: `Insufficient stock for ${item?.itemName}`,
+        //   });
+        // }
         await Item.findByIdAndUpdate(soldItem?._id, {
           $inc: { currentStock: -soldItem?.quantity },
         });

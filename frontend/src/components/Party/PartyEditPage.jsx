@@ -37,8 +37,6 @@ const PartyEditPage = () => {
     },
   });
 
-  console.log(partyBankAccount);
-
   const [data, setData] = useState({
     partyName: party?.partyName,
     mobileNumber: party?.mobileNumber,
@@ -332,9 +330,6 @@ const PartyEditPage = () => {
             </small>
           </div>
         </div>
-       
-
- 
 
         <div className="grid grid-cols-4 gap-3 mt-2 ">
           <div>

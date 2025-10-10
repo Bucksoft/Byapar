@@ -9,14 +9,14 @@ const DashboardAllTransactionsPage = () => {
 
   const searchedInvoices =
     invoices && searchQuery
-      ? invoices.filter(
+      ? invoices?.invoices.filter(
           (invoice) =>
             invoice?.partyId?.partyName
               ?.toLowerCase()
               .includes(searchQuery.toLowerCase()) ||
             invoice?.salesInvoiceNumber === Number(searchQuery)
         )
-      : invoices;
+      : invoices?.invoices;
 
   return (
     <main className="h-full w-full p-2">

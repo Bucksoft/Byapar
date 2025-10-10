@@ -30,7 +30,7 @@ const itemSchema = new mongoose.Schema(
     salesPriceType: {
       type: String,
       enum: ["with tax", "without tax"],
-      default: "with tax",
+      default: "without tax",
     },
     purchasePriceType: {
       type: String,
