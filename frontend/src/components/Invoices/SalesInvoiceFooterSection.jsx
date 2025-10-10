@@ -5,10 +5,9 @@ import BankAccountPopupForBusiness from "../BankAccountPopupForBusiness";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { axiosInstance } from "../../config/axios";
 import { useBusinessStore } from "../../store/businessStore";
-import { useBusinessBankAccountStore } from "../../store/businessBankAccount";
+import { useBusinessBankAccountStore } from "../../store/businessBankAccountStore";
 import toast from "react-hot-toast";
 import { Pen, Trash } from "lucide-react";
-import BusinessBankAccount from "../../../../backend/src/models/businessBankAccount";
 
 const SalesInvoiceFooterSection = ({ data, setData, title, isEditing }) => {
   const [notes, setNotes] = useState(false);
