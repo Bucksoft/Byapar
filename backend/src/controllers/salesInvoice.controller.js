@@ -139,7 +139,7 @@ export async function getAllInvoices(req, res) {
     const invoices = await SalesInvoice.find(filter)
       .skip(skip)
       .limit(limit)
-      .sort({ salesInvoiceNumber: -1 })
+      .sort({ salesInvoiceDate: -1 })
       .populate("partyId");
 
     if (!invoices || invoices.length === 0) {

@@ -32,8 +32,6 @@ const PartyLedgerStatement = ({ party }) => {
   const { invoices } = useInvoiceStore();
   const { creditNotes } = useCreditNoteStore();
 
-  console.log(saleReturns);
-
   const ledgerEntries = useMemo(() => {
     const allEntries = [];
 
@@ -124,11 +122,14 @@ const PartyLedgerStatement = ({ party }) => {
 
   // FILTERING THE ENTRIES
   const filteredEntries = useMemo(() => {
-    return ledgerWithBalance.filter(
-      (entry) =>
-        new Date(entry.date) >= new Date(dateRange.from) &&
-        new Date(entry.date) <= new Date(dateRange.to)
-    );
+    const from = new Date(dateRange.from);
+    const to = new Date(dateRange.to);
+    to.setHours(23, 59, 59, 999);
+
+    return ledgerWithBalance.filter((entry) => {
+      const entryDate = new Date(entry.date);
+      return entryDate >= from && entryDate <= to;
+    });
   }, [dateRange, ledgerWithBalance]);
 
   return (

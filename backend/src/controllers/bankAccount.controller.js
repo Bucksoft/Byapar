@@ -4,7 +4,7 @@ import {
   businessBankAccount,
 } from "../config/validation.js";
 import BankAccount from "../models/bankAccount.schema.js";
-import BusinessBankAccount from "../models/businessBankAccount.js";
+import { BusinessBankAccount } from "../models/businessBankAccount.js";
 
 export async function createBankAccount(req, res) {
   try {

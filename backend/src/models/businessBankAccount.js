@@ -41,8 +41,7 @@ const businessBankAccountSchema = new mongoose.Schema({
   },
 });
 
-const BusinessBankAccount = mongoose.model(
+export const BusinessBankAccount = mongoose.model(
   "BusinessBankAccount",
   businessBankAccountSchema
 );
-export default BusinessBankAccount;

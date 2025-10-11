@@ -64,6 +64,10 @@ const salesReturnSchema = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: "SalesInvoice",
     },
+    type: {
+      type: String,
+      default: "sales return",
+    },
   },
   {
     strict: false,

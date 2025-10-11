@@ -20,16 +20,22 @@ const PartyTransactions = ({ party, filter }) => {
         .filter((invoice) => invoice.partyName === party?.partyName)
         .map((invoice) => ({ ...invoice, type: "sales invoice" }));
 
-    const partyQuotations = quotations
-      ?.filter((quotation) => quotation?.partyName === party?.partyName)
-      .map((quotation) => ({ ...quotation, type: "quotation" }));
+    const partyQuotations =
+      quotations &&
+      quotations
+        ?.filter((quotation) => quotation?.partyName === party?.partyName)
+        .map((quotation) => ({ ...quotation, type: "quotation" }));
 
-    const partyPaymentIns = paymentIns
-      ?.filter((paymentIn) => paymentIn.partyName === party?.partyName)
-      .map((paymentIn) => ({ ...paymentIn, type: "payment in" }));
+    const partyPaymentIns =
+      paymentIns &&
+      paymentIns
+        ?.filter((paymentIn) => paymentIn.partyName === party?.partyName)
+        .map((paymentIn) => ({ ...paymentIn, type: "payment in" }));
 
     setTransactions([...partyInvoices, ...partyPaymentIns, ...partyQuotations]);
   }, [invoices, quotations, paymentIns, party]);
+
+  console.log(transactions);
 
   const filteredTransactions =
     filter && filter !== "all_transactions"
