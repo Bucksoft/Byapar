@@ -158,8 +158,7 @@ const SalesInvoiceItemTable = ({
       const gstAmount = (taxableValue * gstRate) / 100;
       const finalAmount = taxableValue + gstAmount;
 
-      console.log()
-
+      console.log();
 
       return {
         ...item,
@@ -241,7 +240,7 @@ const SalesInvoiceItemTable = ({
   // THIS USE EFFECT CALCULATES FOR SALES RETURN AND PURCHASE RETURN
   useEffect(() => {
     if (title === "Sales Return") {
-      const invoice = invoices.find(
+      const invoice = invoices?.invoices.find(
         (invoice) => invoice?._id === data?.invoiceId
       );
 

@@ -50,11 +50,11 @@ const PaymentInForm = () => {
 
   useEffect(() => {
     if (!parties || !invoices) return;
-    const allInvoices = invoices.filter(
+    const allInvoices = invoices?.invoices.filter(
       (invoice) => invoice.partyName === selectedParty
     );
     setAllInvoices(allInvoices);
-    const totalAmount = invoices.reduce(
+    const totalAmount = invoices?.invoices.reduce(
       (acc, item) => item?.totalAmount + acc,
       0
     );

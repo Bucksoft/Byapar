@@ -82,8 +82,6 @@ const InvoiceTemplate = ({
     0
   );
 
-  console.log(invoice);
-
   return (
     <main
       style={{
@@ -949,13 +947,14 @@ const InvoiceTemplate = ({
               >
                 <p style={{ fontWeight: 600 }}>Total Amount (in words)</p>
                 <span>
-                  {toWords
-                    ?.convert(invoice?.totalAmount)
-                    ?.toLocaleString("en-IN", {
-                      minimumFractionDigits: 2,
-                      maximumFractionDigits: 2,
-                    })
-                    .toUpperCase()}{" "}
+                  {invoice?.totalAmount &&
+                    toWords
+                      ?.convert(invoice?.totalAmount)
+                      ?.toLocaleString("en-IN", {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2,
+                      })
+                      .toUpperCase()}{" "}
                 </span>
               </div>
             </div>
@@ -985,7 +984,11 @@ const InvoiceTemplate = ({
             {/* SIGNATURE BLOCK */}
             <div style={{ marginTop: "50px", marginLeft: "200px" }}>
               {business?.signature !== "null" && (
-                <img src={signature_bspl} alt="signature" width={"150px"} />
+                <img
+                  src={business?.signature}
+                  alt="signature"
+                  width={"150px"}
+                />
               )}
 
               <hr style={{ margin: "16px 0", borderColor: "#d4d4d8" }} />

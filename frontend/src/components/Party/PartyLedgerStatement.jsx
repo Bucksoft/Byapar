@@ -14,10 +14,12 @@ import { usePaymentInStore } from "../../store/paymentInStore";
 import { useInvoiceStore } from "../../store/invoicesStore";
 import { useCreditNoteStore } from "../../store/creditNoteStore";
 import { LuIndianRupee } from "react-icons/lu";
+import { downloadPDF } from "../../../helpers/downloadPdf";
+import CustomLoader from "../Loader";
 
 const PartyLedgerStatement = ({ party }) => {
   const { business } = useBusinessStore();
-
+  const [isDownloading, setIsDownloading] = useState(false);
   const [openDatePicker, setOpenDatePicker] = useState(false);
   const [dateRange, setDateRange] = useState({
     from: new Date(),
@@ -25,16 +27,19 @@ const PartyLedgerStatement = ({ party }) => {
   });
 
   // GET ALL THE INVOICES HERE
-  const { salesReturn } = useSalesReturnStore();
+  const { saleReturns } = useSalesReturnStore();
   const { paymentIns } = usePaymentInStore();
   const { invoices } = useInvoiceStore();
   const { creditNotes } = useCreditNoteStore();
+
+  console.log(saleReturns);
 
   const ledgerEntries = useMemo(() => {
     const allEntries = [];
 
     // PUSH THE INVOICES
     invoices?.invoices.forEach((invoice) => {
+      if (party?._id !== invoice.partyId?._id) return;
       allEntries.push({
         date: invoice?.salesInvoiceDate || "-",
         voucher: invoice?.type || "Sales Invoice",
@@ -48,6 +53,7 @@ const PartyLedgerStatement = ({ party }) => {
 
     // PUSH THE PAYMENT INS
     paymentIns?.forEach((paymentIn) => {
+      if (party?._id !== paymentIn?.partyId) return;
       allEntries.push({
         date: paymentIn?.paymentDate || "-",
         voucher: paymentIn?.type || "Payment In",
@@ -60,11 +66,12 @@ const PartyLedgerStatement = ({ party }) => {
     });
 
     // PUSH THE SALES RETURNS
-    salesReturn?.forEach((sr) => {
+    saleReturns?.forEach((sr) => {
+      if (party?._id !== sr?.partyId) return;
       allEntries.push({
-        date: sr.date || "-",
+        date: sr.salesReturnDate || "-",
         voucher: sr.type || "Sales Return",
-        srNo: sr.returnNumber || "-",
+        srNo: sr.salesReturnNumber || "-",
         debit: 0,
         credit: Number(sr.totalAmount) || "-",
         tdsDeductedByParty: sr?.tdsDeductedByParty || 0,
@@ -74,6 +81,7 @@ const PartyLedgerStatement = ({ party }) => {
 
     // PUSH THE CREDIT NOTES
     creditNotes?.forEach((cn) => {
+      if (party?._id !== cn?.partyId?._id) return;
       allEntries.push({
         date: cn.creditNoteDate,
         voucher: cn.type || "Credit Note",
@@ -84,8 +92,9 @@ const PartyLedgerStatement = ({ party }) => {
         tdsDeductedBySelf: cn?.tdsDeductedBySelf || 0,
       });
     });
+
     return allEntries.sort((a, b) => new Date(a.date) - new Date(b.date));
-  }, [invoices, paymentIns, salesReturn, creditNotes]);
+  }, [invoices, paymentIns, saleReturns, creditNotes]);
 
   // CALCULATING LEDGER'S BALANCE
   const ledgerWithBalance = useMemo(() => {
@@ -126,8 +135,19 @@ const PartyLedgerStatement = ({ party }) => {
     <section className="relative mt-5">
       <div>
         {/* DOWNLOAD */}
-        <button className="btn btn-sm w-1/8 ">
-          <Download size={14} /> Download
+        <button
+          onClick={() => downloadPDF("ledger", "Ledger", setIsDownloading)}
+          className="btn btn-sm btn-dash"
+        >
+          {isDownloading ? (
+            <div className="">
+              <CustomLoader text={"Downloading..."} />
+            </div>
+          ) : (
+            <>
+              <Download size={15} /> Download PDF
+            </>
+          )}
         </button>
 
         {/* PRINTER */}
@@ -136,7 +156,7 @@ const PartyLedgerStatement = ({ party }) => {
         </button>
 
         {/* SHARE */}
-        <button
+        {/* <button
           className="btn btn-sm ml-2 w-1/8"
           popoverTarget="popover-1"
           style={{ anchorName: "--anchor-1" }}
@@ -144,7 +164,7 @@ const PartyLedgerStatement = ({ party }) => {
           <Share size={14} />
           Share
           <ChevronDown size={14} className="ml-10" />
-        </button>
+        </button> */}
 
         {/* CUSTOM DAY PICKER */}
         <button
@@ -192,62 +212,167 @@ const PartyLedgerStatement = ({ party }) => {
         </ul>
       </div>
 
-      <div className="h-full border rounded-md mt-4 border-zinc-200 p-5">
-        <div className="flex items-center justify-between">
+      {/* LEDGER COMPONENT HERE */}
+      <div
+        id="ledger"
+        style={{
+          height: "100%",
+          border: "1px solid rgb(228, 228, 231)",
+          borderRadius: "6px",
+          marginTop: "16px",
+          padding: "20px",
+        }}
+      >
+        <div
+          style={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+          }}
+        >
           <div>
-            <h1 className="font-semibold">{business?.businessName}</h1>
-            <p className="text-xs text-zinc-500">
+            <h1
+              style={{
+                fontWeight: 600,
+              }}
+            >
+              {business?.businessName}
+            </h1>
+            <p
+              style={{
+                fontSize: "12px",
+                color: "#71717b",
+              }}
+            >
               Phone no. {business?.companyPhoneNo}
             </p>
           </div>
           Party Ledger
         </div>
         <div className="divider" />
-        <div className="text-xs flex items-start justify-between">
-          <div className="leading-4.5">
+        <div
+          style={{
+            fontSize: "12px",
+            display: "flex",
+            alignItems: "flex-start",
+            justifyContent: "space-between",
+          }}
+        >
+          <div
+            style={{
+              lineHeight: "18px",
+            }}
+          >
             To, <br />
-            <span className="font-semibold">{party?.partyName}</span> <br />
+            <span
+              style={{
+                fontWeight: 600,
+              }}
+            >
+              {party?.partyName}
+            </span>
+            <br />
             {party?.mobileNumber}
           </div>
-          <div className="text-right border-2 border-zinc-200 p-2 flex flex-col">
-            <p className="pb-2 border-b-2 border-zinc-200">
-              {dateRange?.from?.toLocaleDateString()} -{" "}
-              {dateRange?.to?.toLocaleDateString()}
+
+          <div
+            style={{
+              textAlign: "right",
+              border: "2px solid rgb(228, 228, 231)",
+              padding: "8px",
+              display: "flex",
+              flexDirection: "column",
+              width: "200px",
+            }}
+          >
+            <p
+              style={{
+                paddingBottom: "",
+                display: "flex",
+                justifyContent: "flex-end",
+                gap: "4px",
+              }}
+            >
+              <span> {dateRange?.from?.toLocaleDateString()}</span> -{" "}
+              <span>{dateRange?.to?.toLocaleDateString()}</span>
             </p>
-            <h4 className="mt-3 ">Total Receivable</h4>
-            <p className="font-semibold flex items-center justify-end gap-1">
+
+            <h4
+              style={{
+                marginTop: "12px",
+                fontWeight: 600,
+                borderTop: "2px solid rgb(228, 228, 231)",
+                paddingTop: "8px",
+              }}
+            >
+              {Number(Math.abs(totalBalance || 0)) > 0
+                ? "Total Receivable"
+                : "Total Payable"}
+            </h4>
+
+            <p
+              style={{
+                fontWeight: 600,
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "flex-end",
+              }}
+            >
               <LuIndianRupee />
-              {ledgerWithBalance?.length
-                ? ledgerWithBalance[
-                    ledgerWithBalance.length - 1
-                  ].balance.toLocaleString("en-IN")
-                : 0}
+              {Number(Math.abs(totalBalance || 0)).toLocaleString("en-IN")}
             </p>
           </div>
         </div>
-        <div className="overflow-x-auto mt-5 border border-base-content/5 bg-base-100">
-          <table className="table text-xs table-zebra">
+        <div
+          style={{
+            overflowX: "auto",
+            marginTop: "20px",
+            border: "1px",
+            borderColor: "",
+            backgroundColor: "",
+          }}
+        >
+          <table
+            style={{
+              width: "100%",
+              borderCollapse: "collapse",
+              fontSize: "12px",
+            }}
+          >
             <thead>
-              <tr className="bg-zinc-200">
-                <th>Date</th>
-                <th>Voucher</th>
-                <th>Sr No</th>
-                <th>Credit</th>
-                <th>Debit</th>
-                <th>TDS deducted by party</th>
-                <th>TDS deducted by self</th>
-                <th>Balance</th>
+              <tr
+                style={{
+                  backgroundColor: "#e4e4e7",
+                }}
+              >
+                <th style={{ padding: "8px", textAlign: "left" }}>Date</th>
+                <th style={{ padding: "8px", textAlign: "left" }}>Voucher</th>
+                <th style={{ padding: "8px", textAlign: "left" }}>Sr No</th>
+                <th style={{ padding: "8px", textAlign: "left" }}>Credit</th>
+                <th style={{ padding: "8px", textAlign: "left" }}>Debit</th>
+                <th style={{ padding: "8px", textAlign: "left" }}>
+                  TDS deducted by party
+                </th>
+                <th style={{ padding: "8px", textAlign: "left" }}>
+                  TDS deducted by self
+                </th>
+                <th style={{ padding: "8px", textAlign: "right" }}>Balance</th>
               </tr>
             </thead>
             <tbody>
               {/* THIS FIRST ROW IS FOR OPENING BALANCE */}
               <tr>
-                <td></td>
-                <td>Opening Balance</td>
-                <td>-</td>
-                <td>
+                <td style={{ padding: "6px" }}></td>
+                <td style={{ padding: "6px" }}>Opening Balance</td>
+                <td style={{ padding: "6px" }}>-</td>
+                <td style={{ padding: "6px" }}>
                   {party?.openingBalanceStatus === "To Pay" ? (
-                    <div className="flex items-center ">
+                    <div
+                      style={{
+                        display: "flex",
+                        alignItems: "center",
+                      }}
+                    >
                       <LuIndianRupee />
                       {Number(party?.openingBalance).toLocaleString("en-IN")}
                     </div>
@@ -255,9 +380,14 @@ const PartyLedgerStatement = ({ party }) => {
                     "-"
                   )}
                 </td>
-                <td>
+                <td style={{ padding: "6px" }}>
                   {party?.openingBalanceStatus === "To Collect" ? (
-                    <div className="flex items-center ">
+                    <div
+                      style={{
+                        display: "flex",
+                        alignItems: "center",
+                      }}
+                    >
                       <LuIndianRupee />
                       {Number(party?.openingBalance).toLocaleString("en-IN")}
                     </div>
@@ -265,10 +395,15 @@ const PartyLedgerStatement = ({ party }) => {
                     "-"
                   )}
                 </td>
-                <td>-</td>
-                <td>-</td>
-                <td>
-                  <div className="flex items-center">
+                <td style={{ padding: "6px" }}>-</td>
+                <td style={{ padding: "6px" }}>-</td>
+                <td style={{ padding: "6px" }}>
+                  <div
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                    }}
+                  >
                     <LuIndianRupee />
                     {Number(party?.openingBalance).toLocaleString("en-IN") ||
                       0.0}
@@ -279,41 +414,68 @@ const PartyLedgerStatement = ({ party }) => {
               {/* THIS IS FOR LEDGER */}
               {ledgerWithBalance &&
                 ledgerWithBalance.length > 0 &&
-                ledgerWithBalance.map((entry) => (
-                  <tr>
-                    <td>{entry?.date?.split("T")[0]}</td>
-                    <td>{entry?.voucher}</td>
-                    <td>{entry?.srNo}</td>
-                    <td>
-                      <div className="flex items-center">
+                ledgerWithBalance.map((entry, idx) => (
+                  <tr key={idx}>
+                    <td style={{ padding: "6px" }}>
+                      {entry?.date?.split("T")[0]}
+                    </td>
+                    <td style={{ padding: "6px" }}>{entry?.voucher}</td>
+                    <td style={{ padding: "6px" }}>{entry?.srNo}</td>
+                    <td style={{ padding: "6px" }}>
+                      <div
+                        style={{
+                          display: "flex",
+                          alignItems: "center",
+                        }}
+                      >
                         <LuIndianRupee />
                         {Number(entry?.credit).toLocaleString("en-IN")}
                       </div>
                     </td>
-                    <td>
-                      <div className="flex items-center">
+                    <td style={{ padding: "6px" }}>
+                      <div
+                        style={{
+                          display: "flex",
+                          alignItems: "center",
+                        }}
+                      >
                         <LuIndianRupee />
                         {Number(entry?.debit).toLocaleString("en-IN")}
                       </div>
                     </td>
-                    <td>
-                      <div className="flex items-center">
+                    <td style={{ padding: "6px" }}>
+                      <div
+                        style={{
+                          display: "flex",
+                          alignItems: "center",
+                        }}
+                      >
                         <LuIndianRupee />
                         {Number(entry?.tdsDeductedByParty).toLocaleString(
                           "en-IN"
                         ) || 0}
                       </div>
                     </td>
-                    <td>
-                      <div className="flex items-center">
+                    <td style={{ padding: "6px" }}>
+                      <div
+                        style={{
+                          display: "flex",
+                          alignItems: "center",
+                        }}
+                      >
                         <LuIndianRupee />
                         {Number(entry?.tdsDeductedBySelf).toLocaleString(
                           "en-IN"
                         ) || 0}
                       </div>
                     </td>
-                    <td>
-                      <div className="flex items-center">
+                    <td style={{ padding: "6px" }}>
+                      <div
+                        style={{
+                          display: "flex",
+                          alignItems: "center",
+                        }}
+                      >
                         <LuIndianRupee />
                         {Number(entry?.balance).toLocaleString("en-IN")}
                       </div>
@@ -323,12 +485,17 @@ const PartyLedgerStatement = ({ party }) => {
 
               {/* THIS IS FOR CLOSING BALANCE */}
               <tr>
-                <td></td>
-                <td>Closing Balance</td>
-                <td>-</td>
-                <td>
+                <td style={{ padding: "6px" }}></td>
+                <td style={{ padding: "6px" }}>Closing Balance</td>
+                <td style={{ padding: "6px" }}>-</td>
+                <td style={{ padding: "6px" }}>
                   {totalBalance < 0 ? (
-                    <div className="flex items-center">
+                    <div
+                      style={{
+                        display: "flex",
+                        alignItems: "center",
+                      }}
+                    >
                       <LuIndianRupee />
                       {Math.abs(totalBalance).toLocaleString("en-IN")}
                     </div>
@@ -336,9 +503,14 @@ const PartyLedgerStatement = ({ party }) => {
                     "-"
                   )}
                 </td>
-                <td>
+                <td style={{ padding: "6px" }}>
                   {totalBalance > 0 ? (
-                    <div className="flex items-center ">
+                    <div
+                      style={{
+                        display: "flex",
+                        alignItems: "center",
+                      }}
+                    >
                       <LuIndianRupee />
                       {Math.abs(totalBalance).toLocaleString("en-IN")}
                     </div>
@@ -346,10 +518,16 @@ const PartyLedgerStatement = ({ party }) => {
                     "-"
                   )}
                 </td>
-                <td>-</td>
-                <td>-</td>
-                <td>
-                  <div className="flex items-center gap-1">
+                <td style={{ padding: "6px" }}>-</td>
+                <td style={{ padding: "6px" }}>-</td>
+                <td style={{ padding: "6px" }}>
+                  <div
+                    style={{
+                      display: "flex",
+                      alignItems: "center",
+                      // gap: "4px",
+                    }}
+                  >
                     <LuIndianRupee />
                     {Number(Math.abs(totalBalance || 0)).toLocaleString(
                       "en-IN"
