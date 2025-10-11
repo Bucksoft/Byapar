@@ -144,38 +144,16 @@ export async function getAllItems(req, res) {
         .json({ success: false, msg: "Business ID is required" });
     }
 
-    const page = parseInt(req.query.page) || 1;
-    const limit = parseInt(req.query.limit) || 10;
-    const skip = (page - 1) * limit;
-    const search = req.query.search?.trim() || "";
+    const items = await Item.find({ businessId, clientId: req.user?.id }).sort({
+      createdAt: -1,
+    });
 
-    const filter = {
-      businessId: new mongoose.Types.ObjectId(businessId),
-      clientId: req.user?.id,
-    };
-
-    if (search) {
-      filter.$or = [
-        { itemName: { $regex: search, $options: "i" } },
-        { itemCode: { $regex: search, $options: "i" } },
-        { description: { $regex: search, $options: "i" } },
-      ];
-    }
-
-    const items = await Item.find(filter)
-      .skip(skip)
-      .limit(limit)
-      .sort({ createdAt: -1 });
-
-    const totalItems = await Item.countDocuments(filter);
-    const totalPages = Math.ceil(totalItems / limit);
+    const totalItems = await Item.countDocuments({ businessId });
 
     return res.status(200).json({
       success: true,
-      page,
       items,
-      totalPages,
-      limit,
+      totalItems,
     });
   } catch (error) {
     console.error("❌ Error in fetching items:", error.message);

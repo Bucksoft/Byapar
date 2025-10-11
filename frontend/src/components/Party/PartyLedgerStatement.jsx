@@ -32,6 +32,8 @@ const PartyLedgerStatement = ({ party }) => {
   const { invoices } = useInvoiceStore();
   const { creditNotes } = useCreditNoteStore();
 
+  console.log(invoices);
+
   const ledgerEntries = useMemo(() => {
     const allEntries = [];
 
@@ -105,6 +107,8 @@ const PartyLedgerStatement = ({ party }) => {
       return { ...entry, balance: runningBalance };
     });
   }, [ledgerEntries]);
+
+  console.log(ledgerWithBalance);
 
   // CALCULATING THE TOTAL BALANCE AT THE END OF THE DAY
   const totalBalance = useMemo(() => {

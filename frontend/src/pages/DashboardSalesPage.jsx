@@ -1,7 +1,13 @@
 import DashboardNavbar from "../components/DashboardNavbar";
 import { dashboardSaledCardsDetails } from "../lib/dashboardSalesCards";
 import { FaIndianRupeeSign } from "react-icons/fa6";
-import { EllipsisVertical, Plus, Search } from "lucide-react";
+import {
+  ArrowLeft,
+  ArrowRight,
+  EllipsisVertical,
+  Plus,
+  Search,
+} from "lucide-react";
 import {
   FaArrowLeft,
   FaArrowRight,
@@ -9,7 +15,8 @@ import {
   FaRegEdit,
 } from "react-icons/fa";
 import { motion } from "framer-motion";
-import { container, dashboardLinksItems } from "../components/Sidebar";
+import not_found from "../assets/not-found.png";
+import { container } from "../components/Sidebar";
 import { Link, useNavigate } from "react-router-dom";
 import { queryClient } from "../main";
 import { useMutation, useQuery } from "@tanstack/react-query";
@@ -29,31 +36,25 @@ const DashboardSalesPage = () => {
   const [showDeletePopup, setShowDeletePopup] = useState(false);
   const [invoiceId, setInvoiceId] = useState();
   const [searchQuery, setSearchQuery] = useState("");
-  const [debouncedQuery, setDebouncedQuery] = useState(searchQuery);
   const { business } = useBusinessStore();
   const navigate = useNavigate();
   const fileRef = useRef(null);
   const [page, setPage] = useState(1);
-  const limit = 10;
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 10;
 
   const debouncedSearch = useDebounce(searchQuery, 400);
 
-  // to get all the invoices
+  // FETCH ALL THE INVOICES FOR A BUSINESS
   const {
     isLoading,
     data: invoices,
     isSuccess,
   } = useQuery({
-    queryKey: ["invoices", business?._id, page, debouncedSearch],
+    queryKey: ["invoices", business?._id],
     queryFn: async () => {
       if (!business) return [];
-      const res = await axiosInstance.get(
-        `/sales-invoice/${
-          business._id
-        }?page=${page}&limit=${limit}&search=${encodeURIComponent(
-          debouncedSearch || ""
-        )}`
-      );
+      const res = await axiosInstance.get(`/sales-invoice/${business._id}`);
       setTotalInvoices(res.data?.totalInvoices);
       return res.data || [];
     },
@@ -84,20 +85,30 @@ const DashboardSalesPage = () => {
     }
   }, [isSuccess, invoices]);
 
+  // SEARCH INVOICES
   const searchedInvoices = useMemo(() => {
-    if (!invoices?.invoices) return [];
-
-    return invoices?.invoices.filter(
-      (invoice) =>
-        invoice?.partyId?.partyName
-          ?.toLowerCase()
-          .includes(searchQuery.toLowerCase()) ||
-        invoice?.salesInvoiceNumber
-          ?.toString()
-          ?.toLowerCase()
-          .includes(searchQuery.toLowerCase())
+    if (!invoices?.invoices?.length) return [];
+    return invoices?.invoices?.filter((item) =>
+      item?.salesInvoiceNumber
+        ?.toString()
+        ?.toLowerCase()
+        .includes(searchQuery?.toLowerCase())
     );
-  }, [invoices]);
+  }, [invoices, searchQuery]);
+
+  const paginatedInvoices = useMemo(() => {
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    const endIndex = startIndex + itemsPerPage;
+    return searchedInvoices?.slice(startIndex, endIndex) || [];
+  }, [currentPage, searchedInvoices]);
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchQuery]);
+
+  const totalPages = Math.ceil(
+    (invoices?.invoices?.length || 0) / itemsPerPage
+  );
 
   // MUTATION TO UPLOAD ITEMS IN BULK
   const bulkMutation = useMutation({
@@ -221,27 +232,13 @@ const DashboardSalesPage = () => {
               <CustomLoader text={"Getting all invoices..."} />
             </div>
           ) : (
-            <div
-              className="relative z-10 bg-base-100 
-             h-[460px] overflow-y-auto overflow-x-auto "
-            >
+            <div className="relative z-10 bg-base-100 h-[460px] overflow-y-auto overflow-x-auto">
               <motion.table
-                initial={{
-                  opacity: 0,
-                  translateY: 100,
-                }}
-                animate={{
-                  opacity: 1,
-                  translateY: 0,
-                }}
-                transition={{
-                  ease: "easeInOut",
-                  duration: 0.2,
-                  delay: 0.3,
-                }}
+                initial={{ opacity: 0, translateY: 100 }}
+                animate={{ opacity: 1, translateY: 0 }}
+                transition={{ ease: "easeInOut", duration: 0.2, delay: 0.3 }}
                 className="table table-zebra table-sm min-w-full"
               >
-                {/* head */}
                 <thead>
                   <tr className="bg-[var(--primary-background)]">
                     <th>Date</th>
@@ -253,15 +250,55 @@ const DashboardSalesPage = () => {
                     <th>Action</th>
                   </tr>
                 </thead>
+
                 <tbody>
-                  {searchedInvoices && searchedInvoices?.length > 0 ? (
-                    searchedInvoices.map((invoice) => (
+                  {searchedInvoices?.length === 0 &&
+                  searchQuery.trim() !== "" ? (
+                    <tr>
+                      <td
+                        colSpan="7"
+                        className="text-center py-4 text-gray-500"
+                      >
+                        <motion.div
+                          initial={{ opacity: 0, scale: 0 }}
+                          animate={{ opacity: 1, scale: 1 }}
+                          transition={{
+                            ease: "easeInOut",
+                            duration: 0.2,
+                            delay: 0.2,
+                          }}
+                          className="flex items-center justify-center flex-col"
+                        >
+                          <img
+                            src={not_found}
+                            alt="no_items"
+                            width={250}
+                            loading="lazy"
+                          />
+                          <h3 className="font-semibold">
+                            No matching items found
+                          </h3>
+                          <p className="text-zinc-500 text-xs text-center max-w-sm">
+                            No items found matching “{searchQuery}”. Try a
+                            different name or clear your search.
+                          </p>
+                          <button
+                            className="btn btn-outline btn-sm mt-3"
+                            onClick={() => setSearchQuery("")}
+                          >
+                            Clear search
+                          </button>
+                        </motion.div>
+                      </td>
+                    </tr>
+                  ) : paginatedInvoices?.length > 0 ? (
+                    paginatedInvoices.map((invoice) => (
                       <tr
                         key={invoice?._id}
-                        onClick={(e) => {
-                          navigate(`/dashboard/sales-invoice/${invoice?._id}`);
-                        }}
-                        className={`cursor-pointer hover:bg-zinc-50 `}
+                        onClick={() =>
+                          navigate(`/dashboard/sales-invoice/${invoice?._id}`)
+                        }
+                        className="cursor-pointer hover:bg-zinc-50"
                       >
                         <td>
                           {invoice?.salesInvoiceDate
@@ -270,14 +307,15 @@ const DashboardSalesPage = () => {
                         </td>
                         <td>{invoice?.salesInvoiceNumber}</td>
                         <td>{invoice?.partyId?.partyName || "-"}</td>
-                        <td>{invoice?.dueDate.split("T")[0]}</td>
-                        <td className="flex  flex-col gap-1">
+                        <td>{invoice?.dueDate?.split("T")[0] || "-"}</td>
+                        <td className="flex flex-col gap-1">
                           <div className="flex items-center">
                             <LiaRupeeSignSolid />
                             {Number(invoice?.totalAmount).toLocaleString(
                               "en-IN"
                             )}
                           </div>
+
                           {invoice?.pendingAmount &&
                           invoice.pendingAmount > 0 ? (
                             <small className="flex items-center text-error">
@@ -288,12 +326,8 @@ const DashboardSalesPage = () => {
                               unpaid
                             </small>
                           ) : invoice.status !== "cancelled" ? (
-                            <small className="flex items-center text-error">
-                              <LiaRupeeSignSolid />{" "}
-                              {Number(invoice?.totalAmount).toLocaleString(
-                                "en-IN"
-                              )}{" "}
-                              unpaid
+                            <small className="flex items-center text-success">
+                              Paid
                             </small>
                           ) : (
                             ""
@@ -314,6 +348,7 @@ const DashboardSalesPage = () => {
                             {invoice?.status}
                           </p>
                         </td>
+
                         {invoice?.status !== "cancelled" ? (
                           <td onClick={(e) => e.stopPropagation()}>
                             <div className="dropdown dropdown-end">
@@ -365,6 +400,7 @@ const DashboardSalesPage = () => {
                       </tr>
                     ))
                   ) : (
+                    /* ✅ Case 3: No invoices at all */
                     <tr>
                       <td
                         colSpan="7"
@@ -373,7 +409,7 @@ const DashboardSalesPage = () => {
                         <div className="w-full flex items-center justify-center py-20 flex-col gap-3 text-zinc-400">
                           <FaFileInvoice size={40} />
                           <span className="text-sm">
-                            No transactions matching the current filter
+                            You haven’t generated any invoices yet.
                           </span>
                         </div>
                       </td>
@@ -383,58 +419,29 @@ const DashboardSalesPage = () => {
               </motion.table>
             </div>
           )}
-
-          {/* {(!searchedInvoices || !invoices?.invoices) && (
-            <div className="w-full flex justify-center py-19 flex-col items-center gap-4">
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="48"
-                height="48"
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="2"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                className="icon text-zinc-500 icon-tabler icons-tabler-outline icon-tabler-receipt-rupee"
-              >
-                <path stroke="none" d="M0 0h24v24H0z" fill="none" />
-                <path d="M5 21v-16a2 2 0 0 1 2 -2h10a2 2 0 0 1 2 2v16l-3 -2l-2 2l-2 -2l-2 2l-2 -2l-3 2" />
-                <path d="M15 7h-6h1a3 3 0 0 1 0 6h-1l3 3" />
-                <path d="M9 10h6" />
-              </svg>
-              <h1 className="text-zinc-500">
-                You haven't generated any invoices yet.
-              </h1>
-            </div>
-          )} */}
         </div>
 
         {/* PAGINATION  */}
         <div className="w-full flex items-center justify-end p-4">
-          <div className="join join-sm">
+          <div className="join join-sm flex items-center">
             <button
-              className="join-item btn btn-neutral btn-sm"
-              onClick={() => setPage((old) => Math.max(old - 1, 1))}
-              disabled={page === 1}
+              className="btn btn-sm btn-neutral"
+              disabled={currentPage === 1}
+              onClick={() => setCurrentPage((p) => p - 1)}
             >
-              <FaArrowLeft />
+              <ArrowLeft size={14} />
             </button>
 
-            <button className="join-item btn btn-sm">
-              {page}/{invoices?.totalPages || 1}
-            </button>
+            <span className="text-xs px-4">
+              {currentPage} of {totalPages}
+            </span>
 
             <button
-              onClick={() => {
-                if (invoices && page < invoices?.totalPages) {
-                  setPage((old) => old + 1);
-                }
-              }}
-              disabled={!invoices || page >= invoices.totalPages}
-              className="join-item btn btn-neutral btn-sm"
+              className="btn btn-sm btn-neutral"
+              disabled={currentPage === totalPages}
+              onClick={() => setCurrentPage((p) => p + 1)}
             >
-              <FaArrowRight />
+              <ArrowRight size={14} />
             </button>
           </div>
         </div>

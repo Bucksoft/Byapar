@@ -6,6 +6,7 @@ import {
   getAllInvoices,
   getInvoiceById,
   updatedSalesInvoice,
+  getAllInvoicesForAParty,
 } from "../controllers/salesInvoice.controller.js";
 import { isAuth } from "../middleware/auth.middleware.js";
 const router = express.Router();
@@ -16,5 +17,6 @@ router.route("/:businessId/:id").patch(isAuth, updatedSalesInvoice);
 router.route("/:id").post(isAuth, createSalesInvoice);
 router.route("/:id").get(isAuth, getAllInvoices);
 router.route("/:id").delete(isAuth, deleteInvoice);
+router.route("/party-invoice").get(isAuth, getAllInvoicesForAParty);
 
 export default router;

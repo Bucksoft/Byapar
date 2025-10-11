@@ -189,6 +189,7 @@ export async function getAllParties(req, res) {
       businessId: new mongoose.Types.ObjectId(businessId),
       clientId: req.user?.id,
     });
+
     allFilteredParties.forEach((party) => {
       const balance = party?.currentBalance || 0;
       if (balance > 0) toCollect += balance;
@@ -487,12 +488,24 @@ export async function allParties(req, res) {
         .status(400)
         .json({ success: false, msg: "Please provide the business id" });
     }
+    const totalParties = await Party.countDocuments({ businessId: businessId });
+    let toCollect = 0;
+    let toPay = 0;
     const parties = await Party.find({
       businessId: businessId,
       clientId: req.user.id,
     });
-    return res.status(200).json({ parties });
+    parties.forEach((party) => {
+      const balance = party?.currentBalance || 0;
+      if (balance > 0) toCollect += balance;
+      else if (balance < 0) toPay += Math.abs(balance);
+    });
+
+    return res
+      .status(200)
+      .json({ totalParties, toCollect, toPay, data: parties });
   } catch (error) {
+    console.log(error);
     return res
       .status(500)
       .json({ success: false, msg: "Internal Server Error" });

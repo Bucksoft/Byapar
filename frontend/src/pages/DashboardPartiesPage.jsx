@@ -1,52 +1,43 @@
-import { FaArrowLeft, FaArrowRight, FaIndianRupeeSign } from "react-icons/fa6";
+import { FaIndianRupeeSign } from "react-icons/fa6";
 import {
-  ChevronLeft,
-  ChevronRight,
+  ArrowLeft,
+  ArrowRight,
   Plus,
   Search,
   SquarePen,
   Trash2,
 } from "lucide-react";
 import upload from "../assets/upload.png";
+import not_found from "../assets/not-found.png";
 import { PiMicrosoftExcelLogoFill } from "react-icons/pi";
 import DashboardNavbar from "../components/DashboardNavbar";
 import { dashboardPartiesCardDetails } from "../lib/dashboardPartiesCards";
 import { motion } from "framer-motion";
 import { container, dashboardLinksItems } from "../components/Sidebar";
 import { Link, useNavigate } from "react-router-dom";
-import {
-  keepPreviousData,
-  useMutation,
-  useQuery,
-  useQueryClient,
-} from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { axiosInstance } from "../config/axios";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import CustomLoader from "../components/Loader";
 import { usePartyStore } from "../store/partyStore";
 import toast from "react-hot-toast";
 import { queryClient } from "../main.jsx";
 import { useBusinessStore } from "../store/businessStore.js";
-import Excel from "exceljs";
-import { cleanKeys } from "../../helpers/cleanKeys.js";
-import { v4 as uuid } from "uuid";
 import { uploadExcel } from "../../helpers/uploadExcel.js";
 import { IoMdArrowDown, IoMdArrowUp } from "react-icons/io";
-import { IoArrowDownSharp } from "react-icons/io5";
-import { useDebounce } from "../../helpers/useDebounce.jsx";
 
 const DashboardPartiesPage = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const { business } = useBusinessStore();
-  const { setParties, setTotalParties, totalParties } = usePartyStore();
+  const { setParties, setTotalParties, totalParties, parties } =
+    usePartyStore();
   const [toCollect, setToCollect] = useState(0);
   const [toPay, setToPay] = useState(0);
-  const [page, setPage] = useState(1);
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 10;
   const [partyIdToDelete, setPartyIdToDelete] = useState(null);
   const fileRef = useRef();
   const navigate = useNavigate();
-
-  const limit = 10;
 
   // MUTATION TO UPLOAD BULK PARTY DATA
   const bulkMutation = useMutation({
@@ -76,38 +67,45 @@ const DashboardPartiesPage = () => {
     },
   });
 
-  const debouncedSearch = useDebounce(searchQuery, 400);
-
   // FETCHING ALL PARTIES OF A PARTICULAR BUSINESS
   const { isLoading, data } = useQuery({
-    queryKey: ["parties", page, debouncedSearch, business?._id],
+    queryKey: ["parties", business?._id],
     queryFn: async () => {
       if (!business) {
         return [];
       }
       const res = await axiosInstance.get(
-        `/parties/all/${
-          business?._id
-        }?page=${page}&limit=${limit}&search=${encodeURIComponent(
-          debouncedSearch || ""
-        )}`
+        `/parties/all-parties/${business?._id}`
       );
-      setToCollect(res.data.toCollect);
-      setToPay(res.data.toPay);
-      setTotalParties(res.data.totalParties);
+      setToCollect(res.data?.toCollect);
+      setToPay(res.data?.toPay);
+      setTotalParties(res.data?.totalParties);
       setParties(res.data?.data);
-      return res.data;
+      return res.data?.data;
     },
     enabled: !!business?._id,
     keepPreviousData: true,
   });
 
+  const totalPages = Math.ceil((parties?.length || 0) / itemsPerPage);
+
   // SEARCH FUNCTIONALITY
-  const parties =
-    data &&
-    data?.data?.filter((item) =>
-      item?.partyName.toLowerCase().includes(searchQuery.toLowerCase())
+  const searchedParties = useMemo(() => {
+    if (!parties?.length) return [];
+    return parties.filter((item) =>
+      item?.partyName.toLowerCase().includes(searchQuery?.toLowerCase())
     );
+  }, [parties, searchQuery]);
+
+  const paginatedParties = useMemo(() => {
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    const endIndex = startIndex + itemsPerPage;
+    return searchedParties?.slice(startIndex, endIndex) || [];
+  }, [currentPage, searchedParties]);
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchQuery]);
 
   if (isLoading) {
     return (
@@ -212,9 +210,33 @@ const DashboardPartiesPage = () => {
           animate={{ opacity: 1, scale: 1 }}
           transition={{ ease: "easeInOut", duration: 0.2 }}
           className="relative z-10 h-[400px] bg-base-100 mt-8 border border-[var(--table-border)] rounded-md overflow-x-auto"
-          key="party-table-container "
+          key="party-table-container"
         >
-          {parties ? (
+          {searchedParties?.length === 0 && searchQuery.trim() !== "" ? (
+            <motion.div
+              initial={{ opacity: 0, scale: 0 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{
+                ease: "easeInOut",
+                duration: 0.2,
+                delay: 0.2,
+              }}
+              className="flex items-center justify-center flex-col"
+            >
+              <img src={not_found} alt="no_items" width={250} loading="lazy" />
+              <h3 className="font-semibold">No matching parties found</h3>
+              <p className="text-zinc-500 text-xs text-center max-w-sm">
+                No parties found matching “{searchQuery}”. Try a different name
+                or clear your search.
+              </p>
+              <button
+                className="btn btn-outline btn-sm mt-3"
+                onClick={() => setSearchQuery("")}
+              >
+                Clear search
+              </button>
+            </motion.div>
+          ) : paginatedParties?.length > 0 ? (
             <table className="table table-zebra table-sm min-w-[600px] w-full">
               <thead className="sticky top-0 bg-[var(--primary-background)] z-20 text-xs sm:text-sm">
                 <tr>
@@ -228,7 +250,7 @@ const DashboardPartiesPage = () => {
                 </tr>
               </thead>
               <tbody className="text-center text-xs sm:text-sm">
-                {parties.map((party, index) => (
+                {paginatedParties.map((party, index) => (
                   <tr
                     key={party._id}
                     className="cursor-pointer hover:bg-zinc-50"
@@ -291,25 +313,25 @@ const DashboardPartiesPage = () => {
 
         {/* Pagination */}
         <div className="w-full flex items-center justify-end p-3 sm:p-4">
-          <div className="join join-sm">
+          <div className="join join-sm flex items-center">
             <button
-              className="join-item btn btn-neutral btn-sm"
-              onClick={() => setPage((old) => Math.max(old - 1, 1))}
-              disabled={page === 1}
+              className="btn btn-sm btn-neutral"
+              disabled={currentPage === 1}
+              onClick={() => setCurrentPage((p) => p - 1)}
             >
-              <FaArrowLeft />
+              <ArrowLeft size={14} />
             </button>
-            <button className="join-item btn btn-sm">
-              {page}/{data?.totalPages || 1}
-            </button>
+
+            <span className="text-xs px-4">
+              {currentPage} of {totalPages}
+            </span>
+
             <button
-              onClick={() => {
-                if (data && page < data.totalPages) setPage((old) => old + 1);
-              }}
-              disabled={!data || page >= data.totalPages}
-              className="join-item btn btn-neutral btn-sm"
+              className="btn btn-sm btn-neutral"
+              disabled={currentPage === totalPages}
+              onClick={() => setCurrentPage((p) => p + 1)}
             >
-              <FaArrowRight />
+              <ArrowRight size={14} />
             </button>
           </div>
         </div>

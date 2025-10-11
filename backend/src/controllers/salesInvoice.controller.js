@@ -115,30 +115,10 @@ export async function getAllInvoices(req, res) {
       });
     }
 
-    const page = parseInt(req.query.page) || 1;
-    const limit = parseInt(req.query.limit) || 10;
-    const search = req.query.search?.trim() || "";
-    const skip = (page - 1) * limit;
-
-    const filter = {
-      businessId: new mongoose.Types.ObjectId(businessId),
+    const invoices = await SalesInvoice.find({
+      businessId,
       clientId: req.user?.id,
-    };
-
-    if (search.length > 0) {
-      const searchRegex = new RegExp(search, "i");
-      const searchNumber = Number(search);
-
-      filter.$or = [{ partyName: { $regex: searchRegex } }];
-
-      if (!isNaN(searchNumber)) {
-        filter.$or.push({ salesInvoiceNumber: searchNumber });
-      }
-    }
-
-    const invoices = await SalesInvoice.find(filter)
-      .skip(skip)
-      .limit(limit)
+    })
       .sort({ salesInvoiceDate: -1 })
       .populate("partyId");
 
@@ -148,15 +128,12 @@ export async function getAllInvoices(req, res) {
         .json({ success: false, msg: "Invoices not found" });
     }
 
-    const totalInvoices = await SalesInvoice.countDocuments(filter);
-    const totalPages = Math.ceil(totalInvoices / limit);
-
-    const allInvoices = await SalesInvoice.find(filter);
+    const totalInvoices = await SalesInvoice.countDocuments({ businessId });
 
     // CALCULATE THE TOTALS OF ONLY THOSE INVOICES WHICH ARE NOT CANCELLED.
     const validInvoices =
-      allInvoices?.filter(
-        (invoice) => invoice.status?.toLowerCase() !== "cancelled"
+      invoices?.filter(
+        (invoice) => invoice?.status?.toLowerCase() !== "cancelled"
       ) || [];
 
     const totalSales = Number(
@@ -186,9 +163,6 @@ export async function getAllInvoices(req, res) {
       success: true,
       invoices,
       totalInvoices,
-      totalPages,
-      page,
-      limit,
       totalSales,
       totalPaid,
       totalUnpaid,
@@ -422,5 +396,17 @@ export async function bulkUploadSalesInvoices(req, res) {
     return res
       .status(500)
       .json({ success: false, msg: "Internal Server Error" });
+  }
+}
+
+// CONTROLLER TO GET INVOICES OF A PARTY
+export async function getAllInvoicesForAParty(req, res) {
+  try {
+    const id = req.params.id;
+    if (!id) {
+      return res.status(400).json({ msg: "Please provide a valid party id" });
+    }
+  } catch (error) {
+    return res.status(500).json({ msg: "Internal Server Error" });
   }
 }

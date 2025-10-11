@@ -1,8 +1,8 @@
 import DashboardNavbar from "../components/DashboardNavbar";
-import { Plus, Search } from "lucide-react";
+import { ArrowLeft, ArrowRight, Package, Plus, Search } from "lucide-react";
 import { FaArrowLeft, FaArrowRight, FaIndianRupeeSign } from "react-icons/fa6";
 import { LuPackageSearch } from "react-icons/lu";
-import no_items from "../assets/no_items.jpg";
+import not_found from "../assets/not-found.png";
 import { PiMicrosoftExcelLogoFill } from "react-icons/pi";
 import { motion } from "framer-motion";
 import { container } from "../components/Sidebar";
@@ -11,7 +11,7 @@ import { useMutation, useQuery } from "@tanstack/react-query";
 import { axiosInstance } from "../config/axios";
 import CustomLoader from "../components/Loader";
 import { useItemStore } from "../store/itemStore";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import ItemsList from "../components/Items/ItemsList";
 import { useBusinessStore } from "../store/businessStore";
 import { AiOutlineStock } from "react-icons/ai";
@@ -31,9 +31,10 @@ const DashboardItemsPage = () => {
   const [stockValue, setStockValue] = useState(0);
   const [showLowStock, setShowLowStock] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
-  const [page, setPage] = useState(1);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalItems, setTotalItems] = useState(0);
+  const itemsPerPage = 10;
   const fileRef = useRef();
-  const limit = 10;
 
   // MUTATION TO UPLOAD ITEMS IN BULK
   const bulkMutation = useMutation({
@@ -56,25 +57,18 @@ const DashboardItemsPage = () => {
     e.target.value = null;
   };
 
-  const debouncedSearch = useDebounce(searchQuery, 400);
-
   // FETCHING ALL ITEMS FOR THE BUSINESS
   const {
     data: items,
     isLoading,
     isSuccess,
   } = useQuery({
-    queryKey: ["items", page, business?._id, debouncedSearch],
+    queryKey: ["items", business?._id],
     queryFn: async () => {
       if (!business?._id) return [];
-      const res = await axiosInstance.get(
-        `/item/all/${
-          business._id
-        }?page=${page}&limit=${limit}&search=${encodeURIComponent(
-          debouncedSearch || ""
-        )}`
-      );
-      return res.data;
+      const res = await axiosInstance.get(`/item/all/${business._id}`);
+      setTotalItems(res?.data?.totalItems);
+      return res.data?.items;
     },
     enabled: !!business?._id,
     keepPreviousData: true,
@@ -83,9 +77,7 @@ const DashboardItemsPage = () => {
   // CALCULATING STOCK VALUE AND LOW STOCK ITEMS
   useEffect(() => {
     if (isSuccess && items) {
-      const products = items?.items.filter(
-        (item) => item?.itemType === "product"
-      );
+      const products = items?.filter((item) => item?.itemType === "product");
 
       const totalStockValue = products.reduce(
         (sum, product) =>
@@ -105,24 +97,25 @@ const DashboardItemsPage = () => {
     }
   }, [isSuccess, items]);
 
-  // SEARCH ITEMS
-  const searchedItems =
-    items &&
-    items.items
-      ?.filter((item) =>
-        item?.itemName.toLowerCase().includes(searchQuery.toLowerCase())
-      )
+  const totalPages = Math.ceil((items?.length || 0) / itemsPerPage);
 
-      ?.filter((item) => {
-        if (showLowStock) {
-          return (
-            item?.itemType === "product" &&
-            typeof item?.lowStockQuantity === "number" &&
-            item?.currentStock < item?.lowStockQuantity
-          );
-        }
-        return true;
-      });
+  // SEARCH ITEMS
+  const searchedItems = useMemo(() => {
+    if (!items?.length) return [];
+    return items.filter((item) =>
+      item?.itemName.toLowerCase().includes(searchQuery?.toLowerCase())
+    );
+  }, [items, searchQuery]);
+
+  const paginatedItems = useMemo(() => {
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    const endIndex = startIndex + itemsPerPage;
+    return searchedItems?.slice(startIndex, endIndex) || [];
+  }, [currentPage, searchedItems]);
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchQuery]);
 
   return (
     <main className="h-screen overflow-y-scroll p-2">
@@ -133,7 +126,7 @@ const DashboardItemsPage = () => {
           variants={container}
           initial="hidden"
           animate="show"
-          className="grid grid-cols-2 gap-2 "
+          className="grid grid-cols-3 gap-2 "
         >
           <div
             onClick={() => navigate(`/dashboard/reports?type=Stock Value`)}
@@ -157,6 +150,17 @@ const DashboardItemsPage = () => {
             </p>
             <span className="font-medium text-2xl flex gap-2 items-center">
               {lowStockItems}
+            </span>
+          </div>
+
+          <div
+            className={`border rounded-md p-3 mt-5 border-accent bg-accent/10 shadow-md hover:-translate-y-1 transition-all ease-in-out duration-200 cursor-pointer`}
+          >
+            <p className={`flex items-center gap-3`}>
+              <Package size={16} /> Total Items
+            </p>
+            <span className="font-medium text-2xl flex gap-2 items-center">
+              {totalItems}
             </span>
           </div>
         </motion.section>
@@ -217,64 +221,100 @@ const DashboardItemsPage = () => {
           </div>
         ) : (
           <>
-            {items ? (
-              <>
-                {/* Component to render List items */}
-                <ItemsList items={searchedItems} showLowStock={showLowStock} />
-              </>
+            {isLoading ? (
+              <div className="flex items-center justify-center h-64">
+                <span className="loading loading-spinner loading-md"></span>
+              </div>
             ) : (
-              <motion.div
-                initial={{
-                  opacity: 0,
-                  scale: 0,
-                }}
-                animate={{
-                  opacity: 1,
-                  scale: 1,
-                }}
-                transition={{
-                  ease: "easeInOut",
-                  duration: 0.2,
-                  delay: 0.2,
-                }}
-                className="flex items-center justify-center  flex-col"
-              >
-                <img src={no_items} alt="no_items" width={250} loading="lazy" />
-                <h3 className="font-semibold">No items found</h3>
-                <p className="text-zinc-500 text-xs">
-                  Start by creating your first item or upload items in bulk
-                  using Excel for faster setup.
-                </p>
-              </motion.div>
+              <>
+                {searchedItems?.length === 0 && searchQuery.trim() !== "" ? (
+                  <motion.div
+                    initial={{ opacity: 0, scale: 0 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    transition={{
+                      ease: "easeInOut",
+                      duration: 0.2,
+                      delay: 0.2,
+                    }}
+                    className="flex items-center justify-center flex-col"
+                  >
+                    <img
+                      src={not_found}
+                      alt="no_items"
+                      width={250}
+                      loading="lazy"
+                    />
+                    <h3 className="font-semibold">No matching items found</h3>
+                    <p className="text-zinc-500 text-xs text-center max-w-sm">
+                      No items found matching “{searchQuery}”. Try a different
+                      name or clear your search.
+                    </p>
+                    <button
+                      className="btn btn-outline btn-sm mt-3"
+                      onClick={() => setSearchQuery("")}
+                    >
+                      Clear search
+                    </button>
+                  </motion.div>
+                ) : paginatedItems?.length > 0 ? (
+                  <>
+                    <ItemsList
+                      items={paginatedItems}
+                      showLowStock={showLowStock}
+                    />
+                  </>
+                ) : (
+                  <>
+                    <motion.div
+                      initial={{ opacity: 0, scale: 0 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      transition={{
+                        ease: "easeInOut",
+                        duration: 0.2,
+                        delay: 0.2,
+                      }}
+                      className="flex items-center justify-center flex-col"
+                    >
+                      <img
+                        src={no_items}
+                        alt="no_items"
+                        width={250}
+                        loading="lazy"
+                      />
+                      <h3 className="font-semibold">No items found</h3>
+                      <p className="text-zinc-500 text-xs text-center max-w-sm">
+                        Start by creating your first item or upload items in
+                        bulk using Excel for faster setup.
+                      </p>
+                    </motion.div>
+                  </>
+                )}
+              </>
             )}
           </>
         )}
 
         {/* PAGINATION  */}
         <div className="w-full flex items-center justify-end p-4">
-          <div className="join join-sm">
+          <div className="join join-sm flex items-center">
             <button
-              className="join-item btn btn-neutral btn-sm"
-              onClick={() => setPage((old) => Math.max(old - 1, 1))}
-              disabled={page === 1}
+              className="btn btn-sm btn-neutral"
+              disabled={currentPage === 1}
+              onClick={() => setCurrentPage((p) => p - 1)}
             >
-              <FaArrowLeft />
+              <ArrowLeft size={14} />
             </button>
 
-            <button className="join-item btn btn-sm">
-              {page}/{items?.totalPages || 1}
-            </button>
+            <span className="text-xs px-4">
+              {currentPage} of {totalPages}
+            </span>
 
             <button
-              onClick={() => {
-                if (items && page < items.totalPages) {
-                  setPage((old) => old + 1);
-                }
-              }}
-              disabled={!items || page >= items.totalPages}
-              className="join-item btn btn-neutral btn-sm"
+              className="btn btn-sm btn-neutral"
+              disabled={currentPage === totalPages}
+              onClick={() => setCurrentPage((p) => p + 1)}
             >
-              <FaArrowRight />
+              <ArrowRight size={14} />
             </button>
           </div>
         </div>
