@@ -9,7 +9,13 @@ import { useBusinessBankAccountStore } from "../../store/businessBankAccountStor
 import toast from "react-hot-toast";
 import { Pen, Trash } from "lucide-react";
 
-const SalesInvoiceFooterSection = ({ data, setData, title, isEditing }) => {
+const SalesInvoiceFooterSection = ({
+  data,
+  setData,
+  title,
+  isEditing,
+  invoiceTotals,
+}) => {
   const [notes, setNotes] = useState(false);
   const [termCondition, setTermCondition] = useState(false);
   const [charges, setCharges] = useState(false);
@@ -277,8 +283,11 @@ const SalesInvoiceFooterSection = ({ data, setData, title, isEditing }) => {
         {/* taxable amount */}
         <div className="flex justify-between py-2">
           <span className={`px-2 w-fit text-xs`}>Taxable Amount</span>
-          <span className=" text-xs pr-5">
-            ₹ {Number(data?.taxableAmount).toLocaleString("en-IN") || 0}
+          <span className="text-xs pr-5">
+            ₹{" "}
+            {Number(invoiceTotals?.totalTaxableValue || 0).toLocaleString(
+              "en-IN"
+            )}
           </span>
         </div>
         {data?.items?.length > 0 && (
@@ -286,13 +295,15 @@ const SalesInvoiceFooterSection = ({ data, setData, title, isEditing }) => {
             <div className="flex justify-between py-2">
               <span className={`px-2 w-fit text-xs`}>SGST</span>
               <span className=" text-xs pr-5">
-                ₹ {Number(data?.sgst).toLocaleString("en-IN")}
+                ₹{" "}
+                {Number(invoiceTotals?.totalSGST).toLocaleString("en-IN") ?? 0}
               </span>
             </div>
             <div className="flex justify-between py-2">
               <span className={`px-2 w-fit text-xs`}>CGST</span>
               <span className=" text-xs pr-5">
-                ₹ {Number(data?.cgst).toLocaleString("en-IN")}
+                ₹{" "}
+                {Number(invoiceTotals?.totalCGST).toLocaleString("en-IN") ?? 0}
               </span>
             </div>
           </>
@@ -400,20 +411,15 @@ const SalesInvoiceFooterSection = ({ data, setData, title, isEditing }) => {
           </div>
           <div className="p-2 flex justify-between">
             <span className="text-sm font-semibold">Total Amount</span>
-            {data?.items?.length > 0 ? (
+            {data?.items?.length > 0 && (
               <>
                 ₹{" "}
-                {(selectCheckBox
-                  ? Math.round(Number(data?.totalAmount))
-                  : Number(data?.totalAmount)
-                ).toLocaleString("en-IN")}
+                {selectCheckBox
+                  ? Math.round(invoiceTotals?.totalAmount ?? 0).toLocaleString(
+                      "en-IN"
+                    )
+                  : (invoiceTotals?.totalAmount ?? 0).toLocaleString("en-IN")}
               </>
-            ) : (
-              <input
-                type="text"
-                placeholder="Enter Payment Amount"
-                className="input input-xs border-none w-fit text-xs bg-zinc-200 mr-2 items-center px-5 "
-              />
             )}
           </div>
         </div>
@@ -436,7 +442,10 @@ const SalesInvoiceFooterSection = ({ data, setData, title, isEditing }) => {
                   data.balanceAmount === 0
                 ) : data?.items?.length > 0 ? (
                   <>
-                    {"₹" + Number(data?.balanceAmount).toLocaleString("en-IN")}
+                    {"₹" +
+                      Math.round(Number(data?.balanceAmount)).toLocaleString(
+                        "en-IN"
+                      )}
                   </>
                 ) : (
                   <span>₹ 0</span>

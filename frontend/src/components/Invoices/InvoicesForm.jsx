@@ -1,5 +1,5 @@
 import { ArrowLeft } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useMutation } from "@tanstack/react-query";
 import { axiosInstance } from "../../config/axios";
@@ -21,6 +21,9 @@ import { useProformaInvoiceStore } from "../../store/proformaStore";
 import { usePurchaseInvoiceStore } from "../../store/purchaseInvoiceStore";
 import { usePurchaseOrderStore } from "../../store/purchaseOrderStore";
 import { useDebitNoteStore } from "../../store/debitNoteStore";
+import { usePartyStore } from "../../store/partyStore";
+import SalesInvoiceItemTableTesting from "./InvoiceItemTableTesting";
+import { getTotalTaxRate } from "../../../helpers/getGSTTaxRate";
 
 const InvoicesForm = ({
   title,
@@ -31,6 +34,7 @@ const InvoicesForm = ({
   invoiceToUpdate,
 }) => {
   const { business } = useBusinessStore();
+  const { parties } = usePartyStore();
   const { totalInvoices } = useInvoiceStore();
   const { totalQuotations } = useQuotationStore();
   const { totalSalesReturn } = useSalesReturnStore();
@@ -42,6 +46,8 @@ const InvoicesForm = ({
   const { totalDebitNotes } = useDebitNoteStore();
 
   const [quantities, setQuantities] = useState({});
+  const navigate = useNavigate();
+  const [addedItems, setAddedItems] = useState([]);
 
   const invoiceNoRef = useRef();
 
@@ -90,14 +96,12 @@ const InvoicesForm = ({
     additionalDiscountType: "after tax",
     additionalDiscountPercent: 0,
   };
-
-  const navigate = useNavigate();
-  const [addedItems, setAddedItems] = useState([]);
   const [data, setData] = useState(invoiceData);
 
   // MUTATION FOR CREATING & UPDATING INVOICE
   const mutation = useMutation({
     mutationFn: async (formData) => {
+      console.log(formData);
       if (!business) {
         throw new Error(
           "You don't have any active business yet, create one first"
@@ -255,6 +259,90 @@ const InvoicesForm = ({
     // Run only when invoiceToUpdate changes from null → object
   }, [invoiceToUpdate, isEditing]);
 
+  const invoiceTotals = useMemo(() => {
+    if (!data?.items?.length)
+      return {
+        totalDiscount: 0,
+        totalTaxableValue: 0,
+        totalTax: 0,
+        totalAmount: 0,
+        totalCGST: 0,
+        totalSGST: 0,
+        additionalCharge: 0,
+        additionalChargeGST: 0,
+        additionalDiscountAmount: 0,
+      };
+
+    let totalDiscount = 0;
+    let totalTaxableValue = 0;
+    let totalTax = 0;
+    let totalAmount = 0;
+    let totalAdditionalDiscount = 0;
+
+    data.items.forEach((item) => {
+      const quantity = Number(item.quantity || 0);
+      const basePrice = Number(item.basePrice || 0);
+      const discountAmount = Number(item.discountAmount || 0);
+      const gstAmount = Number(item.gstAmount || 0);
+      const additionalDiscountAmount = Number(
+        item.additionalDiscountAmount || 0
+      );
+
+      const taxableValue = basePrice * quantity - discountAmount;
+
+      totalDiscount += discountAmount;
+      totalTaxableValue += taxableValue;
+      totalTax += gstAmount;
+      totalAdditionalDiscount += additionalDiscountAmount;
+      totalAmount += taxableValue + gstAmount - additionalDiscountAmount;
+    });
+
+    // Include additional charges + GST
+    const additionalCharge = Number(data?.additionalChargeAmount || 0);
+    const additionalChargeGSTRate = getTotalTaxRate(
+      data?.additionalChargeTax || "0"
+    );
+    const additionalChargeGST =
+      (additionalCharge * additionalChargeGSTRate) / 100;
+
+    totalAmount += additionalCharge + additionalChargeGST;
+
+    return {
+      totalDiscount: Number(totalDiscount.toFixed(2)),
+      totalTaxableValue: Number(totalTaxableValue.toFixed(2)),
+      totalTax: Number(totalTax.toFixed(2)),
+      totalAmount: Number(totalAmount.toFixed(2)),
+      totalCGST: Number((totalTax / 2).toFixed(2)),
+      totalSGST: Number((totalTax / 2).toFixed(2)),
+      additionalCharge: Number(additionalCharge.toFixed(2)),
+      additionalChargeGST: Number(additionalChargeGST.toFixed(2)),
+      additionalDiscountAmount: Number(totalAdditionalDiscount.toFixed(2)),
+    };
+  }, [
+    data?.items,
+    data?.additionalDiscountPercent,
+    data?.additionalDiscountType,
+    data?.additionalChargeAmount,
+    data?.additionalChargeTax,
+  ]);
+
+  // FINAL USE EFFECT WHICH WILL SET THE FINAL DATA TO BE SENT AT THE BACKEND
+  useEffect(() => {
+    if (!invoiceTotals) return;
+    setData((prev) => ({
+      ...prev,
+      discountSubtotal: invoiceTotals.totalDiscount,
+      taxableAmount: invoiceTotals.totalTaxableValue,
+      cgst: invoiceTotals.totalCGST,
+      sgst: invoiceTotals.totalSGST,
+      balanceAmount: invoiceTotals.totalAmount,
+      additionalChargeAmount: invoiceTotals.additionalCharge,
+      additionalChargeTax: data?.additionalChargeTax || "",
+      additionalDiscountPercent: data?.additionalDiscountPercent || 0,
+      additionalDiscountType: data?.additionalDiscountType || "after tax",
+    }));
+  }, [invoiceTotals]);
+
   return (
     <main className="max-h-screen w-full">
       {/* navbar starts ----------------------------------------------------- */}
@@ -288,6 +376,7 @@ const InvoicesForm = ({
       <SalesInvoicePartyDetailsSection
         data={data}
         setData={setData}
+        parties={parties}
         party={party}
         setParty={setParty}
         title={title}
@@ -296,12 +385,13 @@ const InvoicesForm = ({
         invoiceToUpdate={invoiceToUpdate}
       />
 
-      <SalesInvoiceItemTable
+      <SalesInvoiceItemTableTesting
         title={title}
         data={data}
         setData={setData}
         isEditing={isEditing}
         invoiceToUpdate={invoiceToUpdate}
+        invoiceTotals={invoiceTotals}
       />
 
       {/* bottom grid part */}
@@ -311,6 +401,7 @@ const InvoicesForm = ({
         addedItems={addedItems}
         title={title}
         isEditing={isEditing}
+        invoiceTotals={invoiceTotals}
       />
     </main>
   );

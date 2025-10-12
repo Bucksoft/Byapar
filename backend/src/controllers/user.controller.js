@@ -40,7 +40,9 @@ export async function login(req, res) {
       expiresIn: Date.now() + 60 * 1000,
     });
     // 2. Send OTP via email to user.
-    await sendOTPviaMail(email, otp);
+    // await sendOTPviaMail(email, otp);
+
+    console.log(otp);
 
     return res.status(200).json({
       status: "success",

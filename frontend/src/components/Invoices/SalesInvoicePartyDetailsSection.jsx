@@ -1,6 +1,5 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
-import { usePartyStore } from "../../store/partyStore";
 import { IoCloseCircle } from "react-icons/io5";
 import { useInvoiceStore } from "../../store/invoicesStore";
 import { Search } from "lucide-react";
@@ -14,12 +13,12 @@ import { axiosInstance } from "../../config/axios";
 import { useBusinessStore } from "../../store/businessStore";
 import toast from "react-hot-toast";
 import { queryClient } from "../../main";
-import { useDebounce } from "../../../helpers/useDebounce";
 
 const SalesInvoicePartyDetailsSection = ({
   title,
   data,
   setData,
+  parties,
   party,
   setParty,
   invoiceNoRef,
@@ -27,8 +26,9 @@ const SalesInvoicePartyDetailsSection = ({
   invoiceToUpdate,
 }) => {
   const [searchPartyQuery, setSearchPartyQuery] = useState("");
-  const [invoiceSearchQuery, setInvoiceSearchQuery] = useState("");
+  const [selectOpen, setSelectOpen] = useState(false);
   const [open, setOpen] = useState(false);
+  const [invoiceSearchQuery, setInvoiceSearchQuery] = useState("");
   const [partyInvoices, setPartyInvoices] = useState([]);
   const [showPartyInvoicePopup, setShowPartyInvoicePopup] = useState(false);
 
@@ -60,31 +60,14 @@ const SalesInvoicePartyDetailsSection = ({
   const { purchaseInvoices } = usePurchaseInvoiceStore(); //  FOR PURCHASE RETURN
   const { business } = useBusinessStore();
 
-  const debouncedSearch = useDebounce(searchPartyQuery, 400);
-
-  const { isLoading, data: parties } = useQuery({
-    queryKey: ["parties", debouncedSearch, business?._id],
-    queryFn: async () => {
-      if (!business) {
-        return [];
-      }
-      const res = await axiosInstance.get(
-        `/parties/all/${
-          business?._id
-        }?page=${1}&limit=${10}&search=${encodeURIComponent(
-          debouncedSearch || ""
-        )}`
-      );
-      return res.data.data;
-      // setParties(res.data?.data);
-    },
-    enabled: !!business?._id,
-    keepPreviousData: true,
-  });
-
-  const searchedParties = parties?.filter((party) =>
-    party?.partyName.toLowerCase().includes(searchPartyQuery.toLowerCase())
-  );
+  // Filter parties based on search input
+  const filteredParties = useMemo(() => {
+    return parties
+      .filter((p) =>
+        p?.partyName?.toLowerCase().includes(searchPartyQuery.toLowerCase())
+      )
+      .sort((a, b) => a.partyName.localeCompare(b.partyName));
+  }, [searchPartyQuery, parties]);
 
   const searchedInvoices =
     invoices &&
@@ -169,40 +152,81 @@ const SalesInvoicePartyDetailsSection = ({
             </span>
 
             {/* Change and add new party dropdown  ----------------------------------------------*/}
+            <div className="relative w-60">
+              {/* Select Button */}
+              <button
+                onClick={() => setSelectOpen(!selectOpen)}
+                className="w-full truncate  flex justify-between items-center btn btn-xs btn-outline btn-neutral text-xs shadow"
+              >
+                {party ? party?.partyName : "Select Party"}
+                <svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  className={`h-4 w-4 transition-transform ${
+                    selectOpen ? "rotate-180" : "rotate-0"
+                  }`}
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M19 9l-7 7-7-7"
+                  />
+                </svg>
+              </button>
 
-            <div className="dropdown dropdown-end">
-              <div
-                tabIndex={0}
-                role="button"
-                className="btn btn-xs text-xxs btn-neutral btn-outline "
-              >
-                {!party ? "Add" : "Change"} Party
-              </div>
-              <ul
-                tabIndex={0}
-                className="dropdown-content menu bg-base-100 rounded-box z-1 w-52 p-2 shadow-sm"
-              >
-                <input
-                  type="text"
-                  className="input input-sm"
-                  placeholder="Search parties"
-                  onChange={(e) => setSearchPartyQuery(e.target.value)}
-                />
-                {parties &&
-                  parties?.map((party) => (
-                    <li key={party?._id} onClick={() => setParty(party)}>
-                      <a>{party?.partyName}</a>
-                    </li>
-                  ))}
-                <li>
-                  <Link
-                    to={"/dashboard/add-party"}
-                    className="btn btn-sm btn-dash btn-info"
-                  >
-                    Create party
-                  </Link>
-                </li>
-              </ul>
+              {/* Dropdown Content */}
+              {selectOpen && (
+                <div className="absolute z-10 mt-2 w-full bg-base-100 border border-gray-200 rounded-lg shadow-lg p-2">
+                  {/* Search Input */}
+                  <input
+                    type="text"
+                    className="input input-sm w-full mb-2"
+                    placeholder="Search parties..."
+                    value={searchPartyQuery}
+                    onChange={(e) => setSearchPartyQuery(e.target.value)}
+                  />
+
+                  {/* Party List */}
+                  <ul className="max-h-60 overflow-y-auto">
+                    {filteredParties.length > 0 ? (
+                      filteredParties.map((p) => (
+                        <li
+                          key={p._id}
+                          className="p-2 rounded-md hover:bg-gray-100 cursor-pointer text-sm truncate"
+                          onClick={() => {
+                            setParty(p);
+                            setData((prev) => ({
+                              ...prev,
+                              partyName: p?.partyName,
+                            }));
+                            setSelectOpen(false);
+                            setSearchPartyQuery("");
+                          }}
+                        >
+                          {p?.partyName}
+                        </li>
+                      ))
+                    ) : (
+                      <li className="p-2 text-sm text-gray-500">
+                        No parties found
+                      </li>
+                    )}
+                  </ul>
+
+                  <div className="border-t border-zinc-100 mt-2 pt-2 flex justify-center">
+                    <Link
+                      to="/dashboard/add-party"
+                      className="btn btn-sm btn-info text-xs w-full"
+                      onClick={() => setSelectOpen(false)}
+                    >
+                      Create Party
+                    </Link>
+                  </div>
+                </div>
+              )}
             </div>
 
             {/* Change and add new party dropdown ends  ----------------------------------------------*/}
@@ -509,10 +533,10 @@ const SalesInvoicePartyDetailsSection = ({
         )}
 
         {/* third block - PAYMENT TERMS AND INVOICE NUMBER GENERATION */}
-        <div className="border-t border-r border-zinc-300 pt-1 relative">
+        <div className="border-t border-r border-zinc-300  pt-1 relative">
           {/* upper part */}
-          <div className=" p-2 flex space-x-2 items-center">
-            <div className="">
+          <div className=" p-2 flex space-x-2 items-center ">
+            <div className="w-1/2">
               <p className="text-xs pb-2">{title} No: </p>
               <input
                 type="number"
@@ -526,10 +550,10 @@ const SalesInvoicePartyDetailsSection = ({
                     salesInvoiceNumber: Number(e.target.value),
                   }))
                 }
-                className="input input-xs border-none bg-zinc-200 w-30"
+                className="input w-full input-xs border-none bg-zinc-200 "
               />
             </div>
-            <div>
+            <div className="w-1/2">
               <p className="text-xs pb-2 ">{title} Date: </p>
               <input
                 type="date"
@@ -542,7 +566,7 @@ const SalesInvoicePartyDetailsSection = ({
                 }
                 onChange={handleInputChange}
                 name="salesInvoiceDate"
-                className="input input-xs border-none bg-zinc-200 w-30"
+                className="input input-xs border-none bg-zinc-200 w-full"
               />
             </div>
           </div>
@@ -551,10 +575,10 @@ const SalesInvoicePartyDetailsSection = ({
           title === "Proforma Invoice" ||
           title === "Purchase Invoice" ? (
             <>
-              <div className="p-2">
+              <div className="p-2 ">
                 <button
                   onClick={() => setOpen(true)}
-                  className={`btn btn-info btn-sm btn-dash px-20 w-fit ${
+                  className={`btn w-full btn-info btn-sm btn-dash px-20  ${
                     open ? "hidden" : ""
                   }`}
                 >
@@ -563,15 +587,17 @@ const SalesInvoicePartyDetailsSection = ({
               </div>
 
               {open && (
-                <>
-                  <div className="flex justify-end relative">
-                    <IoCloseCircle
-                      size={25}
-                      onClick={() => setOpen(false)}
-                      className="text-gray-500 absolute top-0 right-[57px]"
-                    />
-                  </div>
-                  <div className="px-2 py-4 flex space-x-2 border border-dashed w-fit m-2 rounded-md ">
+                <div className="relative p-2 border border-dashed rounded-md w-fit m-2 ">
+                  {/* Close Button */}
+                  <button
+                    onClick={() => setOpen(false)}
+                    className="absolute top-1 right-1 text-gray-500 hover:text-gray-700"
+                  >
+                    <IoCloseCircle size={22} />
+                  </button>
+
+                  {/* Content */}
+                  <div className="flex space-x-2 mt-6">
                     {/* Payment Terms */}
                     <div>
                       <p className="text-xs pb-2">Payment Terms: </p>
@@ -582,21 +608,18 @@ const SalesInvoicePartyDetailsSection = ({
                           value={data.paymentTerms}
                           onChange={(e) => {
                             const days = Number(e.target.value);
-
-                            // calculate new due date = today + days
                             const newDate = new Date();
                             newDate.setDate(newDate.getDate() + days);
-
                             setData((prev) => ({
                               ...prev,
                               paymentTerms: days,
-                              dueDate: newDate.toISOString().split("T")[0], // yyyy-mm-dd format
+                              dueDate: newDate.toISOString().split("T")[0],
                             }));
                           }}
                           name="paymentTerms"
                           className="input input-xs w-30"
                         />
-                        <span className="text-xs absolute z-50 left-21 top-1 bg-zinc-200 ">
+                        <span className="text-xs absolute left-20 top-1 bg-zinc-200 px-1">
                           Days
                         </span>
                       </div>
@@ -621,7 +644,7 @@ const SalesInvoicePartyDetailsSection = ({
                       />
                     </div>
                   </div>
-                </>
+                </div>
               )}
             </>
           ) : title === "Quotation" || title === "Purchase Order" ? (

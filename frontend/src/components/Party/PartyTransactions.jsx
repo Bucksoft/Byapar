@@ -13,29 +13,37 @@ const PartyTransactions = ({ party, filter }) => {
   const { paymentIns } = usePaymentInStore();
   const [transactions, setTransactions] = useState([]);
 
+  console.log(paymentIns);
+
   useEffect(() => {
-    const partyInvoices =
-      invoices &&
-      invoices?.invoices
-        .filter((invoice) => invoice.partyName === party?.partyName)
-        .map((invoice) => ({ ...invoice, type: "sales invoice" }));
+    const safeArray = (x) => (Array.isArray(x) ? x : []);
 
-    const partyQuotations =
-      quotations &&
-      quotations
-        ?.filter((quotation) => quotation?.partyName === party?.partyName)
-        .map((quotation) => ({ ...quotation, type: "quotation" }));
+    // If paymentIns sometimes comes wrapped like { paymentIns: [...] }, try that first.
+    const rawPaymentList = Array.isArray(paymentIns)
+      ? paymentIns
+      : Array.isArray(paymentIns?.paymentIns)
+      ? paymentIns.paymentIns
+      : [];
 
-    const partyPaymentIns =
-      paymentIns &&
-      paymentIns
-        ?.filter((paymentIn) => paymentIn.partyName === party?.partyName)
-        .map((paymentIn) => ({ ...paymentIn, type: "payment in" }));
+    const invoiceList = Array.isArray(invoices?.invoices)
+      ? invoices.invoices
+      : [];
+    const quotationList = safeArray(quotations);
+
+    const partyInvoices = invoiceList
+      .filter((inv) => inv.partyName === party?.partyName)
+      .map((inv) => ({ ...inv, type: "sales invoice" }));
+
+    const partyQuotations = quotationList
+      .filter((q) => q?.partyName === party?.partyName)
+      .map((q) => ({ ...q, type: "quotation" }));
+
+    const partyPaymentIns = rawPaymentList
+      .filter((p) => p?.partyName === party?.partyName)
+      .map((p) => ({ ...p, type: "payment in" }));
 
     setTransactions([...partyInvoices, ...partyPaymentIns, ...partyQuotations]);
   }, [invoices, quotations, paymentIns, party]);
-
-  console.log(transactions);
 
   const filteredTransactions =
     filter && filter !== "all_transactions"
