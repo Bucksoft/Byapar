@@ -51,7 +51,7 @@ const DashboardDeliveryChallanPage = () => {
       document.getElementById("my_modal_2").close();
     },
   });
-  
+
   // FILTERING THE DELIVERY CHALLANS BASED ON THE TYPE AND SEARCH QUERY
   const filteredChallans =
     deliveryChallans &&
@@ -111,8 +111,6 @@ const DashboardDeliveryChallanPage = () => {
       } else {
         return challan;
       }
-
-      return true;
     });
 
   return (

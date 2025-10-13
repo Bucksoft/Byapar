@@ -841,10 +841,5 @@ export const dateRanges = [
   "Last 7 Days",
   "This Month",
   "Previous Month",
-  "Last 30 Days",
-  "This Quarter",
-  "Previous Quarter",
-  "Current Fiscal Year",
-  "Previous Fiscal Year",
   "Last 365 Days",
 ];
