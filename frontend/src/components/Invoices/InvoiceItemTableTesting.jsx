@@ -157,15 +157,16 @@ const SalesInvoiceItemTableTesting = ({
     });
   };
 
+  // MAIN USE EFFECT FOR CALCULATION
   useEffect(() => {
     if (!data?.items?.length) return;
 
     let totalDiscount = 0;
     let totalTaxableValue = 0;
     let totalTax = 0;
-    let totalAmount = 0; // final total including charges and GST
+    let totalAmount = 0;
     let totalAdditionalDiscount = 0;
-    let subtotalAmount = 0; // sum of items before discounts and GST
+    let subtotalAmount = 0;
 
     const updatedItems = data.items.map((item) => {
       const isPurchaseType = [
@@ -174,55 +175,61 @@ const SalesInvoiceItemTableTesting = ({
         "Purchase Order",
       ].includes(title);
 
-      const quantity = quantities[item._id] || item?.quantity || 0;
-      const discountPercent = item?.discountPercent || 0;
-      const discountAmount = item?.discountAmount || 0;
-      const gstRate = getTotalTaxRate(item?.gstTaxRate || "0");
+      const quantity = Number(quantities[item._id] ?? item?.quantity ?? 0);
+      const discountPercent = Number(item?.discountPercent ?? 0);
+      const discountAmount = Number(item?.discountAmount ?? 0);
+      const gstRate = Number(getTotalTaxRate(item?.gstTaxRate ?? "0"));
 
+      // Use salesPrice or purchasePrice safely
       const rawPrice = isPurchaseType
-        ? item.purchasePrice || 0
-        : item.salesPrice || 0;
-      const manualBasePrice = basePrices[item._id];
+        ? Number(item?.purchasePrice ?? 0)
+        : Number(item?.salesPrice ?? 0);
 
+      const manualBasePrice = Number(basePrices[item._id]);
       let basePrice;
-      if (manualBasePrice !== undefined) {
+
+      if (!isNaN(manualBasePrice)) {
         basePrice = manualBasePrice;
-      } else if (item.gstTaxRateType === "with tax") {
-        basePrice = rawPrice / (1 + gstRate / 100);
       } else {
-        basePrice = rawPrice;
+        basePrice =
+          item?.gstTaxRateType === "with tax"
+            ? rawPrice / (1 + gstRate / 100)
+            : rawPrice;
       }
 
       const finalDiscountAmount = discountPercent
         ? (basePrice * quantity * discountPercent) / 100
         : discountAmount;
 
-      const gstAmount =
-        (basePrice * quantity - finalDiscountAmount) * (gstRate / 100);
+      const gstAmount = Math.max(
+        (basePrice * quantity - finalDiscountAmount) * (gstRate / 100),
+        0
+      );
 
       let totalItemAmount =
         basePrice * quantity - finalDiscountAmount + gstAmount;
 
+      // Additional discount
       let additionalDiscountAmount = 0;
-      if (data?.additionalDiscountPercent > 0) {
+      const addDiscPercent = Number(data?.additionalDiscountPercent ?? 0);
+      if (addDiscPercent > 0) {
         if (data?.additionalDiscountType === "before tax") {
           additionalDiscountAmount =
-            ((basePrice * quantity - finalDiscountAmount) *
-              data.additionalDiscountPercent) /
+            ((basePrice * quantity - finalDiscountAmount) * addDiscPercent) /
             100;
           totalItemAmount -= additionalDiscountAmount;
-        } else if (data?.additionalDiscountType === "after tax") {
-          additionalDiscountAmount =
-            (totalItemAmount * data.additionalDiscountPercent) / 100;
+        } else {
+          additionalDiscountAmount = (totalItemAmount * addDiscPercent) / 100;
           totalItemAmount -= additionalDiscountAmount;
         }
       }
 
+      // Accumulate totals
       totalDiscount += finalDiscountAmount;
       totalTaxableValue += basePrice * quantity - finalDiscountAmount;
       totalTax += gstAmount;
       totalAdditionalDiscount += additionalDiscountAmount;
-      subtotalAmount += basePrice * quantity; // before discounts and GST
+      subtotalAmount += basePrice * quantity;
       totalAmount += totalItemAmount;
 
       return {
@@ -237,55 +244,59 @@ const SalesInvoiceItemTableTesting = ({
     });
 
     // Additional charges
-    const additionalCharge = Number(data?.additionalChargeAmount || 0);
-    const additionalChargeGSTRate = getTotalTaxRate(
-      data?.additionalChargeTax || "0"
+    const additionalCharge = Number(data?.additionalChargeAmount ?? 0);
+    const additionalChargeGSTRate = Number(
+      getTotalTaxRate(data?.additionalChargeTax ?? "0")
     );
     const additionalChargeGST =
       (additionalCharge * additionalChargeGSTRate) / 100;
-
     totalAmount += additionalCharge + additionalChargeGST;
 
+    // Only update state if something changed
     setData((prev) => {
-      const updatedData = {
+      let changed = false;
+
+      const newItems = prev.items.map((item, idx) => {
+        const updatedItem = updatedItems[idx];
+        if (JSON.stringify(item) !== JSON.stringify(updatedItem)) {
+          changed = true;
+          return updatedItem;
+        }
+        return item;
+      });
+
+      if (!changed) return prev;
+
+      return {
         ...prev,
-        items: updatedItems,
+        items: newItems,
         discountSubtotal: Number(totalDiscount.toFixed(2)),
         taxableAmount: Number(totalTaxableValue.toFixed(2)),
         cgst: Number((totalTax / 2).toFixed(2)),
         sgst: Number((totalTax / 2).toFixed(2)),
-        balanceAmount: Number(totalAmount.toFixed(2)), // final total including charges and GST
-        totalAmount: Number(totalAmount.toFixed(2)), // explicit totalAmount field
-        amountSubTotal: Number(subtotalAmount.toFixed(2)), // sum of base prices before discounts/GST
+        balanceAmount: Number(totalAmount.toFixed(2)),
+        totalAmount: Number(totalAmount.toFixed(2)),
+        amountSubTotal: Number(subtotalAmount.toFixed(2)),
         additionalChargeAmount: Number(additionalCharge.toFixed(2)),
         additionalChargeTax: prev.additionalChargeTax || "",
         additionalDiscountPercent: prev.additionalDiscountPercent || 0,
         additionalDiscountType: prev.additionalDiscountType || "after tax",
         additionalDiscountAmount: Number(totalAdditionalDiscount.toFixed(2)),
       };
-
-      if (JSON.stringify(prev) === JSON.stringify(updatedData)) return prev;
-      return updatedData;
     });
-  }, [
-    data?.items,
-    quantities,
-    basePrices,
-    data?.additionalDiscountPercent,
-    data?.additionalDiscountType,
-    data?.additionalChargeAmount,
-    data?.additionalChargeTax,
-    title,
-  ]);
+  }, [data.items, quantities, basePrices, title]);
 
   return (
     <>
-      <div className="w-full grid grid-cols-11 text-xs ">
+      <div className="w-full grid grid-cols-12 text-xs ">
         <span className="border-t p-2 border-[var(--primary-border)] uppercase bg-[var(--primary-background)]">
           NO
         </span>
-        <span className="border-t border-l p-2 border-[var(--primary-border)] col-span-3 uppercase bg-[var(--primary-background)]">
+        <span className="border-t border-l p-2 border-[var(--primary-border)] col-span-2 uppercase bg-[var(--primary-background)]">
           Items/ Services
+        </span>
+        <span className="border-t border-l p-2 border-[var(--primary-border)] col-span-2 uppercase bg-[var(--primary-background)]">
+          Description
         </span>
         <span className="border-t border-l p-2 border-[var(--primary-border)] uppercase bg-[var(--primary-background)]">
           HSN/ SAC
@@ -308,22 +319,37 @@ const SalesInvoiceItemTableTesting = ({
         <span className="border-l border-t border-r p-2 border-[var(--primary-border)] text-gray-500 uppercase bg-[var(--primary-background)]"></span>
       </div>
 
-      {/* RENDEING THE ITEMS HERE */}
+      {/* RENDERING THE ITEMS HERE */}
       {data?.items?.map((item, index) => (
-        <div className="w-full grid grid-cols-11 text-xs" key={item?._id}>
+        <div className="w-full grid grid-cols-12 text-xs" key={item?._id}>
           {/* Row Number */}
           <span className="border-t p-2 border-[var(--primary-border)]">
             {index + 1}
           </span>
 
           {/* Item Name */}
-          <span className="border-t flex flex-col  border-l p-2 border-[var(--primary-border)] col-span-3">
+          <span className="border-t flex flex-col border-l p-2 border-[var(--primary-border)] col-span-2">
             {item?.itemName}
-            {item?.description.length > 0 && (
-              <p className="text-xs mt-2 text-zinc-600">
-                ({item?.description})
-              </p>
-            )}
+          </span>
+
+          {/* Description */}
+          <span className="border-t border-l p-2 border-[var(--primary-border)] col-span-2">
+            <textarea
+              type="text"
+              value={item?.description || ""}
+              placeholder="description"
+              onChange={(e) => {
+                setData((prev) => ({
+                  ...prev,
+                  items: prev.items.map((i) =>
+                    i._id === item._id
+                      ? { ...i, description: e.target.value }
+                      : i
+                  ),
+                }));
+              }}
+              className="textarea textarea-xs bg-zinc-100 text-left w-full"
+            />
           </span>
 
           {/* HSN */}

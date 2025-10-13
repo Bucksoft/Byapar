@@ -32,71 +32,92 @@ const PartyLedgerStatement = ({ party }) => {
   const { invoices } = useInvoiceStore();
   const { creditNotes } = useCreditNoteStore();
 
-  console.log(invoices);
-
   const ledgerEntries = useMemo(() => {
+    if (!party) return [];
+
     const allEntries = [];
 
-    // PUSH THE INVOICES
-    invoices?.invoices.forEach((invoice) => {
-      if (party?._id !== invoice.partyId?._id) return;
-      allEntries.push({
-        date: invoice?.salesInvoiceDate || "-",
-        voucher: invoice?.type || "Sales Invoice",
-        srNo: invoice?.salesInvoiceNumber || "-",
-        credit: 0,
-        debit: invoice?.totalAmount || "-",
-        tdsDeductedByParty: invoice?.tdsDeductedByParty || 0,
-        tdsDeductedBySelf: invoice?.tdsDeductedBySelf || 0,
-      });
-    });
+    // --- INVOICES ---
+    Array.isArray(invoices?.invoices) &&
+      invoices.invoices.forEach((invoice) => {
+        const invoicePartyId =
+          invoice?.partyId && typeof invoice.partyId === "object"
+            ? invoice.partyId._id
+            : invoice?.partyId;
 
-    // PUSH THE PAYMENT INS
-    paymentIns?.forEach((paymentIn) => {
-      if (party?._id !== paymentIn?.partyId) return;
-      allEntries.push({
-        date: paymentIn?.paymentDate || "-",
-        voucher: paymentIn?.type || "Payment In",
-        srNo: paymentIn?.paymentInNumber || "-",
-        credit: paymentIn?.paymentAmount || "-",
-        debit: 0,
-        tdsDeductedByParty: paymentIn?.tdsDeductedByParty || 0,
-        tdsDeductedBySelf: paymentIn?.tdsDeductedBySelf || 0,
-      });
-    });
+        if (!invoicePartyId || invoicePartyId !== party._id) return;
 
-    // PUSH THE SALES RETURNS
-    saleReturns?.forEach((sr) => {
-      if (party?._id !== sr?.partyId) return;
-      allEntries.push({
-        date: sr.salesReturnDate || "-",
-        voucher: sr.type || "Sales Return",
-        srNo: sr.salesReturnNumber || "-",
-        debit: 0,
-        credit: Number(sr.totalAmount) || "-",
-        tdsDeductedByParty: sr?.tdsDeductedByParty || 0,
-        tdsDeductedBySelf: sr?.tdsDeductedBySelf || 0,
+        allEntries.push({
+          date: invoice?.salesInvoiceDate || new Date(),
+          voucher: invoice?.type || "Sales Invoice",
+          srNo: invoice?.salesInvoiceNumber ?? "-",
+          credit: 0,
+          debit: Number(invoice?.totalAmount) || 0,
+          tdsDeductedByParty: Number(invoice?.tdsDeductedByParty) || 0,
+          tdsDeductedBySelf: Number(invoice?.tdsDeductedBySelf) || 0,
+        });
       });
-    });
 
-    // PUSH THE CREDIT NOTES
-    creditNotes?.forEach((cn) => {
-      if (party?._id !== cn?.partyId?._id) return;
-      allEntries.push({
-        date: cn.creditNoteDate,
-        voucher: cn.type || "Credit Note",
-        srNo: cn.creditNoteNumber || "-",
-        debit: 0,
-        credit: Number(cn?.totalAmount),
-        tdsDeductedByParty: cn?.tdsDeductedByParty || 0,
-        tdsDeductedBySelf: cn?.tdsDeductedBySelf || 0,
+    // --- PAYMENT INS ---
+    Array.isArray(paymentIns) &&
+      paymentIns.forEach((paymentIn) => {
+        if (!party?._id || paymentIn?.partyId !== party._id) return;
+
+        allEntries.push({
+          date: paymentIn?.paymentDate || new Date(),
+          voucher: paymentIn?.type || "Payment In",
+          srNo: paymentIn?.paymentInNumber ?? "-",
+          credit: Number(paymentIn?.paymentAmount) || 0,
+          debit: 0,
+          tdsDeductedByParty: Number(paymentIn?.tdsDeductedByParty) || 0,
+          tdsDeductedBySelf: Number(paymentIn?.tdsDeductedBySelf) || 0,
+        });
       });
-    });
 
+    // --- SALE RETURNS ---
+    Array.isArray(saleReturns) &&
+      saleReturns.forEach((sr) => {
+        const srPartyId =
+          sr?.partyId && typeof sr.partyId === "object"
+            ? sr.partyId._id
+            : sr?.partyId;
+        if (!srPartyId || srPartyId !== party._id) return;
+
+        allEntries.push({
+          date: sr?.salesReturnDate || new Date(),
+          voucher: sr?.type || "Sales Return",
+          srNo: sr?.salesReturnNumber ?? "-",
+          debit: 0,
+          credit: Number(sr?.totalAmount) || 0,
+          tdsDeductedByParty: Number(sr?.tdsDeductedByParty) || 0,
+          tdsDeductedBySelf: Number(sr?.tdsDeductedBySelf) || 0,
+        });
+      });
+
+    // --- CREDIT NOTES ---
+    Array.isArray(creditNotes) &&
+      creditNotes.forEach((cn) => {
+        const cnPartyId =
+          cn?.partyId && typeof cn.partyId === "object"
+            ? cn.partyId._id
+            : cn?.partyId;
+        if (!cnPartyId || cnPartyId !== party._id) return;
+
+        allEntries.push({
+          date: cn?.creditNoteDate || new Date(),
+          voucher: cn?.type || "Credit Note",
+          srNo: cn?.creditNoteNumber ?? "-",
+          debit: 0,
+          credit: Number(cn?.totalAmount) || 0,
+          tdsDeductedByParty: Number(cn?.tdsDeductedByParty) || 0,
+          tdsDeductedBySelf: Number(cn?.tdsDeductedBySelf) || 0,
+        });
+      });
+
+    // Sort entries by date ascending
     return allEntries.sort((a, b) => new Date(a.date) - new Date(b.date));
-  }, [invoices, paymentIns, saleReturns, creditNotes]);
+  }, [invoices, paymentIns, saleReturns, creditNotes, party]);
 
-  // CALCULATING LEDGER'S BALANCE
   const ledgerWithBalance = useMemo(() => {
     let runningBalance =
       party.openingBalanceStatus === "To Collect"
@@ -108,9 +129,6 @@ const PartyLedgerStatement = ({ party }) => {
     });
   }, [ledgerEntries]);
 
-  console.log(ledgerWithBalance);
-
-  // CALCULATING THE TOTAL BALANCE AT THE END OF THE DAY
   const totalBalance = useMemo(() => {
     if (!ledgerWithBalance.length) return party?.openingBalance || 0;
 
@@ -124,7 +142,7 @@ const PartyLedgerStatement = ({ party }) => {
     );
   }, [ledgerWithBalance, party]);
 
-  // FILTERING THE ENTRIES
+  
   const filteredEntries = useMemo(() => {
     const from = new Date(dateRange.from);
     const to = new Date(dateRange.to);
