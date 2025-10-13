@@ -17,39 +17,67 @@ const DashboardPartyPage = () => {
   const navigate = useNavigate();
   const [selectedMenu, setSelectedMenu] = useState("transactions");
   const { invoices } = useInvoiceStore();
-  const [partyInvoices, setPartyInvoices] = useState();
+  const [partyInvoices, setPartyInvoices] = useState([]);
   const [filter, setFilter] = useState("all_transactions");
 
   function handleSelectedMenu(menu) {
-    setSelectedMenu(menu.toLowerCase());
+    setSelectedMenu(
+      typeof menu === "string" ? menu.toLowerCase() : selectedMenu
+    );
   }
 
   const { isLoading, data: party } = useQuery({
+    queryKey: ["party", id],
     queryFn: async () => {
       const res = await axiosInstance.get(`/parties/${id}`);
-      return res.data.party;
+      return res?.data?.party ?? null;
     },
+    enabled: Boolean(id),
+    retry: 1,
+    staleTime: 1000 * 60 * 5,
   });
 
   useEffect(() => {
-    const partyInvoices =
-      invoices &&
-      invoices?.invoices.filter((invoice) => invoice?.partyId?._id === id);
-    setPartyInvoices(partyInvoices);
+    if (!id) {
+      setPartyInvoices([]);
+      return;
+    }
+
+    const allInvoices = Array.isArray(invoices?.invoices)
+      ? invoices.invoices
+      : [];
+
+    const filtered = allInvoices.filter((invoice) => {
+      const partyIdFromInvoice =
+        invoice?.partyId && typeof invoice.partyId === "object"
+          ? invoice?.partyId._id
+          : invoice?.partyId;
+
+      return String(partyIdFromInvoice) === String(id);
+    });
+
+    setPartyInvoices(filtered);
   }, [id, invoices]);
 
   const handleSelectChange = (e) => {
-    if (e.target.value === "Sales Invoice") {
+    const value = e?.target?.value;
+    if (!value) return;
+
+    if (value === "Sales Invoice") {
       navigate("/dashboard/parties/sales-invoice", { state: { id: id } });
+      return;
     }
-    if (e.target.value === "Quotation") {
+    if (value === "Quotation") {
       navigate("/dashboard/parties/create-quotation", { state: { id: id } });
+      return;
     }
-    if (e.target.value === "Proforma Invoice") {
+    if (value === "Proforma Invoice") {
       navigate("/dashboard/parties/proforma-invoice", { state: { id: id } });
+      return;
     }
-    if (e.target.value === "Sales Return") {
+    if (value === "Sales Return") {
       navigate("/dashboard/parties/sales-return", { state: { id: id } });
+      return;
     }
   };
 
@@ -84,31 +112,37 @@ const DashboardPartyPage = () => {
                   <option value="Sales Return">Sales Return</option>
                 </select>
               </fieldset>
-              <Link to={`/dashboard/edit-party/${party?._id}`}>
-                <button className="btn btn-sm ">
-                  <FaRegEdit />
-                  Edit
-                </button>
-              </Link>
+
+              {party?._id && (
+                <Link to={`/dashboard/edit-party/${party._id}`}>
+                  <button className="btn btn-sm">
+                    <FaRegEdit />
+                    Edit
+                  </button>
+                </Link>
+              )}
             </div>
           </nav>
         </header>
 
+        {/* Menu Section */}
         <section className="flex items-center gap-8 border-b border-zinc-200 text-zinc-600">
-          {dashboardSinglePartyMenus.map((menu) => (
-            <button
-              key={menu.id}
-              className={`flex items-center text-xs mt-5 gap-3 p-3 cursor-pointer ${
-                selectedMenu === menu.title.toLowerCase() &&
-                "text-[var(--secondary-text-color)]  border-b"
-              } `}
-              onClick={() => handleSelectedMenu(menu.title)}
-            >
-              {menu.icon} {menu.title}
-            </button>
-          ))}
+          {Array.isArray(dashboardSinglePartyMenus) &&
+            dashboardSinglePartyMenus.map((menu) => (
+              <button
+                key={menu.id}
+                className={`flex items-center text-xs mt-5 gap-3 p-3 cursor-pointer ${
+                  selectedMenu === menu.title?.toLowerCase() &&
+                  "text-[var(--secondary-text-color)]  border-b"
+                }`}
+                onClick={() => handleSelectedMenu(menu.title)}
+              >
+                {menu.icon} {menu.title}
+              </button>
+            ))}
         </section>
 
+        {/* Filter Dropdown */}
         {selectedMenu !== "ledger (statement)" && (
           <section className="flex flex-col">
             <fieldset className="fieldset">
@@ -134,22 +168,23 @@ const DashboardPartyPage = () => {
           </section>
         )}
 
+        {/* Content Sections */}
         {selectedMenu === "transactions" && (
           <PartyTransactions
-            party={party}
-            partyInvoices={partyInvoices}
+            party={party ?? null}
+            partyInvoices={Array.isArray(partyInvoices) ? partyInvoices : []}
             filter={filter}
           />
         )}
 
-        {selectedMenu === "profile" && <PartyProfile party={party} />}
+        {selectedMenu === "profile" && <PartyProfile party={party ?? null} />}
 
         {selectedMenu === "ledger (statement)" && (
-          <PartyLedgerStatement party={party} filter={filter} />
+          <PartyLedgerStatement party={party ?? null} filter={filter} />
         )}
 
         {selectedMenu === "item wise report" && (
-          <PartyItemWiseReport party={party} filter={filter} />
+          <PartyItemWiseReport party={party ?? null} filter={filter} />
         )}
       </div>
     </main>
