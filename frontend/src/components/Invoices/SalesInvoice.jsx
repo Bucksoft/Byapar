@@ -167,7 +167,7 @@ const SalesInvoice = () => {
         </section>
 
         {isLoading ? (
-          <div className="w-full flex items-center py-16">
+          <div className="w-full flex items-center justify-center py-16">
             <CustomLoader text={"Loading..."} />
           </div>
         ) : (

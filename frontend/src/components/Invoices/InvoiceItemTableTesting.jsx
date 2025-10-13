@@ -360,7 +360,10 @@ const SalesInvoiceItemTableTesting = ({
             <input
               type="number"
               min={0}
-              value={basePrices[item._id] ?? item?.basePrice.toFixed(2) ?? 0}
+              value={
+                basePrices[item._id] ??
+                (item?.basePrice ? Number(item?.basePrice).toFixed(2) : 0)
+              }
               className="input input-xs bg-zinc-100 text-right"
               onChange={(e) => {
                 const newPrice = Number(e.target.value);

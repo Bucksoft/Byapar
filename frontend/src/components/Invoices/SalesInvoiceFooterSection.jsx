@@ -134,8 +134,9 @@ const SalesInvoiceFooterSection = ({
         </div>
 
         {/* add new account */}
-        <BankAccountPopupForBusiness />
-        {bankAccounts &&
+        {!bankAccounts ? (
+          <BankAccountPopupForBusiness />
+        ) : (
           bankAccounts.map((bankAccount) => (
             <div
               key={bankAccount._id}
@@ -203,7 +204,8 @@ const SalesInvoiceFooterSection = ({
                 </button> */}
               </div>
             </div>
-          ))}
+          ))
+        )}
       </div>
       {/* Right Grid Part */}
       <div className="border-l border-l-zinc-300 py-2">

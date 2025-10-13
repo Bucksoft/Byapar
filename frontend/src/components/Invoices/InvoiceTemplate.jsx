@@ -77,10 +77,18 @@ const InvoiceTemplate = ({
     ? items.reduce((acc, item) => acc + (Number(item?.discountAmount) || 0), 0)
     : 0;
 
-  const subtotalTotal = items.reduce(
-    (acc, item) => acc + (Number(item?.totalAmount) || 0),
-    0
-  );
+  const subtotalTotal = items.reduce((acc, item) => {
+    const total =
+      Number(item?.totalAmount) ||
+      (Number(item?.salesPrice) || Number(item?.basePrice) || 0) *
+        (Number(item?.quantity) || 0) *
+        (1 + (Number(item?.gstTaxRate) || 0) / 100) -
+        (Number(item?.discountAmount) || 0);
+
+    return acc + (isNaN(total) ? 0 : total);
+  }, 0);
+
+  console.log(invoice);
 
   return (
     <main
@@ -594,7 +602,13 @@ const InvoiceTemplate = ({
                       }}
                     >
                       <LiaRupeeSignSolid />
-                      {Number(item?.totalAmount || 0).toLocaleString("en-IN", {
+                      {Number(
+                        item?.totalAmount ??
+                          (Number(item?.salesPrice) || 0) *
+                            (Number(item?.quantity) || 0) *
+                            (1 + (Number(item?.gstTaxRate) || 0) / 100) -
+                            (Number(item?.discountAmount) || 0)
+                      ).toLocaleString("en-IN", {
                         minimumFractionDigits: 2,
                         maximumFractionDigits: 2,
                       })}

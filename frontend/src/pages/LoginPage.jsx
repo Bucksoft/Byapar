@@ -124,6 +124,12 @@ const LoginPage = () => {
                 placeholder="Email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") {
+                    e.preventDefault();
+                    mutation.mutate(email);
+                  }
+                }}
               />
               {mutation.isError && (
                 <p className="text-xs text-error mt-3">

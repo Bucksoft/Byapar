@@ -43,8 +43,6 @@ const DashboardSalesPage = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
 
-  const debouncedSearch = useDebounce(searchQuery, 400);
-
   // FETCH ALL THE INVOICES FOR A BUSINESS
   const {
     isLoading,
@@ -88,12 +86,20 @@ const DashboardSalesPage = () => {
   // SEARCH INVOICES
   const searchedInvoices = useMemo(() => {
     if (!invoices?.invoices?.length) return [];
-    return invoices?.invoices?.filter((item) =>
-      item?.salesInvoiceNumber
+
+    return invoices?.invoices?.filter((item) => {
+      const invoiceMatch = item?.salesInvoiceNumber
         ?.toString()
         ?.toLowerCase()
-        .includes(searchQuery?.toLowerCase())
-    );
+        .includes(searchQuery?.toLowerCase());
+
+      const partyMatch = item?.partyName
+        ?.toString()
+        ?.toLowerCase()
+        .includes(searchQuery?.toLowerCase());
+
+      return invoiceMatch || partyMatch;
+    });
   }, [invoices, searchQuery]);
 
   const paginatedInvoices = useMemo(() => {
@@ -308,7 +314,7 @@ const DashboardSalesPage = () => {
                         <td>{invoice?.salesInvoiceNumber}</td>
                         <td>{invoice?.partyId?.partyName || "-"}</td>
                         <td>{invoice?.dueDate?.split("T")[0] || "-"}</td>
-                        <td className="flex flex-col gap-1">
+                        <td className="">
                           <div className="flex items-center">
                             <LiaRupeeSignSolid />
                             {Number(invoice?.totalAmount).toLocaleString(
@@ -316,7 +322,7 @@ const DashboardSalesPage = () => {
                             )}
                           </div>
 
-                          {invoice?.pendingAmount &&
+                          {/* {invoice?.pendingAmount &&
                           invoice.pendingAmount > 0 ? (
                             <small className="flex items-center text-error">
                               <LiaRupeeSignSolid />{" "}
@@ -331,7 +337,7 @@ const DashboardSalesPage = () => {
                             </small>
                           ) : (
                             ""
-                          )}
+                          )} */}
                         </td>
                         <td>
                           <p

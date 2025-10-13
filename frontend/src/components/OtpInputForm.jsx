@@ -39,6 +39,12 @@ const OtpInputForm = ({ email }) => {
           value={otp}
           maxLength={6}
           onChange={(e) => setOtp(e.target.value.replace(/\D/g, ""))}
+          onKeyDown={(e) => {
+            if (e.key === "Enter") {
+              e.preventDefault();
+              mutation.mutate(otp);
+            }
+          }}
           className="input input-sm mt-2 bg-zinc-100 rounded-full"
         />
 

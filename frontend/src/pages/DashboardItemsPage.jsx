@@ -22,6 +22,7 @@ import { uploadExcel } from "../../helpers/uploadExcel";
 import toast from "react-hot-toast";
 import { queryClient } from "../main";
 import { useDebounce } from "../../helpers/useDebounce";
+import no_items from "../assets/no_items.jpg";
 
 const DashboardItemsPage = () => {
   const navigate = useNavigate();
@@ -240,7 +241,7 @@ const DashboardItemsPage = () => {
                   >
                     <img
                       src={not_found}
-                      alt="no_items"
+                      alt="not_found"
                       width={250}
                       loading="lazy"
                     />
