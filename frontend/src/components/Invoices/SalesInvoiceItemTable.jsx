@@ -56,7 +56,7 @@ const SalesInvoiceItemTable = ({
   // handle base price change
   const handleBasePriceChange = (itemId, value) => {
     console.log(value);
-    setAddedItems((prev) =>
+    setAddedItems((prev) =>  
       prev.map((item) =>
         item._id === itemId
           ? { ...item, basePrice: Number(value), isManualBase: true }
@@ -450,7 +450,7 @@ const SalesInvoiceItemTable = ({
                   <input
                     type="text"
                     placeholder="Search Items"
-                    className="input input-sm "
+                    className="input input-sm"
                     value={searchItemQuery}
                     onChange={(e) => setSearchItemQuery(e.target.value)}
                   />

@@ -29,7 +29,7 @@ const SingleItemPage = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    const singleItem = items?.items.find((item) => item?._id === id);
+    const singleItem = items?.find((item) => item?._id === id);
     setItem(singleItem);
   }, [id]);
 
