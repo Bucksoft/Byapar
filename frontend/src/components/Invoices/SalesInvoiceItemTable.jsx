@@ -1,9 +1,8 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useState } from "react";
 import { BsTrash3 } from "react-icons/bs";
 import { LiaRupeeSignSolid } from "react-icons/lia";
 import { useItemStore } from "../../store/itemStore";
 import { Link } from "react-router-dom";
-import not_found from "../../assets/not-found.png";
 import { FaBarcode } from "react-icons/fa6";
 import { CircleX, Percent, Plus } from "lucide-react";
 import { useInvoiceStore } from "../../store/invoicesStore";
@@ -30,28 +29,34 @@ const SalesInvoiceItemTable = ({
   const { business } = useBusinessStore();
   const { purchaseInvoices } = usePurchaseInvoiceStore();
 
+  const debouncedSearch = useDebounce(searchItemQuery, 400);
+
   // FETCHING ALL ITEMS FOR THE BUSINESS
-  const { data: items, isLoading } = useQuery({
-    queryKey: ["items", business?._id],
+  const {
+    data: items,
+    isLoading,
+    isSuccess,
+  } = useQuery({
+    queryKey: ["items", business?._id, debouncedSearch],
     queryFn: async () => {
       if (!business?._id) return [];
-      const res = await axiosInstance.get(`/item/all/${business._id}`);
+      const res = await axiosInstance.get(
+        `/item/all/${
+          business._id
+        }?page=${1}&limit=${100}&search=${encodeURIComponent(
+          debouncedSearch || ""
+        )}`
+      );
       return res.data.items;
     },
     enabled: !!business?._id,
     keepPreviousData: true,
   });
 
-  const filteredItems = useMemo(() => {
-    if (!items?.length) return [];
-    return items.filter((item) =>
-      item?.itemName.toLowerCase().includes(searchItemQuery?.toLowerCase())
-    );
-  }, [items, searchItemQuery]);
-
   // handle base price change
   const handleBasePriceChange = (itemId, value) => {
-    setAddedItems((prev) =>
+    console.log(value);
+    setAddedItems((prev) =>  
       prev.map((item) =>
         item._id === itemId
           ? { ...item, basePrice: Number(value), isManualBase: true }
@@ -77,7 +82,9 @@ const SalesInvoiceItemTable = ({
         const price = Number(item?.salesPrice) || 0;
         const qty = item?.quantity || 1;
         const totalBase = price * qty;
+
         const discountAmount = (totalBase * percent) / 100;
+
         return item._id === itemId
           ? {
               ...item,
@@ -96,7 +103,9 @@ const SalesInvoiceItemTable = ({
         const price = Number(item?.salesPrice) || 0;
         const qty = item?.quantity || 1;
         const totalBase = price * qty;
+
         const discountPercent = (amount / totalBase) * 100;
+
         return item._id === itemId
           ? {
               ...item,
@@ -148,6 +157,8 @@ const SalesInvoiceItemTable = ({
       const taxableValue = basePrice * qty - discountAmount;
       const gstAmount = (taxableValue * gstRate) / 100;
       const finalAmount = taxableValue + gstAmount;
+
+      console.log();
 
       return {
         ...item,
@@ -477,8 +488,8 @@ const SalesInvoiceItemTable = ({
                   </div>
                 </div>
 
-                <div className="overflow-x-auto mt-4 h-[450px] max-h-[80vh] overflow-y-auto rounded-lg border border-base-content/5">
-                  <table className="table table-zebra bg-zinc-200 w-full">
+                <div className="overflow-x-auto mt-4 h-[450px] overflow-y-scroll rounded-box border border-base-content/5 ">
+                  <table className="table table-zebra bg-zinc-300 ">
                     {/* head */}
                     <thead>
                       <tr className="text-xs bg-zinc-100 ">
@@ -491,8 +502,8 @@ const SalesInvoiceItemTable = ({
                       </tr>
                     </thead>
                     <tbody>
-                      {filteredItems.length > 0 ? (
-                        filteredItems?.map((item) => (
+                      {items &&
+                        items?.map((item) => (
                           <tr key={item?._id}>
                             <td>{item?.itemName || "-"}</td>
                             <td>{item?.itemCode || "-"}</td>
@@ -508,7 +519,7 @@ const SalesInvoiceItemTable = ({
                               {showCounterId === item?._id ? (
                                 <div className="flex items-center justify-center space-x-2">
                                   {/* Counter Box */}
-                                  <div className="flex items-center bg-white border border-gray-300 rounded-xl shadow-sm overflow-hidden ">
+                                  <div className="flex items-center bg-white border border-gray-300 rounded-xl shadow-sm overflow-hidden">
                                     {/* Minus Button */}
                                     <button
                                       onClick={() =>
@@ -520,7 +531,7 @@ const SalesInvoiceItemTable = ({
                                           ),
                                         }))
                                       }
-                                      className="px-2 py-1 bg-[var(--primary-btn)] hover:bg-[var(--primary-btn)]/90 transition-colors text-white"
+                                      className="px-3 py-2 bg-[var(--primary-btn)] hover:bg-[var(--primary-btn)]/90 transition-colors text-white"
                                     >
                                       <HiMiniMinusSmall className="w-4 h-4" />
                                     </button>
@@ -537,7 +548,7 @@ const SalesInvoiceItemTable = ({
                                         }))
                                       }
                                       placeholder="0"
-                                      className="w-10 text-center text-sm font-medium outline-none border-x border-gray-200"
+                                      className="w-12 text-center text-sm font-medium outline-none border-x border-gray-200"
                                     />
 
                                     {/* Plus Button */}
@@ -548,7 +559,7 @@ const SalesInvoiceItemTable = ({
                                           [item._id]: (prev[item._id] || 1) + 1,
                                         }))
                                       }
-                                      className="px-2 py-1 bg-[var(--primary-btn)] hover:bg-[var(--primary-btn)]/90 transition-colors text-white"
+                                      className="px-3 py-2 bg-[var(--primary-btn)] hover:bg-[var(--primary-btn)]/90 transition-colors text-white"
                                     >
                                       <HiOutlinePlus className="w-4 h-4" />
                                     </button>
@@ -574,39 +585,14 @@ const SalesInvoiceItemTable = ({
                                       [item._id]: prev[item._id] ?? 1,
                                     }));
                                   }}
-                                  className="btn btn-xs w-full btn-dash btn-neutral"
+                                  className="btn btn-xs w-full btn-dash"
                                 >
                                   Add
                                 </button>
                               )}
                             </td>
                           </tr>
-                        ))
-                      ) : (
-                        <tr>
-                          <td colSpan={6} className="text-center py-6">
-                            <div className="flex flex-col items-center justify-center gap-2 py-12">
-                              <img
-                                src={not_found}
-                                alt="No items"
-                                width={60}
-                                height={60}
-                                className="object-contain"
-                                loading="lazy"
-                              />
-                              <span className="text-gray-600 text-sm font-medium">
-                                No items found
-                              </span>
-                              <button
-                                onClick={() => setSearchItemQuery("")}
-                                className="btn btn-xs btn-neutral btn-outline"
-                              >
-                                Clear Search
-                              </button>
-                            </div>
-                          </td>
-                        </tr>
-                      )}
+                        ))}
                     </tbody>
                   </table>
                 </div>
@@ -635,8 +621,7 @@ const SalesInvoiceItemTable = ({
                             purchasePrice: item.purchasePrice,
                             gstTaxRate:
                               item.purchaseGstTaxRate || item.gstTaxRate,
-                            gstTaxRateType:
-                              item?.purchasePriceType || "with tax",
+                            gstTaxRateType: "with tax",
                             discountPercent: 0,
                             discountAmount: 0,
                           };
@@ -649,7 +634,7 @@ const SalesInvoiceItemTable = ({
                             basePrice: item.salesPrice,
                             salesPrice: item.salesPrice,
                             gstTaxRate: item.gstTaxRate,
-                            gstTaxRateType: item?.salesPriceType || "with tax",
+                            gstTaxRateType: "with tax",
                             discountPercent: 0,
                             discountAmount: 0,
                           };

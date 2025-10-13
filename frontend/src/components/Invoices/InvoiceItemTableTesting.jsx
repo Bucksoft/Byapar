@@ -168,19 +168,22 @@ const SalesInvoiceItemTableTesting = ({
     let totalAdditionalDiscount = 0;
     let subtotalAmount = 0;
 
-    const updatedItems = data.items.map((item) => {
-      const isPurchaseType = [
-        "Purchase Invoice",
-        "Purchase Return",
-        "Purchase Order",
-      ].includes(title);
+    const isPurchaseType = [
+      "Purchase Invoice",
+      "Purchase Return",
+      "Purchase Order",
+    ].includes(title);
 
+    const addDiscPercent = Number(data?.additionalDiscountPercent ?? 0);
+    const addDiscType = data?.additionalDiscountType ?? "after tax";
+
+    const updatedItems = data.items.map((item) => {
       const quantity = Number(quantities[item._id] ?? item?.quantity ?? 0);
       const discountPercent = Number(item?.discountPercent ?? 0);
       const discountAmount = Number(item?.discountAmount ?? 0);
       const gstRate = Number(getTotalTaxRate(item?.gstTaxRate ?? "0"));
 
-      // Use salesPrice or purchasePrice safely
+      // safely pick raw price
       const rawPrice = isPurchaseType
         ? Number(item?.purchasePrice ?? 0)
         : Number(item?.salesPrice ?? 0);
@@ -188,9 +191,8 @@ const SalesInvoiceItemTableTesting = ({
       const manualBasePrice = Number(
         data?.items[item._id]?.basePrice ?? basePrices[item._id] ?? 0
       );
-      let basePrice;
 
-      // handle tax type recalculation properly
+      let basePrice;
       if (!isNaN(manualBasePrice) && manualBasePrice > 0) {
         basePrice = manualBasePrice;
       } else {
@@ -200,39 +202,44 @@ const SalesInvoiceItemTableTesting = ({
             : rawPrice;
       }
 
+      // --- discount before tax ---
       const finalDiscountAmount = discountPercent
         ? (basePrice * quantity * discountPercent) / 100
         : discountAmount;
 
-      const gstAmount = Math.max(
-        (basePrice * quantity - finalDiscountAmount) * (gstRate / 100),
-        0
-      );
+      // subtotal before any additional discount
+      const grossValue = basePrice * quantity;
+      const taxableBeforeAddDisc = grossValue - finalDiscountAmount;
 
-      let totalItemAmount =
-        basePrice * quantity - finalDiscountAmount + gstAmount;
-
-      // Additional discount handling
+      // --- additional discount before tax handling ---
       let additionalDiscountAmount = 0;
-      const addDiscPercent = Number(data?.additionalDiscountPercent ?? 0);
-      if (addDiscPercent > 0) {
-        if (data?.additionalDiscountType === "before tax") {
-          additionalDiscountAmount =
-            ((basePrice * quantity - finalDiscountAmount) * addDiscPercent) /
-            100;
-          totalItemAmount -= additionalDiscountAmount;
-        } else {
-          additionalDiscountAmount = (totalItemAmount * addDiscPercent) / 100;
-          totalItemAmount -= additionalDiscountAmount;
-        }
+      let taxableAfterAddDisc = taxableBeforeAddDisc;
+
+      if (addDiscPercent > 0 && addDiscType === "before tax") {
+        additionalDiscountAmount =
+          (taxableBeforeAddDisc * addDiscPercent) / 100;
+        taxableAfterAddDisc -= additionalDiscountAmount;
+      }
+
+      // --- GST based on final taxable (after before-tax discounts) ---
+      const gstAmount = Math.max((taxableAfterAddDisc * gstRate) / 100, 0);
+
+      // --- total item amount ---
+      let totalItemAmount = taxableAfterAddDisc + gstAmount;
+
+      // --- if additional discount is after tax ---
+      if (addDiscPercent > 0 && addDiscType === "after tax") {
+        const afterTaxDisc = (totalItemAmount * addDiscPercent) / 100;
+        additionalDiscountAmount = afterTaxDisc;
+        totalItemAmount -= afterTaxDisc;
       }
 
       // accumulate totals
       totalDiscount += finalDiscountAmount;
-      totalTaxableValue += basePrice * quantity - finalDiscountAmount;
+      totalTaxableValue += taxableAfterAddDisc;
       totalTax += gstAmount;
       totalAdditionalDiscount += additionalDiscountAmount;
-      subtotalAmount += basePrice * quantity;
+      subtotalAmount += grossValue;
       totalAmount += totalItemAmount;
 
       return {
@@ -246,7 +253,7 @@ const SalesInvoiceItemTableTesting = ({
       };
     });
 
-    // Additional charge calculations
+    // --- additional charge calculation ---
     const additionalCharge = Number(data?.additionalChargeAmount ?? 0);
     const additionalChargeGSTRate = Number(
       getTotalTaxRate(data?.additionalChargeTax ?? "0")
@@ -255,7 +262,7 @@ const SalesInvoiceItemTableTesting = ({
       (additionalCharge * additionalChargeGSTRate) / 100;
     totalAmount += additionalCharge + additionalChargeGST;
 
-    // Update only if changed
+    // --- update only if changed ---
     setData((prev) => {
       let changed = false;
       const newItems = prev.items.map((item, idx) => {
@@ -281,8 +288,8 @@ const SalesInvoiceItemTableTesting = ({
         amountSubTotal: Number(subtotalAmount.toFixed(2)),
         additionalChargeAmount: Number(additionalCharge.toFixed(2)),
         additionalChargeTax: prev.additionalChargeTax || "",
-        additionalDiscountPercent: prev.additionalDiscountPercent || 0,
-        additionalDiscountType: prev.additionalDiscountType || "after tax",
+        additionalDiscountPercent: addDiscPercent,
+        additionalDiscountType: addDiscType,
         additionalDiscountAmount: Number(totalAdditionalDiscount.toFixed(2)),
       };
     });
