@@ -128,7 +128,7 @@ const Sidebar = () => {
         <div className="flex gap-3 px-5 py-3 items-center border-b border-b-zinc-200 ">
           <div className="">
             <div className="w-9 h-9 rounded-full flex items-center justify-center bg-red-200 overflow-hidden">
-              {business?.logo !== "null" ? (
+              {business?.logo && business?.logo !== "null" ? (
                 <img
                   src={business.logo}
                   alt="Logo"
@@ -136,7 +136,7 @@ const Sidebar = () => {
                 />
               ) : (
                 <span className="text-sm font-semibold text-white">
-                  {business?.businessName?.[0]?.toUpperCase()}
+                  {business?.businessName?.[0]?.toUpperCase() || "?"}
                 </span>
               )}
             </div>

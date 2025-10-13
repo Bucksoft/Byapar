@@ -9,14 +9,15 @@ import { parseDate } from "../../src/utils/date.js";
 export async function createSalesInvoice(req, res) {
   try {
     const data = req.body;
-    const validatedResult = salesInvoiceSchema.safeParse(req.body);
-    if (!validatedResult.success) {
-      const validationError = validatedResult.error.format();
-      return res
-        .status(422)
-        .json({ success: false, msg: "Validation failed", validationError });
-    }
-    const partyName = validatedResult.data?.partyName;
+    console.log(data);
+    // const validatedResult = salesInvoiceSchema.safeParse(req.body);
+    // if (!validatedResult.success) {
+    //   const validationError = validatedResult.error.format();
+    //   return res
+    //     .status(422)
+    //     .json({ success: false, msg: "Validation failed", validationError });
+    // }
+    const partyName = data?.partyName;
     const party = await Party.findOne({
       partyName,
     });
@@ -28,7 +29,7 @@ export async function createSalesInvoice(req, res) {
     }
 
     const existingInvoice = await SalesInvoice.findOne({
-      salesInvoiceNumber: validatedResult.data?.salesInvoiceNumber,
+      salesInvoiceNumber:data?.salesInvoiceNumber,
       businessId: req?.params?.id,
     });
 

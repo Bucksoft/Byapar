@@ -587,7 +587,11 @@ const InvoiceTemplate = ({
                   {/* Total */}
                   <td style={{ padding: "6px", textAlign: "right" }}>
                     <div
-                      style={{ display: "flex", justifyContent: "flex-end" }}
+                      style={{
+                        display: "flex",
+                        justifyContent: "flex-end",
+                        alignItems: "center",
+                      }}
                     >
                       <LiaRupeeSignSolid />
                       {Number(item?.totalAmount || 0).toLocaleString("en-IN", {
@@ -644,7 +648,13 @@ const InvoiceTemplate = ({
 
                 {/* Total */}
                 <td style={{ padding: "6px", textAlign: "right" }}>
-                  <div style={{ display: "flex", justifyContent: "flex-end" }}>
+                  <div
+                    style={{
+                      display: "flex",
+                      justifyContent: "flex-end",
+                      alignItems: "center",
+                    }}
+                  >
                     <LiaRupeeSignSolid />
                     {subtotalTotal.toLocaleString("en-IN", {
                       minimumFractionDigits: 2,
