@@ -31,7 +31,6 @@ const DashboardItemsSidebar = ({ modalId, itemIdToEdit }) => {
     if (!itemIdToEdit || !items?.length) return;
     const matchingItems = items.filter((item) => item?._id === itemIdToEdit);
     setItemToBeEdited(matchingItems[0]);
-    console.log(matchingItems);
   }, [itemIdToEdit, items]);
 
   const initialFormState = {

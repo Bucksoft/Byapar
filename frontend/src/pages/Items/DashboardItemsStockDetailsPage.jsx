@@ -118,7 +118,7 @@ const DashboardItemsStockDetailsPage = ({ data, setData }) => {
                 onChange={(e) =>
                   setData((prev) => ({
                     ...prev,
-                    lowStockQuantity: e.target.value,
+                    lowStockQuantity: Number(e.target.value),
                   }))
                 }
                 placeholder="Enter low stock quantity"
