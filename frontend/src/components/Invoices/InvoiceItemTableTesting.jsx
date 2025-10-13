@@ -22,7 +22,8 @@ const SalesInvoiceItemTableTesting = ({
   const [showCounterId, setShowCounterId] = useState(null);
   const [quantities, setQuantities] = useState({});
   const [basePrices, setBasePrices] = useState({});
-
+  const [basePriceInputMode, setBasePriceInputMode] = useState({});
+  const [manualBasePriceRaw, setManualBasePriceRaw] = useState({});
   // FETCH ITEMS
   const { data: items = [] } = useQuery({
     queryKey: ["items", business?._id],
@@ -173,7 +174,6 @@ const SalesInvoiceItemTableTesting = ({
       "Purchase Return",
       "Purchase Order",
     ].includes(title);
-
     const addDiscPercent = Number(data?.additionalDiscountPercent ?? 0);
     const addDiscType = data?.additionalDiscountType ?? "after tax";
 
@@ -182,52 +182,43 @@ const SalesInvoiceItemTableTesting = ({
       const discountPercent = Number(item?.discountPercent ?? 0);
       const discountAmount = Number(item?.discountAmount ?? 0);
       const gstRate = Number(getTotalTaxRate(item?.gstTaxRate ?? "0"));
+      const gstType = item?.gstTaxRateType ?? "with tax";
 
-      // safely pick raw price
       const rawPrice = isPurchaseType
         ? Number(item?.purchasePrice ?? 0)
         : Number(item?.salesPrice ?? 0);
 
-      const manualBasePrice = Number(
-        data?.items[item._id]?.basePrice ?? basePrices[item._id] ?? 0
-      );
+      const manualRaw = manualBasePriceRaw[item._id] ?? 0;
 
-      let basePrice;
-      if (!isNaN(manualBasePrice) && manualBasePrice > 0) {
-        basePrice = manualBasePrice;
-      } else {
-        basePrice =
-          item?.gstTaxRateType === "with tax"
-            ? rawPrice / (1 + gstRate / 100)
-            : rawPrice;
+      // --- calculate basePriceExclusive ---
+      let basePriceExclusive = 0;
+      if (rawPrice > 0) {
+        basePriceExclusive =
+          gstType === "with tax" ? rawPrice / (1 + gstRate / 100) : rawPrice;
+      } else if (manualRaw > 0) {
+        basePriceExclusive =
+          gstType === "with tax" ? manualRaw / (1 + gstRate / 100) : manualRaw;
       }
 
-      // --- discount before tax ---
+      // --- discount ---
       const finalDiscountAmount = discountPercent
-        ? (basePrice * quantity * discountPercent) / 100
+        ? (basePriceExclusive * quantity * discountPercent) / 100
         : discountAmount;
 
-      // subtotal before any additional discount
-      const grossValue = basePrice * quantity;
-      const taxableBeforeAddDisc = grossValue - finalDiscountAmount;
+      const grossValue = basePriceExclusive * quantity;
+      let taxableAfterDiscount = grossValue - finalDiscountAmount;
 
-      // --- additional discount before tax handling ---
       let additionalDiscountAmount = 0;
-      let taxableAfterAddDisc = taxableBeforeAddDisc;
-
       if (addDiscPercent > 0 && addDiscType === "before tax") {
         additionalDiscountAmount =
-          (taxableBeforeAddDisc * addDiscPercent) / 100;
-        taxableAfterAddDisc -= additionalDiscountAmount;
+          (taxableAfterDiscount * addDiscPercent) / 100;
+        taxableAfterDiscount -= additionalDiscountAmount;
       }
 
-      // --- GST based on final taxable (after before-tax discounts) ---
-      const gstAmount = Math.max((taxableAfterAddDisc * gstRate) / 100, 0);
+      const gstAmount = Math.max((taxableAfterDiscount * gstRate) / 100, 0);
 
-      // --- total item amount ---
-      let totalItemAmount = taxableAfterAddDisc + gstAmount;
+      let totalItemAmount = taxableAfterDiscount + gstAmount;
 
-      // --- if additional discount is after tax ---
       if (addDiscPercent > 0 && addDiscType === "after tax") {
         const afterTaxDisc = (totalItemAmount * addDiscPercent) / 100;
         additionalDiscountAmount = afterTaxDisc;
@@ -236,7 +227,7 @@ const SalesInvoiceItemTableTesting = ({
 
       // accumulate totals
       totalDiscount += finalDiscountAmount;
-      totalTaxableValue += taxableAfterAddDisc;
+      totalTaxableValue += taxableAfterDiscount;
       totalTax += gstAmount;
       totalAdditionalDiscount += additionalDiscountAmount;
       subtotalAmount += grossValue;
@@ -245,15 +236,15 @@ const SalesInvoiceItemTableTesting = ({
       return {
         ...item,
         quantity,
-        basePrice,
+        basePrice: Number(basePriceExclusive.toFixed(2)),
         discountAmount: finalDiscountAmount,
+        taxableAmount: Number(taxableAfterDiscount.toFixed(2)), // ✅ new field
         gstAmount,
         totalAmount: totalItemAmount,
         additionalDiscountAmount,
       };
     });
 
-    // --- additional charge calculation ---
     const additionalCharge = Number(data?.additionalChargeAmount ?? 0);
     const additionalChargeGSTRate = Number(
       getTotalTaxRate(data?.additionalChargeTax ?? "0")
@@ -262,7 +253,6 @@ const SalesInvoiceItemTableTesting = ({
       (additionalCharge * additionalChargeGSTRate) / 100;
     totalAmount += additionalCharge + additionalChargeGST;
 
-    // --- update only if changed ---
     setData((prev) => {
       let changed = false;
       const newItems = prev.items.map((item, idx) => {
@@ -297,6 +287,7 @@ const SalesInvoiceItemTableTesting = ({
     data.items,
     quantities,
     basePrices,
+    manualBasePriceRaw,
     title,
     data.additionalDiscountPercent,
     data.additionalDiscountType,
@@ -381,14 +372,19 @@ const SalesInvoiceItemTableTesting = ({
           <span className="border-t border-l p-2 border-[var(--primary-border)]">
             <input
               type="number"
-              min={1}
-              value={quantities[item._id] || item?.quantity}
+              min={1} // HTML validation (won't allow arrow-down below 1)
+              value={quantities[item._id] || item?.quantity || 1} // default to 1
               onChange={(e) => {
-                const newQty = Number(e.target.value);
+                let newQty = Number(e.target.value);
+
+                // Clamp to minimum 1
+                if (isNaN(newQty) || newQty < 1) newQty = 1;
+
                 setQuantities((prev) => ({
                   ...prev,
                   [item._id]: newQty,
                 }));
+
                 setData((prev) => ({
                   ...prev,
                   items: prev.items.map((i) =>
@@ -396,7 +392,7 @@ const SalesInvoiceItemTableTesting = ({
                   ),
                 }));
               }}
-              placeholder="0"
+              placeholder="1"
               className="input input-xs bg-zinc-100 text-right w-full"
             />
           </span>
@@ -407,20 +403,24 @@ const SalesInvoiceItemTableTesting = ({
               type="number"
               min={0}
               value={
-                basePrices[item._id] ??
-                (item?.basePrice ? Number(item?.basePrice).toFixed(2) : 0)
+                basePrices[item._id] !== undefined
+                  ? basePrices[item._id]
+                  : item?.basePrice
+                  ? Number(item.basePrice).toFixed(2)
+                  : ""
               }
               className="input input-xs bg-zinc-100 text-right"
               onChange={(e) => {
-                const newPrice = Number(e.target.value);
+                const newPrice =
+                  e.target.value === "" ? "" : Number(e.target.value);
 
-                // Update local basePrices state
-                setBasePrices((prev) => ({
+                setBasePrices((prev) => ({ ...prev, [item._id]: newPrice }));
+
+                setManualBasePriceRaw((prev) => ({
                   ...prev,
                   [item._id]: newPrice,
                 }));
 
-                // Update the data items array for instant reflection
                 setData((prev) => ({
                   ...prev,
                   items: prev.items.map((i) =>
@@ -440,8 +440,8 @@ const SalesInvoiceItemTableTesting = ({
               max={100}
               step="0.01"
               value={
-                item?.discountPercent !== undefined
-                  ? Number(item.discountPercent.toFixed(2))
+                item.discountPercent !== undefined
+                  ? String(item.discountPercent)
                   : ""
               }
               onChange={(e) =>
@@ -483,12 +483,16 @@ const SalesInvoiceItemTableTesting = ({
             </small>
             <select
               value={item?.gstTaxRateType || "with tax"}
-              onChange={(e) => handleGstTypeChange(item._id, e.target.value)}
-              className="text-[var(--secondary-text-color)]"
+              onChange={(e) => {
+                const newType = e.target.value;
+                setData((prev) => ({
+                  ...prev,
+                  items: prev.items.map((i) =>
+                    i._id === item._id ? { ...i, gstTaxRateType: newType } : i
+                  ),
+                }));
+              }}
             >
-              <option value="with tax" className="hidden">
-                with tax
-              </option>
               <option value="with tax">with tax</option>
               <option value="without tax">without tax</option>
             </select>

@@ -134,7 +134,7 @@ const SalesInvoiceFooterSection = ({
         </div>
 
         {/* add new account */}
-        {!bankAccounts ? (
+        {!bankAccounts?.length ? (
           <BankAccountPopupForBusiness />
         ) : (
           bankAccounts.map((bankAccount) => (

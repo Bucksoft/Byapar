@@ -510,7 +510,10 @@ const InvoiceTemplate = ({
               {items.map((item, index) => (
                 <tr key={index}>
                   <td style={{ padding: "6px" }}>{index + 1}</td>
-                  <td style={{ padding: "6px" }}>{item?.itemName || "-"}</td>
+                  <td style={{ padding: "8px" }}>
+                    <span>{item?.itemName ?? "-"}</span>
+                    <p className="text-xs text-zinc-500">{item?.description || ""}</p>
+                  </td>
 
                   <td style={{ padding: "6px" }}>
                     {item?.HSNCode || item?.SACCode || "-"}
@@ -541,7 +544,7 @@ const InvoiceTemplate = ({
                     <div style={{ display: "flex", alignItems: "center" }}>
                       <LiaRupeeSignSolid />
                       {Number(
-                        item?.taxableValue ||
+                        item?.taxableAmount ||
                           item?.salesPrice * item?.quantity ||
                           0
                       ).toLocaleString("en-IN", {
