@@ -185,10 +185,13 @@ const SalesInvoiceItemTableTesting = ({
         ? Number(item?.purchasePrice ?? 0)
         : Number(item?.salesPrice ?? 0);
 
-      const manualBasePrice = Number(basePrices[item._id]);
+      const manualBasePrice = Number(
+        data?.items[item._id]?.basePrice ?? basePrices[item._id] ?? 0
+      );
       let basePrice;
 
-      if (!isNaN(manualBasePrice)) {
+      // handle tax type recalculation properly
+      if (!isNaN(manualBasePrice) && manualBasePrice > 0) {
         basePrice = manualBasePrice;
       } else {
         basePrice =
@@ -209,7 +212,7 @@ const SalesInvoiceItemTableTesting = ({
       let totalItemAmount =
         basePrice * quantity - finalDiscountAmount + gstAmount;
 
-      // Additional discount
+      // Additional discount handling
       let additionalDiscountAmount = 0;
       const addDiscPercent = Number(data?.additionalDiscountPercent ?? 0);
       if (addDiscPercent > 0) {
@@ -224,7 +227,7 @@ const SalesInvoiceItemTableTesting = ({
         }
       }
 
-      // Accumulate totals
+      // accumulate totals
       totalDiscount += finalDiscountAmount;
       totalTaxableValue += basePrice * quantity - finalDiscountAmount;
       totalTax += gstAmount;
@@ -243,7 +246,7 @@ const SalesInvoiceItemTableTesting = ({
       };
     });
 
-    // Additional charges
+    // Additional charge calculations
     const additionalCharge = Number(data?.additionalChargeAmount ?? 0);
     const additionalChargeGSTRate = Number(
       getTotalTaxRate(data?.additionalChargeTax ?? "0")
@@ -252,10 +255,9 @@ const SalesInvoiceItemTableTesting = ({
       (additionalCharge * additionalChargeGSTRate) / 100;
     totalAmount += additionalCharge + additionalChargeGST;
 
-    // Only update state if something changed
+    // Update only if changed
     setData((prev) => {
       let changed = false;
-
       const newItems = prev.items.map((item, idx) => {
         const updatedItem = updatedItems[idx];
         if (JSON.stringify(item) !== JSON.stringify(updatedItem)) {
@@ -284,7 +286,18 @@ const SalesInvoiceItemTableTesting = ({
         additionalDiscountAmount: Number(totalAdditionalDiscount.toFixed(2)),
       };
     });
-  }, [data.items, quantities, basePrices, title]);
+  }, [
+    data.items,
+    quantities,
+    basePrices,
+    title,
+    data.additionalDiscountPercent,
+    data.additionalDiscountType,
+    data.additionalChargeAmount,
+    data.additionalChargeTax,
+    JSON.stringify(data.items.map((i) => i.gstTaxRateType)),
+    JSON.stringify(data.items.map((i) => i.gstTaxRate)),
+  ]);
 
   return (
     <>

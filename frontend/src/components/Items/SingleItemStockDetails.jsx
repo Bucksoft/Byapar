@@ -8,34 +8,43 @@ const SingleItemStockDetails = ({ item }) => {
   const { invoices } = useInvoiceStore();
   const [invoicesWithItem, setInvoicesWithItem] = useState([]);
 
+  console.log(invoices);  
+
   useEffect(() => {
-    const invoiceWithItem = invoices?.invoices.filter((invoice) =>
-      invoice?.items?.filter((i) => i?.itemName === item?.itemName)
+    if (!invoices || !Array.isArray(invoices?.invoices) || !item?.itemName)
+      return;
+
+    const filtered = invoices.invoices.filter(
+      (invoice) =>
+        Array.isArray(invoice.items) &&
+        invoice.items.some((i) => i?.itemName === item.itemName)
     );
-    setInvoicesWithItem([...invoiceWithItem]);
+
+    setInvoicesWithItem(filtered);
   }, [item, invoices]);
 
-  console.log(invoicesWithItem);
-
   return (
-    <main className="px-5 py-4">
-      <header className="w-full flex justify-between">
+    <main className="flex flex-col px-5 py-4">
+      {/* Header */}
+      <header className="w-full flex justify-between items-center">
         <select defaultValue="Select Date" className="select select-sm">
           <option disabled={true}>Select Date</option>
-          {dateRanges.map((range, index) => (
-            <option>{range}</option>
-          ))}
+          {dateRanges.length &&
+            dateRanges.map((range, index) => (
+              <option key={index}>{range}</option>
+            ))}
         </select>
         <button className="btn btn-sm flex items-center gap-2">
           <FaFilePdf size={15} />
           Download PDF
         </button>
       </header>
-      <div className="overflow-x-auto mt-4">
-        <table className="table table-zebra">
-          {/* head */}
-          <thead>
-            <tr className="bg-zinc-100">
+
+      {/* Table container (scrollable area) */}
+      <div className="flex-1 overflow-y-auto sticky overflow-x-auto mt-4 rounded-md border border-zinc-200">
+        <table className="table table-zebra w-full ">
+          <thead className="bg-zinc-100 sticky top-0">
+            <tr>
               <th>Date</th>
               <th>Transaction Type</th>
               <th>Quantity</th>
@@ -44,23 +53,27 @@ const SingleItemStockDetails = ({ item }) => {
             </tr>
           </thead>
           <tbody>
-            {
-              // To be written
-              invoicesWithItem &&
-                invoicesWithItem.map((invoice) => (
-                  <tr>
-                    <td>
-                      {(invoice?.salesInvoiceDate &&
-                        invoice?.salesInvoiceDate.split("T")[0]) ||
-                        "-"}
-                    </td>
-                    <td>{invoice?.type || "-"}</td>
-                    <td>-</td>
-                    <td>{invoice?.salesInvoiceNumber || "-"}</td>
-                    <td>-</td>
-                  </tr>
-                ))
-            }
+            {invoicesWithItem?.length ? (
+              invoicesWithItem.map((invoice, idx) => (
+                <tr key={idx}>
+                  <td>
+                    {(invoice?.salesInvoiceDate &&
+                      invoice?.salesInvoiceDate.split("T")[0]) ||
+                      "-"}
+                  </td>
+                  <td>{invoice?.type || "-"}</td>
+                  <td>-</td>
+                  <td>{invoice?.salesInvoiceNumber || "-"}</td>
+                  <td>-</td>
+                </tr>
+              ))
+            ) : (
+              <tr>
+                <td colSpan="5" className="text-center text-zinc-400">
+                  No data available
+                </td>
+              </tr>
+            )}
           </tbody>
         </table>
       </div>
