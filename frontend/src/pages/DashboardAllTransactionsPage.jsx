@@ -109,7 +109,7 @@ const DashboardAllTransactionsPage = () => {
           {searchedInvoices.length === 0 ? (
             <div className="flex items-center justify-center flex-col">
               <img src={not_found} alt="not_found" width={250} loading="lazy" />
-              <h3 className="font-semibold">No matching items found</h3>
+              <h3 className="font-semibold">No matching transactions found</h3>
               <p className="text-zinc-500 text-xs text-center max-w-sm">
                 No items found matching “{searchQuery}”. Try a different name or
                 clear your search.

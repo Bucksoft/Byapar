@@ -100,7 +100,7 @@ const DashboardItemsSidebar = ({ modalId, itemIdToEdit }) => {
       if (!itemIdToEdit) {
         document.getElementById(modalId)?.close();
       }
-
+      setCurrentField("Basic Details");
       queryClient.invalidateQueries({ queryKey: ["items"] });
       navigate(`/dashboard/items`);
     },
@@ -255,7 +255,11 @@ const DashboardItemsSidebar = ({ modalId, itemIdToEdit }) => {
               {/* <div className="divider"></div> */}
               <div className="w-full flex justify-end gap-3 mt-4 ">
                 <button
-                  onClick={() => document.getElementById(modalId).close()}
+                  onClick={() => {
+                    document.getElementById(modalId).close();
+                    setCurrentField("Basic Details");
+                    setData(initialFormState);
+                  }}
                   className="btn btn-sm w-1/7"
                 >
                   Cancel
