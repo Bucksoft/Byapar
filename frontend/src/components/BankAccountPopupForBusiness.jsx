@@ -19,8 +19,6 @@ const BankAccountPopupForBusiness = () => {
   const { business } = useBusinessStore();
   const bankMutation = useMutation({
     mutationFn: async () => {
-      // Validation
-
       // API request
       const res = await axiosInstance.post(`/bank-account/${business?._id}`, {
         accountName,

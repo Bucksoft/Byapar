@@ -9,7 +9,6 @@ import { parseDate } from "../../src/utils/date.js";
 export async function createSalesInvoice(req, res) {
   try {
     const data = req.body;
-    console.log(data);
     // const validatedResult = salesInvoiceSchema.safeParse(req.body);
     // if (!validatedResult.success) {
     //   const validationError = validatedResult.error.format();
@@ -29,7 +28,7 @@ export async function createSalesInvoice(req, res) {
     }
 
     const existingInvoice = await SalesInvoice.findOne({
-      salesInvoiceNumber:data?.salesInvoiceNumber,
+      salesInvoiceNumber: data?.salesInvoiceNumber,
       businessId: req?.params?.id,
     });
 
@@ -175,25 +174,37 @@ export async function getAllInvoices(req, res) {
 }
 
 // CONTROLLER TO DELETE INVOICE (MARK STATUS AS CANCELLED AND INCREMENT THE STOCK OF THAT ITEM)
+
 export async function deleteInvoice(req, res) {
+  const session = await mongoose.startSession();
+  session.startTransaction();
   try {
     let { id } = req.params;
     const userId = req.user?.id;
     if (!id) {
+      await session.abortTransaction();
+      session.endSession();
       return res
         .status(400)
         .json({ success: false, msg: "Please provide invoice id" });
     }
 
-    // convert id into mongoose id
+    // Convert id into mongoose ObjectId
     id = new mongoose.Types.ObjectId(id);
 
-    const invoice = await SalesInvoice.findById(id).populate("partyId");
+    // Fetch invoice with party populated
+    const invoice = await SalesInvoice.findById(id)
+      .populate("partyId")
+      .session(session);
     if (!invoice) {
+      await session.abortTransaction();
+      session.endSession();
       return res.status(404).json({ success: false, msg: "Invoice not found" });
     }
 
     if (invoice.status === "cancelled") {
+      await session.abortTransaction();
+      session.endSession();
       return res
         .status(400)
         .json({ success: false, msg: "Invoice is already cancelled" });
@@ -201,6 +212,8 @@ export async function deleteInvoice(req, res) {
 
     const party = invoice.partyId;
     if (!party) {
+      await session.abortTransaction();
+      session.endSession();
       return res
         .status(400)
         .json({ success: false, msg: "Linked party not found" });
@@ -208,36 +221,43 @@ export async function deleteInvoice(req, res) {
 
     const reversalAmount = invoice.balanceAmount || 0;
 
+    // Cancel invoice
     invoice.status = "cancelled";
     invoice.cancelledAt = new Date();
     invoice.cancelledBy = userId || null;
     invoice.pendingAmount = 0;
     invoice.settledAmount = 0;
 
+    // Increment stock for items in invoice (skip deleted items)
     if (Array.isArray(invoice.items)) {
       for (const soldItem of invoice.items) {
         if (soldItem.itemType === "product") {
-          const item = await Item.findById(soldItem?._id);
+          const item = await Item.findById(soldItem?._id).session(session);
           if (!item) {
-            return res.status(400).json({
-              success: false,
-              msg: `Item not found: ${soldItem?._id}`,
-            });
+            // console.warn(`Item not found ${soldItem?.itemName}`);
+            continue;
           }
-          await Item.findByIdAndUpdate(soldItem?._id, {
-            $inc: { currentStock: soldItem?.quantity },
-          });
+          await Item.updateOne(
+            { _id: soldItem._id },
+            { $inc: { currentStock: soldItem?.quantity ?? 0 } }
+          ).session(session);
         }
       }
     }
 
+    // Update party balances
     party.currentBalance = (party.currentBalance || 0) - reversalAmount;
     party.totalDebits = (party.totalDebits || 0) - reversalAmount;
     party.totalInvoices = (party.totalInvoices || 0) - reversalAmount;
     party.totalCredits = (party.totalCredits || 0) + reversalAmount;
 
-    await party.save();
-    await invoice.save();
+    // Save changes inside transaction
+    await party.save({ session });
+    await invoice.save({ session });
+
+    // Commit transaction
+    await session.commitTransaction();
+    session.endSession();
 
     return res.status(200).json({
       success: true,
@@ -245,6 +265,9 @@ export async function deleteInvoice(req, res) {
       invoice,
     });
   } catch (error) {
+    // Rollback on error
+    await session.abortTransaction();
+    session.endSession();
     console.error("ERROR IN CANCELLING SALES INVOICE", error);
     return res.status(500).json({ err: "Internal server error", error });
   }
@@ -326,7 +349,6 @@ export async function bulkUploadSalesInvoices(req, res) {
         .status(400)
         .json({ success: false, msg: "No invoices provided" });
     }
-
     const invoicesToInsert = [];
     let duplicateCount = 0;
 

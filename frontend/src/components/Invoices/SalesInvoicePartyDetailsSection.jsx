@@ -62,12 +62,15 @@ const SalesInvoicePartyDetailsSection = ({
 
   // Filter parties based on search input
   const filteredParties = useMemo(() => {
+    if (!parties?.length) return [];
+
     return parties
+      .filter((p) => p.businessId === business?._id)
       .filter((p) =>
         p?.partyName?.toLowerCase().includes(searchPartyQuery.toLowerCase())
       )
       .sort((a, b) => a.partyName.localeCompare(b.partyName));
-  }, [searchPartyQuery, parties]);
+  }, [searchPartyQuery, parties, business?._id]);
 
   const searchedInvoices =
     invoices &&
@@ -541,6 +544,7 @@ const SalesInvoicePartyDetailsSection = ({
               <input
                 type="number"
                 placeholder="1"
+                readOnly
                 value={data?.salesInvoiceNumber || 1}
                 ref={invoiceNoRef}
                 name={"salesInvoiceNumber"}

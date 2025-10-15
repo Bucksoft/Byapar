@@ -16,6 +16,8 @@ import { useCreditNoteStore } from "../../store/creditNoteStore";
 import { LuIndianRupee } from "react-icons/lu";
 import { downloadPDF } from "../../../helpers/downloadPdf";
 import CustomLoader from "../Loader";
+import { handlePrint } from "../../../helpers/print";
+import { useRef } from "react";
 
 const PartyLedgerStatement = ({ party }) => {
   const { business } = useBusinessStore();
@@ -25,6 +27,7 @@ const PartyLedgerStatement = ({ party }) => {
     from: new Date(),
     to: new Date(new Date().getTime() + 24 * 60 * 60 * 1000),
   });
+  const printRef = useRef();
 
   // GET ALL THE INVOICES HERE
   const { saleReturns } = useSalesReturnStore();
@@ -142,7 +145,6 @@ const PartyLedgerStatement = ({ party }) => {
     );
   }, [ledgerWithBalance, party]);
 
-  
   const filteredEntries = useMemo(() => {
     const from = new Date(dateRange.from);
     const to = new Date(dateRange.to);
@@ -159,7 +161,13 @@ const PartyLedgerStatement = ({ party }) => {
       <div>
         {/* DOWNLOAD */}
         <button
-          onClick={() => downloadPDF("ledger", "Ledger", setIsDownloading)}
+          onClick={() =>
+            downloadPDF(
+              "ledger",
+              `${party?.partyName?.split(" ").join("_").concat("_ledger")}`,
+              setIsDownloading
+            )
+          }
           className="btn btn-sm btn-dash"
         >
           {isDownloading ? (
@@ -174,7 +182,10 @@ const PartyLedgerStatement = ({ party }) => {
         </button>
 
         {/* PRINTER */}
-        <button className="btn btn-sm ml-2 w-1/8">
+        <button
+          onClick={() => handlePrint(printRef)}
+          className="btn btn-sm ml-2 w-1/8"
+        >
           <Printer size={14} /> Print
         </button>
 
@@ -238,6 +249,7 @@ const PartyLedgerStatement = ({ party }) => {
       {/* LEDGER COMPONENT HERE */}
       <div
         id="ledger"
+        ref={printRef}
         style={{
           height: "100%",
           border: "1px solid rgb(228, 228, 231)",
@@ -358,6 +370,7 @@ const PartyLedgerStatement = ({ party }) => {
           <table
             style={{
               width: "100%",
+              border: "1px solid rgb(228, 228, 231)",
               borderCollapse: "collapse",
               fontSize: "12px",
             }}
@@ -368,12 +381,57 @@ const PartyLedgerStatement = ({ party }) => {
                   backgroundColor: "#e4e4e7",
                 }}
               >
-                <th style={{ padding: "8px", textAlign: "left" }}>Date</th>
-                <th style={{ padding: "8px", textAlign: "left" }}>Voucher</th>
-                <th style={{ padding: "8px", textAlign: "left" }}>Sr No</th>
-                <th style={{ padding: "8px", textAlign: "left" }}>Credit</th>
-                <th style={{ padding: "8px", textAlign: "left" }}>Debit</th>
-                <th style={{ padding: "8px", textAlign: "left" }}>
+                <th
+                  style={{
+                    padding: "5px",
+                    textAlign: "left",
+                  }}
+                >
+                  Date
+                </th>
+                <th
+                  style={{
+                    padding: "8px",
+                    textAlign: "left",
+                    textWrap: "nowrap",
+                  }}
+                >
+                  Voucher
+                </th>
+                <th
+                  style={{
+                    padding: "8px",
+                    textAlign: "left",
+                    textWrap: "nowrap",
+                  }}
+                >
+                  Sr No
+                </th>
+                <th
+                  style={{
+                    padding: "8px",
+                    textAlign: "left",
+                    textWrap: "nowrap",
+                  }}
+                >
+                  Credit
+                </th>
+                <th
+                  style={{
+                    padding: "8px",
+                    textAlign: "left",
+                    textWrap: "nowrap",
+                  }}
+                >
+                  Debit
+                </th>
+                <th
+                  style={{
+                    padding: "8px",
+                    textAlign: "left",
+                    textWrap: "nowrap",
+                  }}
+                >
                   TDS deducted by party
                 </th>
                 <th style={{ padding: "8px", textAlign: "left" }}>
@@ -386,7 +444,9 @@ const PartyLedgerStatement = ({ party }) => {
               {/* THIS FIRST ROW IS FOR OPENING BALANCE */}
               <tr>
                 <td style={{ padding: "6px" }}></td>
-                <td style={{ padding: "6px" }}>Opening Balance</td>
+                <td style={{ padding: "6px", textWrap: "nowrap" }}>
+                  Opening Balance
+                </td>
                 <td style={{ padding: "6px" }}>-</td>
                 <td style={{ padding: "6px" }}>
                   {party?.openingBalanceStatus === "To Pay" ? (
@@ -425,6 +485,7 @@ const PartyLedgerStatement = ({ party }) => {
                     style={{
                       display: "flex",
                       alignItems: "center",
+                      justifyContent: "flex-end",
                     }}
                   >
                     <LuIndianRupee />
@@ -439,7 +500,13 @@ const PartyLedgerStatement = ({ party }) => {
                 ledgerWithBalance.length > 0 &&
                 ledgerWithBalance.map((entry, idx) => (
                   <tr key={idx}>
-                    <td style={{ padding: "6px" }}>
+                    <td
+                      style={{
+                        padding: "6px",
+                        textAlign: "left",
+                        width: "100px",
+                      }}
+                    >
                       {entry?.date?.split("T")[0]}
                     </td>
                     <td style={{ padding: "6px" }}>{entry?.voucher}</td>
@@ -497,6 +564,7 @@ const PartyLedgerStatement = ({ party }) => {
                         style={{
                           display: "flex",
                           alignItems: "center",
+                          justifyContent: "flex-end",
                         }}
                       >
                         <LuIndianRupee />
@@ -549,6 +617,7 @@ const PartyLedgerStatement = ({ party }) => {
                       display: "flex",
                       alignItems: "center",
                       // gap: "4px",
+                      justifyContent: "flex-end",
                     }}
                   >
                     <LuIndianRupee />

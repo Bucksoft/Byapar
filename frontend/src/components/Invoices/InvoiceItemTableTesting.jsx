@@ -22,8 +22,9 @@ const SalesInvoiceItemTableTesting = ({
   const [showCounterId, setShowCounterId] = useState(null);
   const [quantities, setQuantities] = useState({});
   const [basePrices, setBasePrices] = useState({});
-  const [basePriceInputMode, setBasePriceInputMode] = useState({});
   const [manualBasePriceRaw, setManualBasePriceRaw] = useState({});
+
+
   // FETCH ITEMS
   const { data: items = [] } = useQuery({
     queryKey: ["items", business?._id],
@@ -191,13 +192,16 @@ const SalesInvoiceItemTableTesting = ({
       const manualRaw = manualBasePriceRaw[item._id] ?? 0;
 
       // --- calculate basePriceExclusive ---
+      // Prefer manual base price if provided, otherwise use raw price
       let basePriceExclusive = 0;
-      if (rawPrice > 0) {
+
+      const effectivePrice = manualRaw > 0 ? manualRaw : rawPrice;
+
+      if (effectivePrice > 0) {
         basePriceExclusive =
-          gstType === "with tax" ? rawPrice / (1 + gstRate / 100) : rawPrice;
-      } else if (manualRaw > 0) {
-        basePriceExclusive =
-          gstType === "with tax" ? manualRaw / (1 + gstRate / 100) : manualRaw;
+          gstType === "with tax"
+            ? effectivePrice / (1 + gstRate / 100)
+            : effectivePrice;
       }
 
       // --- discount ---
@@ -245,14 +249,26 @@ const SalesInvoiceItemTableTesting = ({
       };
     });
 
-    const additionalCharge = Number(data?.additionalChargeAmount ?? 0);
-    const additionalChargeGSTRate = Number(
-      getTotalTaxRate(data?.additionalChargeTax ?? "0")
-    );
-    const additionalChargeGST =
-      (additionalCharge * additionalChargeGSTRate) / 100;
-    totalAmount += additionalCharge + additionalChargeGST;
+    // --- handle multiple additional charges ---
+    let totalAdditionalCharges = 0;
+    let totalAdditionalChargeGST = 0;
 
+    if (
+      Array.isArray(data?.additionalCharges) &&
+      data.additionalCharges.length > 0
+    ) {
+      data.additionalCharges.forEach((charge) => {
+        const amount = Number(charge.amount ?? 0);
+        const gstRate = Number(getTotalTaxRate(charge.tax ?? "0"));
+        const gstAmount = (amount * gstRate) / 100;
+
+        totalAdditionalCharges += amount;
+        totalAdditionalChargeGST += gstAmount;
+      });
+    }
+
+    totalAmount += totalAdditionalCharges + totalAdditionalChargeGST;
+    console.log(totalAmount);
     setData((prev) => {
       let changed = false;
       const newItems = prev.items.map((item, idx) => {
@@ -276,8 +292,9 @@ const SalesInvoiceItemTableTesting = ({
         balanceAmount: Number(totalAmount.toFixed(2)),
         totalAmount: Number(totalAmount.toFixed(2)),
         amountSubTotal: Number(subtotalAmount.toFixed(2)),
-        additionalChargeAmount: Number(additionalCharge.toFixed(2)),
-        additionalChargeTax: prev.additionalChargeTax || "",
+        additionalCharges: data.additionalCharges,
+        totalAdditionalChargeAmount: Number(totalAdditionalCharges.toFixed(2)),
+        totalAdditionalChargeGST: Number(totalAdditionalChargeGST.toFixed(2)),
         additionalDiscountPercent: addDiscPercent,
         additionalDiscountType: addDiscType,
         additionalDiscountAmount: Number(totalAdditionalDiscount.toFixed(2)),
@@ -293,6 +310,7 @@ const SalesInvoiceItemTableTesting = ({
     data.additionalDiscountType,
     data.additionalChargeAmount,
     data.additionalChargeTax,
+    data.additionalCharges,
     JSON.stringify(data.items.map((i) => i.gstTaxRateType)),
     JSON.stringify(data.items.map((i) => i.gstTaxRate)),
   ]);
@@ -359,7 +377,7 @@ const SalesInvoiceItemTableTesting = ({
                   ),
                 }));
               }}
-              className="textarea textarea-xs bg-zinc-100 text-left w-full"
+              className="p-2 border border-zinc-300 rounded-md bg-zinc-100 text-left w-full"
             />
           </span>
 

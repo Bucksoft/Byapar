@@ -7,9 +7,13 @@ import DashboardStockValuePage from "./DashboardStockValuePage";
 import DashboardLowStockPage from "./DashboardLowStockPage";
 import DashboardItemsSalesAndPurchaseSummary from "./DashboardItemsSalesAndPurchaseSummary";
 import DashboardRateListPage from "./DashboardRateListPage";
+import { useState } from "react";
+import InvoiceReport from "../components/Reports/InvoiceReport";
 
 const DashboardReportPage = () => {
   const [searchParams, setSearchParams] = useSearchParams();
+  const [tab, setTab] = useState("party");
+
   const param = searchParams.get("type");
   return (
     <>
@@ -22,7 +26,7 @@ const DashboardReportPage = () => {
       ) : param === "Rate List" ? (
         <DashboardRateListPage />
       ) : (
-        <main className="h-full p-2">
+        <main className="max-h-screen p-2">
           <div className="h-full w-full bg-white rounded-lg p-3">
             {/* header */}
             <motion.div
@@ -41,10 +45,10 @@ const DashboardReportPage = () => {
               className="flex items-center justify-between "
             >
               <h1 className="font-semibold text-lg mt-1">Reports</h1>
-              <button className="btn btn-sm bg-[var(--primary-btn)] flex items-center gap-2">
+              {/* <button className="btn btn-sm bg-[var(--primary-btn)] flex items-center gap-2">
                 {" "}
                 <RiAccountPinCircleFill size={16} /> CA Report Sharing
-              </button>
+              </button> */}
             </motion.div>
 
             <div className="mt-7 text-sm flex items-center gap-5">
@@ -55,10 +59,15 @@ const DashboardReportPage = () => {
                 animate="show"
                 className="flex gap-3"
               >
-                {badges?.map((badge) => (
+                {badges?.map((badge, idx) => (
                   <motion.div
+                    key={idx}
                     variants={dashboardLinksItems}
-                    className="badge badge-soft badge-[var(--badge)] cursor-pointer"
+                    onClick={() => setTab(badge?.label.toLowerCase())}
+                    className={`badge badge-soft badge-[var(--badge)] cursor-pointer ${
+                      tab.toLowerCase() === badge?.label.toLowerCase() &&
+                      " text-[var(--badge)]/80 bg-[var(--badge)]/10 ring-1 shadow-md "
+                    } `}
                   >
                     {badge.label}
                   </motion.div>
@@ -66,6 +75,10 @@ const DashboardReportPage = () => {
               </motion.div>
             </div>
 
+            {/* INVOICE IS SELECTED */}
+            {tab === "invoice" && <InvoiceReport />}
+
+            {/* 
             <motion.table
               initial={{
                 opacity: 0,
@@ -82,7 +95,6 @@ const DashboardReportPage = () => {
               }}
               className="table table-zebra mt-8"
             >
-              {/* head */}
               <thead>
                 <tr className="bg-zinc-100">
                   <th>Favourite</th>
@@ -92,7 +104,7 @@ const DashboardReportPage = () => {
                   <th>Party</th>
                 </tr>
               </thead>
-            </motion.table>
+            </motion.table> */}
           </div>
         </main>
       )}

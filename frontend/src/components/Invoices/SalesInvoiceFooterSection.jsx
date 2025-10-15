@@ -37,16 +37,18 @@ const SalesInvoiceFooterSection = ({
     },
   });
 
+  // MUTATION TO DELETE THE BANK ACCOUNT
   const mutation = useMutation({
     mutationFn: async () => {
       const res = await axiosInstance.delete(`/bank-account/${accountId}`);
-      if (res.data.success) {
-        toast.success(res.data.msg);
-        queryClient.invalidateQueries({
-          queryKey: ["businessBankAccounts"],
-        });
-        document.getElementById("delete-modal").close();
-      }
+      return res.data;
+    },
+    onSuccess: (data) => {
+      toast.success(data.msg);
+      queryClient.invalidateQueries({
+        queryKey: ["businessBankAccounts"],
+      });
+      document.getElementById("delete-modal").close();
     },
   });
 
@@ -211,77 +213,104 @@ const SalesInvoiceFooterSection = ({
       <div className="border-l border-l-zinc-300 py-2">
         {/* add additional charges */}
         <div>
-          {charges && (
-            <div className="px-2">
-              <div className="flex justify-end relative">
-                <IoCloseCircle
-                  size={20}
-                  onClick={() => setCharges(false)}
-                  className="text-gray-500 absolute top-0 right-0 z-10"
-                />
-              </div>
-              <div className=" relative">
-                <input
-                  type="text"
-                  value={data?.additionalChargeReason}
-                  onChange={(e) =>
-                    setData((prev) => ({
-                      ...prev,
-                      additionalChargeReason: e.target.value,
-                    }))
-                  }
-                  placeholder="Enter charge (ex. Transport Charge)"
-                  className="input input-xs border-none text-xs bg-zinc-200"
-                />
-                <span className="absolute top-0 right-57 z-60 px-1 pt-1 text-xs">
-                  ₹
-                </span>
-                <input
-                  type="number"
-                  placeholder="0"
-                  disabled={data.additionalChargeReason.length === 0}
-                  value={data?.additionalChargeAmount}
-                  onChange={(e) =>
-                    setData((prev) => ({
-                      ...prev,
-                      additionalChargeAmount: Number(e.target.value),
-                    }))
-                  }
-                  className="input input-xs  text-xs bg-zinc-200 w-20 absolute top-0 right-41"
-                />
-                <select
-                  defaultValue="No Tax Applicable"
-                  value={
-                    data.additionalChargeReason.length > 0
-                      ? data?.additionalChargeTax
-                      : 0
-                  }
-                  onChange={(e) =>
-                    setData((prev) => ({
-                      ...prev,
-                      additionalChargeTax: e.target.value,
-                    }))
-                  }
-                  className="select select-xs absolute top-0 right-5 w-fit"
-                >
-                  <option>No Tax Applicable</option>
-                  {data?.items.map((item) => (
-                    <option key={item?._id}>{item?.gstTaxRate}</option>
-                  ))}
-                </select>
-              </div>
+          {data?.additionalCharges?.map((charge, index) => (
+            <div key={index} className="px-2 mb-2 relative">
+              {/* Close button for removing a charge */}
+              <IoCloseCircle
+                size={18}
+                onClick={() =>
+                  setData((prev) => ({
+                    ...prev,
+                    additionalCharges: prev.additionalCharges.filter(
+                      (_, i) => i !== index
+                    ),
+                  }))
+                }
+                className="text-gray-500 absolute top-0 right-0 cursor-pointer"
+              />
+
+              {/* Reason Input */}
+              <input
+                type="text"
+                value={charge.reason}
+                onChange={(e) =>
+                  setData((prev) => {
+                    const updated = [...prev.additionalCharges];
+                    updated[index].reason = e.target.value;
+                    return { ...prev, additionalCharges: updated };
+                  })
+                }
+                placeholder="Enter charge (ex. Transport Charge)"
+                className="input input-xs border-none text-xs bg-zinc-200 w-[160px]"
+              />
+
+              {/* Amount Input */}
+              {/* <span className="absolute top-[2px] right-[170px] text-xs">
+                ₹
+              </span> */}
+              <input
+                type="number"
+                placeholder="0"
+                disabled={!charge.reason.length}
+                value={charge.amount}
+                onChange={(e) =>
+                  setData((prev) => {
+                    const updated = [...prev.additionalCharges];
+                    updated[index].amount = Number(e.target.value);
+                    return { ...prev, additionalCharges: updated };
+                  })
+                }
+                className="input input-xs text-xs bg-zinc-200 w-[70px] ml-2"
+              />
+
+              {/* Tax Dropdown */}
+              <select
+                value={charge.tax}
+                onChange={(e) =>
+                  setData((prev) => {
+                    const updated = [...prev.additionalCharges];
+                    updated[index].tax = e.target.value;
+                    return { ...prev, additionalCharges: updated };
+                  })
+                }
+                className="select select-xs text-xs bg-zinc-200 ml-2 w-[130px]"
+              >
+                <option value="">No Tax Applicable</option>
+                {data?.items?.map((item) => (
+                  <option key={item?._id}>{item?.gstTaxRate}</option>
+                ))}
+              </select>
             </div>
-          )}
-          <div className="flex justify-between py-2 ">
+          ))}
+
+          {/* Add Another Charge Button */}
+          <div className="flex justify-between py-2 px-2">
             <span
-              onClick={() => setCharges(true)}
-              className={`px-2 w-fit text-info text-xs cursor-pointer`}
+              onClick={() =>
+                setData((prev) => ({
+                  ...prev,
+                  additionalCharges: [
+                    ...prev.additionalCharges,
+                    { reason: "", amount: 0, tax: "" },
+                  ],
+                }))
+              }
+              className="px-2 w-fit text-info text-xs cursor-pointer"
             >
               + Add Another Charge
             </span>
-            <span className=" text-xs pr-5 ">₹ 0</span>
+
+            {/* Total additional charge amount */}
+            <span className="text-xs pr-5">
+              ₹{" "}
+              {data?.additionalCharges?.reduce(
+                (sum, charge) => sum + Number(charge.amount || 0),
+                0
+              )}
+            </span>
           </div>
         </div>
+
         {/* taxable amount */}
         <div className="flex justify-between py-2">
           <span className={`px-2 w-fit text-xs`}>Taxable Amount</span>

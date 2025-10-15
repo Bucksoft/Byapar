@@ -78,6 +78,7 @@ const InvoicesForm = ({
         : title === "Debit Note"
         ? totalDebitNotes + 1
         : 1,
+
     partyName: party?.partyName || "",
     items: [],
     discountSubtotal: 0,
@@ -90,12 +91,19 @@ const InvoicesForm = ({
     notes: "",
     termsAndCondition: "",
     invoiceId: "",
-    additionalChargeReason: "",
-    additionalChargeAmount: 0,
-    additionalChargeTax: "",
+
+    additionalCharges: [
+      {
+        reason: "",
+        amount: 0,
+        tax: "",
+      },
+    ],
+
     additionalDiscountType: "after tax",
     additionalDiscountPercent: 0,
   };
+
   const [data, setData] = useState(invoiceData);
 
   // MUTATION FOR CREATING & UPDATING INVOICE
@@ -279,6 +287,7 @@ const InvoicesForm = ({
     let totalAmount = 0;
     let totalAdditionalDiscount = 0;
 
+    // === ITEM CALCULATIONS ===
     data.items.forEach((item) => {
       const quantity = Number(item.quantity || 0);
       const basePrice = Number(item.basePrice || 0);
@@ -297,15 +306,25 @@ const InvoicesForm = ({
       totalAmount += taxableValue + gstAmount - additionalDiscountAmount;
     });
 
-    // Include additional charges + GST
-    const additionalCharge = Number(data?.additionalChargeAmount || 0);
-    const additionalChargeGSTRate = getTotalTaxRate(
-      data?.additionalChargeTax || "0"
-    );
-    const additionalChargeGST =
-      (additionalCharge * additionalChargeGSTRate) / 100;
+    // === ADDITIONAL CHARGES CALCULATION (ARRAY) ===
+    let totalAdditionalCharge = 0;
+    let totalAdditionalChargeGST = 0;
 
-    totalAmount += additionalCharge + additionalChargeGST;
+    if (
+      Array.isArray(data?.additionalCharges) &&
+      data.additionalCharges.length > 0
+    ) {
+      data.additionalCharges.forEach((charge) => {
+        const chargeAmount = Number(charge.amount || 0);
+        const taxRate = getTotalTaxRate(charge.tax || "0");
+        const chargeGST = (chargeAmount * taxRate) / 100;
+
+        totalAdditionalCharge += chargeAmount;
+        totalAdditionalChargeGST += chargeGST;
+      });
+    }
+
+    totalAmount += totalAdditionalCharge + totalAdditionalChargeGST;
 
     return {
       totalDiscount: Number(totalDiscount.toFixed(2)),
@@ -314,19 +333,17 @@ const InvoicesForm = ({
       totalAmount: Number(totalAmount.toFixed(2)),
       totalCGST: Number((totalTax / 2).toFixed(2)),
       totalSGST: Number((totalTax / 2).toFixed(2)),
-      additionalCharge: Number(additionalCharge.toFixed(2)),
-      additionalChargeGST: Number(additionalChargeGST.toFixed(2)),
+      additionalCharge: Number(totalAdditionalCharge.toFixed(2)),
+      additionalChargeGST: Number(totalAdditionalChargeGST.toFixed(2)),
       additionalDiscountAmount: Number(totalAdditionalDiscount.toFixed(2)),
     };
   }, [
     data?.items,
     data?.additionalDiscountPercent,
     data?.additionalDiscountType,
-    data?.additionalChargeAmount,
-    data?.additionalChargeTax,
+    data?.additionalCharges,
   ]);
 
-  // FINAL USE EFFECT WHICH WILL SET THE FINAL DATA TO BE SENT AT THE BACKEND
   useEffect(() => {
     if (!invoiceTotals) return;
     setData((prev) => ({
@@ -406,5 +423,4 @@ const InvoicesForm = ({
     </main>
   );
 };
-
 export default InvoicesForm;

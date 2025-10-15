@@ -88,7 +88,6 @@ const InvoiceTemplate = ({
     return acc + (isNaN(total) ? 0 : total);
   }, 0);
 
-  console.log(invoice);
 
   return (
     <main

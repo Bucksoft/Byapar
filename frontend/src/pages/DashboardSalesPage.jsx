@@ -119,6 +119,7 @@ const DashboardSalesPage = () => {
   // MUTATION TO UPLOAD ITEMS IN BULK
   const bulkMutation = useMutation({
     mutationFn: async (data) => {
+      console.log("BULK INVOICE DATA TO SEND ", data);
       const res = await axiosInstance.post(
         `/sales-invoice/bulk/${business?._id}`,
         data
@@ -134,7 +135,6 @@ const DashboardSalesPage = () => {
   const handleFileUpload = async (e) => {
     const selectedFile = e.target.files[0];
     const sanitizedData = await uploadExcel(selectedFile);
-
     if (sanitizedData) {
       bulkMutation.mutate(sanitizedData);
     }
@@ -282,10 +282,10 @@ const DashboardSalesPage = () => {
                             loading="lazy"
                           />
                           <h3 className="font-semibold">
-                            No matching items found
+                            No matching invoices found
                           </h3>
                           <p className="text-zinc-500 text-xs text-center max-w-sm">
-                            No items found matching “{searchQuery}”. Try a
+                            No invoices found matching “{searchQuery}”. Try a
                             different name or clear your search.
                           </p>
                           <button
@@ -368,7 +368,7 @@ const DashboardSalesPage = () => {
                               </div>
                               <ul
                                 tabIndex={0}
-                                className="dropdown-content menu bg-base-100 rounded-box z-10 w-52 p-2 shadow-sm"
+                                className="dropdown-content menu bg-base-100 border border-zinc-300 text-xs rounded-box z-10 w-36 p-1 shadow-sm"
                                 onClick={(e) => e.stopPropagation()}
                               >
                                 <li>
