@@ -51,8 +51,6 @@ const InvoicesForm = ({
 
   const invoiceNoRef = useRef();
 
-  console.log(business);
-
   // INVOICE DATA TO SEND
   const invoiceData = {
     paymentTerms: 0,
@@ -183,7 +181,7 @@ const InvoicesForm = ({
     },
     onSuccess: (data) => {
       toast.success(data?.msg);
-      queryClient.invalidateQueries({ queryKey: ["invoices"] });
+      queryClient.invalidateQueries({ queryKey: ["invoices", business?._id] });
       navigate("/dashboard/sales");
       if (data?.quotation?._id) {
         navigate(`/dashboard/quotations/${data?.quotation?._id}`);

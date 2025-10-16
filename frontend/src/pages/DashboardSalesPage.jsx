@@ -53,7 +53,6 @@ const DashboardSalesPage = () => {
     queryFn: async () => {
       if (!business) return [];
       const res = await axiosInstance.get(`/sales-invoice/${business._id}`);
-      console.log(res);
       setInvoices(res?.data?.invoices);
       setTotalInvoices(res.data?.totalInvoices);
       return res.data || [];

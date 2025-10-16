@@ -88,7 +88,6 @@ const InvoiceTemplate = ({
     return acc + (isNaN(total) ? 0 : total);
   }, 0);
 
-
   return (
     <main
       style={{
@@ -511,7 +510,9 @@ const InvoiceTemplate = ({
                   <td style={{ padding: "6px" }}>{index + 1}</td>
                   <td style={{ padding: "8px" }}>
                     <span>{item?.itemName ?? "-"}</span>
-                    <p className="text-xs text-zinc-500">{item?.description || ""}</p>
+                    <p className="text-xs text-zinc-500">
+                      {item?.description || ""}
+                    </p>
                   </td>
 
                   <td style={{ padding: "6px" }}>

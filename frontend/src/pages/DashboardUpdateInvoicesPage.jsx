@@ -7,6 +7,7 @@ import { useInvoiceStore } from "../store/invoicesStore";
 import { useCreditNoteStore } from "../store/creditNoteStore";
 import { useChallanStore } from "../store/challanStore";
 import { useProformaInvoiceStore } from "../store/proformaStore";
+import { useQuery } from "@tanstack/react-query";
 
 const DashboardUpdateInvoicesPage = () => {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -15,7 +16,6 @@ const DashboardUpdateInvoicesPage = () => {
   const { invoices } = useInvoiceStore();
   const { deliveryChallans } = useChallanStore();
   const { proformaInvoices } = useProformaInvoiceStore();
-
   const [invoiceToUpdate, setInvoiceToUpdate] = useState();
   const [party, setParty] = useState();
 
@@ -25,38 +25,38 @@ const DashboardUpdateInvoicesPage = () => {
 
   // THIS USE EFFECT FILTERS OUT THE CORRECT INVOICE BASED ON THE TYPE
   useEffect(() => {
+    let selectedInvoice = null;
+
     if (type === "quotation") {
-      const quotationToUpdate = quotations?.filter(
-        (quotation) => quotation?._id === id
-      );
-      setParty(quotationToUpdate?.partyId);
-      setInvoiceToUpdate(quotationToUpdate[0]);
+      selectedInvoice = quotations?.find((q) => q?._id === id);
     } else if (type === "sales invoice") {
-      const salesInvoiceToUpdate = invoices?.invoices?.filter(
-        (invoice) => invoice?._id === id
-      );
-      setParty(salesInvoiceToUpdate?.partyId);
-      setInvoiceToUpdate(salesInvoiceToUpdate[0]);
+      selectedInvoice = Array.isArray(invoices?.invoices)
+        ? invoices?.invoices?.find((inv) => inv?._id === id)
+        : [];
     } else if (type === "credit note") {
-      const creditNoteToUpdate = creditNotes?.filter(
-        (creditNote) => creditNote?._id === id
-      );
-      setParty(creditNoteToUpdate?.partyId);
-      setInvoiceToUpdate(creditNoteToUpdate[0]);
+      selectedInvoice = creditNotes?.find((c) => c?._id === id);
     } else if (type === "delivery challan") {
-      const challanToUpdate = deliveryChallans?.filter(
-        (challan) => challan?._id === id
-      );
-      setParty(challanToUpdate?.partyId);
-      setInvoiceToUpdate(challanToUpdate[0]);
+      selectedInvoice = deliveryChallans?.find((d) => d?._id === id);
     } else if (type === "proforma invoice") {
-      const proformaInvoiceToUpdate = proformaInvoices?.filter(
-        (invoice) => invoice?._id === id
-      );
-      setParty(proformaInvoiceToUpdate?.partyId);
-      setInvoiceToUpdate(proformaInvoiceToUpdate[0]);
+      selectedInvoice = proformaInvoices?.find((p) => p?._id === id);
     }
-  }, [id, type]);
+
+    if (selectedInvoice) {
+      setParty(selectedInvoice?.partyId || null);
+      setInvoiceToUpdate(selectedInvoice || null);
+    } else {
+      setParty(null);
+      setInvoiceToUpdate(null);
+    }
+  }, [
+    id,
+    type,
+    quotations,
+    invoices,
+    creditNotes,
+    deliveryChallans,
+    proformaInvoices,
+  ]);
 
   return (
     <main className="max-h-screen flex w-full overflow-auto">

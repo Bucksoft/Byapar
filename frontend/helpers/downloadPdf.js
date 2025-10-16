@@ -7,19 +7,42 @@ export const downloadPDF = async (id, title = "invoice", setIsDownloading) => {
     const element = input.outerHTML;
 
     const fullHTML = `
-      <!DOCTYPE html>
-      <html lang="en">
-        <head>
-          <meta charset="UTF-8" />
-          <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-          <!-- Tailwind CDN (or your built CSS path) -->
-          <script src="https://cdn.tailwindcss.com"></script>
-        </head>
-        <body>
-          ${element}
-        </body>
-      </html>
-    `;
+  <!DOCTYPE html>
+  <html lang="en">
+    <head>
+      <meta charset="UTF-8" />
+      <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+      <style>
+        body {
+          font-family: 'Inter', sans-serif;
+          font-size: 12px;
+          line-height: 1.3;
+          margin: 0;
+          padding: 0;
+          background-color: #fff;
+        }
+        table {
+          border-collapse: collapse;
+          width: 100%;
+        }
+        th, td {
+          padding: 4px 6px;
+          text-align: left;
+        }
+        h1, h2, h3, h4, h5, h6, p {
+          margin: 2px 0;
+        }
+        img {
+          max-width: 100%;
+          height: auto;
+        }
+      </style>
+    </head>
+    <body>
+      ${element}
+    </body>
+  </html>
+`;
 
     const response = await axiosInstance.post(
       "/generate-pdf",
