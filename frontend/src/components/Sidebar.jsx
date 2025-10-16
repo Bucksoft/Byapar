@@ -54,7 +54,7 @@ const Sidebar = () => {
   const navigate = useNavigate();
   // const [sidebarShrink, setSidebarShrink] = useState(false);
   const { business, setBusinesses, setBusiness } = useBusinessStore();
-  const { setInvoices } = useInvoiceStore();
+  const { setInvoices, setTotalInvoices } = useInvoiceStore();
   const { setUser } = useAuthStore();
   const { setItems, setItem } = useItemStore();
   const { setDeliveryChallans } = useChallanStore();
@@ -76,6 +76,7 @@ const Sidebar = () => {
       setBusinesses(null);
       setBusiness(null);
       setInvoices(null);
+      setTotalInvoices(0);
       setItems(null);
       setParties(null);
       setPaymentIns(null);

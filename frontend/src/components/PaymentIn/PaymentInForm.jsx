@@ -50,11 +50,11 @@ const PaymentInForm = () => {
 
   useEffect(() => {
     if (!parties || !invoices) return;
-    const allInvoices = invoices?.invoices.filter(
+    const allInvoices = invoices?.invoices?.filter(
       (invoice) => invoice.partyName === selectedParty
     );
     setAllInvoices(allInvoices);
-    const totalAmount = invoices?.invoices.reduce(
+    const totalAmount = invoices?.invoices?.reduce(
       (acc, item) => item?.totalAmount + acc,
       0
     );
@@ -62,7 +62,7 @@ const PaymentInForm = () => {
   }, [selectedParty]);
 
   useEffect(() => {
-    if (!allInvoices.length) return;
+    if (!allInvoices?.length) return;
 
     let remainingPayment = data.paymentAmount;
     const newSettled = {};
@@ -152,23 +152,25 @@ const PaymentInForm = () => {
   });
 
   // THIS FUNCTION IS USED FOR CALCULATING TOTAL VALUES
-  const totals = allInvoices.reduce(
-    (acc, invoice) => {
-      const alreadySettled = invoice?.settledAmount || 0;
-      const currentSettled = settledInvoices[invoice?._id] || 0;
+  const totals =
+    allInvoices?.length &&
+    allInvoices?.reduce(
+      (acc, invoice) => {
+        const alreadySettled = invoice?.settledAmount || 0;
+        const currentSettled = settledInvoices[invoice?._id] || 0;
 
-      const pending = Math.max(
-        invoice?.totalAmount - (alreadySettled + currentSettled),
-        0
-      );
+        const pending = Math.max(
+          invoice?.totalAmount - (alreadySettled + currentSettled),
+          0
+        );
 
-      acc.totalPending += pending;
-      acc.totalSettled += alreadySettled + currentSettled;
+        acc.totalPending += pending;
+        acc.totalSettled += alreadySettled + currentSettled;
 
-      return acc;
-    },
-    { totalPending: 0, totalSettled: 0 }
-  );
+        return acc;
+      },
+      { totalPending: 0, totalSettled: 0 }
+    );
 
   const formatDateForInput = (date) => {
     if (!date) return "";
@@ -324,7 +326,7 @@ const PaymentInForm = () => {
 
         {/* PARTY's INVOICE DETAILS */}
         <section className="m-4">
-          {allInvoices.length > 0 && (
+          {allInvoices && allInvoices.length > 0 && (
             <div className="overflow-x-auto border border-zinc-300 rounded-lg">
               <p className="p-4 font-medium">Settle invoices</p>
               <table className="table w-full table-zebra ">

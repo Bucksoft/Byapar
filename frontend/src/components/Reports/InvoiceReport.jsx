@@ -1,4 +1,10 @@
-import { ArrowUpDown, EllipsisVertical, Funnel, Printer } from "lucide-react";
+import {
+  ArrowUpDown,
+  Download,
+  EllipsisVertical,
+  Funnel,
+  Printer,
+} from "lucide-react";
 import { useMemo, useRef, useState } from "react";
 import { DayPicker } from "react-day-picker";
 import { LuIndianRupee } from "react-icons/lu";
@@ -11,9 +17,11 @@ import { handlePrint } from "../../../helpers/print";
 import { queryClient } from "../../main";
 import toast from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
+import { downloadPDF } from "../../../helpers/downloadPdf";
 
 const InvoiceReport = () => {
   const [openDatePicker, setOpenDatePicker] = useState(false);
+  const [isDownloading, setIsDownloading] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const printRef = useRef();
   const { business } = useBusinessStore();
@@ -167,7 +175,7 @@ const InvoiceReport = () => {
             <input
               className="input input-sm"
               type="text"
-              placeholder="Search"
+              placeholder="Search by invoice number"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
             />
@@ -419,7 +427,7 @@ const InvoiceReport = () => {
                           <button
                             onClick={(e) => {
                               e.stopPropagation();
-                              handlePrint("#invoice");
+                              handlePrint(invoice?._id);
                             }}
                             className="btn btn-xs bg-white"
                           >
@@ -438,7 +446,7 @@ const InvoiceReport = () => {
                             </div>
                             <ul
                               tabIndex="-1"
-                              className="border border-zinc-300 dropdown-content menu bg-base-100 rounded-box z-1 w-52 p-1 text-xs shadow-sm"
+                              className="border border-zinc-300 dropdown-content menu bg-base-100 rounded-box z-100 w-52 p-1 text-xs shadow-sm"
                             >
                               <li
                                 onClick={() =>
@@ -449,7 +457,13 @@ const InvoiceReport = () => {
                               >
                                 <a>View/Edit</a>
                               </li>
-                              <li>
+                              <li
+                                onClick={() =>
+                                  navigate(
+                                    `/dashboard/parties/create-payment-in`
+                                  )
+                                }
+                              >
                                 <a>Receive Payment</a>
                               </li>
                               <li>
@@ -478,19 +492,73 @@ const InvoiceReport = () => {
 
       <dialog id="report_popup" className="modal">
         <div className="modal-box w-11/12 max-w-7xl">
+          <div className="modal-action sticky top-0 z-10 mb-10 w-full">
+            <form method="dialog">
+              <button className="btn btn-sm shadow">Close</button>
+            </form>
+            <button
+              onClick={() =>
+                downloadPDF("sales_report", "sales_report", setIsDownloading)
+              }
+              className="btn btn-sm bg-[var(--primary-btn)] shadow"
+            >
+              {isDownloading ? (
+                <div className="">
+                  <CustomLoader text={""} />
+                </div>
+              ) : (
+                <>
+                  <Download size={14} />
+                </>
+              )}
+            </button>
+            <button
+              onClick={() => handlePrint(printRef)}
+              className="btn btn-sm bg-[var(--primary-btn)] shadow"
+            >
+              Print
+            </button>
+          </div>
           {/* INVOICE TO DOWNLOAD */}
-          <div className="w-full">
+          <div
+            id="sales_report"
+            ref={printRef}
+            style={{
+              width: "100%",
+            }}
+          >
             {/* HEADER PART */}
-            <div className="flex items-start justify-between">
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "space-between",
+              }}
+            >
               <img src={business?.logo} width={70} alt="Business" />
               <div>
-                <h1 className="text-lg font-semibold">
+                <h2
+                  style={{
+                    fontSize: "18px",
+                    fontWeight: 600,
+                  }}
+                >
                   {business?.businessName?.toUpperCase()}
-                </h1>
-                <p className="text-sm text-zinc-500">
+                </h2>
+                <p
+                  style={{
+                    fontSize: "12px",
+                    color: "#71717b",
+                  }}
+                >
                   {business?.billingAddress}
                 </p>
-                <div className="flex gap-2">
+                <div
+                  style={{
+                    display: "flex",
+                    gap: "6px",
+                  }}
+                >
                   <small>{business?.companyPhoneNo}</small>
                   <small>
                     {business?.companyEmail?.length
@@ -506,30 +574,49 @@ const InvoiceReport = () => {
               </div>
             </div>
 
-            <div className="divider" />
+            <div
+              style={{
+                height: "2px",
+                width: "100%",
+                backgroundColor: "#e4e4e7",
+                margin: "20px 0px",
+              }}
+            />
 
             {/* MAIN PART */}
-            <div className="w-full">
-              <h3 className="underline font-bold text-lg text-center">
+            <div
+              style={{
+                width: "100%",
+              }}
+            >
+              <h4
+                style={{
+                  textDecoration: "underline",
+                  fontWeight: 700,
+                  fontSize: "18px",
+                  textAlign: "center",
+                }}
+              >
                 Sale Report
-              </h3>
-              <h2>
+              </h4>
+              <h5>
                 Duration : {dateRange?.from.toLocaleDateString("en-GB")} to{" "}
                 {dateRange?.to.toLocaleDateString("en-GB")}{" "}
-              </h2>
+              </h5>
             </div>
 
-            <div className="mt-5 overflow-y-scroll max-h-[400px] ">
-              <table
-                ref={printRef}
-                className=" table table-zebra w-full relative"
-              >
+            <div
+              style={{
+                marginTop: "20px",
+                // overflowY: "scroll",
+                // maxHeight: "400px",
+              }}
+            >
+              <table className=" table table-zebra w-full relative">
                 <thead
                   style={{
                     backgroundColor: "#e4e4e7",
-                    position: "sticky",
-                    top: 0,
-                    zIndex: 10,
+                    fontSize: "12px",
                   }}
                 >
                   <tr>
@@ -540,16 +627,10 @@ const InvoiceReport = () => {
                           alignItems: "center",
                           justifyContent: "space-between",
                           gap: 20,
+                          padding: "5px",
                         }}
                       >
                         <span>Date</span>
-                        <ArrowUpDown
-                          onClick={() => setSortType("date")}
-                          size={12}
-                          style={{
-                            cursor: "pointer",
-                          }}
-                        />
                       </div>
                     </th>
                     <th>
@@ -558,16 +639,10 @@ const InvoiceReport = () => {
                           display: "flex",
                           alignItems: "center",
                           justifyContent: "space-between",
+                          padding: "5px",
                         }}
                       >
                         <span>Invoice no</span>
-                        <ArrowUpDown
-                          onClick={() => setSortType("invoiceNo")}
-                          size={12}
-                          style={{
-                            cursor: "pointer",
-                          }}
-                        />
                       </div>
                     </th>
                     <th>
@@ -579,14 +654,6 @@ const InvoiceReport = () => {
                         }}
                       >
                         <span>Party Name</span>
-                        <ArrowUpDown
-                          onClick={() => setSortType("partyName")}
-                          size={12}
-                          style={{
-                            cursor: "pointer",
-                            marginLeft: "20px",
-                          }}
-                        />
                       </div>
                     </th>
                     <th>
@@ -598,13 +665,6 @@ const InvoiceReport = () => {
                         }}
                       >
                         <span>Transaction</span>
-                        <ArrowUpDown
-                          onClick={() => setSortType("transaction")}
-                          size={12}
-                          style={{
-                            cursor: "pointer",
-                          }}
-                        />
                       </div>
                     </th>
                     <th>
@@ -616,13 +676,6 @@ const InvoiceReport = () => {
                         }}
                       >
                         <span>Payment Type</span>
-                        <ArrowUpDown
-                          onClick={() => setSortType("paymentType")}
-                          size={12}
-                          style={{
-                            cursor: "pointer",
-                          }}
-                        />
                       </div>
                     </th>
                     <th>
@@ -634,13 +687,6 @@ const InvoiceReport = () => {
                         }}
                       >
                         <span>Amount</span>
-                        <ArrowUpDown
-                          onClick={() => setSortType("amount")}
-                          size={12}
-                          style={{
-                            cursor: "pointer",
-                          }}
-                        />
                       </div>
                     </th>
                     <th>
@@ -652,13 +698,6 @@ const InvoiceReport = () => {
                         }}
                       >
                         <span>Balance</span>
-                        <ArrowUpDown
-                          onClick={() => setSortType("balance")}
-                          size={12}
-                          style={{
-                            cursor: "pointer",
-                          }}
-                        />
                       </div>
                     </th>
                     <th>
@@ -670,23 +709,27 @@ const InvoiceReport = () => {
                         }}
                       >
                         <span>Status</span>
-                        <ArrowUpDown
-                          onClick={() => setSortType("status")}
-                          size={12}
-                          style={{
-                            cursor: "pointer",
-                          }}
-                        />
                       </div>
                     </th>
                   </tr>
                 </thead>
 
-                <tbody className="text-xs ">
+                <tbody
+                  style={{
+                    fontSize: "12px",
+                  }}
+                >
                   {isLoading ? (
                     <tr>
                       <td colSpan={8}>
-                        <div className="flex items-center justify-center py-8">
+                        <div
+                          style={{
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "space-between",
+                            padding: "32px 0px",
+                          }}
+                        >
                           <CustomLoader text={"Loading..."} />
                         </div>
                       </td>
@@ -694,14 +737,25 @@ const InvoiceReport = () => {
                   ) : searchedInvoices?.length === 0 ? (
                     <tr>
                       <td colSpan={8}>
-                        <div className="flex items-center justify-center flex-col">
+                        <div
+                          style={{
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "center",
+                            flexDirection: "column",
+                          }}
+                        >
                           <img
                             src={not_found}
                             alt="not_found"
                             width={250}
                             loading="lazy"
                           />
-                          <h3 className="font-semibold">
+                          <h3
+                            style={{
+                              fontWeight: "600",
+                            }}
+                          >
                             No matching items found
                           </h3>
                         </div>
@@ -714,7 +768,9 @@ const InvoiceReport = () => {
                         onClick={() =>
                           navigate(`/dashboard/sales-invoice/${invoice?._id}`)
                         }
-                        className="cursor-pointer"
+                        style={{
+                          cursor: "pointer",
+                        }}
                       >
                         <td>
                           {invoice?.salesInvoiceDate?.split("T")[0] || "-"}
@@ -724,7 +780,13 @@ const InvoiceReport = () => {
                         <td>{invoice?.type || "-"}</td>
                         <td>{invoice?.paymentType || "-"}</td>
                         <td>
-                          <div className="flex items-center gap-1">
+                          <div
+                            style={{
+                              display: "flex",
+                              alignItems: "center",
+                              gap: "4px",
+                            }}
+                          >
                             <LuIndianRupee size={10} />
                             {Number(invoice?.totalAmount).toLocaleString(
                               "en-IN"
@@ -732,7 +794,13 @@ const InvoiceReport = () => {
                           </div>
                         </td>
                         <td>
-                          <div className="flex items-center gap-1">
+                          <div
+                            style={{
+                              display: "flex",
+                              alignItems: "center",
+                              gap: "4px",
+                            }}
+                          >
                             <LuIndianRupee size={10} />
                             {invoice?.balance
                               ? Number(invoice?.balanceAmount).toLocaleString(
@@ -760,18 +828,19 @@ const InvoiceReport = () => {
                 </tbody>
               </table>
             </div>
-          </div>
 
-          <div className="modal-action">
-            <form method="dialog">
-              <button className="btn btn-sm">Close</button>
-            </form>
-            <button
-              onClick={() => handlePrint(printRef)}
-              className="btn btn-sm bg-[var(--primary-btn)]"
+            {/* TOTAL SALES IN THE REPORT */}
+            <h4
+              style={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "end",
+                margin: "20px 0px",
+                width: "100%",
+              }}
             >
-              Print
-            </button>
+              Total Sale : <LuIndianRupee size={15} /> {invoices?.totalSales}
+            </h4>
           </div>
         </div>
       </dialog>

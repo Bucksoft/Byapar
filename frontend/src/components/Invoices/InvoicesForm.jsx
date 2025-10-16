@@ -51,6 +51,8 @@ const InvoicesForm = ({
 
   const invoiceNoRef = useRef();
 
+  console.log(business);
+
   // INVOICE DATA TO SEND
   const invoiceData = {
     paymentTerms: 0,

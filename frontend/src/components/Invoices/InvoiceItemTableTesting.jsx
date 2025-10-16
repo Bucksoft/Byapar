@@ -24,7 +24,6 @@ const SalesInvoiceItemTableTesting = ({
   const [basePrices, setBasePrices] = useState({});
   const [manualBasePriceRaw, setManualBasePriceRaw] = useState({});
 
-
   // FETCH ITEMS
   const { data: items = [] } = useQuery({
     queryKey: ["items", business?._id],
@@ -268,7 +267,6 @@ const SalesInvoiceItemTableTesting = ({
     }
 
     totalAmount += totalAdditionalCharges + totalAdditionalChargeGST;
-    console.log(totalAmount);
     setData((prev) => {
       let changed = false;
       const newItems = prev.items.map((item, idx) => {

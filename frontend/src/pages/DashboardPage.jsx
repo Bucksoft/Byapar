@@ -69,10 +69,10 @@ const DashboardPage = () => {
                   Latest Transactions
                 </h1>
                 {invoices ? (
-                  <>
-                    <table className="table table-zebra text-sm mt-2 min-w-full">
+                  <div className="">
+                    <table className="table table-zebra text-sm mt-2 min-w-full table-sm border border-zinc-200 ">
                       {/* head */}
-                      <thead className="bg-zinc-200">
+                      <thead className="bg-zinc-300">
                         <tr>
                           <th className="font-medium">DATE</th>
                           <th className="font-medium">TYPE</th>
@@ -111,7 +111,7 @@ const DashboardPage = () => {
                         View All Transactions
                       </Link>
                     </div>
-                  </>
+                  </div>
                 ) : (
                   <div className="text-sm text-center text-zinc-500 my-10 flex items-center justify-center flex-col gap-3">
                     <IoReceiptOutline size={40} />

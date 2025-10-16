@@ -27,10 +27,21 @@ export async function createSalesInvoice(req, res) {
         .json({ success: false, msg: "Party doesn't exists" });
     }
 
-    const existingInvoice = await SalesInvoice.findOne({
-      salesInvoiceNumber: data?.salesInvoiceNumber,
-      businessId: req?.params?.id,
-    });
+    // Find the latest invoice for this business
+    const latestInvoice = await SalesInvoice.findOne({
+      businessId: req.params.id,
+    })
+      .sort({ salesInvoiceNumber: -1 }) // sort descending by invoice number
+      .limit(1);
+
+    // Generate next invoice number
+    let nextInvoiceNumber = 1; // default if no invoices yet
+    if (latestInvoice) {
+      nextInvoiceNumber = latestInvoice.salesInvoiceNumber + 1;
+    }
+
+    // Assign the generated invoice number
+    data.salesInvoiceNumber = nextInvoiceNumber;
 
     if (existingInvoice) {
       return res.status(400).json({
@@ -128,7 +139,11 @@ export async function getAllInvoices(req, res) {
         .json({ success: false, msg: "Invoices not found" });
     }
 
-    const totalInvoices = await SalesInvoice.countDocuments({ businessId });
+    const latestInvoice = await SalesInvoice.findOne({
+      businessId: req.params.id,
+    })
+      .sort({ salesInvoiceNumber: -1 })
+      .limit(1);
 
     // CALCULATE THE TOTALS OF ONLY THOSE INVOICES WHICH ARE NOT CANCELLED.
     const validInvoices =
@@ -162,7 +177,7 @@ export async function getAllInvoices(req, res) {
     return res.status(200).json({
       success: true,
       invoices,
-      totalInvoices,
+      totalInvoices: latestInvoice?.salesInvoiceNumber,
       totalSales,
       totalPaid,
       totalUnpaid,
