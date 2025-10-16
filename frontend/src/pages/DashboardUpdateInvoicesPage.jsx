@@ -26,31 +26,31 @@ const DashboardUpdateInvoicesPage = () => {
   // THIS USE EFFECT FILTERS OUT THE CORRECT INVOICE BASED ON THE TYPE
   useEffect(() => {
     if (type === "quotation") {
-      const quotationToUpdate = quotations.filter(
+      const quotationToUpdate = quotations?.filter(
         (quotation) => quotation?._id === id
       );
       setParty(quotationToUpdate?.partyId);
       setInvoiceToUpdate(quotationToUpdate[0]);
     } else if (type === "sales invoice") {
-      const salesInvoiceToUpdate = invoices?.invoices.filter(
+      const salesInvoiceToUpdate = invoices?.invoices?.filter(
         (invoice) => invoice?._id === id
       );
       setParty(salesInvoiceToUpdate?.partyId);
       setInvoiceToUpdate(salesInvoiceToUpdate[0]);
     } else if (type === "credit note") {
-      const creditNoteToUpdate = creditNotes.filter(
+      const creditNoteToUpdate = creditNotes?.filter(
         (creditNote) => creditNote?._id === id
       );
       setParty(creditNoteToUpdate?.partyId);
       setInvoiceToUpdate(creditNoteToUpdate[0]);
     } else if (type === "delivery challan") {
-      const challanToUpdate = deliveryChallans.filter(
+      const challanToUpdate = deliveryChallans?.filter(
         (challan) => challan?._id === id
       );
       setParty(challanToUpdate?.partyId);
       setInvoiceToUpdate(challanToUpdate[0]);
     } else if (type === "proforma invoice") {
-      const proformaInvoiceToUpdate = proformaInvoices.filter(
+      const proformaInvoiceToUpdate = proformaInvoices?.filter(
         (invoice) => invoice?._id === id
       );
       setParty(proformaInvoiceToUpdate?.partyId);
