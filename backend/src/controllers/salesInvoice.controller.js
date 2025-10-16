@@ -9,6 +9,7 @@ import { parseDate } from "../../src/utils/date.js";
 export async function createSalesInvoice(req, res) {
   try {
     const data = req.body;
+    console.log("REQUEST DATA ", data);
     // const validatedResult = salesInvoiceSchema.safeParse(req.body);
     // if (!validatedResult.success) {
     //   const validationError = validatedResult.error.format();
@@ -34,16 +35,18 @@ export async function createSalesInvoice(req, res) {
       .sort({ salesInvoiceNumber: -1 }) // sort descending by invoice number
       .limit(1);
 
+    console.log(latestInvoice);
+
     // Generate next invoice number
-    let nextInvoiceNumber = 1; // default if no invoices yet
-    if (latestInvoice) {
-      nextInvoiceNumber = latestInvoice.salesInvoiceNumber + 1;
-    }
+    // let nextInvoiceNumber = 1; // default if no invoices yet
+    // if (latestInvoice) {
+    //   nextInvoiceNumber = latestInvoice.salesInvoiceNumber + 1;
+    // }
 
     // Assign the generated invoice number
-    data.salesInvoiceNumber = nextInvoiceNumber;
+    // data.salesInvoiceNumber = nextInvoiceNumber;
 
-    if (existingInvoice) {
+    if (!latestInvoice) {
       return res.status(400).json({
         success: false,
         msg: "Invoice already exists with this invoice number",
