@@ -97,7 +97,7 @@ const Sidebar = () => {
 
   return (
     <>
-      <section className="h-screen bg-[var(--sidebar-background)] text-black/70 max-h-screen overflow-y-auto hide-scrollbar relative">
+      <section className="h-screen bg-[var(--sidebar-background)] text-black/70 max-h-screen overflow-y-auto hide-scrollbar relative border-r border-r-zinc-200 shadow-md">
         {/* nav */}
         <motion.h1
           initial={{
@@ -108,7 +108,7 @@ const Sidebar = () => {
             translateX: 0,
             filter: "blur(0)",
           }}
-          className="sticky  top-0 z-10 text-md text-black font-semibold flex items-center  gap-3 w-full px-5 py-3 backdrop-blur-md border-b border-b-zinc-200"
+          className="sticky top-0 z-10 text-md text-black font-semibold flex items-center  gap-3 w-full px-5 py-3 backdrop-blur-md border-b border-b-zinc-200"
         >
           <img
             src={"https://byapar.bucksoftech.top/upload/Byapar_Logo.svg"}
@@ -177,10 +177,10 @@ const Sidebar = () => {
                       to={`/dashboard/${field.label.toLowerCase()}`}
                       onClick={() => setCurrentLink(field?.label)}
                       className={({ isActive }) =>
-                        `flex items-center justify-between text-xs font-medium cursor-pointer py-2 pl-[13.5px] w-full transition-all duration-200 ease-in-out  text-black/70
+                        `flex items-center justify-between text-xs font-medium cursor-pointer py-2 pl-[13.5px] w-full transition-all duration-200 ease-in-out text-black/70
                 ${
                   isActive
-                    ? "bg-[var(--primary-btn)]/10 text-[var(--primary-btn)] border-l-2 scale-105"
+                    ? "bg-[var(--primary-btn)]/10 text-[var(--primary-btn)]  scale-105"
                     : "hover:text-[var(--primary-btn)] "
                 }`
                       }
@@ -233,11 +233,11 @@ const Sidebar = () => {
                     }
                     className={({ isActive }) =>
                       `group px-4 flex items-center gap-5 text-xs py-2 cursor-pointer transition-all ease-in-out duration-150 
-              ${
-                isActive
-                  ? "bg-[var(--primary-btn)]/10 text-[var(--primary-btn)] scale-105 border-l-2"
-                  : "hover:text-[var(--primary-btn)] hover:scale-105 "
-              }`
+                    ${
+                      isActive
+                        ? "bg-[var(--primary-btn)]/10 text-[var(--primary-btn)] "
+                        : "hover:text-[var(--primary-btn)] hover:scale-105 "
+                    }`
                     }
                   >
                     {field?.icon}
@@ -251,7 +251,7 @@ const Sidebar = () => {
           </motion.div>
         </div>
 
-        <div className="hidden  py-2 border-b border-zinc-300">
+        <div className="hidden py-2 border-b border-zinc-300">
           <label className="pl-4 font-semibold text-xs text-[var(--primary-btn)]">
             ACCOUNTING SOLUTIONS
           </label>

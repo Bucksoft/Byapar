@@ -4,12 +4,23 @@ import { IoReceiptOutline } from "react-icons/io5";
 import DashboardCard from "../components/DashboardCard";
 import { dashboardCardDetails } from "../lib/dashboardCardDetails";
 import { motion } from "framer-motion";
-import { useInvoiceStore } from "../store/invoicesStore";
 import { LiaRupeeSignSolid } from "react-icons/lia";
 import { Link } from "react-router-dom";
+import { useQuery } from "@tanstack/react-query";
+import { axiosInstance } from "../config/axios";
+import { useBusinessStore } from "../store/businessStore";
+import CustomLoader from "../components/Loader";
 
 const DashboardPage = () => {
-  const { invoices } = useInvoiceStore();
+  const { business } = useBusinessStore();
+
+  const { isLoading, data: invoices } = useQuery({
+    queryKey: ["invoices"],
+    queryFn: async () => {
+      const res = await axiosInstance.get(`/sales-invoice/${business?._id}`);
+      return res?.data?.invoices;
+    },
+  });
 
   return (
     <main className="h-full">
@@ -59,66 +70,77 @@ const DashboardPage = () => {
 
             <div className="flex flex-col lg:flex-row gap-3 mt-3">
               {/* latest transactions */}
-              <motion.div
-                initial={{ translateY: -100, filter: "blur(3px)", opacity: 0 }}
-                animate={{ translateY: 0, filter: "blur(0)", opacity: 1 }}
-                transition={{ ease: "easeInOut", duration: 0.3, delay: 0.3 }}
-                className="w-full lg:w-3/5 bg-white px-5 py-3 rounded-lg overflow-x-auto"
-              >
-                <h1 className="font-semibold text-sm rounded-lg p-2">
-                  Latest Transactions
-                </h1>
-                {invoices ? (
-                  <div className="">
-                    <table className="table table-zebra text-sm mt-2 min-w-full table-sm border border-zinc-200 ">
-                      {/* head */}
-                      <thead className="bg-zinc-300">
-                        <tr>
-                          <th className="font-medium">DATE</th>
-                          <th className="font-medium">TYPE</th>
-                          <th className="font-medium">TXN NO</th>
-                          <th className="font-medium">PARTY NAME</th>
-                          <th className="font-medium">AMOUNT</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {invoices &&
-                          invoices?.invoices?.slice(0, 3).map((invoice) => (
-                            <tr key={invoice?._id}>
-                              <td>
-                                {(invoice?.salesInvoiceDate &&
-                                  invoice?.salesInvoiceDate.split("T")[0]) ||
-                                  "-"}
-                              </td>
-                              <td>{invoice?.type || "-"}</td>
-                              <td>{invoice?.salesInvoiceNumber || "-"}</td>
-                              <td>{invoice?.partyId?.partyName || "-"}</td>
-                              <td className="flex items-center">
-                                <LiaRupeeSignSolid />
-                                {Number(invoice?.totalAmount).toLocaleString(
-                                  "en-IN"
-                                ) || "-"}
-                              </td>
-                            </tr>
-                          ))}
-                      </tbody>
-                    </table>
-                    <div className="w-full text-center mt-2">
-                      <Link
-                        to={"/dashboard/all-transactions"}
-                        className="text-xs text-blue-500 hover:text-blue-600"
-                      >
-                        View All Transactions
-                      </Link>
+
+              {isLoading ? (
+                <div className="w-full lg:w-3/5 bg-white px-5 py-3 rounded-lg overflow-x-auto flex items-center justify-center">
+                  <CustomLoader text={"Loading latest transactions..."} />
+                </div>
+              ) : (
+                <motion.div
+                  initial={{
+                    translateY: -100,
+                    filter: "blur(3px)",
+                    opacity: 0,
+                  }}
+                  animate={{ translateY: 0, filter: "blur(0)", opacity: 1 }}
+                  transition={{ ease: "easeInOut", duration: 0.3, delay: 0.3 }}
+                  className="w-full lg:w-3/5 bg-white px-5 py-3 rounded-lg overflow-x-auto"
+                >
+                  <h1 className="font-semibold text-sm rounded-lg p-2">
+                    Latest Transactions
+                  </h1>
+                  {invoices?.length ? (
+                    <div className="">
+                      <table className="table table-zebra text-sm mt-2 min-w-full table-sm border border-zinc-200 ">
+                        {/* head */}
+                        <thead className="bg-zinc-300">
+                          <tr>
+                            <th className="font-medium">DATE</th>
+                            <th className="font-medium">TYPE</th>
+                            <th className="font-medium">TXN NO</th>
+                            <th className="font-medium">PARTY NAME</th>
+                            <th className="font-medium">AMOUNT</th>
+                          </tr>
+                        </thead>
+                        <tbody>
+                          {invoices &&
+                            invoices?.slice(0, 10).map((invoice) => (
+                              <tr key={invoice?._id}>
+                                <td>
+                                  {(invoice?.salesInvoiceDate &&
+                                    invoice?.salesInvoiceDate.split("T")[0]) ||
+                                    "-"}
+                                </td>
+                                <td>{invoice?.type || "-"}</td>
+                                <td>{invoice?.salesInvoiceNumber || "-"}</td>
+                                <td>{invoice?.partyId?.partyName || "-"}</td>
+                                <td className="flex items-center">
+                                  <LiaRupeeSignSolid />
+                                  {Number(invoice?.totalAmount).toLocaleString(
+                                    "en-IN"
+                                  ) || "-"}
+                                </td>
+                              </tr>
+                            ))}
+                        </tbody>
+                      </table>
+                      <div className="w-full text-center mt-2">
+                        <Link
+                          to={"/dashboard/all-transactions"}
+                          className="text-xs text-blue-500 hover:text-blue-600"
+                        >
+                          View All Transactions
+                        </Link>
+                      </div>
                     </div>
-                  </div>
-                ) : (
-                  <div className="text-sm text-center text-zinc-500 my-10 flex items-center justify-center flex-col gap-3">
-                    <IoReceiptOutline size={40} />
-                    Create your first transaction
-                  </div>
-                )}
-              </motion.div>
+                  ) : (
+                    <div className="text-sm text-center text-zinc-500 my-10 flex items-center justify-center flex-col gap-3">
+                      <IoReceiptOutline size={40} />
+                      Create your first transaction
+                    </div>
+                  )}
+                </motion.div>
+              )}
 
               {/* Dashboard cards */}
               <motion.div

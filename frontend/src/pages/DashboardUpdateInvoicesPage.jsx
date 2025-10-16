@@ -1,21 +1,13 @@
 import { useParams, useSearchParams } from "react-router-dom";
 import InvoicesForm from "../components/Invoices/InvoicesForm";
-import { usePartyStore } from "../store/partyStore";
 import { useEffect, useState } from "react";
-import { useQuotationStore } from "../store/quotationStore";
-import { useInvoiceStore } from "../store/invoicesStore";
-import { useCreditNoteStore } from "../store/creditNoteStore";
-import { useChallanStore } from "../store/challanStore";
-import { useProformaInvoiceStore } from "../store/proformaStore";
 import { useQuery } from "@tanstack/react-query";
+import { axiosInstance } from "../config/axios";
+import CustomLoader from "../components/Loader";
 
 const DashboardUpdateInvoicesPage = () => {
   const [searchParams, setSearchParams] = useSearchParams();
-  const { quotations } = useQuotationStore();
-  const { creditNotes } = useCreditNoteStore();
-  const { invoices } = useInvoiceStore();
-  const { deliveryChallans } = useChallanStore();
-  const { proformaInvoices } = useProformaInvoiceStore();
+  const [endpoint, setEndpoint] = useState("");
   const [invoiceToUpdate, setInvoiceToUpdate] = useState();
   const [party, setParty] = useState();
 
@@ -25,38 +17,57 @@ const DashboardUpdateInvoicesPage = () => {
 
   // THIS USE EFFECT FILTERS OUT THE CORRECT INVOICE BASED ON THE TYPE
   useEffect(() => {
-    let selectedInvoice = null;
+    if (!id.length || !type.length) return;
+    let endpoint = "";
 
-    if (type === "quotation") {
-      selectedInvoice = quotations?.find((q) => q?._id === id);
-    } else if (type === "sales invoice") {
-      selectedInvoice = Array.isArray(invoices?.invoices)
-        ? invoices?.invoices?.find((inv) => inv?._id === id)
-        : [];
-    } else if (type === "credit note") {
-      selectedInvoice = creditNotes?.find((c) => c?._id === id);
-    } else if (type === "delivery challan") {
-      selectedInvoice = deliveryChallans?.find((d) => d?._id === id);
-    } else if (type === "proforma invoice") {
-      selectedInvoice = proformaInvoices?.find((p) => p?._id === id);
+    switch (type) {
+      case "quotation":
+        endpoint = `/quotation/${id}`;
+        break;
+      case "sales invoice":
+        endpoint = `/sales-invoice/invoice/${id}`;
+        break;
+      case "credit note":
+        endpoint = `/credit-note/invoice/${id}`;
+        break;
+      case "delivery challan":
+        endpoint = `/delivery-challan/invoice/${id}`;
+        break;
+      case "proforma invoice":
+        endpoint = `/proforma-invoice/invoice/${id}`;
+        break;
+      default:
+        break;
     }
+    if (!endpoint) return;
+    setEndpoint(endpoint);
+  }, [id, type]);
 
-    if (selectedInvoice) {
-      setParty(selectedInvoice?.partyId || null);
-      setInvoiceToUpdate(selectedInvoice || null);
-    } else {
-      setParty(null);
-      setInvoiceToUpdate(null);
-    }
-  }, [
-    id,
-    type,
-    quotations,
-    invoices,
-    creditNotes,
-    deliveryChallans,
-    proformaInvoices,
-  ]);
+  const { isLoading, data } = useQuery({
+    queryKey: [endpoint],
+    queryFn: async () => {
+      const res = await axiosInstance.get(endpoint);
+      if (res?.data?.invoice) {
+        setInvoiceToUpdate(res?.data?.invoice);
+      } else if (res?.data?.quotation) {
+        setInvoiceToUpdate(res?.data?.quotation);
+      } else if (res?.data?.creditNote) {
+        setInvoiceToUpdate(res?.data?.creditNote);
+      } else if (res?.data?.deliveryChallan) {
+        setInvoiceToUpdate(res?.data?.deliveryChallan);
+      } else if (res?.data?.proformaInvoice) {
+        setInvoiceToUpdate(res?.data?.proformaInvoice);
+      }
+    },
+  });
+
+  if (isLoading) {
+    return (
+      <div className="w-full h-screen flex items-center justify-center">
+        <CustomLoader text={"Loading..."} />
+      </div>
+    );
+  }
 
   return (
     <main className="max-h-screen flex w-full overflow-auto">

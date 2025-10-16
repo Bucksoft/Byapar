@@ -40,7 +40,7 @@ const DashboardLayout = () => {
   return (
     <main className="flex min-h-screen w-full bg-zinc-100 overflow-x-hidden relative">
       {/* Sidebar for large screens */}
-      <section className="hidden md:block w-1/6 min-h-screen bg-white shadow">
+      <section className="hidden md:block w-1/6 min-h-screen shadow">
         <Sidebar />
       </section>
 

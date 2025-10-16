@@ -125,7 +125,7 @@ const DashboardPartiesPage = () => {
   };
 
   return (
-    <main className="h-screen overflow-y-auto p-2 sm:p-4 lg:p-6">
+    <main className="h-screen overflow-y-auto p-2 ">
       <section className="min-h-full w-full bg-gradient-to-b from-white to-transparent rounded-lg p-3 sm:p-5">
         {/* Top Navigation */}
         <DashboardNavbar title="Parties" />

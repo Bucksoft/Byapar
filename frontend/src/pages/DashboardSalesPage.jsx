@@ -154,12 +154,14 @@ const DashboardSalesPage = () => {
         >
           {/* TOTAL SALES */}
           <div
-            className={`border border-[#84994F] shadow-zinc-500 mt-5 rounded-md p-3  shadow-md hover:-translate-y-1 transition-all ease-in-out duration-200 cursor-pointer`}
+            className={`border-l-4 border-[#DC143C] shadow-zinc-500 mt-5  rounded-md p-3  shadow-md hover:-translate-y-1 transition-all ease-in-out duration-200 cursor-pointer bg-gradient-to-tl from-[rgba(220,20,60,0.1)] to-white`}
           >
-            <p className={`flex items-center gap-3 text-[#84994F]`}>
-              <FaFileInvoice />
-              Total Sales
-            </p>
+            <div className="flex items-center justify-between">
+              <p className={`flex items-center gap-3 text-[#DC143C]`}>
+                <FaFileInvoice />
+                Total Sales
+              </p>
+            </div>
             <span className="font-medium text-2xl flex items-center gap-2">
               <FaIndianRupeeSign size={15} />
               {invoices?.totalSales || 0}
@@ -168,9 +170,9 @@ const DashboardSalesPage = () => {
 
           {/* PAID */}
           <div
-            className={`border border-[#84994F] mt-5 shadow-zinc-500 rounded-md p-3  shadow-md hover:-translate-y-1 transition-all ease-in-out duration-200 cursor-pointer`}
+            className={`border-l-4 border-[#8FA31E] mt-5 shadow-zinc-500 rounded-md p-3 bg-gradient-to-tl from-[rgba(143,163,30,0.1)] shadow-md hover:-translate-y-1 transition-all ease-in-out duration-200 cursor-pointer`}
           >
-            <p className={`flex items-center gap-3 text-[#84994F]`}>
+            <p className={`flex items-center gap-3 text-[#8FA31E]`}>
               <FaFileInvoice />
               Paid
             </p>
@@ -182,9 +184,9 @@ const DashboardSalesPage = () => {
 
           {/* UNPAID */}
           <div
-            className={`border border-[#84994F] shadow-zinc-500 mt-5 rounded-md p-3  shadow-md hover:-translate-y-1 transition-all ease-in-out duration-200 cursor-pointer`}
+            className={`border-l-4 border-[#33A1E0] shadow-zinc-500 mt-5 rounded-md p-3 bg-gradient-to-tl from-[rgba(51,161,224,0.1)] shadow-md hover:-translate-y-1 transition-all ease-in-out duration-200 cursor-pointer`}
           >
-            <p className={`flex items-center gap-3 text-[#84994F]`}>
+            <p className={`flex items-center gap-3 text-[#33A1E0]`}>
               <FaFileInvoice />
               Unpaid
             </p>

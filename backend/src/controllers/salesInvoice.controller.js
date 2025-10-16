@@ -4,6 +4,7 @@ import Party from "../models/party.schema.js";
 import { Item } from "../models/item.schema.js";
 import mongoose from "mongoose";
 import { parseDate } from "../../src/utils/date.js";
+import { getFinancialYearRange } from "../utils/financialYear.js";
 
 // CONTROLLER TO CREATE A SALES INVOICE
 export async function createSalesInvoice(req, res) {
@@ -34,8 +35,6 @@ export async function createSalesInvoice(req, res) {
     })
       .sort({ salesInvoiceNumber: -1 }) // sort descending by invoice number
       .limit(1);
-
-    console.log(latestInvoice);
 
     // Generate next invoice number
     // let nextInvoiceNumber = 1; // default if no invoices yet
@@ -154,21 +153,28 @@ export async function getAllInvoices(req, res) {
         (invoice) => invoice?.status?.toLowerCase() !== "cancelled"
       ) || [];
 
+    const { start, end } = getFinancialYearRange();
+
+    const invoicesInFY = validInvoices.filter((invoice) => {
+      const validDate = new Date(invoice?.salesInvoiceDate);
+      return validDate >= start && validDate <= end;
+    });
+
     const totalSales = Number(
-      validInvoices
+      invoicesInFY
         .reduce((acc, invoice) => acc + Number(invoice?.totalAmount || 0), 0)
         .toFixed(2)
     ).toLocaleString("en-IN");
 
     const totalPaid = Number(
-      validInvoices.reduce(
+      invoicesInFY.reduce(
         (sum, invoice) => sum + (invoice.settledAmount || 0),
         0
       )
     ).toLocaleString("en-IN");
 
     const totalUnpaid = Number(
-      validInvoices.reduce(
+      invoicesInFY.reduce(
         (sum, invoice) =>
           sum +
           (invoice.pendingAmount ??
