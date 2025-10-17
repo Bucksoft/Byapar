@@ -52,8 +52,8 @@ const PartyTransactions = ({ party, filter }) => {
 
   return (
     <section>
-      <div className="overflow-x-auto">
-        <table className="table table-sm table-zebra">
+      <div className="overflow-x-auto border border-zinc-200 rounded-md mb-4">
+        <table className="table table-sm table-zebra ">
           {/* head */}
           <thead>
             <tr className="bg-zinc-100">

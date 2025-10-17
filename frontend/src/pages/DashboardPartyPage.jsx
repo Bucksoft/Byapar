@@ -89,10 +89,10 @@ const DashboardPartyPage = () => {
   };
 
   return (
-    <main className="h-full p-2">
-      <div className="h-full w-full bg-white rounded-lg p-3">
+    <main className="h-screen p-2">
+      <div className=" w-full bg-white rounded-lg p-3">
         {/* Header section */}
-        <header>
+        <header className="sticky top-0 bg-white z-10 py-3">
           <nav className="flex items-center justify-between">
             <div className="flex items-center gap-2 text-md">
               <ArrowLeft
