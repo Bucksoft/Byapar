@@ -27,6 +27,7 @@ const PaymentInForm = () => {
   const paymentAmountRef = useRef();
   const location = useLocation();
 
+  // DATA TO SEND TO THE BACKEND
   const [data, setData] = useState({
     partyName: "",
     paymentAmount: 0,
@@ -44,17 +45,17 @@ const PaymentInForm = () => {
       const res = await axiosInstance.get(
         `/parties/all-parties/${business?._id}`
       );
-      return res.data?.parties;
+      return res.data?.data;
     },
   });
 
   useEffect(() => {
     if (!parties || !invoices) return;
-    const allInvoices = invoices?.invoices?.filter(
+    const allInvoices = invoices?.filter(
       (invoice) => invoice.partyName === selectedParty
     );
     setAllInvoices(allInvoices);
-    const totalAmount = invoices?.invoices?.reduce(
+    const totalAmount = invoices?.reduce(
       (acc, item) => item?.totalAmount + acc,
       0
     );
@@ -177,11 +178,17 @@ const PaymentInForm = () => {
     return new Date(date).toISOString().split("T")[0];
   };
 
+  useEffect(() => {
+    if (location?.state?.invoiceId && location?.state?.partyName) {
+      setSelectedParty(location?.state?.partyName);
+    }
+  }, [location?.state?.invoiceId, location?.state?.partyName]);
+
   return (
-    <main className="h-full w-full p-2 ">
+    <main className="h-screen  w-full p-2 ">
       <div className="h-full w-full bg-white rounded-lg">
         {/* Header */}
-        <header className="flex items-center justify-between p-2">
+        <header className="flex items-center justify-between p-2 sticky top-0 bg-white z-10">
           <div className="flex items-center gap-2">
             <ArrowLeft onClick={() => navigate(-1)} />
             Payment In
@@ -212,11 +219,12 @@ const PaymentInForm = () => {
         {/* form */}
         <section className="grid grid-cols-2 py-2 px-4 gap-2">
           {/* left div */}
-          <div className="p-4  text-sm border border-[var(--primary-background)] rounded-lg">
+          <div className="p-4 space-y-2 text-sm border border-[var(--primary-background)] rounded-lg">
             <label className="text-zinc-500">Party Name</label>
             <br />
+
             <select
-              className="select select-sm w-full mt-2 mb-5"
+              className="select select-sm w-full"
               value={selectedParty}
               onChange={(e) => {
                 setSelectedParty(e.target.value);
@@ -227,15 +235,15 @@ const PaymentInForm = () => {
               }}
             >
               <option className="hidden">Select Party</option>
-              {allParties &&
-                allParties?.map((party) => (
-                  <option value={party?.partyName} key={party?._id}>
-                    {party?.partyName}
-                  </option>
-                ))}
+              {parties?.map((party) => (
+                <option key={party._id} value={party.partyName}>
+                  {party.partyName}
+                </option>
+              ))}
             </select>
 
-            {selectedParty && (
+            {/* DISPLAYING THE CURRENT BALANCE */}
+            {/* {selectedParty && (
               <p className="flex items-center mb-1 text-green-500 text-xs">
                 Current Balance :
                 <LiaRupeeSignSolid />{" "}
@@ -245,7 +253,7 @@ const PaymentInForm = () => {
                   )[0]?.currentBalance
                 }
               </p>
-            )}
+            )} */}
 
             <label className="text-zinc-500 ">Payment Amount</label>
             <br />
@@ -325,7 +333,7 @@ const PaymentInForm = () => {
         </section>
 
         {/* PARTY's INVOICE DETAILS */}
-        <section className="m-4">
+        <section className="m-4 py-5">
           {allInvoices && allInvoices.length > 0 && (
             <div className="overflow-x-auto border border-zinc-300 rounded-lg">
               <p className="p-4 font-medium">Settle invoices</p>
@@ -367,7 +375,14 @@ const PaymentInForm = () => {
                               type="checkbox"
                               checked={pending === 0}
                               className="checkbox checkbox-sm checkbox-info"
-                              // readOnly
+                              onChange={(e) =>
+                                setData((prev) => ({
+                                  ...prev,
+                                  paymentAmount:
+                                    Number(prev.paymentAmount) +
+                                    Number(pending),
+                                }))
+                              }
                             />
                           </td>
 

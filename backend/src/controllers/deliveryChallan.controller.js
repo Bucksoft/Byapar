@@ -76,23 +76,31 @@ export async function createDeliveryChallan(req, res) {
 export async function getAllDeliveryChallan(req, res) {
   try {
     const businessId = req.params?.id;
-    const totalDeliveryChallans = await DeliveryChallan.countDocuments({});
+    const latestDeliveryChallan = await DeliveryChallan.findOne({ businessId })
+      .sort("-deliveryChallanNumber")
+      .limit(1);
+
     if (!businessId) {
       return res
         .status(400)
         .json({ success: false, msg: "Business Id not provided" });
     }
+
     const deliveryChallans = await DeliveryChallan.find({
       $and: [{ businessId }, { clientId: req.user?.id }],
     }).populate("partyId");
+
     if (!deliveryChallans) {
       return res
         .status(400)
         .json({ status: false, msg: "Delivery Challans not found" });
     }
-    return res
-      .status(200)
-      .json({ success: true, deliveryChallans, totalDeliveryChallans });
+    
+    return res.status(200).json({
+      success: true,
+      deliveryChallans,
+      totalDeliveryChallans: latestDeliveryChallan?.deliveryChallanNumber,
+    });
   } catch (error) {
     console.log("Error in getting delivery challans", error);
     return res

@@ -76,7 +76,9 @@ export async function createProformaInvoice(req, res) {
 export async function getAllProformaInvoices(req, res) {
   try {
     const businessId = req.params?.id;
-    const totalProformaInvoices = await ProformaInvoice.countDocuments({});
+    const latestProformaInvoice = await ProformaInvoice.findOne({ businessId })
+      .sort("-proformaInvoiceNumber")
+      .limit(1);
     if (!businessId) {
       return res
         .status(400)
@@ -92,9 +94,11 @@ export async function getAllProformaInvoices(req, res) {
         .status(400)
         .json({ status: false, msg: "Proforma Invoices not found" });
     }
-    return res
-      .status(200)
-      .json({ success: true, proformaInvoices, totalProformaInvoices });
+    return res.status(200).json({
+      success: true,
+      proformaInvoices,
+      totalProformaInvoices: latestProformaInvoice?.proformaInvoiceNumber,
+    });
   } catch (error) {
     console.log("Error in getting proforma invoices", error);
     return res

@@ -135,8 +135,11 @@ export async function createCreditNote(req, res) {
 export async function getAllCreditNotes(req, res) {
   try {
     try {
-      const totalCreditNotes = await CreditNote.countDocuments({});
       const businessId = req.params.id;
+      const latestCreditNote = await CreditNote.findOne({ businessId })
+        .sort("-creditNoteNumber")
+        .limit(1);
+
       const creditNotes = await CreditNote.find({
         $and: [{ businessId: businessId, clientId: req?.user?.id }],
       }).populate("invoiceId");
@@ -147,7 +150,11 @@ export async function getAllCreditNotes(req, res) {
       }
       return res
         .status(200)
-        .json({ success: true, creditNotes, totalCreditNotes });
+        .json({
+          success: true,
+          creditNotes,
+          totalCreditNotes: latestCreditNote?.creditNoteNumber,
+        });
     } catch (error) {
       console.log("ERROR IN GETTING CREDIT NOTES");
       return res.status(500).json({ err: "Internal server error", error });

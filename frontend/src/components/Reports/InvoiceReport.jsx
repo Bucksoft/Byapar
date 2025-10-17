@@ -18,11 +18,14 @@ import { queryClient } from "../../main";
 import toast from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
 import { downloadPDF } from "../../../helpers/downloadPdf";
+import InvoiceTemplate from "../Invoices/InvoiceTemplate";
 
 const InvoiceReport = () => {
   const [openDatePicker, setOpenDatePicker] = useState(false);
   const [isDownloading, setIsDownloading] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
+  const [invoiceToDownload, setInvoiceToDownload] = useState(null);
+  const [invoiceIdToDownload, setInvoiceIdToDownload] = useState(null);
   const printRef = useRef();
   const { business } = useBusinessStore();
   const navigate = useNavigate();
@@ -460,15 +463,29 @@ const InvoiceReport = () => {
                               <li
                                 onClick={() =>
                                   navigate(
-                                    `/dashboard/parties/create-payment-in`
+                                    `/dashboard/parties/create-payment-in`,
+                                    {
+                                      state: {
+                                        invoiceId: invoice?._id,
+                                        partyName: invoice?.partyName,
+                                      },
+                                    }
                                   )
                                 }
                               >
                                 <a>Receive Payment</a>
                               </li>
-                              <li>
+                              <li
+                                onClick={(e) => {
+                                  setInvoiceToDownload(invoice);
+                                  document
+                                    .getElementById("invoice_pdf_modal")
+                                    .showModal();
+                                }}
+                              >
                                 <a>Open PDF</a>
                               </li>
+
                               <li
                                 onClick={() =>
                                   cancelMutation.mutate(invoice?._id)
@@ -490,6 +507,7 @@ const InvoiceReport = () => {
         </div>
       </section>
 
+      {/* REPORT POPUP MODAL */}
       <dialog id="report_popup" className="modal">
         <div className="modal-box w-11/12 max-w-7xl">
           <div className="modal-action sticky top-0 z-10 mb-10 w-full">
@@ -842,6 +860,53 @@ const InvoiceReport = () => {
               Total Sale : <LuIndianRupee size={15} /> {invoices?.totalSales}
             </h4>
           </div>
+        </div>
+      </dialog>
+
+      {/* INVOICE MODAL */}
+      <dialog id="invoice_pdf_modal" className="modal">
+        <div className="modal-box max-w-4xl w-11/12 max-h-[95%] ">
+          <div className="flex items-center justify-between sticky bg-white -top-10 py-4 ">
+            <h3 className="font-bold text-lg">
+              {invoiceToDownload?.partyName}
+            </h3>
+            {/* MODAL ACTIONS */}
+            <div className="modal-action ">
+              <form method="dialog">
+                <button className="btn btn-sm">Close</button>
+              </form>
+              <button
+                onClick={() =>
+                  downloadPDF(
+                    invoiceIdToDownload,
+                    `${invoiceToDownload?.partyName
+                      ?.split(" ")
+                      .join("_")
+                      .concat("_invoice")}`,
+                    setIsDownloading
+                  )
+                }
+                className="btn btn-sm bg-[var(--primary-btn)]"
+              >
+                {isDownloading ? (
+                  <div className="">
+                    <CustomLoader text={""} />
+                  </div>
+                ) : (
+                  <>
+                    <Download size={14} />
+                  </>
+                )}
+              </button>
+            </div>
+          </div>
+
+          <InvoiceTemplate
+            type={"Sales Invoice"}
+            color={"#E56E2A"}
+            invoice={invoiceToDownload}
+            setInvoiceIdToDownload={setInvoiceIdToDownload}
+          />
         </div>
       </dialog>
     </main>

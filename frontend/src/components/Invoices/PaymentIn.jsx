@@ -5,6 +5,7 @@ const PaymentInTemplate = ({ data, id, printRef }) => {
   const total =
     data?.invoices &&
     data?.invoices.reduce((acc, invoice) => acc + invoice?.settledAmount, 0);
+    
   return (
     <main
       id={id}

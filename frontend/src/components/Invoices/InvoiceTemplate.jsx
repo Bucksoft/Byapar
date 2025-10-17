@@ -28,7 +28,9 @@ const InvoiceTemplate = ({
   });
 
   useEffect(() => {
-    setInvoiceIdToDownload(invoiceIdToDownload?.current?.id);
+    if (invoiceIdToDownload?.current?.id) {
+      setInvoiceIdToDownload(invoiceIdToDownload?.current?.id);
+    }
   }, [invoiceIdToDownload]);
 
   const parseAmount = (val) => {
@@ -93,13 +95,13 @@ const InvoiceTemplate = ({
       style={{
         display: "flex",
         width: "100%",
-        height: "100vh",
+        // height: "100vh",
         justifyContent: "center",
         alignItems: "start",
         minHeight: "100vh",
         padding: "1rem 0",
         overflowX: "hidden",
-        overflowY: "auto",
+        // overflowY: "auto",
       }}
       ref={printRef}
       class="print-invoice"
@@ -695,7 +697,7 @@ const InvoiceTemplate = ({
           >
             {bankAccounts &&
               bankAccounts?.map((bankAccount) => (
-                <div style={{ marginTop: "12px" }}>
+                <div key={bankAccount?._id} style={{ marginTop: "12px" }}>
                   <div>
                     <h4 style={{ fontWeight: 600 }}>Bank Details</h4>
 

@@ -90,7 +90,7 @@ export async function getAllQuotations(req, res) {
     const latestQuotation = await Quotation.findOne({
       businessId: req.params?.id,
     })
-      .sort("-quotationInvoiceNumber")
+      .sort("-quotationNumber")
       .limit(1);
     const quotations = await Quotation.find({
       $and: [
@@ -107,13 +107,11 @@ export async function getAllQuotations(req, res) {
         .status(400)
         .json({ success: false, msg: "Quotations not found" });
     }
-    return res
-      .status(200)
-      .json({
-        success: true,
-        quotations,
-        totalQuotations: latestQuotation.quotationInvoiceNumber,
-      });
+    return res.status(200).json({
+      success: true,
+      quotations,
+      totalQuotations: latestQuotation.quotationNumber,
+    });
   } catch (error) {
     console.log("Error in getting  quotations", error);
     return res

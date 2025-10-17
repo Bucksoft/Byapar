@@ -78,7 +78,10 @@ const SalesInvoice = () => {
               onClick={() =>
                 downloadPDF(
                   invoiceIdToDownload,
-                  "sales invoice",
+                  `${invoice?.partyName
+                    ?.split(" ")
+                    .join("_")
+                    .concat("_invoice")}`,
                   setIsDownloading
                 )
               }
@@ -171,7 +174,7 @@ const SalesInvoice = () => {
             <CustomLoader text={"Loading..."} />
           </div>
         ) : (
-          <section className="mt-3 bg-sky-50 flex justify-center py-1 overflow-y-scroll flex-1">
+          <section className="mt-3 bg-sky-50 flex justify-center py-1 flex-1">
             {/* Invoice template */}
             <InvoiceTemplate
               color={"#E56E2A"}

@@ -10,7 +10,6 @@ import { getFinancialYearRange } from "../utils/financialYear.js";
 export async function createSalesInvoice(req, res) {
   try {
     const data = req.body;
-    console.log("REQUEST DATA ", data);
     // const validatedResult = salesInvoiceSchema.safeParse(req.body);
     // if (!validatedResult.success) {
     //   const validationError = validatedResult.error.format();
@@ -414,7 +413,7 @@ export async function bulkUploadSalesInvoices(req, res) {
         items,
         partyId: party?._id || null,
         totalAmount: invoiceData?.TotalAmount || 0,
-        balanceAmount: invoiceData?.BalanceDue || 0,
+        balanceAmount: invoiceData?.BalanceDue || invoiceData?.TotalAmount || 0,
         amountSubTotal: invoiceData?.TotalAmount || 0,
       };
       invoicesToInsert.push(newInovice);

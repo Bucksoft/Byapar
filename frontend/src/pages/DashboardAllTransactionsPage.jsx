@@ -4,15 +4,27 @@ import { dateRanges } from "../utils/constants";
 import { useMemo, useState } from "react";
 import not_found from "../assets/not-found.png";
 import dayjs from "dayjs";
+import { useQuery } from "@tanstack/react-query";
+import { axiosInstance } from "../config/axios";
+import { useBusinessStore } from "../store/businessStore";
+import CustomLoader from "../components/Loader";
 
 const DashboardAllTransactionsPage = () => {
-  const { invoices } = useInvoiceStore();
   const [day, setDay] = useState("");
+  const { business } = useBusinessStore();
   const [searchQuery, setSearchQuery] = useState("");
+
+  const { isLoading, data: invoices } = useQuery({
+    queryKey: ["invoices"],
+    queryFn: async () => {
+      const res = await axiosInstance.get(`/sales-invoice/${business?._id}`);
+      return res?.data?.invoices;
+    },
+  });
 
   // FUNCTION TO SEARCH INVOICES
   const searchedInvoices = useMemo(() => {
-    if (!invoices?.invoices) return [];
+    if (!invoices) return [];
 
     const now = dayjs();
     let startDate, endDate;
@@ -22,30 +34,43 @@ const DashboardAllTransactionsPage = () => {
         startDate = now.startOf("day");
         endDate = now.endOf("day");
         break;
+
       case "Yesterday":
         startDate = now.subtract(1, "day").startOf("day");
         endDate = now.subtract(1, "day").endOf("day");
         break;
+
       case "This Week":
         startDate = now.startOf("week");
         endDate = now.endOf("week");
         break;
+
       case "Last Week":
         startDate = now.subtract(1, "week").startOf("week");
         endDate = now.subtract(1, "week").endOf("week");
         break;
+
+      case "Last 7 days":
+        startDate = now.subtract(6, "day").startOf("day");
+        endDate = now.endOf("day");
+        break;
+
       case "This Month":
         startDate = now.startOf("month");
         endDate = now.endOf("month");
         break;
+
       case "Last Month":
-        startDate = now.subtract(1, "month").startOf("month");
-        endDate = now.subtract(1, "month").endOf("month");
+        const lastMonth = now.subtract(1, "month");
+        startDate = lastMonth.startOf("month");
+        endDate = lastMonth.endOf("month");
         break;
+
       case "Last 365 Days":
-        startDate = now.subtract(1, "year").startOf("year");
-        endDate = now.subtract(1, "year").endOf("year");
+        startDate = now.subtract(365, "day").startOf("day");
+        endDate = now.endOf("day");
         break;
+
       default:
         startDate = null;
         endDate = null;
@@ -54,7 +79,7 @@ const DashboardAllTransactionsPage = () => {
 
     const query = searchQuery?.trim()?.toLowerCase() || "";
 
-    return invoices.invoices.filter((invoice) => {
+    return invoices?.filter((invoice) => {
       const invoiceDate = dayjs(invoice?.salesInvoiceDate);
       const isWithinRange =
         !startDate ||
@@ -72,7 +97,15 @@ const DashboardAllTransactionsPage = () => {
 
       return isWithinRange && matchesSearch;
     });
-  }, [invoices?.invoices, searchQuery, day]);
+  }, [invoices, searchQuery, day]);
+
+  if (isLoading) {
+    return (
+      <div className="w-full h-screen flex items-center justify-center ">
+        <CustomLoader text={"Loading..."} />
+      </div>
+    );
+  }
 
   return (
     <main className="h-screen bg-white overflow-y-scroll w-full p-2">
