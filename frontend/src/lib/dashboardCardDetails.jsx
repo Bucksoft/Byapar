@@ -8,7 +8,7 @@ export const dashboardCardDetails = [
   {
     id: 2,
     title: "",
-    content: "Get zero collateral loans upto ₹50 Lakh with myBillBook",
+    content: "Get zero collateral loans upto ₹50 Lakh with Byapar",
     btnText: "Apply Now",
   },
 ];

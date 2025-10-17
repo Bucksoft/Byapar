@@ -32,8 +32,9 @@ const DashboardPaymentInPage = () => {
     queryKey: ["paymentIns"],
     queryFn: async () => {
       const res = await axiosInstance.get(`/payment-in/all/${business?._id}`);
-      setTotalPaymentIns(res.data?.totalPaymentIns);
-      setPaymentIns(res.data.paymentIns);
+      console.log(res);
+      setTotalPaymentIns(res.data?.totalPaymentIns || 1);
+      setPaymentIns(res.data?.paymentIns);
       return res.data.paymentIns;
     },
   });
@@ -95,7 +96,7 @@ const DashboardPaymentInPage = () => {
       {page === "Payment In" ? (
         <PaymentInForm />
       ) : (
-        <div className="h-full w-full bg-gradient-to-b from-white to-transparent rounded-lg p-3">
+        <div className=" w-full bg-gradient-to-b from-white to-transparent rounded-lg p-3">
           <DashboardNavbar title={"Payment In"} />
           <SalesNavigationMenus
             btnText={"Payment In"}

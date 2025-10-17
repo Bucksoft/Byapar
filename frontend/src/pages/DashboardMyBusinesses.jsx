@@ -96,12 +96,16 @@ const DashboardMyBusinesses = () => {
               businesses.map((business) => (
                 <div
                   key={business?._id}
-                  className="card w-96 bg-base-100 card-md shadow-lg border-l-4 border-l-info"
+                  style={{
+                    boxShadow:
+                      "rgba(0, 0, 0, 0.16) 0px 3px 6px, rgba(0, 0, 0, 0.23) 0px 3px 6px",
+                  }}
+                  className="card w-96 rounded-4xl card-md border-l-2 border-l-info"
                 >
                   <div className="card-body">
-                    <div className="flex items-center gap-3">
+                    <div className="flex items-start gap-3">
                       {/* Business Logo */}
-                      <div className="w-9 h-9 rounded-full flex items-center justify-center bg-red-200 overflow-hidden">
+                      <div className="w-12 h-12 rounded-2xl flex items-center justify-center bg-red-200 overflow-hidden">
                         {business?.logo !== "null" ? (
                           <img
                             src={business.logo}
@@ -191,25 +195,59 @@ const DashboardMyBusinesses = () => {
 
                     {/* Actions */}
                     <div className="justify-end card-actions mt-5">
-                      <button
-                        onClick={() =>
-                          navigate("/dashboard/business", {
-                            state: { businessId: business?._id },
-                          })
-                        }
-                        className="btn btn-success btn-soft btn-xs"
-                      >
-                        <PenSquare size={15} /> Edit
-                      </button>
+                      <div className="inline-flex rounded-lg overflow-hidden shadow ">
+                        {/* Edit Button */}
+                        <button
+                          onClick={() =>
+                            navigate("/dashboard/business", {
+                              state: { businessId: business?._id },
+                            })
+                          }
+                          className="flex items-center gap-1 px-3 py-1 bg-emerald-100 text-emerald-700 hover:bg-emerald-200 transition-colors text-xs font-medium"
+                        >
+                          <PenSquare size={15} /> Edit
+                        </button>
 
-                      <button
-                        className="btn btn-xs btn-soft btn-error mr-2"
-                        onClick={() =>
-                          document.getElementById("my_modal_2").showModal()
-                        }
-                      >
-                        <BsTrash3 /> Delete
-                      </button>
+                        {/* Delete Button */}
+                        <button
+                          onClick={() =>
+                            document.getElementById("my_modal_2").showModal()
+                          }
+                          className="flex items-center gap-1 px-3 py-1 bg-red-100 text-red-700 hover:bg-red-200 transition-colors text-xs font-medium border-l border-zinc-200"
+                        >
+                          <BsTrash3 size={15} /> Delete
+                        </button>
+
+                        {/* Activate / Active Button */}
+                        <button
+                          onClick={() => {
+                            setActiveBusinessId(business?._id);
+                            mutation.mutate({
+                              id: business?._id,
+                              status: "active",
+                            });
+                          }}
+                          disabled={mutation?.isPending}
+                          className={`flex items-center gap-1 px-3 py-1 text-xs font-medium border-l border-zinc-200 transition-colors ${
+                            currentlyActiveBusiness?._id === business?._id
+                              ? "bg-blue-500 text-white hover:bg-blue-600"
+                              : "bg-blue-100 text-blue-700 hover:bg-blue-200"
+                          }`}
+                        >
+                          {mutation?.isPending &&
+                          business?._id === activeBusinessId ? (
+                            <CustomLoader text={"Loading..."} size={12} />
+                          ) : (
+                            <>
+                              <IoMdCheckmarkCircleOutline size={15} />
+                              {currentlyActiveBusiness?._id === business?._id
+                                ? "Active"
+                                : "Mark Active"}
+                            </>
+                          )}
+                        </button>
+                      </div>
+
                       <dialog id="my_modal_2" className="modal">
                         <div className="modal-box">
                           <h3 className="font-bold text-lg">
@@ -234,33 +272,6 @@ const DashboardMyBusinesses = () => {
                           <button>close</button>
                         </form>
                       </dialog>
-                      <button
-                        onClick={() => {
-                          setActiveBusinessId(business?._id);
-                          mutation.mutate({
-                            id: business?._id,
-                            status: "active",
-                          });
-                        }}
-                        className={`btn btn-info  btn-xs ${
-                          currentlyActiveBusiness?._id === business?._id
-                            ? ""
-                            : "btn-soft"
-                        }  `}
-                        disabled={mutation?.isPending}
-                      >
-                        {mutation?.isPending &&
-                        business?._id === activeBusinessId ? (
-                          <CustomLoader text={"Loading..."} />
-                        ) : (
-                          <>
-                            <IoMdCheckmarkCircleOutline size={15} />
-                            {currentlyActiveBusiness?._id === business?._id
-                              ? "Active"
-                              : "Mark as active"}
-                          </>
-                        )}
-                      </button>
                     </div>
                   </div>
                 </div>

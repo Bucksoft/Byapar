@@ -141,11 +141,15 @@ const DashboardPartiesPage = () => {
             <motion.div
               variants={dashboardLinksItems}
               key={details.id}
-              style={{ borderColor: dashboardPartiesCardDetails[0].color }}
-              className="border rounded-md  p-3 sm:p-4 shadow-md shadow-zinc-300 hover:-translate-y-1 hover:bg-emerald-100/10 transition-all duration-200 cursor-pointer"
+              style={{
+                borderColor: details.color,
+                background: `linear-gradient(to top left, ${details.rgb}, white)`,
+              }}
+              className={`border-l-4 
+              rounded-md p-3 sm:p-4 shadow-md shadow-zinc-300 hover:-translate-y-1 hover:bg-emerald-100/10 transition-all duration-200 cursor-pointer`}
             >
               <p
-                style={{ color: dashboardPartiesCardDetails[0].color }}
+                style={{ color: `${details.color}` }}
                 className="flex items-center gap-2 sm:gap-3 text-base"
               >
                 {details?.icon} {details?.label}

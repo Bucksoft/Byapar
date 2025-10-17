@@ -131,9 +131,9 @@ const DashboardItemsPage = () => {
         >
           <div
             onClick={() => navigate(`/dashboard/reports?type=Stock Value`)}
-            className={`border rounded-md p-3 mt-5 bg-error/10 border-error shadow-md  hover:-translate-y-1 transition-all ease-in-out duration-200 cursor-pointer`}
+            className={`border-l-4 border-l-[#9B5DE0] rounded-md p-3 mt-5 shadow-md hover:-translate-y-1 transition-all ease-in-out duration-200 cursor-pointer bg-gradient-to-tl from-[rgba(155,93,224,0.1)] to-white`}
           >
-            <p className={`flex items-center gap-3`}>
+            <p className={`flex items-center gap-3 text-[#9B5DE0]`}>
               <AiOutlineStock /> Stock Value
             </p>
             <span className="font-medium text-2xl flex gap-2 items-center">
@@ -144,9 +144,9 @@ const DashboardItemsPage = () => {
 
           <div
             onClick={() => navigate(`/dashboard/reports?type=Low Stock`)}
-            className={`border rounded-md p-3 mt-5 border-warning bg-warning/10 shadow-md hover:-translate-y-1 transition-all ease-in-out duration-200 cursor-pointer`}
+            className={`rounded-md p-3 mt-5 border-warning bg-warning/10 shadow-md hover:-translate-y-1 transition-all ease-in-out duration-200 cursor-pointer border-l-4 border-l-[#D25D5D] bg-gradient-to-tl from-[rgba(210,93,93,0.1)] to-white`}
           >
-            <p className={`flex items-center gap-3`}>
+            <p className={`flex items-center gap-3 text-[#D25D5D]`}>
               <BsFillBoxSeamFill /> Low Stock
             </p>
             <span className="font-medium text-2xl flex gap-2 items-center">
@@ -155,9 +155,9 @@ const DashboardItemsPage = () => {
           </div>
 
           <div
-            className={`border rounded-md p-3 mt-5 border-accent bg-accent/10 shadow-md hover:-translate-y-1 transition-all ease-in-out duration-200 cursor-pointer`}
+            className={`border-l-4 rounded-md p-3 mt-5 border-accent bg-accent/10 shadow-md hover:-translate-y-1 transition-all ease-in-out duration-200 cursor-pointer border-l-[#7ADAA5] bg-gradient-to-tl from-[rgba(122,218,165,0.1)] to-white`}
           >
-            <p className={`flex items-center gap-3`}>
+            <p className={`flex items-center gap-3 text-[#7ADAA5]`}>
               <Package size={16} /> Total Items
             </p>
             <span className="font-medium text-2xl flex gap-2 items-center">

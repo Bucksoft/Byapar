@@ -23,9 +23,9 @@ const DashboardPage = () => {
   });
 
   return (
-    <main className="h-full">
+    <main className="h-screen">
       <div className="h-full w-full rounded-lg p-3">
-        <div className="flex flex-col md:flex-row gap-3 bg-zinc-100">
+        <div className="flex flex-col md:flex-row gap-3 ">
           {/* sidebar */}
           {/* <Sidebar /> */}
 

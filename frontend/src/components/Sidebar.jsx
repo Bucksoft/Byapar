@@ -97,7 +97,7 @@ const Sidebar = () => {
 
   return (
     <>
-      <section className="h-screen bg-[var(--sidebar-background)] text-black/70 max-h-screen overflow-y-auto hide-scrollbar relative border-r border-r-zinc-200 shadow-md">
+      <section className="h-screen bg-[var(--sidebar-background)] text-black/70 max-h-screen overflow-y-auto hide-scrollbar relative shadow-md rounded-tr-2xl rounded-br-2xl border-r-2 border-r-zinc-200 ">
         {/* nav */}
         <motion.h1
           initial={{
@@ -127,24 +127,24 @@ const Sidebar = () => {
 
         {/* business details */}
         <div className="flex gap-3 px-5 py-3 items-center border-b border-b-zinc-200 ">
-          <div className="">
-            <div className="w-9 h-9 rounded-full flex items-center justify-center bg-red-200 overflow-hidden">
+          <div className="border-3 bg-white border-zinc-300 rounded-2xl p-1">
+            <div className="w-12 h-12 rounded-xl hover:scale-120 transition-all ease-in-out duration-300 flex items-center justify-center bg-red-200 overflow-hidden">
               {business?.logo && business?.logo !== "null" ? (
                 <img
                   src={business.logo}
                   alt="Logo"
-                  className="w-full h-full object-cover"
+                  className="w-full h-full object-cover "
                 />
               ) : (
-                <span className="text-sm font-semibold text-white">
+                <span className="text-sm font-semibold text-white tracking-tight">
                   {business?.businessName?.[0]?.toUpperCase() || "?"}
                 </span>
               )}
             </div>
           </div>
 
-          <div className="flex-1">
-            <p className="font-medium text-sm break-words whitespace-normal">
+          <div className="flex-1 tracking-tight">
+            <p className="font-semibold text-sm break-words whitespace-normal">
               {business?.businessName ||
                 business?.companyEmail ||
                 "Business name"}
@@ -206,11 +206,11 @@ const Sidebar = () => {
                             to={sublink.link}
                             className={({ isActive }) =>
                               `block p-2 rounded-md transition-all duration-200 ease-in-out 
-                      ${
-                        isActive
-                          ? " text-[var(--primary-btn)] font-semibold"
-                          : "hover:bg-white/20"
-                      }`
+                              ${
+                                isActive
+                                  ? " text-[var(--primary-btn)] font-semibold  "
+                                  : "hover:bg-white/20"
+                              }`
                             }
                           >
                             {sublink.label}
@@ -235,7 +235,7 @@ const Sidebar = () => {
                       `group px-4 flex items-center gap-5 text-xs py-2 cursor-pointer transition-all ease-in-out duration-150 
                     ${
                       isActive
-                        ? "bg-[var(--primary-btn)]/10 text-[var(--primary-btn)] "
+                        ? "bg-[var(--primary-btn)]/10 text-[var(--primary-btn)] font-semibold"
                         : "hover:text-[var(--primary-btn)] hover:scale-105 "
                     }`
                     }

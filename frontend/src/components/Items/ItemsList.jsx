@@ -121,7 +121,7 @@ const ItemsList = ({ showLowStock, items }) => {
       )}
       <div
         className="relative z-10 bg-base-100 mt-8 
-             h-[460px] overflow-y-auto overflow-x-auto  border border-[var(--table-border)] "
+             h-[460px] rounded-md overflow-y-auto overflow-x-auto  border border-[var(--table-border)] "
       >
         <table className="table table-sm w-full table-zebra">
           {/* head */}

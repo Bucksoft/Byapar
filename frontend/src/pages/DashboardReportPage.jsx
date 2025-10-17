@@ -64,9 +64,9 @@ const DashboardReportPage = () => {
                     key={idx}
                     variants={dashboardLinksItems}
                     onClick={() => setTab(badge?.label.toLowerCase())}
-                    className={`badge badge-soft badge-[var(--badge)] cursor-pointer ${
+                    className={`badge badge-soft badge-primary cursor-pointer ${
                       tab.toLowerCase() === badge?.label.toLowerCase() &&
-                      " text-[var(--badge)]/80 bg-[var(--badge)]/10 ring-1 shadow-md "
+                      " text-[var(--badge)] ring-1 shadow-lg "
                     } `}
                   >
                     {badge.label}

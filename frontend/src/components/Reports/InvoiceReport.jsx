@@ -186,7 +186,7 @@ const InvoiceReport = () => {
               onClick={() =>
                 document.getElementById("report_popup").showModal()
               }
-              className="btn btn-sm"
+              className="btn btn-sm "
             >
               <Printer size={19} />
             </button>
@@ -427,7 +427,7 @@ const InvoiceReport = () => {
                       </td>
                       <td>
                         <div className="flex items-center gap-2">
-                          <button
+                          {/* <button
                             onClick={(e) => {
                               e.stopPropagation();
                               handlePrint("invoice");
@@ -435,7 +435,7 @@ const InvoiceReport = () => {
                             className="btn btn-xs bg-white"
                           >
                             <Printer size={12} />
-                          </button>
+                          </button> */}
                           <div
                             onClick={(e) => e.stopPropagation()}
                             className="dropdown dropdown-bottom dropdown-end "

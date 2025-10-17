@@ -15,6 +15,7 @@ import { usePaymentInStore } from "../../store/paymentInStore";
 
 const PaymentInForm = () => {
   const [settledInvoices, setSettledInvoices] = useState({});
+  const [checkedInvoices, setCheckedInvoices] = useState({});
   const navigate = useNavigate();
   const { parties, setParty } = usePartyStore();
   const { invoices } = useInvoiceStore();
@@ -25,7 +26,14 @@ const PaymentInForm = () => {
   const [totalInvoiceAmount, setTotalInvoiceAmount] = useState(0);
   const [allInvoices, setAllInvoices] = useState([]);
   const paymentAmountRef = useRef();
+  const allocationTriggerRef = useRef(false);
+
   const location = useLocation();
+
+  const handlePaymentInputChange = (value) => {
+    allocationTriggerRef.current = true;
+    setData((prev) => ({ ...prev, paymentAmount: Number(value || 0) }));
+  };
 
   // DATA TO SEND TO THE BACKEND
   const [data, setData] = useState({
@@ -51,11 +59,11 @@ const PaymentInForm = () => {
 
   useEffect(() => {
     if (!parties || !invoices) return;
-    const allInvoices = invoices?.filter(
+    const allInvoices = invoices?.invoices?.filter(
       (invoice) => invoice.partyName === selectedParty
     );
     setAllInvoices(allInvoices);
-    const totalAmount = invoices?.reduce(
+    const totalAmount = invoices?.invoices?.reduce(
       (acc, item) => item?.totalAmount + acc,
       0
     );
@@ -65,10 +73,15 @@ const PaymentInForm = () => {
   useEffect(() => {
     if (!allInvoices?.length) return;
 
-    let remainingPayment = data.paymentAmount;
-    const newSettled = {};
+    if (!allocationTriggerRef.current) {
+      return;
+    }
+    allocationTriggerRef.current = false;
 
-    // Sort invoices by oldest first
+    let remainingPayment = Number(data.paymentAmount) || 0;
+    const newSettled = {};
+    const newChecked = {};
+
     const sorted = [...allInvoices].sort(
       (a, b) =>
         new Date(a.salesInvoiceDate).getTime() -
@@ -78,16 +91,20 @@ const PaymentInForm = () => {
     sorted.forEach((invoice) => {
       const alreadySettled = invoice?.settledAmount || 0;
       const pending = Math.max(invoice.totalAmount - alreadySettled, 0);
+
       if (remainingPayment > 0 && pending > 0) {
         const settleAmount = Math.min(pending, remainingPayment);
         newSettled[invoice._id] = settleAmount;
+        newChecked[invoice._id] = settleAmount === pending;
         remainingPayment -= settleAmount;
       } else {
         newSettled[invoice._id] = 0;
+        newChecked[invoice._id] = false;
       }
     });
 
     setSettledInvoices(newSettled);
+    setCheckedInvoices(newChecked);
     setData((prev) => ({ ...prev, settledInvoices: newSettled }));
   }, [data.paymentAmount, allInvoices]);
 
@@ -184,263 +201,277 @@ const PaymentInForm = () => {
     }
   }, [location?.state?.invoiceId, location?.state?.partyName]);
 
+  const handleInvoiceCheckbox = (invoiceId, pending) => {
+    // prevent auto-allocation from running in effect
+    allocationTriggerRef.current = false;
+
+    setCheckedInvoices((prevChecked) => {
+      const isChecked = !prevChecked[invoiceId];
+      const nextChecked = { ...prevChecked, [invoiceId]: isChecked };
+
+      // update settledInvoices for just this invoice
+      setSettledInvoices((prevSettled) => {
+        const nextSettled = { ...prevSettled };
+        if (isChecked) {
+          nextSettled[invoiceId] = pending; // mark fully settled for this invoice
+        } else {
+          nextSettled[invoiceId] = 0;
+        }
+        // update data.settledInvoices and paymentAmount based on nextSettled
+        const totalSettledSum = Object.values(nextSettled).reduce(
+          (s, v) => s + Number(v || 0),
+          0
+        );
+        setData((prevData) => ({
+          ...prevData,
+          paymentAmount: totalSettledSum,
+          settledInvoices: nextSettled,
+        }));
+        return nextSettled;
+      });
+
+      return nextChecked;
+    });
+  };
+
   return (
-    <main className="h-screen  w-full p-2 ">
-      <div className="h-full w-full bg-white rounded-lg">
+    <main className="h-screen w-full p-2">
+      <div className="h-full w-full bg-white rounded-lg flex flex-col">
         {/* Header */}
-        <header className="flex items-center justify-between p-2 sticky top-0 bg-white z-10">
+        <header className="flex items-center justify-between p-2 sticky top-0 bg-white z-20 border-b border-zinc-200">
           <div className="flex items-center gap-2">
-            <ArrowLeft onClick={() => navigate(-1)} />
-            Payment In
+            <ArrowLeft
+              onClick={() => navigate(-1)}
+              className="cursor-pointer"
+            />
+            <h2 className="font-medium">Payment In</h2>
           </div>
-          <div>
+          <div className="flex items-center gap-2">
             <button
               onClick={() => navigate(-1)}
-              className="btn btn-soft btn-sm mr-2"
+              className="btn btn-soft btn-sm"
             >
               Cancel
             </button>
             <button
-              className={`btn btn-sm bg-[var(--primary-btn)] ${
-                mutation?.isPending && ""
-              } `}
+              className={`btn btn-sm bg-[var(--primary-btn)]  ${
+                mutation?.isPending && "opacity-70 cursor-not-allowed"
+              }`}
               disabled={mutation?.isPending}
               onClick={() => mutation.mutate(data)}
             >
-              {mutation.isPending ? (
-                <CustomLoader text={"Saving..."} />
-              ) : (
-                <>Save</>
-              )}
+              {mutation.isPending ? <CustomLoader text="Saving..." /> : "Save"}
             </button>
           </div>
         </header>
 
-        {/* form */}
-        <section className="grid grid-cols-2 py-2 px-4 gap-2">
-          {/* left div */}
-          <div className="p-4 space-y-2 text-sm border border-[var(--primary-background)] rounded-lg">
-            <label className="text-zinc-500">Party Name</label>
-            <br />
-
-            <select
-              className="select select-sm w-full"
-              value={selectedParty}
-              onChange={(e) => {
-                setSelectedParty(e.target.value);
-                setData((prev) => ({
-                  ...prev,
-                  partyName: e.target.value,
-                }));
-              }}
-            >
-              <option className="hidden">Select Party</option>
-              {parties?.map((party) => (
-                <option key={party._id} value={party.partyName}>
-                  {party.partyName}
-                </option>
-              ))}
-            </select>
-
-            {/* DISPLAYING THE CURRENT BALANCE */}
-            {/* {selectedParty && (
-              <p className="flex items-center mb-1 text-green-500 text-xs">
-                Current Balance :
-                <LiaRupeeSignSolid />{" "}
-                {
-                  parties?.filter(
-                    (party) => party?.partyName === selectedParty
-                  )[0]?.currentBalance
-                }
-              </p>
-            )} */}
-
-            <label className="text-zinc-500 ">Payment Amount</label>
-            <br />
-            <input
-              type="number"
-              placeholder="0"
-              ref={paymentAmountRef}
-              value={data.paymentAmount}
-              onChange={(e) =>
-                setData((prev) => ({
-                  ...prev,
-                  paymentAmount: Number(e.target.value),
-                }))
-              }
-              className="input input-sm w-full mt-2"
-            />
-          </div>
-
-          {/* right div */}
-          <div className="p-4  text-sm border border-[var(--primary-background)] rounded-lg">
-            <div className="flex items-center justify-center gap-3 ">
-              <div className="flex flex-col w-full">
-                <label className="text-zinc-500">Payment Date</label>
-                <input
-                  type="date"
-                  className="input input-sm mt-2"
-                  value={formatDateForInput(data?.paymentDate)}
-                  onChange={(e) =>
+        {/* Scrollable Content */}
+        <div className="flex-1 overflow-y-auto px-4 py-3 space-y-4">
+          {/* Form Section */}
+          <section className="grid grid-cols-2 gap-4">
+            {/* Left Div */}
+            <div className="p-4 space-y-3 text-sm border border-[var(--primary-background)] rounded-lg">
+              <div>
+                <label className="text-zinc-500">Party Name</label>
+                <select
+                  className="select select-sm w-full mt-1"
+                  value={selectedParty}
+                  onChange={(e) => {
+                    setSelectedParty(e.target.value);
                     setData((prev) => ({
                       ...prev,
-                      paymentDate: e.target.value,
-                    }))
-                  }
-                />
-              </div>
-              <div className="flex flex-col w-full">
-                <label className="text-zinc-500">Payment Mode</label>
-                <select className="select select-sm mt-2">
-                  <option value="Cash">Cash</option>
-                  <option value="UPI">UPI</option>
-                  <option value="Card">Card</option>
-                  <option value="Netbanking">Netbanking</option>
-                  <option value="Bank transfer">Bank Transfer</option>
-                  <option value="Cheque">Cheque</option>
+                      partyName: e.target.value,
+                    }));
+                  }}
+                >
+                  <option className="hidden">Select Party</option>
+                  {parties?.map((party) => (
+                    <option key={party._id} value={party.partyName}>
+                      {party.partyName}
+                    </option>
+                  ))}
                 </select>
               </div>
-              <div className="flex flex-col w-full">
-                <label className="text-zinc-500">Payment In Number</label>
+
+              <div>
+                <label className="text-zinc-500">Payment Amount</label>
                 <input
                   type="text"
-                  className="input input-sm mt-2"
-                  placeholder="1"
-                  name="paymentInNumber"
-                  value={data?.paymentInNumber}
-                  onChange={(e) =>
-                    setData((prev) => ({
-                      ...prev,
-                      paymentInNumber: e.target.value,
-                    }))
-                  }
+                  value={data.paymentAmount}
+                  onChange={(e) => handlePaymentInputChange(e.target.value)}
+                  ref={paymentAmountRef}
+                  className="input input-sm w-full mt-2"
                 />
               </div>
             </div>
 
-            <div className="flex flex-col mt-5">
-              <label className="text-zinc-500">Notes</label>
-              <textarea
-                className="textarea mt-3 w-full"
-                placeholder="Enter notes"
-                value={data.notes}
-                onChange={(e) =>
-                  setData((prev) => ({ ...prev, notes: e.target.value }))
-                }
-              />
+            {/* Right Div */}
+            <div className="p-4 bg-white text-sm border border-[var(--primary-background)] rounded-lg space-y-4">
+              <div className="flex items-center justify-between gap-3">
+                <div className="flex flex-col w-full">
+                  <label className="text-zinc-500">Payment Date</label>
+                  <input
+                    type="date"
+                    className="input input-sm mt-1"
+                    value={formatDateForInput(data?.paymentDate)}
+                    onChange={(e) =>
+                      setData((prev) => ({
+                        ...prev,
+                        paymentDate: e.target.value,
+                      }))
+                    }
+                  />
+                </div>
+                <div className="flex flex-col w-full">
+                  <label className="text-zinc-500">Payment Mode</label>
+                  <select
+                    className="select select-sm mt-1"
+                    value={data.paymentMode}
+                    onChange={(e) =>
+                      setData((prev) => ({
+                        ...prev,
+                        paymentMode: e.target.value,
+                      }))
+                    }
+                  >
+                    <option value="Cash">Cash</option>
+                    <option value="UPI">UPI</option>
+                    <option value="Card">Card</option>
+                    <option value="Netbanking">Netbanking</option>
+                    <option value="Bank transfer">Bank Transfer</option>
+                    <option value="Cheque">Cheque</option>
+                  </select>
+                </div>
+                <div className="flex flex-col w-full">
+                  <label className="text-zinc-500">Payment In Number</label>
+                  <input
+                    type="text"
+                    className="input input-sm mt-1"
+                    placeholder="1"
+                    name="paymentInNumber"
+                    value={data?.paymentInNumber}
+                    onChange={(e) =>
+                      setData((prev) => ({
+                        ...prev,
+                        paymentInNumber: e.target.value,
+                      }))
+                    }
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="text-zinc-500">Notes</label>
+                <textarea
+                  className="textarea textarea-sm mt-2 w-full"
+                  placeholder="Enter notes"
+                  value={data.notes}
+                  onChange={(e) =>
+                    setData((prev) => ({ ...prev, notes: e.target.value }))
+                  }
+                />
+              </div>
             </div>
-          </div>
-        </section>
+          </section>
 
-        {/* PARTY's INVOICE DETAILS */}
-        <section className="m-4 py-5">
+          {/* Party's Invoice Details */}
           {allInvoices && allInvoices.length > 0 && (
-            <div className="overflow-x-auto border border-zinc-300 rounded-lg">
-              <p className="p-4 font-medium">Settle invoices</p>
-              <table className="table w-full table-zebra ">
-                {/* head */}
-                <thead>
-                  <tr className="bg-[var(--primary-background)] ">
-                    <th className="w-10"></th>
-                    <th>Date</th>
-                    <th>Due Date</th>
-                    <th>Invoice Number</th>
-                    <th>Invoice Amount</th>
-                    <th>Pending Amount</th>
-                    <th className="text-right">Amount Settled</th>
-                  </tr>
-                </thead>
+            <section className="border border-zinc-300 rounded-lg flex flex-col max-h-[55vh]">
+              <p className="p-4 font-medium border-b border-zinc-300">
+                Settle invoices
+              </p>
 
-                <tbody>
-                  {[...allInvoices]
-                    .sort(
-                      (a, b) =>
-                        new Date(a.salesInvoiceDate).getTime() -
-                        new Date(b.salesInvoiceDate).getTime()
-                    )
-                    .map((invoice) => {
-                      const alreadySettled = invoice?.settledAmount || 0;
-                      const currentSettled = settledInvoices[invoice?._id] || 0;
-                      const pending = Math.max(
-                        invoice?.totalAmount -
-                          (alreadySettled + currentSettled),
-                        0
-                      );
+              {/* Scrollable Table */}
+              <div className="flex-1 overflow-auto">
+                <table className="table w-full table-zebra">
+                  <thead className="sticky top-0 bg-[var(--primary-background)] z-10">
+                    <tr>
+                      <th className="w-10"></th>
+                      <th>Date</th>
+                      <th>Due Date</th>
+                      <th>Invoice Number</th>
+                      <th>Invoice Amount</th>
+                      <th>Pending Amount</th>
+                      <th className="text-right">Amount Settled</th>
+                    </tr>
+                  </thead>
 
-                      return (
-                        <tr key={invoice?._id} className="hover:bg-gray-50">
-                          {/* Checkbox → mark as fully settled if pending is 0 */}
-                          <td className="px-2 py-2">
-                            <input
-                              type="checkbox"
-                              checked={pending === 0}
-                              className="checkbox checkbox-sm checkbox-info"
-                              onChange={(e) =>
-                                setData((prev) => ({
-                                  ...prev,
-                                  paymentAmount:
-                                    Number(prev.paymentAmount) +
-                                    Number(pending),
-                                }))
-                              }
-                            />
-                          </td>
+                  <tbody>
+                    {[...allInvoices]
+                      .sort(
+                        (a, b) =>
+                          new Date(a.salesInvoiceDate).getTime() -
+                          new Date(b.salesInvoiceDate).getTime()
+                      )
+                      .map((invoice) => {
+                        const alreadySettled = invoice?.settledAmount || 0;
+                        const currentSettled =
+                          settledInvoices[invoice?._id] || 0;
+                        const pending = Math.max(
+                          invoice?.totalAmount -
+                            (alreadySettled + currentSettled),
+                          0
+                        );
 
-                          <td>{invoice?.salesInvoiceDate.split("T")[0]}</td>
-                          <td>{invoice?.dueDate.split("T")[0]}</td>
-                          <td>{invoice?.salesInvoiceNumber}</td>
-
-                          {/* Invoice Amount */}
-                          <td>
-                            <span className="inline-flex items-center gap-1">
-                              <LiaRupeeSignSolid className="text-gray-600" />
-                              {Number(invoice?.totalAmount).toLocaleString(
-                                "en-IN"
-                              )}
-                            </span>
-                          </td>
-
-                          {/* Pending Amount */}
-                          <td>
-                            <span className="inline-flex items-center gap-1">
+                        return (
+                          <tr key={invoice?._id} className="hover:bg-gray-50">
+                            <td className="px-2 py-2">
+                              <input
+                                type="checkbox"
+                                checked={!!checkedInvoices[invoice._id]}
+                                className="checkbox checkbox-sm checkbox-info"
+                                onChange={() =>
+                                  handleInvoiceCheckbox(invoice._id, pending)
+                                }
+                              />
+                            </td>
+                            <td>{invoice?.salesInvoiceDate.split("T")[0]}</td>
+                            <td>{invoice?.dueDate.split("T")[0]}</td>
+                            <td>{invoice?.salesInvoiceNumber}</td>
+                            <td>
+                              <span className="inline-flex items-center gap-1">
+                                <LiaRupeeSignSolid className="text-gray-600" />
+                                {Number(invoice?.totalAmount).toLocaleString(
+                                  "en-IN"
+                                )}
+                              </span>
+                            </td>
+                            <td>
+                              <span className="inline-flex items-center gap-1">
+                                <LiaRupeeSignSolid />
+                                {pending.toLocaleString("en-IN")}
+                              </span>
+                            </td>
+                            <td className="inline-flex items-center gap-1 justify-end w-full">
                               <LiaRupeeSignSolid />
-                              {pending.toLocaleString("en-IN")}
-                            </span>
-                          </td>
+                              {Number(
+                                alreadySettled + currentSettled
+                              ).toLocaleString("en-IN")}
+                            </td>
+                          </tr>
+                        );
+                      })}
+                  </tbody>
+                </table>
+              </div>
 
-                          {/* Amount Settled (previous + current) */}
-                          <td className="inline-flex items-center gap-1 justify-end w-full">
-                            <LiaRupeeSignSolid />
-                            {Number(
-                              alreadySettled + currentSettled
-                            ).toLocaleString("en-IN")}
-                          </td>
-                        </tr>
-                      );
-                    })}
-                </tbody>
-              </table>
-              {/* total amount */}
-              <div className="p-4 font-medium  flex justify-between border-t border-zinc-300">
+              {/* Footer - Total Amounts */}
+              <div className="p-4 font-medium flex justify-between border-t border-zinc-300 bg-white sticky bottom-0">
                 <h2>Total</h2>
-                <div className="flex items-center  w-3/9 justify-between">
-                  <span className="flex items-center ">
+                <div className="flex items-center gap-10">
+                  <span className="flex items-center">
                     <LiaRupeeSignSolid />
-                    {/*  pending amount ka total */}
                     {totals.totalPending.toLocaleString("en-IN")}
                   </span>
-
-                  {/* Settled amount ka total */}
-                  <span className="flex items-center ">
+                  <span className="flex items-center">
                     <LiaRupeeSignSolid />
-                    {/*  pending amount ka total */}
                     {totals.totalSettled.toLocaleString("en-IN")}
                   </span>
                 </div>
               </div>
-            </div>
+            </section>
           )}
-        </section>
+        </div>
       </div>
     </main>
   );

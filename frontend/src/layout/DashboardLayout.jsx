@@ -38,9 +38,9 @@ const DashboardLayout = () => {
   }
 
   return (
-    <main className="flex min-h-screen w-full bg-zinc-100 overflow-x-hidden relative">
+    <main className="flex min-h-screen w-full overflow-x-hidden relative">
       {/* Sidebar for large screens */}
-      <section className="hidden md:block w-1/6 min-h-screen shadow">
+      <section className="hidden md:block w-1/6 min-h-screen ">
         <Sidebar />
       </section>
 
@@ -79,7 +79,7 @@ const DashboardLayout = () => {
       </section>
 
       {/* Main Content */}
-      <section className="flex-1 md:ml-0 mt-0 md:mt-0 min-h-screen overflow-x-hidden bg-[var(--sidebar-background)]">
+      <section className="flex-1 md:ml-0 mt-0 md:mt-0 min-h-screen overflow-x-hidden">
         <Outlet />
       </section>
     </main>

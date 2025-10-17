@@ -141,6 +141,7 @@ export async function getAllPaymentInDetails(req, res) {
     })
       .sort("-paymentInNumber")
       .limit(1);
+
     const paymentIns = await PaymentIn.find({
       $and: [
         {
@@ -156,13 +157,11 @@ export async function getAllPaymentInDetails(req, res) {
         .status(400)
         .json({ success: false, msg: "Payment In details not found" });
     }
-    return res
-      .status(200)
-      .json({
-        success: true,
-        paymentIns,
-        totalPaymentIns: latestPaymentIns?.paymentInNumber,
-      });
+    return res.status(200).json({
+      success: true,
+      paymentIns,
+      totalPaymentIns: latestPaymentIns?.paymentInNumber || 0,
+    });
   } catch (error) {
     console.error("ERROR IN GETTING PAYMENT IN DETAILS :", error);
     return res
