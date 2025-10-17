@@ -7,3 +7,9 @@ export const handlePrint = (ref) => {
   printWindow.document.close();
   printWindow.print();
 };
+
+
+
+export const print = ()=>{
+  
+}

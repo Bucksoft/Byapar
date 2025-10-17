@@ -16,7 +16,7 @@ const DashboardPartyPage = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const [selectedMenu, setSelectedMenu] = useState("transactions");
-  const { invoices } = useInvoiceStore();
+  // const { invoices } = useInvoiceStore();
   const [partyInvoices, setPartyInvoices] = useState([]);
   const [filter, setFilter] = useState("all_transactions");
 
@@ -34,30 +34,37 @@ const DashboardPartyPage = () => {
     },
     enabled: Boolean(id),
     retry: 1,
-    staleTime: 1000 * 60 * 5,
+    // staleTime: 1000 * 60 * 5,
   });
 
-  useEffect(() => {
-    if (!id) {
-      setPartyInvoices([]);
-      return;
-    }
+  const { isLoading: isLoadingInvoices, data: invoices } = useQuery({
+    queryKey: ["invoices", id],
+    queryFn: async () => {
+      const res = await axiosInstance.get(`/sales-invoice/party/${id}`);
+      setPartyInvoices(res.data?.invoices);
+      return res.data?.invoices;
+    },
+  });
 
-    const allInvoices = Array.isArray(invoices?.invoices)
-      ? invoices.invoices
-      : [];
+  // useEffect(() => {
+  //   if (!id) {
+  //     setPartyInvoices([]);
+  //     return;
+  //   }
 
-    const filtered = allInvoices.filter((invoice) => {
-      const partyIdFromInvoice =
-        invoice?.partyId && typeof invoice.partyId === "object"
-          ? invoice?.partyId._id
-          : invoice?.partyId;
+  //   const allInvoices = Array.isArray(invoices) ? invoices : [];
 
-      return String(partyIdFromInvoice) === String(id);
-    });
+  //   const filtered = allInvoices.filter((invoice) => {
+  //     const partyIdFromInvoice =
+  //       invoice?.partyId && typeof invoice.partyId === "object"
+  //         ? invoice?.partyId._id
+  //         : invoice?.partyId;
 
-    setPartyInvoices(filtered);
-  }, [id, invoices]);
+  //     return String(partyIdFromInvoice) === String(id);
+  //   });
+
+  //   setPartyInvoices(filtered);
+  // }, [id, invoices]);
 
   const handleSelectChange = (e) => {
     const value = e?.target?.value;

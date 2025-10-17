@@ -430,7 +430,7 @@ const InvoiceReport = () => {
                           <button
                             onClick={(e) => {
                               e.stopPropagation();
-                              handlePrint(invoice?._id);
+                              handlePrint("invoice");
                             }}
                             className="btn btn-xs bg-white"
                           >
@@ -904,6 +904,7 @@ const InvoiceReport = () => {
           <InvoiceTemplate
             type={"Sales Invoice"}
             color={"#E56E2A"}
+            // ref={printRef}
             invoice={invoiceToDownload}
             setInvoiceIdToDownload={setInvoiceIdToDownload}
           />

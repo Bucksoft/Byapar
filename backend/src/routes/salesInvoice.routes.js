@@ -17,6 +17,6 @@ router.route("/:businessId/:id").patch(isAuth, updatedSalesInvoice);
 router.route("/:id").post(isAuth, createSalesInvoice);
 router.route("/:id").get(isAuth, getAllInvoices);
 router.route("/:id").delete(isAuth, deleteInvoice);
-router.route("/party-invoice").get(isAuth, getAllInvoicesForAParty);
+router.route("/party/:id").get(isAuth, getAllInvoicesForAParty);
 
 export default router;

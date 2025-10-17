@@ -452,6 +452,8 @@ export async function getAllInvoicesForAParty(req, res) {
     if (!id) {
       return res.status(400).json({ msg: "Please provide a valid party id" });
     }
+    const invoices = await SalesInvoice.find({ partyId: id });
+    return res.status(200).json({ success: true, invoices });
   } catch (error) {
     return res.status(500).json({ msg: "Internal Server Error" });
   }
