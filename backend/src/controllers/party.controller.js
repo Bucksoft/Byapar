@@ -243,13 +243,15 @@ export async function updatePartyDetails(req, res) {
   try {
     // GET THE ID OF THE PARTY AND DATA
     const { id } = req.params;
-    const businessId = new mongoose.Types.ObjectId(req.params.id);
     if (!id) {
       return res
         .status(400)
         .json({ success: false, msg: "Please provide party ID" });
     }
+
+    const businessId = new mongoose.Types.ObjectId(req.params.id);
     const data = req.body;
+
     const {
       bankAccountNumber,
       IFSCCode,
@@ -257,40 +259,59 @@ export async function updatePartyDetails(req, res) {
       accountHoldersName,
       bankAndBranchName,
     } = req.body;
-    // update the bank details only if they are provided
-    const bankAccount = await BankAccount.findOne({ partyId: id });
-    if (bankAccount) {
-      bankAccount.bankAccountNumber = bankAccountNumber;
-      bankAccount.IFSCCode = IFSCCode;
-      bankAccount.upiId = upiId;
-      bankAccount.accountHoldersName = accountHoldersName;
-      bankAccount.bankAndBranchName = bankAndBranchName;
-      await bankAccount.save();
-    } else {
-      const newBankAccount = new BankAccount({
-        bankAccountNumber,
-        IFSCCode,
-        upiId,
-        accountHoldersName,
-        bankAndBranchName,
-        partyId: id,
-        businessId,
-      });
-      await newBankAccount.save();
+
+    // Only proceed with bank update if at least one field is provided
+    const hasBankDetails =
+      bankAccountNumber ||
+      IFSCCode ||
+      upiId ||
+      accountHoldersName ||
+      bankAndBranchName;
+
+    if (hasBankDetails) {
+      let bankAccount = await BankAccount.findOne({ partyId: id });
+
+      if (bankAccount) {
+        // Update only provided fields (not overwrite existing)
+        if (bankAccountNumber)
+          bankAccount.bankAccountNumber = bankAccountNumber;
+        if (IFSCCode) bankAccount.IFSCCode = IFSCCode;
+        if (upiId) bankAccount.upiId = upiId;
+        if (accountHoldersName)
+          bankAccount.accountHoldersName = accountHoldersName;
+        if (bankAndBranchName)
+          bankAccount.bankAndBranchName = bankAndBranchName;
+
+        await bankAccount.save();
+      } else {
+        // Create only if new details are provided
+        const newBankAccount = new BankAccount({
+          bankAccountNumber,
+          IFSCCode,
+          upiId,
+          accountHoldersName,
+          bankAndBranchName,
+          partyId: id,
+          businessId,
+        });
+        await newBankAccount.save();
+      }
     }
 
-    // FIND THE PARTY AND UPDATE ITS FIELDS.
+    // FIND THE PARTY AND UPDATE ITS FIELDS
     const updatedParty = await Party.findByIdAndUpdate(id, data, { new: true });
+
     if (!updatedParty) {
       return res
         .status(400)
         .json({ success: false, msg: "Party could not be updated" });
     }
+
     return res
       .status(200)
       .json({ msg: "Party updated successfully", updatedParty });
   } catch (error) {
-    console.log("ERROR IN UPDATING PARTY DETAILS");
+    console.log("ERROR IN UPDATING PARTY DETAILS", error);
     return res.status(500).json({ err: "Internal server error", error });
   }
 }
