@@ -126,7 +126,7 @@ const InvoiceTemplate = ({
             display: "flex",
             // flexDirection: "column",
             justifyContent: "space-between",
-            alignItems: "center",
+            alignItems: "start",
           }}
         >
           <div
@@ -139,9 +139,9 @@ const InvoiceTemplate = ({
             {business?.logo !== "null" && (
               <div
                 style={{
-                  width: "2.25rem",
-                  height: "2.25rem",
-                  borderRadius: "9999px",
+                  width: "2.5rem",
+                  height: "2.5rem",
+                  borderRadius: "0px",
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
@@ -558,19 +558,33 @@ const InvoiceTemplate = ({
 
                   {/* Tax */}
                   <td style={{ padding: "6px" }}>
-                    <div style={{ display: "flex", alignItems: "center" }}>
-                      <LiaRupeeSignSolid />
-                      {Number(
-                        item?.gstAmount ||
-                          (item?.salesPrice * (item?.gstTaxRate || 0)) / 100
-                      ).toLocaleString("en-IN", {
-                        minimumFractionDigits: 2,
-                        maximumFractionDigits: 2,
-                      })}
+                    <div
+                      style={{
+                        display: "flex",
+                        alignItems: "start",
+                        flexDirection: "column",
+                        justifyContent: "start",
+                      }}
+                    >
+                      <div
+                        style={{
+                          display: "flex",
+                          alignItems: "center",
+                        }}
+                      >
+                        <LiaRupeeSignSolid />
+                        {Number(
+                          item?.gstAmount ||
+                            (item?.salesPrice * (item?.gstTaxRate || 0)) / 100
+                        ).toLocaleString("en-IN", {
+                          minimumFractionDigits: 2,
+                          maximumFractionDigits: 2,
+                        })}
+                      </div>
                       {item?.gstTaxRate && (
-                        <span style={{ marginLeft: "4px", color: "#52525c" }}>
+                        <div style={{ marginLeft: "4px", color: "#52525c" }}>
                           ({getGSTPercentage(item?.gstTaxRate)}%)
-                        </span>
+                        </div>
                       )}
                     </div>
                   </td>

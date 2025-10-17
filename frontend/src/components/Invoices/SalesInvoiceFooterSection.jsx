@@ -142,68 +142,86 @@ const SalesInvoiceFooterSection = ({
           bankAccounts.map((bankAccount) => (
             <div
               key={bankAccount._id}
-              className=" mt-2 border border-zinc-200 mx-5 p-2"
+              className="bg-white rounded-xl shadow-md border border-zinc-200 p-4 mx-5 mt-4 hover:shadow-lg transition-shadow duration-200"
             >
-              {/* ACCOUNT NAME */}
-              {bankAccount?.accountName.length > 0 && (
-                <div className="flex items-center gap-2 text-sm">
-                  <h2 className="font-semibold text-zinc-700">Account Name</h2>
-                  <p>{bankAccount?.accountName}</p>
-                </div>
-              )}
-
-              {/* ACCOUNT NUMBER */}
-              {bankAccount?.bankAccountNumber.length > 0 && (
-                <div className="flex items-center gap-2 text-sm">
-                  <h2 className="font-semibold text-zinc-700">
-                    Account Number
+              {/* Header: Account Name */}
+              {bankAccount?.accountName && (
+                <div className="flex items-center justify-between mb-3">
+                  <h2 className="font-semibold text-zinc-800 text-sm">
+                    Account Name
                   </h2>
-                  <p>{bankAccount?.bankAccountNumber}</p>
+                  <p className="text-zinc-600 text-sm">
+                    {bankAccount.accountName}
+                  </p>
                 </div>
               )}
 
-              {/* IFSC Code */}
-              {bankAccount?.IFSCCode.length > 0 && (
-                <div className="flex items-center gap-2 text-sm">
-                  <h2 className="font-semibold text-zinc-700">IFSC Code</h2>
-                  <p>{bankAccount?.IFSCCode}</p>
-                </div>
-              )}
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                {/* Account Number */}
+                {bankAccount?.bankAccountNumber && (
+                  <div className="flex flex-col">
+                    <span className="text-zinc-500 text-xs font-medium">
+                      Account Number
+                    </span>
+                    <p className="text-zinc-700 text-sm">
+                      {bankAccount.bankAccountNumber}
+                    </p>
+                  </div>
+                )}
 
-              {/* UPI id */}
-              {bankAccount?.upiId.length > 0 && (
-                <div className="flex items-center gap-2 text-sm">
-                  <h2 className="font-semibold text-zinc-700">UPI Id</h2>
-                  <p>{bankAccount?.upiId}</p>
-                </div>
-              )}
+                {/* IFSC Code */}
+                {bankAccount?.IFSCCode && (
+                  <div className="flex flex-col">
+                    <span className="text-zinc-500 text-xs font-medium">
+                      IFSC Code
+                    </span>
+                    <p className="text-zinc-700 text-sm">
+                      {bankAccount.IFSCCode}
+                    </p>
+                  </div>
+                )}
 
-              {/* Account Holder's Name */}
-              {bankAccount?.accountHoldersName.length > 0 && (
-                <div className="flex items-center gap-2 text-sm">
-                  <h2 className="font-semibold text-zinc-700">
-                    Account Holder's Name
-                  </h2>
-                  <p>{bankAccount?.accountHoldersName}</p>
-                </div>
-              )}
+                {/* UPI Id */}
+                {bankAccount?.upiId && (
+                  <div className="flex flex-col">
+                    <span className="text-zinc-500 text-xs font-medium">
+                      UPI ID
+                    </span>
+                    <p className="text-zinc-700 text-sm">{bankAccount.upiId}</p>
+                  </div>
+                )}
 
-              <div className="flex gap-2 clear-start mt-2">
+                {/* Account Holder's Name */}
+                {bankAccount?.accountHoldersName && (
+                  <div className="flex flex-col">
+                    <span className="text-zinc-500 text-xs font-medium">
+                      Account Holder's Name
+                    </span>
+                    <p className="text-zinc-700 text-sm">
+                      {bankAccount.accountHoldersName}
+                    </p>
+                  </div>
+                )}
+              </div>
+
+              {/* Action Buttons */}
+              <div className="flex justify-end gap-2 mt-4">
                 <button
-                  className="btn btn-xs btn-error btn-outline"
+                  className="btn btn-xs btn-error btn-outline flex items-center gap-1 hover:bg-red-50"
                   onClick={() => {
                     document.getElementById("delete-modal").showModal();
                     setAccountId(bankAccount?._id);
                   }}
                 >
-                  <Trash size={14} />
+                  <Trash size={14} /> Delete
                 </button>
+                {/* Uncomment if edit functionality needed */}
                 {/* <button
-                  onClick={() => setIsEditingAccount(true)}
-                  className="btn btn-xs btn-success btn-outline"
-                >
-                  <Pen size={14} />
-                </button> */}
+                      className="btn btn-xs btn-success btn-outline flex items-center gap-1 hover:bg-green-50"
+                      onClick={() => setIsEditingAccount(true)}
+                    >
+                      <Pen size={14} /> Edit
+              </button> */}
               </div>
             </div>
           ))
