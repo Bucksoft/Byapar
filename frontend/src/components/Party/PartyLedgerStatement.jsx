@@ -41,8 +41,8 @@ const PartyLedgerStatement = ({ party }) => {
     const allEntries = [];
 
     // --- INVOICES ---
-    Array.isArray(invoices?.invoices) &&
-      invoices.invoices.forEach((invoice) => {
+    Array.isArray(invoices) &&
+      invoices.forEach((invoice) => {
         const invoicePartyId =
           invoice?.partyId && typeof invoice.partyId === "object"
             ? invoice.partyId._id

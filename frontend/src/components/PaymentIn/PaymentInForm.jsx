@@ -17,7 +17,7 @@ const PaymentInForm = () => {
   const [settledInvoices, setSettledInvoices] = useState({});
   const [checkedInvoices, setCheckedInvoices] = useState({});
   const navigate = useNavigate();
-  const { parties, setParty } = usePartyStore();
+  const { setParty } = usePartyStore();
   const { invoices } = useInvoiceStore();
   const { business } = useBusinessStore();
   const { paymentIns, totalPaymentIns } = usePaymentInStore();
@@ -58,12 +58,15 @@ const PaymentInForm = () => {
   });
 
   useEffect(() => {
-    if (!parties || !invoices) return;
-    const allInvoices = invoices?.invoices?.filter(
-      (invoice) => invoice.partyName === selectedParty
+    if (!allParties || !invoices) return;
+    const allInvoices = invoices?.filter(
+      (invoice) =>
+        invoice.partyName === selectedParty ||
+        invoice.partyName === location.state?.partyName
     );
+
     setAllInvoices(allInvoices);
-    const totalAmount = invoices?.invoices?.reduce(
+    const totalAmount = invoices?.reduce(
       (acc, item) => item?.totalAmount + acc,
       0
     );
@@ -285,7 +288,7 @@ const PaymentInForm = () => {
                   }}
                 >
                   <option className="hidden">Select Party</option>
-                  {parties?.map((party) => (
+                  {allParties?.map((party) => (
                     <option key={party._id} value={party.partyName}>
                       {party.partyName}
                     </option>
@@ -437,7 +440,7 @@ const PaymentInForm = () => {
                               </span>
                             </td>
                             <td>
-                              <span className="inline-flex items-center gap-1">
+                              <span className="inline-flex items-center gap-1 ">
                                 <LiaRupeeSignSolid />
                                 {pending.toLocaleString("en-IN")}
                               </span>
@@ -458,7 +461,7 @@ const PaymentInForm = () => {
               {/* Footer - Total Amounts */}
               <div className="p-4 font-medium flex justify-between border-t border-zinc-300 bg-white sticky bottom-0">
                 <h2>Total</h2>
-                <div className="flex items-center gap-10">
+                <div className="flex items-center gap-10  w-1/3 justify-between ">
                   <span className="flex items-center">
                     <LiaRupeeSignSolid />
                     {totals.totalPending.toLocaleString("en-IN")}

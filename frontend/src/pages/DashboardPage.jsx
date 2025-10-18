@@ -10,16 +10,20 @@ import { useQuery } from "@tanstack/react-query";
 import { axiosInstance } from "../config/axios";
 import { useBusinessStore } from "../store/businessStore";
 import CustomLoader from "../components/Loader";
+import { useInvoiceStore } from "../store/invoicesStore";
 
 const DashboardPage = () => {
   const { business } = useBusinessStore();
+  const { setInvoices } = useInvoiceStore();
 
   const { isLoading, data: invoices } = useQuery({
-    queryKey: ["invoices"],
+    queryKey: ["invoices", business?._id],
     queryFn: async () => {
-      const res = await axiosInstance.get(`/sales-invoice/${business?._id}`);
+      const res = await axiosInstance.get(`/sales-invoice/${business._id}`);
+      setInvoices(res?.data?.invoices);
       return res?.data?.invoices;
     },
+    enabled: !!business?._id,
   });
 
   return (

@@ -128,7 +128,7 @@ export async function getAllInvoices(req, res) {
     }
 
     const invoices = await SalesInvoice.find({
-      businessId,
+      businessId: new mongoose.Types.ObjectId(businessId),
       clientId: req.user?.id,
     })
       .sort({ salesInvoiceDate: -1 })
@@ -448,7 +448,9 @@ export async function bulkUploadSalesInvoices(req, res) {
 // CONTROLLER TO GET INVOICES OF A PARTY
 export async function getAllInvoicesForAParty(req, res) {
   try {
+    const partyName = req.query?.partyName;
     const id = req.params.id;
+    console.log(partyName);
     if (!id) {
       return res.status(400).json({ msg: "Please provide a valid party id" });
     }

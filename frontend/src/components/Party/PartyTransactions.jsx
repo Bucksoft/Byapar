@@ -16,16 +16,13 @@ const PartyTransactions = ({ party, filter }) => {
   useEffect(() => {
     const safeArray = (x) => (Array.isArray(x) ? x : []);
 
-    // If paymentIns sometimes comes wrapped like { paymentIns: [...] }, try that first.
     const rawPaymentList = Array.isArray(paymentIns)
       ? paymentIns
       : Array.isArray(paymentIns?.paymentIns)
       ? paymentIns.paymentIns
       : [];
 
-    const invoiceList = Array.isArray(invoices?.invoices)
-      ? invoices.invoices
-      : [];
+    const invoiceList = Array.isArray(invoices) ? invoices : [];
     const quotationList = safeArray(quotations);
 
     const partyInvoices = invoiceList

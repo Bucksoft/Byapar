@@ -37,6 +37,7 @@ const DashboardSalesPage = () => {
   const [invoiceId, setInvoiceId] = useState();
   const [searchQuery, setSearchQuery] = useState("");
   const { business } = useBusinessStore();
+  const { invoices } = useInvoiceStore();
   const navigate = useNavigate();
   const fileRef = useRef(null);
   const [page, setPage] = useState(1);
@@ -44,23 +45,23 @@ const DashboardSalesPage = () => {
   const itemsPerPage = 10;
 
   // FETCH ALL THE INVOICES FOR A BUSINESS
-  const {
-    isLoading,
-    data: invoices,
-    isSuccess,
-  } = useQuery({
-    queryKey: ["invoices", business?._id],
-    queryFn: async () => {
-      if (!business) return [];
-      const res = await axiosInstance.get(`/sales-invoice/${business._id}`);
-      setInvoices(res?.data?.invoices);
-      setTotalInvoices(res.data?.totalInvoices);
-      return res.data || [];
-    },
-    enabled: !!business,
-    keepPreviousData: true,
-    retry: 1,
-  });
+  // const {
+  //   isLoading,
+  //   data: invoices,
+  //   isSuccess,
+  // } = useQuery({
+  //   queryKey: ["invoices", business?._id],
+  //   queryFn: async () => {
+  //     if (!business) return [];
+  //     const res = await axiosInstance.get(`/sales-invoice/${business._id}`);
+  //     setInvoices(res?.data?.invoices);
+  //     setTotalInvoices(res.data?.totalInvoices);
+  //     return res.data || [];
+  //   },
+  //   enabled: !!business,
+  //   keepPreviousData: true,
+  //   retry: 1,
+  // });
 
   // mutation to delete an invoice
   const mutation = useMutation({
@@ -79,16 +80,16 @@ const DashboardSalesPage = () => {
   });
 
   useEffect(() => {
-    if (isSuccess && invoices) {
+    if (invoices) {
       setInvoices(invoices);
     }
-  }, [isSuccess, invoices]);
+  }, [invoices]);
 
   // SEARCH INVOICES
   const searchedInvoices = useMemo(() => {
-    if (!invoices?.invoices?.length) return [];
+    if (!invoices?.length) return [];
 
-    return invoices?.invoices?.filter((item) => {
+    return invoices?.filter((item) => {
       const invoiceMatch = item?.salesInvoiceNumber
         ?.toString()
         ?.toLowerCase()
@@ -113,9 +114,7 @@ const DashboardSalesPage = () => {
     setCurrentPage(1);
   }, [searchQuery]);
 
-  const totalPages = Math.ceil(
-    (invoices?.invoices?.length || 0) / itemsPerPage
-  );
+  const totalPages = Math.ceil((invoices?.length || 0) / itemsPerPage);
 
   // MUTATION TO UPLOAD ITEMS IN BULK
   const bulkMutation = useMutation({
@@ -236,96 +235,85 @@ const DashboardSalesPage = () => {
         </motion.div>
 
         <div className="flex-1 bg-base-100 mt-5 rounded-md border border-[var(--table-border)] shadow-sm">
-          {isLoading ? (
-            <div className="w-full py-3 flex justify-center">
-              <CustomLoader text={"Getting all invoices..."} />
-            </div>
-          ) : (
-            <div className="relative z-10 bg-base-100 h-[460px] overflow-y-auto overflow-x-auto">
-              <motion.table
-                initial={{ opacity: 0, translateY: 100 }}
-                animate={{ opacity: 1, translateY: 0 }}
-                transition={{ ease: "easeInOut", duration: 0.2, delay: 0.3 }}
-                className="table table-zebra table-sm min-w-full"
-              >
-                <thead>
-                  <tr className="bg-[var(--primary-background)]">
-                    <th>Date</th>
-                    <th>Invoice Number</th>
-                    <th>Party Name</th>
-                    <th>Due In</th>
-                    <th>Amount</th>
-                    <th>Status</th>
-                    <th>Action</th>
-                  </tr>
-                </thead>
+          <div className="relative z-10 bg-base-100 h-[460px] overflow-y-auto overflow-x-auto">
+            <motion.table
+              initial={{ opacity: 0, translateY: 100 }}
+              animate={{ opacity: 1, translateY: 0 }}
+              transition={{ ease: "easeInOut", duration: 0.2, delay: 0.3 }}
+              className="table table-zebra table-sm min-w-full"
+            >
+              <thead>
+                <tr className="bg-[var(--primary-background)]">
+                  <th>Date</th>
+                  <th>Invoice Number</th>
+                  <th>Party Name</th>
+                  <th>Due In</th>
+                  <th>Amount</th>
+                  <th>Status</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
 
-                <tbody>
-                  {searchedInvoices?.length === 0 &&
-                  searchQuery.trim() !== "" ? (
-                    <tr>
-                      <td
-                        colSpan="7"
-                        className="text-center py-4 text-gray-500"
+              <tbody>
+                {searchedInvoices?.length === 0 && searchQuery.trim() !== "" ? (
+                  <tr>
+                    <td colSpan="7" className="text-center py-4 text-gray-500">
+                      <motion.div
+                        initial={{ opacity: 0, scale: 0 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        transition={{
+                          ease: "easeInOut",
+                          duration: 0.2,
+                          delay: 0.2,
+                        }}
+                        className="flex items-center justify-center flex-col"
                       >
-                        <motion.div
-                          initial={{ opacity: 0, scale: 0 }}
-                          animate={{ opacity: 1, scale: 1 }}
-                          transition={{
-                            ease: "easeInOut",
-                            duration: 0.2,
-                            delay: 0.2,
-                          }}
-                          className="flex items-center justify-center flex-col"
+                        <img
+                          src={not_found}
+                          alt="no_items"
+                          width={250}
+                          loading="lazy"
+                        />
+                        <h3 className="font-semibold">
+                          No matching invoices found
+                        </h3>
+                        <p className="text-zinc-500 text-xs text-center max-w-sm">
+                          No invoices found matching “{searchQuery}”. Try a
+                          different name or clear your search.
+                        </p>
+                        <button
+                          className="btn btn-outline btn-sm mt-3"
+                          onClick={() => setSearchQuery("")}
                         >
-                          <img
-                            src={not_found}
-                            alt="no_items"
-                            width={250}
-                            loading="lazy"
-                          />
-                          <h3 className="font-semibold">
-                            No matching invoices found
-                          </h3>
-                          <p className="text-zinc-500 text-xs text-center max-w-sm">
-                            No invoices found matching “{searchQuery}”. Try a
-                            different name or clear your search.
-                          </p>
-                          <button
-                            className="btn btn-outline btn-sm mt-3"
-                            onClick={() => setSearchQuery("")}
-                          >
-                            Clear search
-                          </button>
-                        </motion.div>
+                          Clear search
+                        </button>
+                      </motion.div>
+                    </td>
+                  </tr>
+                ) : paginatedInvoices?.length > 0 ? (
+                  paginatedInvoices.map((invoice) => (
+                    <tr
+                      key={invoice?._id}
+                      onClick={() =>
+                        navigate(`/dashboard/sales-invoice/${invoice?._id}`)
+                      }
+                      className="cursor-pointer hover:bg-zinc-50"
+                    >
+                      <td>
+                        {invoice?.salesInvoiceDate
+                          ? invoice?.salesInvoiceDate.split("T")[0]
+                          : "-"}
                       </td>
-                    </tr>
-                  ) : paginatedInvoices?.length > 0 ? (
-                    paginatedInvoices.map((invoice) => (
-                      <tr
-                        key={invoice?._id}
-                        onClick={() =>
-                          navigate(`/dashboard/sales-invoice/${invoice?._id}`)
-                        }
-                        className="cursor-pointer hover:bg-zinc-50"
-                      >
-                        <td>
-                          {invoice?.salesInvoiceDate
-                            ? invoice?.salesInvoiceDate.split("T")[0]
-                            : "-"}
-                        </td>
-                        <td>{invoice?.salesInvoiceNumber}</td>
-                        <td>{invoice?.partyId?.partyName || "-"}</td>
-                        <td>{invoice?.dueDate?.split("T")[0] || "-"}</td>
-                        <td className="">
-                          <div className="flex items-center">
-                            <LiaRupeeSignSolid />
-                            {Number(invoice?.totalAmount).toLocaleString(
-                              "en-IN"
-                            )}
-                          </div>
+                      <td>{invoice?.salesInvoiceNumber}</td>
+                      <td>{invoice?.partyId?.partyName || "-"}</td>
+                      <td>{invoice?.dueDate?.split("T")[0] || "-"}</td>
+                      <td className="">
+                        <div className="flex items-center">
+                          <LiaRupeeSignSolid />
+                          {Number(invoice?.totalAmount).toLocaleString("en-IN")}
+                        </div>
 
-                          {/* {invoice?.pendingAmount &&
+                        {/* {invoice?.pendingAmount &&
                           invoice.pendingAmount > 0 ? (
                             <small className="flex items-center text-error">
                               <LiaRupeeSignSolid />{" "}
@@ -341,93 +329,89 @@ const DashboardSalesPage = () => {
                           ) : (
                             ""
                           )} */}
-                        </td>
-                        <td>
-                          <p
-                            className={`badge badge-soft badge-sm ${
-                              invoice?.status === "unpaid"
-                                ? "badge-error"
-                                : invoice?.status === "partially paid"
-                                ? "badge-secondary"
-                                : invoice?.status === "cancelled"
-                                ? "badge-primary"
-                                : "badge-success"
-                            }`}
-                          >
-                            {invoice?.status}
-                          </p>
-                        </td>
-
-                        {invoice?.status !== "cancelled" ? (
-                          <td onClick={(e) => e.stopPropagation()}>
-                            <div className="dropdown dropdown-end">
-                              <div
-                                tabIndex={0}
-                                role="button"
-                                className="btn m-1 btn-xs"
-                                onClick={(e) => e.stopPropagation()}
-                              >
-                                <EllipsisVertical size={13} />
-                              </div>
-                              <ul
-                                tabIndex={0}
-                                className="dropdown-content menu bg-base-100 border border-zinc-300 text-xs rounded-box z-10 w-36 p-1 shadow-sm"
-                                onClick={(e) => e.stopPropagation()}
-                              >
-                                <li>
-                                  <button
-                                    onClick={() =>
-                                      navigate(
-                                        `/dashboard/update/${invoice?._id}?type=sales invoice`
-                                      )
-                                    }
-                                    className="flex items-center gap-2"
-                                  >
-                                    <FaRegEdit /> Edit
-                                  </button>
-                                </li>
-                                <li>
-                                  <a
-                                    onClick={() => {
-                                      document
-                                        .getElementById("my_modal_2")
-                                        .showModal();
-                                      setInvoiceId(invoice?._id);
-                                    }}
-                                    className="text-[var(--error-text-color)]"
-                                  >
-                                    <BsTrash3 />
-                                    Delete
-                                  </a>
-                                </li>
-                              </ul>
-                            </div>
-                          </td>
-                        ) : (
-                          <td>-</td>
-                        )}
-                      </tr>
-                    ))
-                  ) : (
-                    /* ✅ Case 3: No invoices at all */
-                    <tr>
-                      <td
-                        colSpan="7"
-                        className="text-center py-4 text-gray-500"
-                      >
-                        <div className="w-full flex items-center justify-center py-20 flex-col gap-3 text-zinc-400">
-                          <FaFileInvoice size={40} />
-                          <span className="text-sm">
-                            You haven’t generated any invoices yet.
-                          </span>
-                        </div>
                       </td>
+                      <td>
+                        <p
+                          className={`badge badge-soft badge-sm ${
+                            invoice?.status === "unpaid"
+                              ? "badge-error"
+                              : invoice?.status === "partially paid"
+                              ? "badge-secondary"
+                              : invoice?.status === "cancelled"
+                              ? "badge-primary"
+                              : "badge-success"
+                          }`}
+                        >
+                          {invoice?.status}
+                        </p>
+                      </td>
+
+                      {invoice?.status !== "cancelled" ? (
+                        <td onClick={(e) => e.stopPropagation()}>
+                          <div className="dropdown dropdown-end">
+                            <div
+                              tabIndex={0}
+                              role="button"
+                              className="btn m-1 btn-xs"
+                              onClick={(e) => e.stopPropagation()}
+                            >
+                              <EllipsisVertical size={13} />
+                            </div>
+                            <ul
+                              tabIndex={0}
+                              className="dropdown-content menu bg-base-100 border border-zinc-300 text-xs rounded-box z-10 w-36 p-1 shadow-sm"
+                              onClick={(e) => e.stopPropagation()}
+                            >
+                              <li>
+                                <button
+                                  onClick={() =>
+                                    navigate(
+                                      `/dashboard/update/${invoice?._id}?type=sales invoice`
+                                    )
+                                  }
+                                  className="flex items-center gap-2"
+                                >
+                                  <FaRegEdit /> Edit
+                                </button>
+                              </li>
+                              <li>
+                                <a
+                                  onClick={() => {
+                                    document
+                                      .getElementById("my_modal_2")
+                                      .showModal();
+                                    setInvoiceId(invoice?._id);
+                                  }}
+                                  className="text-[var(--error-text-color)]"
+                                >
+                                  <BsTrash3 />
+                                  Delete
+                                </a>
+                              </li>
+                            </ul>
+                          </div>
+                        </td>
+                      ) : (
+                        <td>-</td>
+                      )}
                     </tr>
-                  )}
-                </tbody>
-              </motion.table>
-            </div>
-          )}
+                  ))
+                ) : (
+                  /* ✅ Case 3: No invoices at all */
+                  <tr>
+                    <td colSpan="7" className="text-center py-4 text-gray-500">
+                      <div className="w-full flex items-center justify-center py-20 flex-col gap-3 text-zinc-400">
+                        <FaFileInvoice size={40} />
+                        <span className="text-sm">
+                          You haven’t generated any invoices yet.
+                        </span>
+                      </div>
+                    </td>
+                  </tr>
+                )}
+              </tbody>
+            </motion.table>
+          </div>
         </div>
 
         {/* PAGINATION  */}

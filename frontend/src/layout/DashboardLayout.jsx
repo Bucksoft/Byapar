@@ -7,9 +7,11 @@ import { useBusinessStore } from "../store/businessStore";
 import { RiMenu2Fill } from "react-icons/ri";
 import { useAuthStore } from "../store/authStore";
 import CustomLoader from "../components/Loader";
+import { useInvoiceStore } from "../store/invoicesStore";
 
 const DashboardLayout = () => {
   const [showSidebar, setShowSidebar] = useState(false);
+  const { setInvoices, setTotalInvoices } = useInvoiceStore();
 
   const { setUser } = useAuthStore();
   const { setBusiness, business } = useBusinessStore();

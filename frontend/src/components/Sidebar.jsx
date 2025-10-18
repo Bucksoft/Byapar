@@ -28,6 +28,7 @@ import { useChallanStore } from "../store/challanStore";
 import { BsExclamationCircle } from "react-icons/bs";
 import { useMutation } from "@tanstack/react-query";
 import ByaparLogo from "../assets/Byapar_Logo.svg";
+import { useDebitNoteStore } from "../store/debitNoteStore";
 
 export const container = {
   hidden: { opacity: 0 },
@@ -65,6 +66,7 @@ const Sidebar = () => {
   const { setPurchaseInvoices } = usePurchaseInvoiceStore();
   const { setCategories } = useCategoryStore();
   const { setQuotations } = useQuotationStore();
+  const { setDebitNotes } = useDebitNoteStore();
 
   const { setSaleReturns } = useSalesReturnStore();
   const [currentLink, setCurrentLink] = useState("");
@@ -84,11 +86,13 @@ const Sidebar = () => {
       setParty(null);
       setPaymentIn(null);
       setPaymentOuts(null);
+      setDebitNotes(null);
       setProformaInvoices(null);
       setPurchaseInvoices(null);
       setDeliveryChallans(null);
       setQuotations(null);
       setSaleReturns(null);
+
       setCategories(null);
       navigate("/login");
       toast.success("Logged out");

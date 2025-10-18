@@ -12,15 +12,16 @@ import CustomLoader from "../components/Loader";
 const DashboardAllTransactionsPage = () => {
   const [day, setDay] = useState("");
   const { business } = useBusinessStore();
+  const { invoices } = useInvoiceStore();
   const [searchQuery, setSearchQuery] = useState("");
 
-  const { isLoading, data: invoices } = useQuery({
-    queryKey: ["invoices"],
-    queryFn: async () => {
-      const res = await axiosInstance.get(`/sales-invoice/${business?._id}`);
-      return res?.data?.invoices;
-    },
-  });
+  // const { isLoading, data: invoices } = useQuery({
+  //   queryKey: ["invoices"],
+  //   queryFn: async () => {
+  //     const res = await axiosInstance.get(`/sales-invoice/${business?._id}`);
+  //     return res?.data?.invoices;
+  //   },
+  // });
 
   // FUNCTION TO SEARCH INVOICES
   const searchedInvoices = useMemo(() => {
@@ -99,13 +100,13 @@ const DashboardAllTransactionsPage = () => {
     });
   }, [invoices, searchQuery, day]);
 
-  if (isLoading) {
-    return (
-      <div className="w-full h-screen flex items-center justify-center ">
-        <CustomLoader text={"Loading..."} />
-      </div>
-    );
-  }
+  // if (isLoading) {
+  //   return (
+  //     <div className="w-full h-screen flex items-center justify-center ">
+  //       <CustomLoader text={"Loading..."} />
+  //     </div>
+  //   );
+  // }
 
   return (
     <main className="h-screen bg-white overflow-y-scroll w-full p-2">
@@ -166,7 +167,7 @@ const DashboardAllTransactionsPage = () => {
                 </tr>
               </thead>
               <tbody>
-                {(searchedInvoices || invoices?.invoices || [])
+                {(searchedInvoices || invoices || [])
                   .slice()
                   .sort(
                     (a, b) =>
