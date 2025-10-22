@@ -11,6 +11,7 @@ export async function createPaymentIn(req, res) {
     const {
       partyName,
       paymentAmount,
+      partyId,
       paymentDate,
       paymentMode,
       notes,
@@ -18,7 +19,11 @@ export async function createPaymentIn(req, res) {
       settledInvoices,
     } = req.body;
 
-    const party = await Party.findOne({ partyName }).session(session);
+    const party = await Party.findOne({
+      _id: new mongoose.Types.ObjectId(partyId),
+      businessId: req.params?.id,
+    }).session(session);
+
     if (!party) {
       await session.abortTransaction();
       session.endSession();
@@ -28,17 +33,11 @@ export async function createPaymentIn(req, res) {
     const existingPaymentIn = await PaymentIn.findOne({
       paymentInNumber,
     }).session(session);
-    if (existingPaymentIn) {
-      await session.abortTransaction();
-      session.endSession();
-      return res
-        .status(400)
-        .json({ success: false, msg: "Payment In number already exists" });
-    }
 
     const invoiceIds = Object.keys(settledInvoices || {});
     const invoices = await SalesInvoice.find({
       partyId: party._id,
+      businessId: req.params?.id,
       _id: { $in: invoiceIds },
     })
       .sort({ salesInvoiceDate: 1 })
@@ -102,7 +101,9 @@ export async function createPaymentIn(req, res) {
           clientId: req.user.id,
           partyId: party._id,
           notes,
-          paymentInNumber,
+          paymentInNumber: existingPaymentIn
+            ? (Number(existingPaymentIn.paymentInNumber) + 1).toString()
+            : paymentInNumber,
           businessId: req.params?.id,
           settledInvoices,
         },
@@ -136,22 +137,26 @@ export async function createPaymentIn(req, res) {
 
 export async function getAllPaymentInDetails(req, res) {
   try {
-    const latestPaymentIns = await PaymentIn.findOne({
-      businessId: req.params?.id,
-    })
-      .sort("-paymentInNumber")
-      .limit(1);
+    const latestPaymentIns = await PaymentIn.aggregate([
+      {
+        $match: { businessId: new mongoose.Types.ObjectId(req.params?.id) },
+      },
+      {
+        $addFields: {
+          paymentInNumberNumeric: { $toInt: "$paymentInNumber" },
+        },
+      },
+      {
+        $sort: { paymentInNumberNumeric: -1 },
+      },
+      { $limit: 1 },
+    ]);
 
     const paymentIns = await PaymentIn.find({
-      $and: [
-        {
-          businessId: req.params?.id,
-        },
-        {
-          clientId: req.user?.id,
-        },
-      ],
+      businessId: req.params?.id,
+      clientId: req.user?.id,
     });
+
     if (!paymentIns) {
       return res
         .status(400)
@@ -160,7 +165,8 @@ export async function getAllPaymentInDetails(req, res) {
     return res.status(200).json({
       success: true,
       paymentIns,
-      totalPaymentIns: latestPaymentIns?.paymentInNumber || 0,
+      latestPaymentIn: Number(latestPaymentIns?.paymentInNumber) || 0,
+      totalPaymentIns: paymentIns.length,
     });
   } catch (error) {
     console.error("ERROR IN GETTING PAYMENT IN DETAILS :", error);
@@ -233,9 +239,10 @@ export async function deletePaymentIn(req, res) {
         const [[invoiceId, amountSettled]] = Object.entries(settled);
         const id = new mongoose.Types.ObjectId(invoiceId);
         const invoice = await SalesInvoice.findById(id).session(session);
+        console.log(invoice);
         if (invoice) {
-          invoice.settledAmount -= amountSettled;
-          invoice.pendingAmount += amountSettled;
+          invoice.settledAmount -= Number(amountSettled);
+          invoice.pendingAmount += Number(amountSettled);
           if (invoice.settledAmount < 0) invoice.settledAmount = 0;
           invoice.status = "unpaid";
           await invoice.save({ session });

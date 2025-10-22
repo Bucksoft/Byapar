@@ -8,7 +8,7 @@ import { MdOutlineCalendarToday } from "react-icons/md";
 import { axiosInstance } from "../../config/axios";
 import CustomLoader from "../Loader";
 import toast from "react-hot-toast";
-import { Cross, Trash } from "lucide-react";
+import { Cross, Pen, Trash } from "lucide-react";
 import { useRef } from "react";
 import { useBusinessStore } from "../../store/businessStore";
 import { useNavigate } from "react-router-dom";
@@ -44,6 +44,8 @@ const BusinessForm = ({ businessToBeUpdated }) => {
     pincode: "",
   });
 
+  console.log(businessToBeUpdated);
+
   // THIS IS USED TO AUTOMATICALLY ADD ALL THE FIELDS FOR EDITING
   useEffect(() => {
     if (businessToBeUpdated) {
@@ -65,6 +67,12 @@ const BusinessForm = ({ businessToBeUpdated }) => {
         pincode: businessToBeUpdated.pincode || "",
       });
     }
+    if (
+      businessToBeUpdated &&
+      businessToBeUpdated.additionalInformation.length
+    ) {
+      setAdditionalInformation(businessToBeUpdated.additionalInformation);
+    }
   }, [businessToBeUpdated]);
 
   // HANDLES THE LOGO CHANGE
@@ -72,7 +80,7 @@ const BusinessForm = ({ businessToBeUpdated }) => {
     const file = e.target.files[0];
     if (!file) return;
 
-    const maxFileSize = 5 * 1024 * 1024; // 5MB
+    const maxFileSize = 5 * 1024 * 1024;
     if (file.size > maxFileSize) {
       setFileSizeError(true);
       toast.error("File is too big");
@@ -84,8 +92,9 @@ const BusinessForm = ({ businessToBeUpdated }) => {
       const base64String = reader.result;
       setLogoPreviewUrl(base64String);
       const pureBase64 = base64String.split(",")[1];
-      logoRef.current = pureBase64;
+      // logoRef.current = pureBase64;
     };
+    logoRef.current = file;
     reader.readAsDataURL(file);
     e.target.value = null;
   };
@@ -101,10 +110,10 @@ const BusinessForm = ({ businessToBeUpdated }) => {
       setSignaturePreviewUrl(base64String);
 
       const pureBase64 = base64String.split(",")[1];
-      signatureRef.current = pureBase64;
+      // signatureRef.current = pureBase64;
     };
     reader.readAsDataURL(file);
-
+    signatureRef.current = file;
     e.target.value = null;
   };
 
@@ -140,7 +149,6 @@ const BusinessForm = ({ businessToBeUpdated }) => {
         `/business/${businessToBeUpdated?._id}`,
         formData
       );
-      console.log(res);
       return res.data.business;
     },
     onSuccess: (data) => {
@@ -175,12 +183,18 @@ const BusinessForm = ({ businessToBeUpdated }) => {
         JSON.stringify(additionalInformation)
       );
     }
+
     if (businessToBeUpdated) {
       updateMutation.mutate(formData);
     } else {
       mutation.mutate(formData);
     }
   };
+
+  const currentAdditionalInfo =
+    Array.isArray(additionalInformation) && additionalInformation.length > 0
+      ? additionalInformation
+      : businessToBeUpdated?.additionalInformation || [];
 
   return (
     <>
@@ -413,7 +427,9 @@ const BusinessForm = ({ businessToBeUpdated }) => {
                   className="select select-sm "
                 >
                   {states?.map((state) => (
-                    <option disabled={state === "Enter state"}>{state}</option>
+                    <option key={state} disabled={state === "Enter state"}>
+                      {state}
+                    </option>
                   ))}
                 </select>
               </fieldset>
@@ -817,42 +833,50 @@ const BusinessForm = ({ businessToBeUpdated }) => {
                 onChange={(e) => setAdditionalInfoValue(e.target.value)}
               />
               <div
-                onClick={() =>
+                onClick={() => {
                   setAdditionalInformation((prev) => [
                     ...prev,
                     {
                       key: additionalInfoKey,
                       value: additionalInfoValue,
                     },
-                  ])
-                }
+                  ]);
+                  setAdditionalInfoKey("");
+                  setAdditionalInfoValue("");
+                }}
                 className="btn btn-sm bg-[var(--primary-btn)] ml-3"
               >
                 Add
               </div>
             </div>
-            {Array.isArray(additionalInformation) &&
-              additionalInformation.length > 0 &&
-              additionalInformation.map((info, index) => (
-                <div
-                  key={index}
-                  className="px-4 pb-2 text-sm flex items-center justify-between"
-                >
-                  <div>
-                    <h3>{info?.key}</h3>
-                    <span className="text-zinc-500">{info?.value}</span>
-                  </div>
+            {(
+              (Array.isArray(additionalInformation) &&
+                additionalInformation.length > 0 &&
+                additionalInformation) ||
+              []
+            ).map((info, index) => (
+              <div
+                key={index}
+                className="px-4 pb-2 text-sm flex items-center justify-between"
+              >
+                <div>
+                  <h3>{info?.key}</h3>
+                  <span className="text-zinc-500">{info?.value}</span>
+                </div>
+                <div className="flex items-center gap-3 justify-center">
                   <Trash
-                    onClick={() =>
-                      setAdditionalInformation((prev) =>
-                        prev.filter((info, i) => info?.key !== info?.key)
-                      )
-                    }
+                    onClick={() => {
+                      setAdditionalInformation((prev) => {
+                        const safePrev = Array.isArray(prev) ? prev : [];
+                        return safePrev.filter((_, i) => i !== index);
+                      });
+                    }}
                     size={15}
                     className="text-[var(--error-text-color)] cursor-pointer"
                   />
                 </div>
-              ))}
+              </div>
+            ))}
           </div>
         </motion.div>
       </form>

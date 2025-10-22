@@ -24,6 +24,7 @@ import bankAccountRoutes from "./routes/bankAccount.js";
 import { loginViaGoogleCallback } from "./controllers/user.controller.js";
 import cookieParser from "cookie-parser";
 import path from "path";
+import { fileURLToPath } from "url";
 
 dotenv.config();
 const PORT = process.env.PORT || 8000;
@@ -53,6 +54,10 @@ app.use("/health", (req, res) => {
     timestamp: Date.now(),
   });
 });
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+app.use("/uploads", express.static(path.join(__dirname, "../uploads")));
 
 app.use("/api/v1/business", businessRoutes);
 app.use("/api/v1/user", userRoutes);

@@ -35,7 +35,7 @@ const InvoicesForm = ({
 }) => {
   const { business } = useBusinessStore();
   const { parties } = usePartyStore();
-  const { totalInvoices } = useInvoiceStore();
+  const { totalInvoices, latestInvoiceNumber } = useInvoiceStore();
   const { totalQuotations } = useQuotationStore();
   const { totalSalesReturn } = useSalesReturnStore();
   const { totalCreditNotes } = useCreditNoteStore();
@@ -60,7 +60,7 @@ const InvoicesForm = ({
     salesInvoiceDate: new Date(Date.now()),
     salesInvoiceNumber:
       title === "Sales Invoice"
-        ? totalInvoices + 1
+        ? latestInvoiceNumber + 1
         : title === "Quotation"
         ? totalQuotations + 1
         : title === "Sales Return"
@@ -80,6 +80,7 @@ const InvoicesForm = ({
         : 1,
 
     partyName: party?.partyName || "",
+    partyId: "",
     items: [],
     discountSubtotal: 0,
     taxableAmount: "",
@@ -109,7 +110,6 @@ const InvoicesForm = ({
   // MUTATION FOR CREATING & UPDATING INVOICE
   const mutation = useMutation({
     mutationFn: async (formData) => {
-      console.log(formData);
       if (!business) {
         throw new Error(
           "You don't have any active business yet, create one first"

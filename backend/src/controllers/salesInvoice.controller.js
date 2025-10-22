@@ -10,16 +10,10 @@ import { getFinancialYearRange } from "../utils/financialYear.js";
 export async function createSalesInvoice(req, res) {
   try {
     const data = req.body;
-    // const validatedResult = salesInvoiceSchema.safeParse(req.body);
-    // if (!validatedResult.success) {
-    //   const validationError = validatedResult.error.format();
-    //   return res
-    //     .status(422)
-    //     .json({ success: false, msg: "Validation failed", validationError });
-    // }
-    const partyName = data?.partyName;
+    const partyId = new mongoose.Types.ObjectId(data?.partyId);
     const party = await Party.findOne({
-      partyName,
+      _id: partyId,
+      businessId: req.params?.id,
     });
 
     if (!party) {
@@ -28,28 +22,11 @@ export async function createSalesInvoice(req, res) {
         .json({ success: false, msg: "Party doesn't exists" });
     }
 
-    // Find the latest invoice for this business
-    const latestInvoice = await SalesInvoice.findOne({
+    // Find the invoice for this business if it exists
+    const existingInvoice = await SalesInvoice.findOne({
       businessId: req.params.id,
-    })
-      .sort({ salesInvoiceNumber: -1 }) // sort descending by invoice number
-      .limit(1);
-
-    // Generate next invoice number
-    // let nextInvoiceNumber = 1; // default if no invoices yet
-    // if (latestInvoice) {
-    //   nextInvoiceNumber = latestInvoice.salesInvoiceNumber + 1;
-    // }
-
-    // Assign the generated invoice number
-    // data.salesInvoiceNumber = nextInvoiceNumber;
-
-    if (!latestInvoice) {
-      return res.status(400).json({
-        success: false,
-        msg: "Invoice already exists with this invoice number",
-      });
-    }
+      salesInvoiceNumber: Number(data?.salesInvoiceNumber),
+    });
 
     // SALES INVOICE MEIN STOCK KAM HOTA HAI, AGR PRODUCT HAI TO WRNA SERVICE KE CASE MEIN NHI HOTA
     for (const soldItem of data?.items) {
@@ -85,6 +62,10 @@ export async function createSalesInvoice(req, res) {
       businessId: req.params?.id,
       clientId: req.user?.id,
       type: "sales invoice",
+      pendingAmount: data?.totalAmount,
+      salesInvoiceNumber: existingInvoice
+        ? existingInvoice.salesInvoiceNumber + 1
+        : data?.salesInvoiceNumber,
       ...data,
     });
 
@@ -119,7 +100,6 @@ export async function createSalesInvoice(req, res) {
 export async function getAllInvoices(req, res) {
   try {
     const businessId = req.params?.id;
-
     if (!businessId) {
       return res.status(400).json({
         success: false,
@@ -185,7 +165,8 @@ export async function getAllInvoices(req, res) {
     return res.status(200).json({
       success: true,
       invoices,
-      totalInvoices: latestInvoice?.salesInvoiceNumber,
+      totalInvoices: invoices.length,
+      latestInvoiceNumber: latestInvoice?.salesInvoiceNumber,
       totalSales,
       totalPaid,
       totalUnpaid,
@@ -366,6 +347,7 @@ export async function bulkUploadSalesInvoices(req, res) {
         .status(400)
         .json({ success: false, msg: "Business id is required" });
     }
+
     const bulkInvoices = req.body || [];
     if (!Array.isArray(bulkInvoices) || bulkInvoices.length === 0) {
       return res
@@ -414,6 +396,7 @@ export async function bulkUploadSalesInvoices(req, res) {
         partyId: party?._id || null,
         totalAmount: invoiceData?.TotalAmount || 0,
         balanceAmount: invoiceData?.BalanceDue || invoiceData?.TotalAmount || 0,
+        pendingAmount: invoiceData?.TotalAmount || 0,
         amountSubTotal: invoiceData?.TotalAmount || 0,
       };
       invoicesToInsert.push(newInovice);
@@ -448,13 +431,12 @@ export async function bulkUploadSalesInvoices(req, res) {
 // CONTROLLER TO GET INVOICES OF A PARTY
 export async function getAllInvoicesForAParty(req, res) {
   try {
-    const partyName = req.query?.partyName;
+    const businessId = req.query?.businessId;
     const id = req.params.id;
-    console.log(partyName);
     if (!id) {
       return res.status(400).json({ msg: "Please provide a valid party id" });
     }
-    const invoices = await SalesInvoice.find({ partyId: id });
+    const invoices = await SalesInvoice.find({ partyId: id, businessId });
     return res.status(200).json({ success: true, invoices });
   } catch (error) {
     return res.status(500).json({ msg: "Internal Server Error" });

@@ -204,6 +204,7 @@ const SalesInvoicePartyDetailsSection = ({
                             setData((prev) => ({
                               ...prev,
                               partyName: p?.partyName,
+                              partyId: p?._id,
                             }));
                             setSelectOpen(false);
                             setSearchPartyQuery("");

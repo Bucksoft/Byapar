@@ -279,7 +279,15 @@ const PartyLedgerStatement = ({ party }) => {
                 color: "#71717b",
               }}
             >
-              Phone no. {business?.companyPhoneNo}
+              Phone no. : {business?.companyPhoneNo}
+            </p>
+            <p
+              style={{
+                fontSize: "12px",
+                color: "#71717b",
+              }}
+            >
+              Address : {business?.billingAddress}
             </p>
           </div>
           Party Ledger
@@ -307,7 +315,8 @@ const PartyLedgerStatement = ({ party }) => {
               {party?.partyName}
             </span>
             <br />
-            {party?.mobileNumber}
+            <div>{party?.mobileNumber}</div>
+            <div>{party?.billingAddress}</div>
           </div>
 
           <div
@@ -328,8 +337,18 @@ const PartyLedgerStatement = ({ party }) => {
                 gap: "4px",
               }}
             >
-              <span> {dateRange?.from?.toLocaleDateString()}</span> -{" "}
-              <span>{dateRange?.to?.toLocaleDateString()}</span>
+              <span
+                style={{
+                  fontWeight: 600,
+                }}
+              >
+                {" "}
+                {dateRange?.from?.toLocaleDateString()}
+              </span>{" "}
+              -{" "}
+              <span style={{ fontWeight: 600 }}>
+                {dateRange?.to?.toLocaleDateString()}
+              </span>
             </p>
 
             <h4
@@ -498,7 +517,7 @@ const PartyLedgerStatement = ({ party }) => {
               {/* THIS IS FOR LEDGER */}
               {ledgerWithBalance &&
                 ledgerWithBalance.length > 0 &&
-                ledgerWithBalance.map((entry, idx) => (
+                filteredEntries.map((entry, idx) => (
                   <tr key={idx}>
                     <td
                       style={{

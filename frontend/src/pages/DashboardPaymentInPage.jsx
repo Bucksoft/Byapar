@@ -23,7 +23,7 @@ const DashboardPaymentInPage = () => {
   const [page, setPage] = useState("");
   const navigate = useNavigate();
   const [searchedQuery, setSearchedQuery] = useState("");
-  const { setPaymentIns, setTotalPaymentIns, totalPaymentIns } =
+  const { setPaymentIns, setTotalPaymentIns, setLatestPaymentIn } =
     usePaymentInStore();
   const [filterDate, setFilterDate] = useState("");
   const { business } = useBusinessStore();
@@ -32,7 +32,8 @@ const DashboardPaymentInPage = () => {
     queryKey: ["paymentIns"],
     queryFn: async () => {
       const res = await axiosInstance.get(`/payment-in/all/${business?._id}`);
-      setTotalPaymentIns(res.data?.totalPaymentIns || 1);
+      setTotalPaymentIns(res.data?.totalPaymentIns || 0);
+      setLatestPaymentIn(res.data?.latestPaymentIn || 0);
       setPaymentIns(res.data?.paymentIns);
       return res.data.paymentIns;
     },

@@ -32,12 +32,13 @@ import { uploadExcel } from "../../helpers/uploadExcel";
 import { useDebounce } from "../../helpers/useDebounce";
 
 const DashboardSalesPage = () => {
-  const { setInvoices, setTotalInvoices } = useInvoiceStore();
+  const { setInvoices, setTotalInvoices, setLatestInvoiceNumber } =
+    useInvoiceStore();
   const [showDeletePopup, setShowDeletePopup] = useState(false);
   const [invoiceId, setInvoiceId] = useState();
   const [searchQuery, setSearchQuery] = useState("");
   const { business } = useBusinessStore();
-  const { invoices } = useInvoiceStore();
+  // const { invoices } = useInvoiceStore();
   const navigate = useNavigate();
   const fileRef = useRef(null);
   const [page, setPage] = useState(1);
@@ -45,23 +46,25 @@ const DashboardSalesPage = () => {
   const itemsPerPage = 10;
 
   // FETCH ALL THE INVOICES FOR A BUSINESS
-  // const {
-  //   isLoading,
-  //   data: invoices,
-  //   isSuccess,
-  // } = useQuery({
-  //   queryKey: ["invoices", business?._id],
-  //   queryFn: async () => {
-  //     if (!business) return [];
-  //     const res = await axiosInstance.get(`/sales-invoice/${business._id}`);
-  //     setInvoices(res?.data?.invoices);
-  //     setTotalInvoices(res.data?.totalInvoices);
-  //     return res.data || [];
-  //   },
-  //   enabled: !!business,
-  //   keepPreviousData: true,
-  //   retry: 1,
-  // });
+  const {
+    isLoading,
+    data: invoices,
+    isSuccess,
+  } = useQuery({
+    queryKey: ["invoices", business?._id],
+    queryFn: async () => {
+      if (!business) return [];
+      const res = await axiosInstance.get(`/sales-invoice/${business._id}`);
+      console.log(res);
+      setInvoices(res?.data?.invoices);
+      setTotalInvoices(res.data?.totalInvoices);
+      setLatestInvoiceNumber(res.data?.latestInvoiceNumber);
+      return res.data || [];
+    },
+    enabled: !!business,
+    keepPreviousData: true,
+    retry: 1,
+  });
 
   // mutation to delete an invoice
   const mutation = useMutation({
@@ -81,15 +84,15 @@ const DashboardSalesPage = () => {
 
   useEffect(() => {
     if (invoices) {
-      setInvoices(invoices);
+      setInvoices(invoices?.invoices);
     }
   }, [invoices]);
 
   // SEARCH INVOICES
   const searchedInvoices = useMemo(() => {
-    if (!invoices?.length) return [];
+    if (!invoices?.invoices?.length) return [];
 
-    return invoices?.filter((item) => {
+    return invoices?.invoices?.filter((item) => {
       const invoiceMatch = item?.salesInvoiceNumber
         ?.toString()
         ?.toLowerCase()
@@ -114,7 +117,9 @@ const DashboardSalesPage = () => {
     setCurrentPage(1);
   }, [searchQuery]);
 
-  const totalPages = Math.ceil((invoices?.length || 0) / itemsPerPage);
+  const totalPages = Math.ceil(
+    (invoices?.invoices?.length || 0) / itemsPerPage
+  );
 
   // MUTATION TO UPLOAD ITEMS IN BULK
   const bulkMutation = useMutation({
@@ -313,8 +318,8 @@ const DashboardSalesPage = () => {
                           {Number(invoice?.totalAmount).toLocaleString("en-IN")}
                         </div>
 
-                        {/* {invoice?.pendingAmount &&
-                          invoice.pendingAmount > 0 ? (
+                        {invoice?.pendingAmount &&
+                          invoice.pendingAmount > 0 && (
                             <small className="flex items-center text-error">
                               <LiaRupeeSignSolid />{" "}
                               {Number(invoice?.pendingAmount).toLocaleString(
@@ -322,13 +327,7 @@ const DashboardSalesPage = () => {
                               )}{" "}
                               unpaid
                             </small>
-                          ) : invoice.status !== "cancelled" ? (
-                            <small className="flex items-center text-success">
-                              Paid
-                            </small>
-                          ) : (
-                            ""
-                          )} */}
+                          )}
                       </td>
                       <td>
                         <p

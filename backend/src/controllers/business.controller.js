@@ -1,6 +1,7 @@
 import { businessSchema } from "../config/validation.js";
 import { Business } from "../models/business.schema.js";
 import { UserCredential } from "../models/user.schema.js";
+import path from "path";
 
 // CREATE BUSINESS API
 export async function createBusiness(req, res) {
@@ -10,16 +11,29 @@ export async function createBusiness(req, res) {
     const logoFile = req.files?.logo?.[0];
     const signatureFile = req.files?.signature?.[0];
 
+    let parsedAdditionalInfo = [];
+    if (req.body?.additionalInformation) {
+      try {
+        parsedAdditionalInfo = JSON.parse(req.body.additionalInformation);
+      } catch (e) {
+        console.error("Invalid JSON in additionalInformation");
+      }
+    }
+
     if (data.gstRegistered) {
       data.gstRegistered = Boolean(data.gstRegistered);
     }
 
     if (logoFile) {
-      data.logo = logoFile.path;
+      data.logo = `${req.protocol}://${req.get("host")}/uploads/${path.basename(
+        req.files.logo[0].path
+      )}`;
     }
 
     if (signatureFile) {
-      data.signature = signatureFile.path;
+      data.signature = `${req.protocol}://${req.get(
+        "host"
+      )}/uploads/${path.basename(req.files.signature[0].path)}`;
     }
 
     // CHECK IF THE SAME BUSINESS IS ALREADY PRESENT OR NOT
@@ -49,11 +63,12 @@ export async function createBusiness(req, res) {
         .json({ success: true, msg: "Validation failed", validationError });
     }
 
-    // CREATE THE BUSINESS
+    // // CREATE THE BUSINESS
     const dataToInsert = validatedResult.data;
     const business = await Business.create({
       ...dataToInsert,
       clientId: req?.user?.id,
+      additionalInformation: parsedAdditionalInfo,
     });
 
     if (!business) {
@@ -65,7 +80,7 @@ export async function createBusiness(req, res) {
     // RETURN SUCCESS RESPONSE
     return res
       .status(200)
-      .json({ success: true, msg: "Business created successfully", business });
+      .json({ success: true, msg: "Business created successfully" });
   } catch (error) {
     console.log("Error in creating business ", error);
     return res
@@ -77,32 +92,62 @@ export async function createBusiness(req, res) {
 // UPDATE BUSINESS API
 export async function updateBusiness(req, res) {
   try {
-    // GET THE BUSINESS ID FROM THE PARAMETERS
     const { id } = req.params;
     if (!id) {
       return res
         .status(400)
         .json({ success: false, msg: "Please provide business ID" });
     }
+    const logoFile = req.files?.logo?.[0];
+    const signatureFile = req.files?.signature?.[0];
 
-    // FIND THE BUSINESS BASED ON THE ID AND UPDATE
-    const updatedBusiness = await Business.findByIdAndUpdate(id, req.body, {
-      new: true,
-    });
+    if (logoFile) {
+      req.body.logo = `${req.protocol}://${req.get(
+        "host"
+      )}/uploads/${path.basename(req.files.logo[0].path)}`;
+    }
+
+    if (signatureFile) {
+      req.body.signature = `${req.protocol}://${req.get(
+        "host"
+      )}/uploads/${path.basename(req.files.signature[0].path)}`;
+    }
+
+    console.log(req.body.logoFile);
+    console.log(req.body.signatureFile);
+
+    let parsedAdditionalInfo = [];
+    if (req.body?.additionalInformation) {
+      try {
+        parsedAdditionalInfo = JSON.parse(req.body.additionalInformation);
+      } catch (e) {
+        console.error("Invalid JSON in additionalInformation");
+      }
+    }
+
+    const updatedBusiness = await Business.findByIdAndUpdate(
+      id,
+      {
+        ...req.body,
+        additionalInformation: parsedAdditionalInfo,
+        clientId: req.user.id,
+      },
+      { new: true }
+    );
+
     if (!updatedBusiness) {
       return res
         .status(400)
         .json({ success: false, msg: "Business could not be updated" });
     }
 
-    // RETURN SUCCESS RESPONSE
     return res.status(200).json({
       success: true,
-      msg: "Business details updated",
+      msg: "Business details updated successfully",
       updatedBusiness,
     });
   } catch (error) {
-    console.log("Error in updating business details", error);
+    console.error("Error in updating business details", error);
     return res
       .status(500)
       .json({ success: false, msg: "Internal server error" });

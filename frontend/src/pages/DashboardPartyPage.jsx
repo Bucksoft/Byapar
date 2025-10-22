@@ -11,13 +11,16 @@ import PartyProfile from "../components/Party/PartyProfile";
 import PartyLedgerStatement from "../components/Party/PartyLedgerStatement";
 import PartyItemWiseReport from "../components/Party/PartyItemWiseReport";
 import { useInvoiceStore } from "../store/invoicesStore";
+import { useBusinessStore } from "../store/businessStore";
 
 const DashboardPartyPage = () => {
   const { id } = useParams();
   const navigate = useNavigate();
+  const { invoices } = useInvoiceStore();
   const [selectedMenu, setSelectedMenu] = useState("transactions");
   // const { invoices } = useInvoiceStore();
   const [partyInvoices, setPartyInvoices] = useState([]);
+  const { business } = useBusinessStore();
   const [filter, setFilter] = useState("all_transactions");
 
   function handleSelectedMenu(menu) {
@@ -37,23 +40,24 @@ const DashboardPartyPage = () => {
     // staleTime: 1000 * 60 * 5,
   });
 
-  const { isLoading: isLoadingInvoices, data: invoices } = useQuery({
-    queryKey: ["invoices", id],
+  const { data } = useQuery({
+    queryKey: ["invoices"],
     queryFn: async () => {
-      const res = await axiosInstance.get(`/sales-invoice/party/${id}`);
+      const res = await axiosInstance.get(
+        `/sales-invoice/party/${id}?businessId=${business?._id}`
+      );
       setPartyInvoices(res.data?.invoices);
-      return res.data?.invoices;
+      return res.data?.invoices || [];
     },
   });
 
+  // FILTER OUT THE INVOICES OF THE PARTY
   // useEffect(() => {
   //   if (!id) {
   //     setPartyInvoices([]);
   //     return;
   //   }
-
   //   const allInvoices = Array.isArray(invoices) ? invoices : [];
-
   //   const filtered = allInvoices.filter((invoice) => {
   //     const partyIdFromInvoice =
   //       invoice?.partyId && typeof invoice.partyId === "object"
@@ -62,9 +66,9 @@ const DashboardPartyPage = () => {
 
   //     return String(partyIdFromInvoice) === String(id);
   //   });
-
+  //   console.log(filtered);
   //   setPartyInvoices(filtered);
-  // }, [id, invoices]);
+  // }, []);
 
   const handleSelectChange = (e) => {
     const value = e?.target?.value;

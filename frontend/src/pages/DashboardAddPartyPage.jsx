@@ -139,7 +139,7 @@ const DashboardAddPartyPage = () => {
 
   return (
     <>
-      <main className="h-screen overflow-y-scroll w-full relative border-l border-[var(--primary-border)]">
+      <main className="h-screen overflow-y-scroll w-full relative  border-[var(--primary-border)]">
         {/* navigation */}
         <header className="flex items-center justify-between p-3 bg-white sticky top-0 z-50 border-b border-[var(--primary-border)]">
           <h1 className="flex items-center gap-2">

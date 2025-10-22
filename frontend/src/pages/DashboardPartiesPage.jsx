@@ -25,6 +25,7 @@ import { queryClient } from "../main.jsx";
 import { useBusinessStore } from "../store/businessStore.js";
 import { uploadExcel } from "../../helpers/uploadExcel.js";
 import { IoMdArrowDown, IoMdArrowUp } from "react-icons/io";
+import no_party from "../assets/no_party.png";
 
 const DashboardPartiesPage = () => {
   const [searchQuery, setSearchQuery] = useState("");
@@ -38,6 +39,24 @@ const DashboardPartiesPage = () => {
   const [partyIdToDelete, setPartyIdToDelete] = useState(null);
   const fileRef = useRef();
   const navigate = useNavigate();
+
+  // FETCHING ALL PARTIES OF A PARTICULAR BUSINESS
+  const { isLoading, data } = useQuery({
+    queryKey: ["parties", business?._id],
+    queryFn: async () => {
+      const res = await axiosInstance.get(
+        `/parties/all-parties/${business?._id}`
+      );
+      console.log(res);
+      setToCollect(res.data?.toCollect);
+      setToPay(res.data?.toPay);
+      setTotalParties(res.data?.totalParties);
+      setParties(res.data?.data);
+      return res.data?.data;
+    },
+    enabled: !!business?._id,
+    keepPreviousData: true,
+  });
 
   // MUTATION TO UPLOAD BULK PARTY DATA
   const bulkMutation = useMutation({
@@ -63,28 +82,8 @@ const DashboardPartiesPage = () => {
     onSuccess: (data) => {
       toast.success(data.msg);
       document.getElementById("my_modal_3").close();
-      queryClient.invalidateQueries({ queryKey: ["parties"] });
+      queryClient.invalidateQueries({ queryKey: ["parties", business?._id] });
     },
-  });
-
-  // FETCHING ALL PARTIES OF A PARTICULAR BUSINESS
-  const { isLoading, data } = useQuery({
-    queryKey: ["parties", business?._id],
-    queryFn: async () => {
-      if (!business) {
-        return [];
-      }
-      const res = await axiosInstance.get(
-        `/parties/all-parties/${business?._id}`
-      );
-      setToCollect(res.data?.toCollect);
-      setToPay(res.data?.toPay);
-      setTotalParties(res.data?.totalParties);
-      setParties(res.data?.data);
-      return res.data?.data;
-    },
-    enabled: !!business?._id,
-    keepPreviousData: true,
   });
 
   const totalPages = Math.ceil((parties?.length || 0) / itemsPerPage);
@@ -302,15 +301,10 @@ const DashboardPartiesPage = () => {
             </table>
           ) : (
             <div className="w-full flex flex-col gap-3 items-center justify-center py-16 text-center">
+              <img src={no_party} alt="no_parties" width={180} />
               <h1 className="text-zinc-500 text-sm sm:text-base">
                 No parties found for this business
               </h1>
-              <Link
-                to="/dashboard/add-party"
-                className="btn btn-info btn-sm sm:btn-md"
-              >
-                Create party
-              </Link>
             </div>
           )}
         </motion.div>

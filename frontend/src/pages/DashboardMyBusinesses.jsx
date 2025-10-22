@@ -52,6 +52,7 @@ const DashboardMyBusinesses = () => {
     },
     onSuccess: (data) => {
       toast.success(data?.msg);
+      document.getElementById("my_modal_2").close();
       queryClient.invalidateQueries({
         queryKey: [
           "business",
@@ -67,6 +68,8 @@ const DashboardMyBusinesses = () => {
       });
     },
   });
+
+  console.log(businesses);
 
   return (
     <main className="h-full p-2">
@@ -100,7 +103,7 @@ const DashboardMyBusinesses = () => {
                     boxShadow:
                       "rgba(0, 0, 0, 0.16) 0px 3px 6px, rgba(0, 0, 0, 0.23) 0px 3px 6px",
                   }}
-                  className="card w-96 rounded-4xl card-md border-l-2 border-l-info"
+                  className="card w-96 bg-gradient-to-b from-white to-gray-100  rounded-4xl card-md border-l-2 border-l-info"
                 >
                   <div className="card-body">
                     <div className="flex items-start gap-3">

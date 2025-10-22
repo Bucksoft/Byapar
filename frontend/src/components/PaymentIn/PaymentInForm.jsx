@@ -20,7 +20,7 @@ const PaymentInForm = () => {
   const { setParty } = usePartyStore();
   const { invoices } = useInvoiceStore();
   const { business } = useBusinessStore();
-  const { paymentIns, totalPaymentIns } = usePaymentInStore();
+  const { paymentIns, totalPaymentIns, latestPaymentIn } = usePaymentInStore();
   const [selectedParty, setSelectedParty] = useState();
   const [paymentInToEdit, setPaymentInToEdit] = useState();
   const [totalInvoiceAmount, setTotalInvoiceAmount] = useState(0);
@@ -38,10 +38,11 @@ const PaymentInForm = () => {
   // DATA TO SEND TO THE BACKEND
   const [data, setData] = useState({
     partyName: "",
+    partyId: "",
     paymentAmount: 0,
     paymentDate: new Date(Date.now()),
     paymentMode: "cash",
-    paymentInNumber: totalPaymentIns + 1,
+    paymentInNumber: latestPaymentIn + 1,
     notes: "",
     settledInvoices: {},
   });
@@ -61,7 +62,7 @@ const PaymentInForm = () => {
     if (!allParties || !invoices) return;
     const allInvoices = invoices?.filter(
       (invoice) =>
-        invoice.partyName === selectedParty ||
+        invoice.partyId?._id.toString() === data?.partyId.toString() ||
         invoice.partyName === location.state?.partyName
     );
 
@@ -284,6 +285,9 @@ const PaymentInForm = () => {
                     setData((prev) => ({
                       ...prev,
                       partyName: e.target.value,
+                      partyId: allParties.find(
+                        (p) => p.partyName === e.target.value
+                      )?._id,
                     }));
                   }}
                 >

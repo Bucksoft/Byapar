@@ -10,6 +10,8 @@ export const usePaymentInStore = create(
       setPaymentIn: (data) => set({ paymentIn: data }),
       totalPaymentIns: 0,
       setTotalPaymentIns: (data) => set({ totalPaymentIns: data }),
+      latestPaymentIn: 0,
+      setLatestPaymentIn: (data) => set({ latestPaymentIn: data }),
     }),
     {
       name: "paymentIn",

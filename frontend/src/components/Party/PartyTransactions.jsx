@@ -1,14 +1,11 @@
-import React from "react";
 import { GrDocumentExcel } from "react-icons/gr";
 import { LiaRupeeSignSolid } from "react-icons/lia";
-import { useInvoiceStore } from "../../store/invoicesStore";
 import { useQuotationStore } from "../../store/quotationStore";
 import { usePaymentInStore } from "../../store/paymentInStore";
 import { useEffect } from "react";
 import { useState } from "react";
 
-const PartyTransactions = ({ party, filter }) => {
-  const { invoices } = useInvoiceStore();
+const PartyTransactions = ({ party, filter, partyInvoices: invoices }) => {
   const { quotations } = useQuotationStore();
   const { paymentIns } = usePaymentInStore();
   const [transactions, setTransactions] = useState([]);
@@ -22,7 +19,7 @@ const PartyTransactions = ({ party, filter }) => {
       ? paymentIns.paymentIns
       : [];
 
-    const invoiceList = Array.isArray(invoices) ? invoices : [];
+    const invoiceList = safeArray(invoices);
     const quotationList = safeArray(quotations);
 
     const partyInvoices = invoiceList
@@ -43,7 +40,7 @@ const PartyTransactions = ({ party, filter }) => {
   const filteredTransactions =
     filter && filter !== "all_transactions"
       ? transactions.filter(
-          (t) => t.type.replace(" ", "_") === filter.toLowerCase() // sales_invoice → sales invoice
+          (t) => t.type.replace(" ", "_") === filter.toLowerCase()
         )
       : transactions;
 
@@ -63,8 +60,18 @@ const PartyTransactions = ({ party, filter }) => {
             </tr>
           </thead>
           <tbody>
-            {filteredTransactions?.length > 0 &&
-              filteredTransactions.map((transaction, index) => (
+            {filteredTransactions
+              ?.slice() 
+              .sort((a, b) => {
+                const dateA = new Date(
+                  a.salesInvoiceDate || a.quotationDate || a.paymentDate
+                );
+                const dateB = new Date(
+                  b.salesInvoiceDate || b.quotationDate || b.paymentDate
+                );
+                return dateB - dateA; // descending order
+              })
+              .map((transaction, index) => (
                 <tr key={transaction?._id}>
                   <td>{index + 1}</td>
                   <td>
@@ -96,9 +103,9 @@ const PartyTransactions = ({ party, filter }) => {
                   </td>
                   <td>
                     <div
-                      className={`  ${
+                      className={`${
                         transaction.status && "badge badge-sm badge-soft"
-                      }    ${
+                      } ${
                         transaction?.status === "unpaid"
                           ? "badge-error"
                           : "badge-success"

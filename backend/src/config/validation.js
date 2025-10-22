@@ -188,7 +188,7 @@ export const businessSchema = z.object({
   TDS: z.boolean().default(false),
   TCS: z.boolean().default(false),
 
-  additionalInfo: z.string().optional(),
+  // additionalInformation: z.array(z.string()).optional(),
 
   signature: z.string().optional(),
 

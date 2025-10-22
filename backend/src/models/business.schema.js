@@ -58,9 +58,12 @@ const businessSchema = new mongoose.Schema({
     type: Boolean,
     default: false,
   },
-  additionalInfo: {
-    type: String,
-  },
+  additionalInformation: [
+    {
+      key: String,
+      value: String,
+    },
+  ],
   signature: {
     type: String,
   },
