@@ -152,7 +152,7 @@ const DashboardSalesReturnPage = () => {
                     <td>{(saleReturn?.salesReturnDate).split("T")[0]}</td>
                     <td>{saleReturn?.salesReturnNumber}</td>
                     <td>{saleReturn?.partyName}</td>
-                    <td>{saleReturn?.dueIn || "-"}</td>
+                    <td>{saleReturn?.dueDate.split("T")[0] || "-"}</td>
                     <td>{saleReturn?.invoiceId?.salesInvoiceNumber || "-"}</td>
                     <td>
                       <div className="flex items-center">
