@@ -56,11 +56,11 @@ export const dashboardFields = [
         label: "Inventory",
         link: "items",
       },
-      {
-        id: 2,
-        label: "Godown (Warehouse)",
-        link: "godown",
-      },
+      // {
+      //   id: 2,
+      //   label: "Godown (Warehouse)",
+      //   link: "godown",
+      // },
     ],
   },
   {
@@ -92,21 +92,21 @@ export const dashboardFields = [
         label: "Sales Return",
         link: "sales-return",
       },
-      {
-        id: 5,
-        label: "Credit Note",
-        link: "credit-note",
-      },
-      {
-        id: 6,
-        label: "Delivery Challan",
-        link: "delivery-challan",
-      },
-      {
-        id: 7,
-        label: "Proforma Invoice",
-        link: "proforma",
-      },
+      // {
+      //   id: 5,
+      //   label: "Credit Note",
+      //   link: "credit-note",
+      // },
+      // {
+      //   id: 6,
+      //   label: "Delivery Challan",
+      //   link: "delivery-challan",
+      // },
+      // {
+      //   id: 7,
+      //   label: "Proforma Invoice",
+      //   link: "proforma",
+      // },
     ],
   },
   {
@@ -123,26 +123,26 @@ export const dashboardFields = [
         label: "Purchase Invoices",
         link: "purchases",
       },
-      {
-        id: 2,
-        label: "Payment Out",
-        link: "payment-out",
-      },
+      // {
+      //   id: 2,
+      //   label: "Payment Out",
+      //   link: "payment-out",
+      // },
       {
         id: 3,
         label: "Purchase Return",
         link: "purchase-return",
       },
-      {
-        id: 4,
-        label: "Debit Note",
-        link: "debit-note",
-      },
-      {
-        id: 5,
-        label: "Purchase Orders",
-        link: "purchase-order",
-      },
+      // {
+      //   id: 4,
+      //   label: "Debit Note",
+      //   link: "debit-note",
+      // },
+      // {
+      //   id: 5,
+      //   label: "Purchase Orders",
+      //   link: "purchase-order",
+      // },
     ],
   },
   {

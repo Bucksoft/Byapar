@@ -187,8 +187,34 @@ export async function deleteSaleReturn(req, res) {
         .status(400)
         .json({ status: false, msg: "Failed to delete sales return" });
     }
+    if (deletedSalesReturn.status === "cancelled") {
+      return res.status(400).json({
+        success: false,
+        msg: "Sales return already cancelled",
+      });
+    }
+    if (Array.isArray(deletedSalesReturn?.items)) {
+      for (const item of deletedSalesReturn.items) {
+        const dbItem = await Item.findById(item?._id);
+        if (dbItem) {
+          dbItem.currentStock =
+            (dbItem.currentStock || 0) - Number(item.quantity || 0);
+          await dbItem.save();
+        }
+      }
+    }
+
+    const party = await Party.findById(deletedSalesReturn?.partyId?._id);
+    if (party) {
+      party.currentBalance =
+        (party.currentBalance || 0) +
+        Number(deletedSalesReturn.totalAmount || 0);
+      await party.save();
+    }
+
     deletedSalesReturn.status = "cancelled";
     await deletedSalesReturn.save();
+
     return res.status(200).json({ success: true, msg: "Deleted Sales Return" });
   } catch (error) {
     console.log("ERROR IN DELETING SALES RETURN");

@@ -138,6 +138,8 @@ const SalesInvoiceFooterSection = ({
         {/* add new account */}
         {!bankAccounts?.length ? (
           <BankAccountPopupForBusiness />
+        ) : title === "Purchase Invoice" ? (
+          <></>
         ) : (
           bankAccounts.map((bankAccount) => (
             <div

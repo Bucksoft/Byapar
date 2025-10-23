@@ -91,6 +91,15 @@ export async function createPurchaseReturn(req, res) {
       });
     }
 
+    const returnAmount = purchaseReturn.totalAmount || 0;
+
+    party.currentBalance = (party.currentBalance || 0) - returnAmount;
+    party.totalCredits = (party.totalCredits || 0) + returnAmount;
+    party.totalDebits = (party.totalDebits || 0) - returnAmount;
+    party.totalReturns = (party.totalReturns || 0) + returnAmount;
+
+    await party.save();
+
     return res.status(201).json({
       success: true,
       msg: "Purchase Return created successfully",
@@ -167,21 +176,71 @@ export async function deletePurchaseReturn(req, res) {
         .status(400)
         .json({ success: false, msg: "Please provide purchase return id" });
     }
-    const deletedSalesReturn = await PurchaseReturn.findById(id);
-    if (!deletedSalesReturn) {
+
+    const deletedPurchaseReturn = await PurchaseReturn.findById(id);
+    if (!deletedPurchaseReturn) {
+      return res
+        .status(404)
+        .json({ success: false, msg: "Purchase return not found" });
+    }
+
+    if (deletedPurchaseReturn.status === "cancelled") {
       return res
         .status(400)
-        .json({ status: false, msg: "Purchase return not found" });
+        .json({ success: false, msg: "Purchase return already cancelled" });
     }
-    deletedSalesReturn.status = "cancelled";
-    await deletePurchaseReturn.save();
-    return res.status(200).json({ success: true, msg: "Deleted Sales Return" });
+
+    if (Array.isArray(deletedPurchaseReturn.items)) {
+      for (const item of deletedPurchaseReturn.items) {
+        const itemId = item._id || item.itemId;
+        const dbItem = await Item.findById(itemId);
+        if (dbItem) {
+          dbItem.currentStock =
+            (dbItem.currentStock || 0) + Number(item.quantity || 0);
+          await dbItem.save();
+        }
+      }
+    }
+
+    const partyId =
+      (deletedPurchaseReturn.partyId &&
+        (deletedPurchaseReturn.partyId._id || deletedPurchaseReturn.partyId)) ||
+      null;
+
+    const returnAmount = Number(deletedPurchaseReturn.totalAmount || 0);
+
+    if (partyId) {
+      const party = await Party.findById(partyId);
+      if (party) {
+        party.currentBalance = (party.currentBalance || 0) + returnAmount;
+        party.totalDebits = (party.totalDebits || 0) + returnAmount;
+        party.totalCredits = (party.totalCredits || 0) - returnAmount;
+        party.totalReturns = Math.max(
+          (party.totalReturns || 0) - returnAmount,
+          0
+        );
+
+        await party.save();
+      }
+    }
+
+    deletedPurchaseReturn.status = "cancelled";
+    await deletedPurchaseReturn.save();
+
+    return res.status(200).json({
+      success: true,
+      msg: "Purchase return cancelled and stock & party balance reverted",
+      purchaseReturn: deletedPurchaseReturn,
+    });
   } catch (error) {
-    console.log("ERROR IN DELETING SALES RETURN");
-    return res.status(500).json({ err: "Internal server error", error });
+    console.error("ERROR IN DELETING PURCHASE RETURN:", error);
+    return res.status(500).json({
+      success: false,
+      msg: "Internal server error",
+      error: error.message,
+    });
   }
 }
-
 export async function getAllPurchaseReturnOfAParty(req, res) {
   try {
     const businessId = req.query?.businessId;

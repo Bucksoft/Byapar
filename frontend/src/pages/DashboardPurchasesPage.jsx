@@ -96,11 +96,11 @@ const DashboardPurchasesPage = () => {
           animate="show"
           className="grid grid-cols-3 gap-2"
         >
-          {/* TOTAL SALES */}
+          {/* TOTAL PURCHASES */}
           <div
-            className={`border border-[#456882] shadow-zinc-500 mt-5 rounded-md p-3  shadow-md hover:-translate-y-1 transition-all ease-in-out duration-200 cursor-pointer`}
+            className={`border-l-4 border-[#F4991A] shadow-zinc-500 mt-5  rounded-md p-3  shadow-md hover:-translate-y-1 transition-all ease-in-out duration-200 cursor-pointer bg-gradient-to-tl from-[rgba(244,153,26,0.1)] to-white`}
           >
-            <p className={`flex items-center gap-3 text-[#456882]`}>
+            <p className={`flex items-center gap-3 text-[#F4991A]`}>
               <FaFileInvoice />
               Total Purchases
             </p>
@@ -122,9 +122,9 @@ const DashboardPurchasesPage = () => {
 
           {/* PAID */}
           <div
-            className={`border border-[#456882] mt-5 shadow-zinc-500 rounded-md p-3  shadow-md hover:-translate-y-1 transition-all ease-in-out duration-200 cursor-pointer`}
+            className={`border-l-4 border-[#F7374F] mt-5 shadow-zinc-500 rounded-md p-3 bg-gradient-to-tl from-[rgba(247,55,79,0.1)] shadow-md hover:-translate-y-1 transition-all ease-in-out duration-200 cursor-pointer`}
           >
-            <p className={`flex items-center gap-3 text-[#456882]`}>
+            <p className={`flex items-center gap-3 text-[#F7374F]`}>
               <FaFileInvoice />
               Paid
             </p>
@@ -143,9 +143,9 @@ const DashboardPurchasesPage = () => {
 
           {/* UNPAID */}
           <div
-            className={`border border-[#456882] shadow-zinc-500 mt-5 rounded-md p-3  shadow-md hover:-translate-y-1 transition-all ease-in-out duration-200 cursor-pointer`}
+            className={`border-l-4 border-[#255F38] shadow-zinc-500 mt-5 rounded-md p-3 bg-gradient-to-tl from-[rgba(37,95,56,0.1)] shadow-md hover:-translate-y-1 transition-all ease-in-out duration-200 cursor-pointer`}
           >
-            <p className={`flex items-center gap-3 text-[#456882]`}>
+            <p className={`flex items-center gap-3 text-[#255F38]`}>
               <FaFileInvoice />
               Unpaid
             </p>

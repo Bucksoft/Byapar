@@ -185,7 +185,7 @@ const Sidebar = () => {
                 ${
                   isActive
                     ? "bg-[var(--primary-btn)]/10 text-[var(--primary-btn)]  scale-105"
-                    : "hover:text-[var(--primary-btn)] "
+                    : "hover:text-[var(--primary-btn)]"
                 }`
                       }
                     >

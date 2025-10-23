@@ -206,7 +206,8 @@ const DashboardSalesReturnPage = () => {
                               </li> */}
                           <li>
                             <a
-                              onClick={() => {
+                              onClick={(e) => {
+                                e.stopPropagation();
                                 document
                                   .getElementById("my_modal_2")
                                   .showModal();

@@ -43,7 +43,7 @@ const DashboardUpdateInvoicesPage = () => {
         endpoint = `/purchase-return/return/${id}`;
         break;
       case "sale return":
-        endpoint = `/sale-return/return/${id}`;
+        endpoint = `/sales-return/return/${id}`;
         break;
       default:
         break;

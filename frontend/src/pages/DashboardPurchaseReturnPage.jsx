@@ -171,7 +171,13 @@ const DashboardPurchaseReturnPage = () => {
                       </div>
                     </td>
                     <td>
-                      <div className="badge badge-sm badge-secondary badge-soft">
+                      <div
+                        className={` ${
+                          purchaseReturn?.status === "cancelled"
+                            ? "badge-error"
+                            : "badge-primary"
+                        }  badge badge-sm  badge-soft`}
+                      >
                         {purchaseReturn?.status}
                       </div>
                     </td>
