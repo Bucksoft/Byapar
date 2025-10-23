@@ -36,6 +36,12 @@ const DashboardUpdateInvoicesPage = () => {
       case "proforma invoice":
         endpoint = `/proforma-invoice/invoice/${id}`;
         break;
+      case "purchase invoice":
+        endpoint = `/purchase-invoice/invoice/${id}`;
+        break;
+      case "purchase return":
+        endpoint = `/purchase-return/return/${id}`;
+        break;
       default:
         break;
     }
@@ -57,6 +63,10 @@ const DashboardUpdateInvoicesPage = () => {
         setInvoiceToUpdate(res?.data?.deliveryChallan);
       } else if (res?.data?.proformaInvoice) {
         setInvoiceToUpdate(res?.data?.proformaInvoice);
+      } else if (res?.data?.purchaseInvoice) {
+        setInvoiceToUpdate(res?.data?.purchaseInvoice);
+      } else if (res?.data?.purchaseReturn) {
+        setInvoiceToUpdate(res?.data?.purchaseReturn);
       }
     },
   });
@@ -71,7 +81,7 @@ const DashboardUpdateInvoicesPage = () => {
 
   return (
     <main className="max-h-screen flex w-full overflow-auto">
-      <section className=" w-full bg-gray-100  h-screen p-2">
+      <section className="w-full h-screen p-2">
         <div className=" border border-zinc-300 h-full rounded-md bg-white overflow-auto ">
           <InvoicesForm
             title={

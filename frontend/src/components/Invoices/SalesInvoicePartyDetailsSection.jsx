@@ -89,7 +89,7 @@ const SalesInvoicePartyDetailsSection = ({
   // this use effect fetches all the invoices of the selected party
   useEffect(() => {
     if (title === "Sales Return" || title === "Credit Note") {
-      const selectedPartyInvoices = invoices?.invoices.filter(
+      const selectedPartyInvoices = invoices?.invoices?.filter(
         (invoice) => invoice?.partyName === party?.partyName
       );
       setPartyInvoices(selectedPartyInvoices);

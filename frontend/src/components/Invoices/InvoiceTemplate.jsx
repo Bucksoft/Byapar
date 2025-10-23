@@ -234,6 +234,8 @@ const InvoiceTemplate = ({
                 ? "Purchase Order"
                 : type === "Debit Note"
                 ? "Debit Note"
+                : type === "Purchase Return"
+                ? "Purchase Return "
                 : ""}
             </h1>
             {/* NUMBER */}
@@ -265,6 +267,8 @@ const InvoiceTemplate = ({
                   ? "Purchase Order No."
                   : type === "Debit Note"
                   ? "Debit Note No."
+                  : type === "Purchase Return"
+                  ? "Purchase Return No."
                   : ""}
               </p>
               <span>
@@ -286,6 +290,8 @@ const InvoiceTemplate = ({
                   ? invoice?.purchaseOrderNumber
                   : type === "Debit Note"
                   ? invoice?.debitNoteNumber
+                  : type === "Purchase Return"
+                  ? invoice?.purchaseReturnNumber
                   : ""}
               </span>
             </div>
@@ -319,6 +325,8 @@ const InvoiceTemplate = ({
                   ? "Purchase Order Date"
                   : type === "Debit Note"
                   ? "Debit Note Date"
+                  : type === "Purchase Return"
+                  ? "Purchase Return Date"
                   : ""}
               </p>
               <span>
@@ -340,6 +348,8 @@ const InvoiceTemplate = ({
                   ? invoice?.purchaseOrderDate?.split("T")[0]
                   : type === "Debit Note"
                   ? invoice?.debitNoteDate?.split("T")[0]
+                  : type === "Purchase Return"
+                  ? invoice?.purchaseReturnDate?.split("T")[0]
                   : ""}
               </span>
             </div>
@@ -380,6 +390,8 @@ const InvoiceTemplate = ({
                   ? invoice?.dueDate?.split("T")[0]
                   : type === "Purchase Order"
                   ? invoice?.validityDate?.split("T")[0]
+                  : type === "Purchase Return"
+                  ? invoice?.purchaseReturnDate?.split("T")[0]
                   : ""}
               </span>
             </div>

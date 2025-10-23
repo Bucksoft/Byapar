@@ -12,31 +12,30 @@ import { queryClient } from "../../main";
 import CustomLoader from "../Loader";
 import { handlePrint } from "../../../helpers/print";
 
-const PurchaseInvoice = () => {
+const PurchaseReturn = () => {
   const { id } = useParams();
   const navigate = useNavigate();
   const printRef = useRef();
-  const [isDownloading, setIsDownloading] = useState(false);
-  const [invoiceIdToDownload, setInvoiceIdToDownload] = useState();
+  const [invoiceIdToDownload, setInvoiceIdToDownload] = useState("invoice");
 
-  // THIS IS THE QUERY TO GET THE INVOICE BASED ON ID
+  // THIS IS THE QUERY TO GET THE DEBIT NOTE BASED ON ID
   const { isLoading, data: invoice } = useQuery({
+    queryKey: ["purchaseReturn", id],
     queryFn: async () => {
-      const res = await axiosInstance.get(`/purchase-invoice/invoice/${id}`);
-      return res.data?.invoice;
+      const res = await axiosInstance.get(`/purchase-return/return/${id}`);
+      return res.data?.purchaseReturn;
     },
   });
 
-  // THIS IS THE MUTATION TO DELETE THE INVOICE
+  // THIS IS THE MUTATION TO DELETE THE DEBIT NOTE
   const mutation = useMutation({
     mutationFn: async (invoiceId) => {
-      const res = await axiosInstance.delete(`/purchase-invoice/${invoiceId}`);
+      const res = await axiosInstance.delete(`/purchase-return/${invoiceId}`);
       return res.data;
     },
     onSuccess: (data) => {
       toast.success(data?.msg);
-      navigate("/dashboard/purchases");
-      queryClient.invalidateQueries({ queryKey: ["purchaseInvoice"] });
+      queryClient.invalidateQueries({ queryKey: ["purchaseReturn"] });
       document.getElementById("my_modal_3").close();
     },
   });
@@ -48,7 +47,7 @@ const PurchaseInvoice = () => {
         <header className="flex items-center justify-between">
           <div className="flex items-center gap-3">
             <ArrowLeft onClick={() => navigate(-1)} />
-            <h1 className="font-medium">Purchase Invoice</h1>
+            <h1 className="font-medium">Purchase Return</h1>
             <div className="badge badge-success badge-soft">
               {invoice?.status}
             </div>
@@ -65,28 +64,12 @@ const PurchaseInvoice = () => {
               <Printer size={15} /> Print PDF
             </button>
             <button
-              disabled={mutation.isPending}
               onClick={() =>
-                downloadPDF(
-                  invoiceIdToDownload,
-                  `${invoice?.partyName
-                    ?.split(" ")
-                    .join("_")
-                    .concat("_invoice")}`,
-                  setIsDownloading
-                )
+                downloadPDF(invoiceIdToDownload, "Purchase Return")
               }
               className="btn btn-sm"
             >
-              {isDownloading ? (
-                <div className="">
-                  <CustomLoader text={"Downloading..."} />
-                </div>
-              ) : (
-                <>
-                  <Download size={15} /> Download PDF
-                </>
-              )}
+              <Download size={15} /> Download PDF
             </button>
             <div className="dropdown dropdown-end">
               <div tabIndex={0} role="button" className="btn btn-sm">
@@ -100,7 +83,7 @@ const PurchaseInvoice = () => {
                   <button
                     onClick={() =>
                       navigate(
-                        `/dashboard/update/${invoice?._id}?type=purchase invoice`
+                        `/dashboard/update/${invoice?._id}?type=purchase return`
                       )
                     }
                   >
@@ -161,14 +144,16 @@ const PurchaseInvoice = () => {
         </section>
 
         {isLoading ? (
-          <CustomLoader text={"Loading..."} />
+          <div className="w-full flex items-center justify-center py-16">
+            <CustomLoader text={"Loading..."} />
+          </div>
         ) : (
           <section className="mt-3 bg-sky-50 flex justify-center py-1 overflow-y-scroll flex-1">
             {/* Invoice template */}
             <InvoiceTemplate
-              color={"#48B3AF"}
+              color={"#1E93AB"}
               invoice={invoice}
-              type={"Purchase Invoice"}
+              type={"Purchase Return"}
               setInvoiceIdToDownload={setInvoiceIdToDownload}
             />
           </section>
@@ -200,4 +185,4 @@ const PurchaseInvoice = () => {
   );
 };
 
-export default PurchaseInvoice;
+export default PurchaseReturn;

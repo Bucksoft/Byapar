@@ -16,6 +16,7 @@ const PartyLedgerStatement = ({
   paymentIns,
   salesReturns,
   creditNotes,
+  purchaseReturns,
 }) => {
   const { business } = useBusinessStore();
   const [isDownloading, setIsDownloading] = useState(false);
@@ -101,6 +102,26 @@ const PartyLedgerStatement = ({
           date: sr?.salesReturnDate || new Date(),
           voucher: sr?.type || "Sales Return",
           srNo: sr?.salesReturnNumber ?? "-",
+          debit: 0,
+          credit: Number(sr?.totalAmount) || 0,
+          tdsDeductedByParty: Number(sr?.tdsDeductedByParty) || 0,
+          tdsDeductedBySelf: Number(sr?.tdsDeductedBySelf) || 0,
+        });
+      });
+
+    // PURCHASE RETURNS
+    Array.isArray(purchaseReturns) &&
+      purchaseReturns.forEach((sr) => {
+        const srPartyId =
+          sr?.partyId && typeof sr.partyId === "object"
+            ? sr.partyId._id
+            : sr?.partyId;
+        if (!srPartyId || srPartyId !== party._id) return;
+
+        allEntries.push({
+          date: sr?.purchaseReturnDate || new Date(),
+          voucher: sr?.type || "Purchase Return",
+          srNo: sr?.purchaseReturnNumber ?? "-",
           debit: 0,
           credit: Number(sr?.totalAmount) || 0,
           tdsDeductedByParty: Number(sr?.tdsDeductedByParty) || 0,

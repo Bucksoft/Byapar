@@ -76,6 +76,7 @@ import CreditNote from "./components/Invoices/CreditNote";
 import PreviewExcel from "./components/PreviewExcel";
 import PurchaseOrder from "./components/Invoices/PurchaseOrder";
 import DebitNote from "./components/Invoices/DebitNote";
+import PurchaseReturn from "./components/Invoices/PurchaseReturn";
 
 function App() {
   const { user } = useAuthStore();
@@ -196,6 +197,11 @@ function App() {
           <Route
             path="/dashboard/purchase-return"
             element={<DashboardPurchaseReturnPage />}
+          />
+
+          <Route
+            path="/dashboard/purchase-return/:id"
+            element={<PurchaseReturn />}
           />
 
           <Route

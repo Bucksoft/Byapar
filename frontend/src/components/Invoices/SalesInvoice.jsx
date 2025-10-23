@@ -1,6 +1,4 @@
 import { ArrowLeft, Download, EllipsisVertical, Printer } from "lucide-react";
-import { GiProfit } from "react-icons/gi";
-import { TbFileInvoice } from "react-icons/tb";
 import { useNavigate, useParams } from "react-router-dom";
 import InvoiceTemplate from "./InvoiceTemplate";
 import { useMutation, useQuery } from "@tanstack/react-query";

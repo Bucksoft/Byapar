@@ -110,6 +110,18 @@ const DashboardPartyPage = () => {
     enabled: Boolean(id && business?._id),
   });
 
+  // FETCHING ALL THE PURCHASE RETURN OF A PARTICULAR PARTY
+  const { data: purchaseReturns = [] } = useQuery({
+    queryKey: ["purchaseReturn", id, business?._id],
+    queryFn: async () => {
+      const res = await axiosInstance.get(
+        `/purchase-return/party/${id}?businessId=${business?._id}`
+      );
+      return res.data?.purchaseReturns || [];
+    },
+    enabled: Boolean(id && business?._id),
+  });
+
   const handleSelectChange = (e) => {
     const value = e?.target?.value;
     if (!value) return;
@@ -229,6 +241,7 @@ const DashboardPartyPage = () => {
             partyQuotations={quotations}
             partySalesReturns={salesReturns}
             partyCreditNotes={creditNotes}
+            partyPurchaseReturns={purchaseReturns}
             filter={filter}
           />
         )}
@@ -242,6 +255,7 @@ const DashboardPartyPage = () => {
             paymentIns={paymentIns}
             salesReturns={salesReturns}
             creditNotes={creditNotes}
+            purchaseReturns={purchaseReturns}
             party={party ?? null}
             filter={filter}
           />

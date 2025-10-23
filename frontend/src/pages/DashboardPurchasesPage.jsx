@@ -17,6 +17,7 @@ import { BsTrash3 } from "react-icons/bs";
 import { BiDuplicate } from "react-icons/bi";
 import { MdOutlineHistory } from "react-icons/md";
 import { FaRegEdit } from "react-icons/fa";
+import { useMemo } from "react";
 
 const DashboardPurchasesPage = () => {
   const { business } = useBusinessStore();
@@ -36,10 +37,19 @@ const DashboardPurchasesPage = () => {
       const res = await axiosInstance.delete(`/purchase-invoice/${invoiceId}`);
       return res.data;
     },
-    onSuccess: (data) => {
+    onSuccess: async (data) => {
       toast.success(data?.msg);
-      queryClient.invalidateQueries({ queryKey: ["purchaseInvoice"] });
-      document.getElementById("my_modal_2").close();
+
+      await queryClient.invalidateQueries({ queryKey: ["purchaseInvoice"] });
+
+      setTimeout(() => {
+        const modal = document.getElementById("delete_modal");
+        modal?.close();
+        setInvoiceId(null);
+      }, 150);
+    },
+    onError: (err) => {
+      toast.error("Failed to delete invoice");
     },
   });
 
@@ -52,21 +62,29 @@ const DashboardPurchasesPage = () => {
       setTotalPurchaseInvoices(res.data?.totalPurchaseInvoices);
       return res.data?.purchaseInvoices;
     },
+    enabled: !!business?._id,
+    staleTime: 0,
+    cacheTime: 0,
   });
 
   // FILTERING INVOICE BASED ON SEARCH QUERY
-  const filteredInvoices = purchaseInvoices?.filter((invoice) => {
+  const filteredInvoices = useMemo(() => {
     const query = searchQuery.toLowerCase();
-
     return (
-      invoice?.purchaseInvoiceNumber
-        ?.toString()
-        .toLowerCase()
-        .includes(query) ||
-      invoice?.partyName?.toLowerCase().includes(query) ||
-      invoice?.totalAmount?.toString().toLowerCase().includes(query)
+      purchaseInvoices?.filter((invoice) =>
+        [
+          invoice?.purchaseInvoiceNumber,
+          invoice?.partyName,
+          invoice?.totalAmount,
+        ].some((field) => field?.toString()?.toLowerCase()?.includes(query))
+      ) || []
     );
-  });
+  }, [searchQuery, purchaseInvoices]);
+
+  const handleDelete = (id) => {
+    setInvoiceId(id);
+    mutation.mutate(id);
+  };
 
   return (
     <main className="h-full p-2">
@@ -174,32 +192,6 @@ const DashboardPurchasesPage = () => {
                 placeholder="Search"
               />
             </label>
-            <div className="dropdown dropdown-center dropdown-sm">
-              <div
-                tabIndex={0}
-                role="button"
-                className="btn m-1 btn-sm btn-wide bg-[var(--primary-btn)] text-nowrap"
-              >
-                <Calendar size={14} /> Last 365 days
-              </div>
-              <ul
-                tabIndex={0}
-                className="dropdown-content menu bg-base-100 rounded-box z-1 w-52 p-2 shadow-sm"
-              >
-                <li>
-                  <a>Today</a>
-                </li>
-                <li>
-                  <a>Yesterday</a>
-                </li>
-                <li>
-                  <a>This week</a>
-                </li>
-                <li>
-                  <a>Last week</a>
-                </li>
-              </ul>
-            </div>
           </div>
 
           <Link to={"/dashboard/purchase-invoice"}>
@@ -262,7 +254,7 @@ const DashboardPurchasesPage = () => {
                         <td>{"-"}</td>
                         <td>
                           <div className="flex items-center ">
-                            <LiaRupeeSignSolid size={12}/>
+                            <LiaRupeeSignSolid size={12} />
                             {Number(invoice?.totalAmount).toLocaleString(
                               "en-IN"
                             )}
@@ -300,7 +292,7 @@ const DashboardPurchasesPage = () => {
                                 <button
                                   onClick={() =>
                                     navigate(
-                                      `/dashboard/update/${invoice?._id}?type=sales invoice`
+                                      `/dashboard/update/${invoice?._id}?type=purchase invoice`
                                     )
                                   }
                                   className="flex items-center gap-2"
@@ -312,7 +304,7 @@ const DashboardPurchasesPage = () => {
                                 <a
                                   onClick={() => {
                                     document
-                                      .getElementById("my_modal_2")
+                                      .getElementById("delete_modal")
                                       .showModal();
                                     setInvoiceId(invoice?._id);
                                   }}
@@ -359,7 +351,7 @@ const DashboardPurchasesPage = () => {
       </div>
       {!showDeletePopup && (
         <>
-          <dialog id="my_modal_2" className="modal">
+          <dialog id="delete_modal" className="modal">
             <div className="modal-box">
               <h3 className="font-bold text-lg">Confirm Deletion</h3>
               <p className="py-4 text-sm">
@@ -368,7 +360,7 @@ const DashboardPurchasesPage = () => {
               </p>
               <div className="flex w-full">
                 <button
-                  onClick={() => mutation.mutate()}
+                  onClick={() => mutation.mutate(invoiceId)}
                   className="btn btn-sm btn-ghost  ml-auto text-[var(--error-text-color)]"
                 >
                   Delete

@@ -12,6 +12,7 @@ const PartyTransactions = ({
   partyQuotations: quotations,
   partySalesReturns: salesReturns,
   partyCreditNotes: creditNotes,
+  partyPurchaseReturns: purchaseReturns,
 }) => {
   const [transactions, setTransactions] = useState([]);
 
@@ -24,6 +25,7 @@ const PartyTransactions = ({
     const rawPaymentInList = safeArray(paymentIns);
     const salesReturnList = safeArray(salesReturns);
     const creditNotesList = safeArray(creditNotes);
+    const purchaseReturnList = safeArray(purchaseReturns);
 
     const partyInvoicesList = invoiceList
       .filter((inv) => inv.partyName === party?.partyName)
@@ -49,6 +51,10 @@ const PartyTransactions = ({
       .filter((p) => p?.partyName === party?.partyName)
       .map((p) => ({ ...p, type: "credit note" }));
 
+    const partyPurchaseReturnList = purchaseReturnList
+      .filter((p) => p?.partyName === party?.partyName)
+      .map((p) => ({ ...p, type: "credit note" }));
+
     setTransactions([
       ...partyInvoicesList,
       ...partyPaymentIns,
@@ -56,6 +62,7 @@ const PartyTransactions = ({
       ...partyPurchaseInvoiceList,
       ...partySalesReturnList,
       ...partyCreditNotesList,
+      ...partyPurchaseReturnList,
     ]);
   }, [
     invoices,
@@ -65,6 +72,7 @@ const PartyTransactions = ({
     party,
     salesReturns,
     creditNotes,
+    purchaseReturns,
   ]);
 
   const filteredTransactions =

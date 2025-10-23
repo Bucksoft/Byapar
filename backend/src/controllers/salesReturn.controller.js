@@ -164,7 +164,8 @@ export async function getAllSalesReturn(req, res) {
     return res.status(200).json({
       success: true,
       salesReturn,
-      totalSalesReturn: latestSalesReturn?.salesReturnNumber,
+      totalSalesReturn: salesReturn.length,
+      latestSalesReturnNumber: latestSalesReturn?.salesReturnNumber,
     });
   } catch (error) {
     console.log("ERROR IN CREATING SALES RETURN");
@@ -180,12 +181,14 @@ export async function deleteSaleReturn(req, res) {
         .status(400)
         .json({ success: false, msg: "Please provide sales return id" });
     }
-    const deletedSalesReturn = await SalesReturn.findByIdAndDelete(id);
+    const deletedSalesReturn = await SalesReturn.findById(id);
     if (!deletedSalesReturn) {
       return res
         .status(400)
         .json({ status: false, msg: "Failed to delete sales return" });
     }
+    deletedSalesReturn.status = "cancelled";
+    await deletedSalesReturn.save();
     return res.status(200).json({ success: true, msg: "Deleted Sales Return" });
   } catch (error) {
     console.log("ERROR IN DELETING SALES RETURN");
