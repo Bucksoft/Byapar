@@ -4,12 +4,14 @@ import {
   createSalesReturn,
   deleteSaleReturn,
   getAllSalesReturn,
+  getAllSalesReturnsOfAParty,
   getSaleReturnById,
 } from "../controllers/salesReturn.controller.js";
 
 const router = express.Router();
 
 router.route("/return/:id").get(isAuth, getSaleReturnById);
+router.route("/party/:id").get(isAuth, getAllSalesReturnsOfAParty);
 router.route("/:id").post(isAuth, createSalesReturn);
 router.route("/:id").get(isAuth, getAllSalesReturn);
 router.route("/:id").delete(isAuth, deleteSaleReturn);

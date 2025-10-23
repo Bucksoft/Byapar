@@ -214,3 +214,20 @@ export async function getSaleReturnById(req, res) {
     return res.status(500).json({ err: "Internal server error", error });
   }
 }
+
+export async function getAllSalesReturnsOfAParty(req, res) {
+  try {
+    const businessId = req.query?.businessId;
+    const id = req.params.id;
+    if (!id) {
+      return res.status(400).json({ msg: "Please provide a valid party id" });
+    }
+    const salesReturns = await SalesReturn.find({
+      partyId: id,
+      businessId,
+    });
+    return res.status(200).json({ success: true, salesReturns });
+  } catch (error) {
+    return res.status(500).json({ msg: "Internal Server Error" });
+  }
+}

@@ -154,3 +154,20 @@ export async function updateQuotation(req, res) {
       .json({ success: false, msg: "Internal Server error" });
   }
 }
+
+export async function getAllQuotationsOfAParty(req, res) {
+  try {
+    const businessId = req.query?.businessId;
+    const id = req.params.id;
+    if (!id) {
+      return res.status(400).json({ msg: "Please provide a valid party id" });
+    }
+    const quotations = await Quotation.find({
+      partyId: id,
+      businessId,
+    });
+    return res.status(200).json({ success: true, quotations });
+  } catch (error) {
+    return res.status(500).json({ msg: "Internal Server Error" });
+  }
+}

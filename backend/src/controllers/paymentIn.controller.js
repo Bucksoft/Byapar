@@ -298,3 +298,20 @@ export async function updatePaymentIn(req, res) {
       .json({ success: false, msg: "Internal Server Error" });
   }
 }
+
+export async function getAllPaymentInsForAParty(req, res) {
+  try {
+    const businessId = req.query?.businessId;
+    const id = req.params.id;
+    if (!id) {
+      return res.status(400).json({ msg: "Please provide a valid party id" });
+    }
+    const paymentIns = await PaymentIn.find({
+      partyId: id,
+      businessId,
+    });
+    return res.status(200).json({ success: true, paymentIns });
+  } catch (error) {
+    return res.status(500).json({ msg: "Internal Server Error" });
+  }
+}

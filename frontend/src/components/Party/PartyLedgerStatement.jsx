@@ -1,40 +1,30 @@
-import {
-  ChevronDown,
-  Download,
-  MessageSquare,
-  Printer,
-  Share,
-} from "lucide-react";
+import { Download, MessageSquare, Printer } from "lucide-react";
 import { BsWhatsapp } from "react-icons/bs";
 import { useBusinessStore } from "../../store/businessStore";
 import { DayPicker } from "react-day-picker";
-import { useEffect, useMemo, useState } from "react";
-import { useSalesReturnStore } from "../../store/salesReturnStore";
-import { usePaymentInStore } from "../../store/paymentInStore";
-import { useInvoiceStore } from "../../store/invoicesStore";
-import { useCreditNoteStore } from "../../store/creditNoteStore";
+import { useMemo, useState } from "react";
 import { LuIndianRupee } from "react-icons/lu";
 import { downloadPDF } from "../../../helpers/downloadPdf";
 import CustomLoader from "../Loader";
 import { handlePrint } from "../../../helpers/print";
 import { useRef } from "react";
 
-const PartyLedgerStatement = ({ party }) => {
+const PartyLedgerStatement = ({
+  party,
+  invoices,
+  purchaseInvoices,
+  paymentIns,
+  salesReturns,
+  creditNotes,
+}) => {
   const { business } = useBusinessStore();
   const [isDownloading, setIsDownloading] = useState(false);
   const [openDatePicker, setOpenDatePicker] = useState(false);
   const [dateRange, setDateRange] = useState({
-    from: new Date(),
-    to: new Date(new Date().getTime() + 24 * 60 * 60 * 1000),
+    from: new Date(new Date().setDate(new Date().getDate() - 1)),
+    to: new Date(),
   });
   const printRef = useRef();
-
-  // GET ALL THE INVOICES HERE
-  const { saleReturns } = useSalesReturnStore();
-  const { paymentIns } = usePaymentInStore();
-  const { invoices } = useInvoiceStore();
-  const { creditNotes } = useCreditNoteStore();
-
   const ledgerEntries = useMemo(() => {
     if (!party) return [];
 
@@ -61,6 +51,27 @@ const PartyLedgerStatement = ({ party }) => {
         });
       });
 
+    // purchase invoices
+    Array.isArray(purchaseInvoices) &&
+      purchaseInvoices.forEach((invoice) => {
+        const invoicePartyId =
+          invoice?.partyId && typeof invoice.partyId === "object"
+            ? invoice.partyId._id
+            : invoice?.partyId;
+
+        if (!invoicePartyId || invoicePartyId !== party._id) return;
+
+        allEntries.push({
+          date: invoice?.purchaseInvoiceDate || new Date(),
+          voucher: invoice?.type || "Purchase Invoice",
+          srNo: invoice?.purchaseInvoiceNumber ?? "-",
+          credit: Number(invoice?.totalAmount) || 0,
+          debit: 0,
+          tdsDeductedByParty: Number(invoice?.tdsDeductedByParty) || 0,
+          tdsDeductedBySelf: Number(invoice?.tdsDeductedBySelf) || 0,
+        });
+      });
+
     // --- PAYMENT INS ---
     Array.isArray(paymentIns) &&
       paymentIns.forEach((paymentIn) => {
@@ -78,8 +89,8 @@ const PartyLedgerStatement = ({ party }) => {
       });
 
     // --- SALE RETURNS ---
-    Array.isArray(saleReturns) &&
-      saleReturns.forEach((sr) => {
+    Array.isArray(salesReturns) &&
+      salesReturns.forEach((sr) => {
         const srPartyId =
           sr?.partyId && typeof sr.partyId === "object"
             ? sr.partyId._id
@@ -119,7 +130,7 @@ const PartyLedgerStatement = ({ party }) => {
 
     // Sort entries by date ascending
     return allEntries.sort((a, b) => new Date(a.date) - new Date(b.date));
-  }, [invoices, paymentIns, saleReturns, creditNotes, party]);
+  }, [invoices, paymentIns, salesReturns, creditNotes, party]);
 
   const ledgerWithBalance = useMemo(() => {
     let runningBalance =
@@ -146,7 +157,11 @@ const PartyLedgerStatement = ({ party }) => {
   }, [ledgerWithBalance, party]);
 
   const filteredEntries = useMemo(() => {
+    if (!dateRange) return ledgerWithBalance;
+
     const from = new Date(dateRange.from);
+    from.setHours(0, 0, 0, 0);
+
     const to = new Date(dateRange.to);
     to.setHours(23, 59, 59, 999);
 

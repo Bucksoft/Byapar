@@ -393,8 +393,8 @@ export const salesInvoiceSchema = z.object({
   notes: z.string().optional(),
   termsAndCondition: z.string().optional(),
   taxableAmount: z.number().optional(),
-  sgst: z.string().optional(),
-  cgst: z.string().optional(),
+  sgst: z.number().optional(),
+  cgst: z.number().optional(),
   totalAmount: z.number().min(0, "Total amount is required"),
   balanceAmount: z.number().min(0, "Balance amount is required"),
 });

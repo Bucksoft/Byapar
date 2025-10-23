@@ -3,16 +3,19 @@ import { salesInvoiceSchema } from "../config/validation.js";
 import { Item } from "../models/item.schema.js";
 import Party from "../models/party.schema.js";
 import PurchaseInvoice from "../models/purchaseInvoice.schema.js";
+import { getFinancialYearRange } from "../utils/financialYear.js";
 
 // Route    POST   /api/v1/purchase-invoice/:businessId
 // Desc     CREATE PURCHASE INVOICE
 // access   PRIVATE
+
 export async function createPurchaseInvoice(req, res) {
   const session = await mongoose.startSession();
   session.startTransaction();
 
   try {
     const data = req.body;
+    const partyId = data?.partyId;
 
     const validatedResult = salesInvoiceSchema.safeParse(data);
     if (!validatedResult.success) {
@@ -32,7 +35,15 @@ export async function createPurchaseInvoice(req, res) {
       ...rest
     } = validatedResult.data;
     const items = req.body?.items;
-    const party = await Party.findOne({ partyName }).session(session);
+
+    const party = await Party.findOne({
+      partyName: data?.partyName,
+      _id: partyId,
+      businessId: req.params?.id,
+    }).session(session);
+
+    console.log(party);
+
     if (!party) {
       await session.abortTransaction();
       session.endSession();
@@ -43,17 +54,9 @@ export async function createPurchaseInvoice(req, res) {
     }
 
     const existingPurchaseInvoice = await PurchaseInvoice.findOne({
+      businessId: req.params.id,
       salesInvoiceNumber,
     }).session(session);
-
-    if (existingPurchaseInvoice) {
-      await session.abortTransaction();
-      session.endSession();
-      return res.status(400).json({
-        success: false,
-        msg: "Invoice already exists with this number",
-      });
-    }
 
     for (const purchaseItem of items) {
       const item = await Item.findById(purchaseItem?._id).session(session);
@@ -85,7 +88,9 @@ export async function createPurchaseInvoice(req, res) {
     const purchaseInvoice = await PurchaseInvoice.create(
       [
         {
-          purchaseInvoiceNumber: salesInvoiceNumber,
+          purchaseInvoiceNumber: existingPurchaseInvoice
+            ? existingPurchaseInvoice.purchaseInvoiceNumber + 1
+            : salesInvoiceNumber,
           purchaseInvoiceDate: salesInvoiceDate,
           partyId: party._id,
           partyName: party.partyName,
@@ -144,16 +149,64 @@ export async function getAllPurchaseInvoice(req, res) {
       $and: [{ businessId: req.params?.id, clientId: req.user?.id }],
     })
       .populate("partyId")
-      .sort("purchaseInvoiceDate");
-    const totalPurchaseInvoices = await PurchaseInvoice.countDocuments({});
+      .sort({ purchaseInvoiceDate: -1 });
+
     if (!purchaseInvoices) {
       return res
         .status(400)
         .json({ success: false, msg: "Invoices not found" });
     }
-    return res
-      .status(200)
-      .json({ success: true, purchaseInvoices, totalPurchaseInvoices });
+
+    const latestPurchaseInvoice = await PurchaseInvoice.findOne({
+      businessId: req.params.id,
+    })
+      .sort({ purchaseInvoiceNumber: -1 })
+      .limit(1);
+
+    const validInvoices =
+      purchaseInvoices?.filter(
+        (invoice) => invoice?.status?.toLowerCase() !== "cancelled"
+      ) || [];
+
+    const { start, end } = getFinancialYearRange();
+
+    const invoicesInFY = validInvoices.filter((invoice) => {
+      const validDate = new Date(invoice?.purchaseInvoiceDate);
+      return validDate >= start && validDate <= end;
+    });
+
+    const totalPurchases = Number(
+      invoicesInFY
+        .reduce((acc, invoice) => acc + Number(invoice?.totalAmount || 0), 0)
+        .toFixed(2)
+    ).toLocaleString("en-IN");
+
+    const totalPaid = Number(
+      invoicesInFY.reduce(
+        (sum, invoice) => sum + (invoice.settledAmount || 0),
+        0
+      )
+    ).toLocaleString("en-IN");
+
+    const totalUnpaid = Number(
+      invoicesInFY.reduce(
+        (sum, invoice) =>
+          sum +
+          (invoice.pendingAmount ??
+            invoice.totalAmount - (invoice.settledAmount || 0)),
+        0
+      )
+    ).toLocaleString("en-IN");
+
+    return res.status(200).json({
+      success: true,
+      purchaseInvoices,
+      totalPurchaseInvoices: validInvoices.length,
+      latestPurchaseInvoiceNumber: latestPurchaseInvoice?.purchaseInvoiceNumber,
+      totalPurchases,
+      totalPaid,
+      totalUnpaid,
+    });
   } catch (error) {
     console.log("ERROR IN GETTING  PURCHASE INVOICE ");
     return res.status(500).json({ err: "Internal server error", error });
@@ -255,5 +308,25 @@ export async function getPurchaseInvoiceById(req, res) {
     return res
       .status(500)
       .json({ success: false, msg: "Internal server error" });
+  }
+}
+
+// Route    GET   /api/v1/purchase-invoice/party/:id
+// Desc     GET PURCHASE INVOICE OF A PARTY BY ID
+// access   PRIVATE
+export async function getAllPurchaseInvoiceForAParty(req, res) {
+  try {
+    const businessId = req.query?.businessId;
+    const id = req.params.id;
+    if (!id) {
+      return res.status(400).json({ msg: "Please provide a valid party id" });
+    }
+    const purchaseInvoices = await PurchaseInvoice.find({
+      partyId: id,
+      businessId,
+    });
+    return res.status(200).json({ success: true, purchaseInvoices });
+  } catch (error) {
+    return res.status(500).json({ msg: "Internal Server Error" });
   }
 }

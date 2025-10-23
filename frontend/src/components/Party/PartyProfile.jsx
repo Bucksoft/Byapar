@@ -33,9 +33,14 @@ const PartyProfile = ({ party }) => {
           <div>
             <label className="text-zinc-500">Opening Balance</label>
             <p className="mt-1 flex items-center">
-              {" "}
-              <LiaRupeeSignSolid />
-              {party?.openingBalance || "-"}
+              {party?.openingBalance ? (
+                <>
+                  <LiaRupeeSignSolid />
+                  {party?.openingBalance}
+                </>
+              ) : (
+                <>-</>
+              )}
             </p>
           </div>
         </div>
@@ -83,8 +88,14 @@ const PartyProfile = ({ party }) => {
           <div>
             <label className="text-zinc-500">Credit Limit</label>
             <p className="mt-1 flex items-center">
-              <LiaRupeeSignSolid />
-              {party?.creditLimit || "-"}
+              {party?.creditLimit ? (
+                <>
+                  <LiaRupeeSignSolid />
+                  {party?.creditLimit}
+                </>
+              ) : (
+                <>-</>
+              )}
             </p>
           </div>
         </div>

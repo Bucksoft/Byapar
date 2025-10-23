@@ -209,7 +209,7 @@ const DashboardPurchasesPage = () => {
           </Link>
         </motion.div>
 
-        <div className="mt-8 overflow-x-auto  border border-base-content/5 bg-base-100">
+        <div className="mt-8 h-[460px] overflow-x-auto  border border-base-content/15 bg-base-100 overflow-y-auto">
           {isLoading ? (
             <div className="w-full flex justify-center py-16">
               <CustomLoader text={"Loading..."} />
@@ -230,7 +230,7 @@ const DashboardPurchasesPage = () => {
                   duration: 0.2,
                   delay: 0.3,
                 }}
-                className="table table-zebra border border-[var(--table-border)] "
+                className="table table-zebra  "
               >
                 {/* head */}
                 <thead>
@@ -261,8 +261,8 @@ const DashboardPurchasesPage = () => {
                         <td>{invoice?.partyId?.partyName}</td>
                         <td>{"-"}</td>
                         <td>
-                          <div className="flex items-center">
-                            <LiaRupeeSignSolid />
+                          <div className="flex items-center ">
+                            <LiaRupeeSignSolid size={12}/>
                             {Number(invoice?.totalAmount).toLocaleString(
                               "en-IN"
                             )}

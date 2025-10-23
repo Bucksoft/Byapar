@@ -19,7 +19,6 @@ const DashboardPartyPage = () => {
   const { invoices } = useInvoiceStore();
   const [selectedMenu, setSelectedMenu] = useState("transactions");
   // const { invoices } = useInvoiceStore();
-  const [partyInvoices, setPartyInvoices] = useState([]);
   const { business } = useBusinessStore();
   const [filter, setFilter] = useState("all_transactions");
 
@@ -37,38 +36,79 @@ const DashboardPartyPage = () => {
     },
     enabled: Boolean(id),
     retry: 1,
-    // staleTime: 1000 * 60 * 5,
   });
 
-  const { data } = useQuery({
-    queryKey: ["invoices"],
+  // FETCHING ALL INVOICES OF A PARTICULAR PARTY
+  const { data: partyInvoices = [] } = useQuery({
+    queryKey: ["invoices", id, business?._id],
     queryFn: async () => {
       const res = await axiosInstance.get(
         `/sales-invoice/party/${id}?businessId=${business?._id}`
       );
-      setPartyInvoices(res.data?.invoices);
       return res.data?.invoices || [];
     },
+    enabled: Boolean(id && business?._id),
   });
 
-  // FILTER OUT THE INVOICES OF THE PARTY
-  // useEffect(() => {
-  //   if (!id) {
-  //     setPartyInvoices([]);
-  //     return;
-  //   }
-  //   const allInvoices = Array.isArray(invoices) ? invoices : [];
-  //   const filtered = allInvoices.filter((invoice) => {
-  //     const partyIdFromInvoice =
-  //       invoice?.partyId && typeof invoice.partyId === "object"
-  //         ? invoice?.partyId._id
-  //         : invoice?.partyId;
+  // FETCHING ALL THE PAYMENT IN OF A PARTICULAR PARTY
+  const { data: purchaseInvoices = [] } = useQuery({
+    queryKey: ["purchaseInvoice", id, business?._id],
+    queryFn: async () => {
+      const res = await axiosInstance.get(
+        `/purchase-invoice/party/${id}?businessId=${business?._id}`
+      );
+      return res.data?.purchaseInvoices || [];
+    },
+    enabled: Boolean(id && business?._id),
+  });
 
-  //     return String(partyIdFromInvoice) === String(id);
-  //   });
-  //   console.log(filtered);
-  //   setPartyInvoices(filtered);
-  // }, []);
+  // FETCHING ALL THE PAYMENT IN OF A PARTICULAR PARTY
+  const { data: paymentIns = [] } = useQuery({
+    queryKey: ["paymentIns", id, business?._id],
+    queryFn: async () => {
+      const res = await axiosInstance.get(
+        `/payment-in/party/${id}?businessId=${business?._id}`
+      );
+      return res.data?.paymentIns || [];
+    },
+    enabled: Boolean(id && business?._id),
+  });
+
+  // FETCHING ALL THE QUOTATIONS OF A PARTICULAR PARTY
+  const { data: quotations = [] } = useQuery({
+    queryKey: ["quotations", id, business?._id],
+    queryFn: async () => {
+      const res = await axiosInstance.get(
+        `/quotation/party/${id}?businessId=${business?._id}`
+      );
+      return res.data?.quotations || [];
+    },
+    enabled: Boolean(id && business?._id),
+  });
+
+  // FETCHING ALL THE SALES RETURN OF A PARTICULAR PARTY
+  const { data: salesReturns = [] } = useQuery({
+    queryKey: ["salesReturn", id, business?._id],
+    queryFn: async () => {
+      const res = await axiosInstance.get(
+        `/sales-return/party/${id}?businessId=${business?._id}`
+      );
+      return res.data?.salesReturns || [];
+    },
+    enabled: Boolean(id && business?._id),
+  });
+
+  // FETCHING ALL THE CREDIT NOTES OF A PARTICULAR PARTY
+  const { data: creditNotes = [] } = useQuery({
+    queryKey: ["creditNote", id, business?._id],
+    queryFn: async () => {
+      const res = await axiosInstance.get(
+        `/credit-note/party/${id}?businessId=${business?._id}`
+      );
+      return res.data?.creditNotes || [];
+    },
+    enabled: Boolean(id && business?._id),
+  });
 
   const handleSelectChange = (e) => {
     const value = e?.target?.value;
@@ -183,7 +223,12 @@ const DashboardPartyPage = () => {
         {selectedMenu === "transactions" && (
           <PartyTransactions
             party={party ?? null}
-            partyInvoices={Array.isArray(partyInvoices) ? partyInvoices : []}
+            partyInvoices={partyInvoices}
+            partyPurchaseInvoices={purchaseInvoices}
+            partyPaymentIns={paymentIns}
+            partyQuotations={quotations}
+            partySalesReturns={salesReturns}
+            partyCreditNotes={creditNotes}
             filter={filter}
           />
         )}
@@ -191,7 +236,15 @@ const DashboardPartyPage = () => {
         {selectedMenu === "profile" && <PartyProfile party={party ?? null} />}
 
         {selectedMenu === "ledger (statement)" && (
-          <PartyLedgerStatement party={party ?? null} filter={filter} />
+          <PartyLedgerStatement
+            invoices={partyInvoices}
+            purchaseInvoices={purchaseInvoices}
+            paymentIns={paymentIns}
+            salesReturns={salesReturns}
+            creditNotes={creditNotes}
+            party={party ?? null}
+            filter={filter}
+          />
         )}
 
         {selectedMenu === "item wise report" && (

@@ -1,28 +1,31 @@
 import { GrDocumentExcel } from "react-icons/gr";
 import { LiaRupeeSignSolid } from "react-icons/lia";
-import { useQuotationStore } from "../../store/quotationStore";
-import { usePaymentInStore } from "../../store/paymentInStore";
 import { useEffect } from "react";
 import { useState } from "react";
 
-const PartyTransactions = ({ party, filter, partyInvoices: invoices }) => {
-  const { quotations } = useQuotationStore();
-  const { paymentIns } = usePaymentInStore();
+const PartyTransactions = ({
+  party,
+  filter,
+  partyPurchaseInvoices,
+  partyInvoices: invoices,
+  partyPaymentIns: paymentIns,
+  partyQuotations: quotations,
+  partySalesReturns: salesReturns,
+  partyCreditNotes: creditNotes,
+}) => {
   const [transactions, setTransactions] = useState([]);
 
   useEffect(() => {
     const safeArray = (x) => (Array.isArray(x) ? x : []);
 
-    const rawPaymentList = Array.isArray(paymentIns)
-      ? paymentIns
-      : Array.isArray(paymentIns?.paymentIns)
-      ? paymentIns.paymentIns
-      : [];
-
     const invoiceList = safeArray(invoices);
     const quotationList = safeArray(quotations);
+    const purchaseInvoiceList = safeArray(partyPurchaseInvoices);
+    const rawPaymentInList = safeArray(paymentIns);
+    const salesReturnList = safeArray(salesReturns);
+    const creditNotesList = safeArray(creditNotes);
 
-    const partyInvoices = invoiceList
+    const partyInvoicesList = invoiceList
       .filter((inv) => inv.partyName === party?.partyName)
       .map((inv) => ({ ...inv, type: "sales invoice" }));
 
@@ -30,12 +33,39 @@ const PartyTransactions = ({ party, filter, partyInvoices: invoices }) => {
       .filter((q) => q?.partyName === party?.partyName)
       .map((q) => ({ ...q, type: "quotation" }));
 
-    const partyPaymentIns = rawPaymentList
+    const partyPaymentIns = rawPaymentInList
       .filter((p) => p?.partyName === party?.partyName)
       .map((p) => ({ ...p, type: "payment in" }));
 
-    setTransactions([...partyInvoices, ...partyPaymentIns, ...partyQuotations]);
-  }, [invoices, quotations, paymentIns, party]);
+    const partyPurchaseInvoiceList = purchaseInvoiceList
+      .filter((p) => p?.partyName === party?.partyName)
+      .map((p) => ({ ...p, type: "purchase invoice" }));
+
+    const partySalesReturnList = salesReturnList
+      .filter((p) => p?.partyName === party?.partyName)
+      .map((p) => ({ ...p, type: "sales return" }));
+
+    const partyCreditNotesList = creditNotesList
+      .filter((p) => p?.partyName === party?.partyName)
+      .map((p) => ({ ...p, type: "credit note" }));
+
+    setTransactions([
+      ...partyInvoicesList,
+      ...partyPaymentIns,
+      ...partyQuotations,
+      ...partyPurchaseInvoiceList,
+      ...partySalesReturnList,
+      ...partyCreditNotesList,
+    ]);
+  }, [
+    invoices,
+    partyPurchaseInvoices,
+    quotations,
+    paymentIns,
+    party,
+    salesReturns,
+    creditNotes,
+  ]);
 
   const filteredTransactions =
     filter && filter !== "all_transactions"
@@ -61,15 +91,21 @@ const PartyTransactions = ({ party, filter, partyInvoices: invoices }) => {
           </thead>
           <tbody>
             {filteredTransactions
-              ?.slice() 
+              ?.slice()
               .sort((a, b) => {
                 const dateA = new Date(
-                  a.salesInvoiceDate || a.quotationDate || a.paymentDate
+                  a.salesInvoiceDate ||
+                    a.quotationDate ||
+                    a.paymentDate ||
+                    a.purchaseInvoiceDate
                 );
                 const dateB = new Date(
-                  b.salesInvoiceDate || b.quotationDate || b.paymentDate
+                  b.salesInvoiceDate ||
+                    b.quotationDate ||
+                    b.paymentDate ||
+                    b.purchaseInvoiceDate
                 );
-                return dateB - dateA; // descending order
+                return dateB - dateA;
               })
               .map((transaction, index) => (
                 <tr key={transaction?._id}>
@@ -78,6 +114,7 @@ const PartyTransactions = ({ party, filter, partyInvoices: invoices }) => {
                     {transaction?.salesInvoiceDate?.split("T")[0] ||
                       transaction?.quotationDate?.split("T")[0] ||
                       transaction?.paymentDate?.split("T")[0] ||
+                      transaction?.purchaseInvoiceDate?.split("T")[0] ||
                       "-"}
                   </td>
                   <td>{transaction?.type || "-"}</td>
@@ -85,6 +122,7 @@ const PartyTransactions = ({ party, filter, partyInvoices: invoices }) => {
                     {transaction?.salesInvoiceNumber ||
                       transaction?.quotationNumber ||
                       transaction?.paymentInNumber ||
+                      transaction?.purchaseInvoiceNumber ||
                       "-"}
                   </td>
                   <td>
