@@ -180,7 +180,12 @@ const DashboardSalesReturnPage = () => {
                         <ul
                           tabIndex={0}
                           className="dropdown-content menu bg-base-100 rounded-box z-10 w-52 p-2 shadow-sm"
-                          onClick={(e) => e.stopPropagation()}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            navigate(
+                              `/dashboard/update/${saleReturn?._id}?type=sale return`
+                            );
+                          }}
                         >
                           <li>
                             <a>

@@ -42,6 +42,9 @@ const DashboardUpdateInvoicesPage = () => {
       case "purchase return":
         endpoint = `/purchase-return/return/${id}`;
         break;
+      case "sale return":
+        endpoint = `/sale-return/return/${id}`;
+        break;
       default:
         break;
     }
@@ -67,6 +70,8 @@ const DashboardUpdateInvoicesPage = () => {
         setInvoiceToUpdate(res?.data?.purchaseInvoice);
       } else if (res?.data?.purchaseReturn) {
         setInvoiceToUpdate(res?.data?.purchaseReturn);
+      } else if (res?.data?.saleReturn) {
+        setInvoiceToUpdate(res?.data?.saleReturn);
       }
     },
   });
@@ -95,6 +100,12 @@ const DashboardUpdateInvoicesPage = () => {
                 ? "Delivery Challan"
                 : type === "proforma invoice"
                 ? "Proforma Invoice"
+                : type === "purchase Invoice"
+                ? "Purchase Invoice"
+                : type === "purchase Return"
+                ? "Purchase Return"
+                : type === "sale Return"
+                ? "Sale Return"
                 : ""
             }
             type={type}
