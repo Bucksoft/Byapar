@@ -147,15 +147,17 @@ export async function updateBusiness(req, res) {
       )}/uploads/${path.basename(signatureFile.path)}`;
     }
 
+    // Parse additional info
     let parsedAdditionalInfo = [];
     if (req.body?.additionalInformation) {
       try {
         parsedAdditionalInfo = JSON.parse(req.body.additionalInformation);
-      } catch (e) {
+      } catch {
         console.error("Invalid JSON in additionalInformation");
       }
     }
 
+    // Update business details
     const updatedBusiness = await Business.findByIdAndUpdate(
       id,
       {
@@ -172,16 +174,26 @@ export async function updateBusiness(req, res) {
         .json({ success: false, msg: "Business could not be updated" });
     }
 
+    // Handle bank accounts
     if (req.body?.bankAccounts) {
       let parsedBankAccounts = [];
       try {
         parsedBankAccounts = JSON.parse(req.body.bankAccounts);
-      } catch (e) {
+      } catch {
         console.error("Invalid JSON in bankAccounts");
       }
 
+      const existingAccounts = await BusinessBankAccount.find({
+        businessId: id,
+      });
+      const existingIds = existingAccounts.map((acc) => acc._id.toString());
+      const incomingIds = parsedBankAccounts
+        .filter((acc) => acc._id)
+        .map((acc) => acc._id.toString());
+
+      // 1️⃣ Update or create accounts
       for (const acc of parsedBankAccounts) {
-        if (acc._id) {
+        if (acc._id && existingIds.includes(acc._id)) {
           await BusinessBankAccount.findByIdAndUpdate(acc._id, {
             accountName: acc.accountName || "",
             bankAccountNumber: acc.bankAccountNumber || "",
@@ -206,6 +218,15 @@ export async function updateBusiness(req, res) {
             businessId: id,
           });
         }
+      }
+
+      // 2️⃣ Optionally remove deleted accounts
+      const accountsToDelete = existingAccounts.filter(
+        (acc) => !incomingIds.includes(acc._id.toString())
+      );
+
+      for (const acc of accountsToDelete) {
+        await BusinessBankAccount.findByIdAndDelete(acc._id);
       }
     }
 

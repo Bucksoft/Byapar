@@ -157,7 +157,7 @@ const InvoiceTemplate = ({
               width: "50%",
             }}
           >
-            {business?.logo !== "null" && (
+            {type === "Sales Invoice" && business?.logo !== "null" ? (
               <div
                 style={{
                   width: "2.5rem",
@@ -183,10 +183,14 @@ const InvoiceTemplate = ({
                   }}
                 />
               </div>
+            ) : (
+              <div>{/* DISPLAYING THE PARTY LOGO */}</div>
             )}
 
             <h2 style={{ fontWeight: 600, fontSize: "20px" }}>
-              {business?.businessName}
+              {type === "Sales Invoice"
+                ? business?.businessName
+                : invoice?.partyName}
             </h2>
             <p
               style={{
@@ -194,40 +198,74 @@ const InvoiceTemplate = ({
                 color: "#52525b", // text-gray-600
               }}
             >
-              {business?.billingAddress}
+              {type === "Sales Invoice"
+                ? business?.billingAddress
+                : invoice?.partyId?.billingAddress}
             </p>
 
-            {business?.gstNumber.length > 0 && (
-              <p
-                style={{
-                  display: "flex",
-                  fontSize: "0.875rem",
-                  color: "#52525b",
-                }}
-              >
-                <span
-                  style={{
-                    fontWeight: 600,
-                    marginRight: "0.5rem",
-                  }}
-                >
-                  GSTIN
-                </span>
-                {business?.gstNumber}
-              </p>
-            )}
+            {type === "Party Invoice"
+              ? invoice?.partyId?.GSTIN?.length > 0 && (
+                  <p
+                    style={{
+                      display: "flex",
+                      fontSize: "0.875rem",
+                      color: "#52525b",
+                    }}
+                  >
+                    <span
+                      style={{
+                        fontWeight: 600,
+                        marginRight: "0.5rem",
+                      }}
+                    >
+                      GSTIN
+                    </span>
+                    {invoice?.partyId?.GSTIN}
+                  </p>
+                )
+              : business?.gstNumber?.length > 0 && (
+                  <p
+                    style={{
+                      display: "flex",
+                      fontSize: "0.875rem",
+                      color: "#52525b",
+                    }}
+                  >
+                    <span
+                      style={{
+                        fontWeight: 600,
+                        marginRight: "0.5rem",
+                      }}
+                    >
+                      GSTIN
+                    </span>
+                    {business?.gstNumber}
+                  </p>
+                )}
 
-            {business?.companyEmail.length > 0 && (
-              <p
-                style={{
-                  display: "flex",
-                  fontSize: "0.875rem",
-                  color: "#52525b",
-                }}
-              >
-                {business?.companyEmail}
-              </p>
-            )}
+            {type === "Purchase Invoice"
+              ? invoice?.partyId?.email?.length > 0 && (
+                  <p
+                    style={{
+                      display: "flex",
+                      fontSize: "0.875rem",
+                      color: "#52525b",
+                    }}
+                  >
+                    {invoice?.partyId?.email}
+                  </p>
+                )
+              : business?.companyEmail?.length > 0 && (
+                  <p
+                    style={{
+                      display: "flex",
+                      fontSize: "0.875rem",
+                      color: "#52525b",
+                    }}
+                  >
+                    {business?.companyEmail}
+                  </p>
+                )}
           </div>
           <div>
             <h1
@@ -430,10 +468,39 @@ const InvoiceTemplate = ({
             color: "#3f3f46",
           }}
         >
-          <span style={{ color: color }}>
-            <BsTelephone />
-          </span>
-          {business?.companyPhoneNo}
+          {type === "Purchase Invoice"
+            ? invoice?.partyId?.mobileNumber?.length > 0 && (
+                <p
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "0.4rem",
+                    fontSize: "0.875rem",
+                    color: "#52525b",
+                  }}
+                >
+                  <span style={{ color: color }}>
+                    <BsTelephone />
+                  </span>
+                  {invoice?.partyId?.mobileNumber}
+                </p>
+              )
+            : business?.companyPhoneNo?.length > 0 && (
+                <p
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: "0.4rem",
+                    fontSize: "0.875rem",
+                    color: "#52525b",
+                  }}
+                >
+                  <span style={{ color: color }}>
+                    <BsTelephone />
+                  </span>
+                  {business?.companyPhoneNo}
+                </p>
+              )}
         </div>
 
         <hr style={{ margin: "16px 0", borderColor: "#d4d4d8" }} />
@@ -451,32 +518,55 @@ const InvoiceTemplate = ({
             <h3 style={{ fontWeight: "bold" }}>
               {type === "Credit Note"
                 ? "PARTY NAME"
-                : type === "Purchase Order" || type === "Purchase Invoice"
+                : type === "Purchase Order"
                 ? "BILL FROM"
                 : "BILL TO"}
             </h3>
-            <p style={{ fontWeight: "bold" }}>{invoice?.partyId?.partyName}</p>
+            <p style={{ fontWeight: "bold" }}>
+              {type === "Purchase Invoice"
+                ? business?.businessName
+                : invoice?.partyId?.partyName}
+            </p>
             <p style={{ fontSize: "14px", color: "#3f3f46" }}>
-              {type === "Purchase Order"
-                ? invoice?.partyId?.shippingAddress
+              {type === "Purchase Invoice"
+                ? business?.shippingAddress
                 : invoice?.partyId?.billingAddress}
             </p>
-            {invoice?.partyId?.mobileNumber.length > 0 && (
-              <p style={{ fontWeight: 600 }}>
-                Mobile{" "}
-                <span style={{ fontWeight: "normal" }}>
-                  {invoice?.partyId?.mobileNumber}
-                </span>
-              </p>
-            )}
-            {invoice?.partyId?.GSTIN.length > 0 && (
-              <p style={{ fontWeight: 600 }}>
-                GSTIN{" "}
-                <span style={{ fontWeight: "normal" }}>
-                  {invoice?.partyId?.GSTIN}
-                </span>
-              </p>
-            )}
+            {type === "Purchase Invoice"
+              ? business?.companyPhoneNo?.length > 0 && (
+                  <p style={{ fontWeight: 600 }}>
+                    Mobile{" "}
+                    <span style={{ fontWeight: "normal" }}>
+                      {business?.companyPhoneNo}
+                    </span>
+                  </p>
+                )
+              : invoice?.partyId?.mobileNumber?.length > 0 && (
+                  <p style={{ fontWeight: 600 }}>
+                    Mobile{" "}
+                    <span style={{ fontWeight: "normal" }}>
+                      {invoice?.partyId?.mobileNumber}
+                    </span>
+                  </p>
+                )}
+
+            {type === "Purchase Invoice"
+              ? business?.gstNumber?.length > 0 && (
+                  <p style={{ fontWeight: 600 }}>
+                    GSTIN{" "}
+                    <span style={{ fontWeight: "normal" }}>
+                      {business?.gstNumber}
+                    </span>
+                  </p>
+                )
+              : invoice?.partyId?.GSTIN?.length > 0 && (
+                  <p style={{ fontWeight: 600 }}>
+                    GSTIN{" "}
+                    <span style={{ fontWeight: "normal" }}>
+                      {invoice?.partyId?.GSTIN}
+                    </span>
+                  </p>
+                )}
           </section>
           {/* {type === "Delivery Challan" && (
             <section style={{ fontSize: "14px" }}>
@@ -1072,12 +1162,14 @@ const InvoiceTemplate = ({
 
             {/* SIGNATURE BLOCK */}
             <div style={{ marginTop: "50px", marginLeft: "200px" }}>
-              {business?.signature !== "null" && (
+              {type === "Sales Invoice" && business?.signature !== "null" ? (
                 <img
                   src={business?.signature}
                   alt="signature"
                   width={"150px"}
                 />
+              ) : (
+                <div>{/* DISPLAY THE PARTY's SIGNATURE */}</div>
               )}
 
               <hr style={{ margin: "16px 0", borderColor: "#d4d4d8" }} />

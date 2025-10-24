@@ -246,7 +246,7 @@ const DashboardPurchasesPage = () => {
                             `/dashboard/purchase-invoice/${invoice?._id}`
                           )
                         }
-                        className="cursor-pointer"
+                        className="cursor-pointer text-xs"
                       >
                         <td>{invoice?.purchaseInvoiceDate.split("T")[0]}</td>
                         <td>{invoice?.purchaseInvoiceNumber}</td>
@@ -254,7 +254,7 @@ const DashboardPurchasesPage = () => {
                         <td>{"-"}</td>
                         <td>
                           <div className="flex items-center ">
-                            <LiaRupeeSignSolid size={12} />
+                            <LiaRupeeSignSolid size={14} />
                             {Number(invoice?.totalAmount).toLocaleString(
                               "en-IN"
                             )}

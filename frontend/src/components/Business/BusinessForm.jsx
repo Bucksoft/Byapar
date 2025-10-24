@@ -25,7 +25,7 @@ const BusinessForm = ({ businessToBeUpdated }) => {
   const [editIndex, setEditIndex] = useState();
 
   const [bankAccountNumber, setBankAccountNumber] = useState("");
-  const [ifscCode, setIfscCode] = useState("");
+  const [ifscCode, setifscCode] = useState("");
   const [accountName, setAccountName] = useState("");
   const [openingBalance, setOpeningBalance] = useState();
   const [bankAndBranchName, setBankAndBranchName] = useState("");
@@ -246,7 +246,7 @@ const BusinessForm = ({ businessToBeUpdated }) => {
   const resetBankForm = () => {
     setAccountName("");
     setBankAccountNumber("");
-    setIfscCode("");
+    setifscCode("");
     setBankAndBranchName("");
     setAccountHoldersName("");
     setUpiId("");
@@ -261,12 +261,15 @@ const BusinessForm = ({ businessToBeUpdated }) => {
       const res = await axiosInstance.patch(
         `/bank-account/mark-as-active/${id}?businessId=${businessToBeUpdated?._id}`
       );
-      console.log("BANK ACCOUNT WHICH IS ACTIVE", res.data.bankAccount);
       return res.data.bankAccount;
     },
     onSuccess: (data) => {
       setActiveAccount(data);
       toast.success("Bank account marked as active ");
+      navigate("/dashboard/my-businesses");
+      queryClient.invalidateQueries({
+        queryKey: ["businessBankAccounts", businessToBeUpdated?._id],
+      });
     },
   });
 
@@ -1067,7 +1070,7 @@ const BusinessForm = ({ businessToBeUpdated }) => {
                       onClick={() => {
                         setAccountName(bank.accountName);
                         setBankAccountNumber(bank.bankAccountNumber);
-                        setIfscCode(bank.IFSCCode);
+                        setifscCode(bank.ifscCode);
                         setBankAndBranchName(bank.bankAndBranchName);
                         setAccountHoldersName(bank.accountHoldersName);
                         setUpiId(bank.upiId);
@@ -1172,13 +1175,13 @@ const BusinessForm = ({ businessToBeUpdated }) => {
 
             <div className="flex justify-between gap-2">
               <div className="flex flex-col w-1/2 gap-1">
-                <p className="text-gray-600 text-xs">IFSC Code</p>
+                <p className="text-gray-600 text-xs">ifsc Code</p>
                 <input
                   type="text"
                   placeholder="ex-ICIC0001234"
-                  name="IFSCCode"
+                  name="ifscCode"
                   value={ifscCode}
-                  onChange={(e) => setIfscCode(e.target.value)}
+                  onChange={(e) => setifscCode(e.target.value)}
                   className={`border border-gray-200  rounded w-full p-1`}
                   maxLength={11}
                   style={{ textTransform: "uppercase" }}
@@ -1327,7 +1330,7 @@ const BusinessForm = ({ businessToBeUpdated }) => {
 
                   setAccountName("");
                   setBankAccountNumber("");
-                  setIfscCode("");
+                  setifscCode("");
                   setBankAndBranchName("");
                   setAccountHoldersName("");
                   setUpiId("");

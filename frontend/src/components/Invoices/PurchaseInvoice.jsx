@@ -171,6 +171,7 @@ const PurchaseInvoice = () => {
               color={"#FAB12F"}
               invoice={invoice}
               type={"Purchase Invoice"}
+              printRef={printRef}
               setInvoiceIdToDownload={setInvoiceIdToDownload}
             />
           </section>
