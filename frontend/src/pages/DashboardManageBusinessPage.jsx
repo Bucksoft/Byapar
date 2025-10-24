@@ -23,7 +23,7 @@ const DashboardManageBusinessPage = () => {
 
   return (
     <main className="">
-      <div className=" flex max-h-screen overflow-y-scroll bg-white  relative p-2 border border-gray-200 shadow-2xs  ">
+      <div className=" flex max-h-screen overflow-y-scroll bg-white  relative p-2 shadow-2xs  ">
         <div className="w-full ">
           {/* main section */}
           <BusinessForm businessToBeUpdated={editableBusiness} />

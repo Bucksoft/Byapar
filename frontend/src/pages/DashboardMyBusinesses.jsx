@@ -69,8 +69,6 @@ const DashboardMyBusinesses = () => {
     },
   });
 
-  console.log(businesses);
-
   return (
     <main className="h-full p-2">
       <div className="h-full w-full bg-white rounded-lg p-3">

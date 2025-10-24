@@ -1,12 +1,10 @@
 import { BsTelephone } from "react-icons/bs";
 import { useBusinessStore } from "../../store/businessStore";
 import { LiaRupeeSignSolid } from "react-icons/lia";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { toWords } from "../../../helpers/wordsToCurrency";
 import { useQuery } from "@tanstack/react-query";
 import { axiosInstance } from "../../config/axios";
-import bspl_logo from "../../assets/bspl_logo.png";
-import signature_bspl from "../../assets/signature_bspl.png";
 import { LuIndianRupee } from "react-icons/lu";
 
 const InvoiceTemplate = ({
@@ -18,14 +16,37 @@ const InvoiceTemplate = ({
 }) => {
   const { business } = useBusinessStore();
   const invoiceIdToDownload = useRef();
+  const [bankAccount, setBankAccount] = useState(null);
 
   const { isLoading, data: bankAccounts } = useQuery({
     queryKey: ["businessBankAccounts"],
     queryFn: async () => {
       const res = await axiosInstance.get(`/bank-account/${business?._id}`);
-      return res.data;
+      const activeAccount = res.data?.find((acc) => acc.isActive);
+      return activeAccount;
     },
   });
+
+  const { data: supplierBankAccount } = useQuery({
+    queryKey: ["bankAccounts", business?._id],
+    queryFn: async () => {
+      const res = await axiosInstance.get(
+        `/bank-account/party/${invoice?.partyId?._id}`
+      );
+      return res.data;
+    },
+    enabled: type === "Purchase Invoice",
+  });
+
+  useEffect(() => {
+    if (type === "Sales Invoice" && bankAccounts) {
+      setBankAccount(bankAccounts);
+    } else if (type === "Purchase Invoice" && supplierBankAccount) {
+      setBankAccount(supplierBankAccount);
+    } else {
+      setBankAccount(null);
+    }
+  }, [type, bankAccounts, supplierBankAccount]);
 
   useEffect(() => {
     if (invoiceIdToDownload?.current?.id) {
@@ -430,7 +451,7 @@ const InvoiceTemplate = ({
             <h3 style={{ fontWeight: "bold" }}>
               {type === "Credit Note"
                 ? "PARTY NAME"
-                : type === "Purchase Order"
+                : type === "Purchase Order" || type === "Purchase Invoice"
                 ? "BILL FROM"
                 : "BILL TO"}
             </h3>
@@ -715,19 +736,29 @@ const InvoiceTemplate = ({
           <hr style={{ margin: "16px 0", borderColor: "#d4d4d8" }} />
           <section
             style={{
-              display: "grid",
-              gridTemplateColumns: "1fr 1fr",
+              display: "flex",
+              alignItems: "start",
+              justifyContent: "space-between",
               fontSize: "12px",
               gap: "20px",
             }}
           >
-            {bankAccounts &&
-              bankAccounts?.map((bankAccount) => (
-                <div key={bankAccount?._id} style={{ marginTop: "12px" }}>
+            <div
+              style={{
+                width: "50%",
+              }}
+            >
+              {" "}
+              {bankAccount && (
+                <div
+                  key={bankAccount?._id}
+                  style={{
+                    marginTop: "12px",
+                  }}
+                >
                   <div>
                     <h4 style={{ fontWeight: 600 }}>Bank Details</h4>
 
-                    {/* ACCOUNT HOLDER'S NAME */}
                     <div
                       style={{
                         display: "flex",
@@ -747,7 +778,6 @@ const InvoiceTemplate = ({
                       </p>
                     </div>
 
-                    {/* BANK ACCOUNT NUMBER */}
                     <div
                       style={{
                         display: "flex",
@@ -767,7 +797,6 @@ const InvoiceTemplate = ({
                       </p>
                     </div>
 
-                    {/* IFSC Code */}
                     <div
                       style={{
                         display: "flex",
@@ -806,7 +835,6 @@ const InvoiceTemplate = ({
                       </p>
                     </div>
 
-                    {/* BANK AND BRANCH NAME */}
                     <div
                       style={{
                         display: "flex",
@@ -821,7 +849,12 @@ const InvoiceTemplate = ({
                       >
                         Bank and Branch
                       </h3>
-                      <p style={{ whiteSpace: "pre-line", textAlign: "right" }}>
+                      <p
+                        style={{
+                          whiteSpace: "pre-line",
+                          textAlign: "right",
+                        }}
+                      >
                         {bankAccount?.bankAndBranchName}
                       </p>
                     </div>
@@ -834,10 +867,11 @@ const InvoiceTemplate = ({
                     </p>
                   </div>
                 </div>
-              ))}
+              )}
+            </div>
 
             {/* FOOTER RIGHT SECTION (TOTAL'S) */}
-            <div style={{ marginTop: "12px" }}>
+            <div style={{ marginTop: "12px", width: "50%" }}>
               {/* TAXABLE AMOUNT */}
               <div style={{ display: "flex", justifyContent: "space-between" }}>
                 <p>Taxable Amount</p>

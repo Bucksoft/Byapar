@@ -8,6 +8,8 @@ export const useBusinessBankAccountStore = create(
       setBankAccount: (data) => set({ bankAccount: data }),
       bankAccounts: null,
       setBankAccounts: (data) => set({ bankAccounts: data }),
+      activeAccount: null,
+      setActiveAccount: (data) => set({ activeAccount: data }),
     }),
     {
       name: "businessBankAccount",

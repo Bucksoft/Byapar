@@ -233,6 +233,7 @@ export async function getBusinessBankAccounts(req, res) {
     const id = req.params.id;
     const businessBankAccounts = await BusinessBankAccount.find({
       businessId: id,
+      clientId: req.user?.id,
     });
     if (!businessBankAccounts) {
       return res.status(400).json({ msg: "Business bank accounts not found" });
@@ -246,9 +247,10 @@ export async function getBusinessBankAccounts(req, res) {
 export async function deleteBusinessBankAccount(req, res) {
   try {
     const id = req.params.id;
-    console.log(id);
+    const businessId = req.query?.businessId;
     const deletedBankAccount = await BusinessBankAccount.findByIdAndDelete({
       _id: id,
+      businessId,
     });
     if (!deletedBankAccount) {
       return res.status(400).json({ msg: "Bank account not found" });
@@ -289,5 +291,51 @@ export async function deletePartyBankAccount(req, res) {
     return res.status(200).json({ msg: "Bank account removed successfully" });
   } catch (error) {
     return res.status(500).json({ msg: "Internal Server Error" });
+  }
+}
+
+export async function markBusinessBankAccountAsActive(req, res) {
+  try {
+    const { id } = req.params;
+    const { businessId } = req.query;
+
+    if (!id || !businessId) {
+      return res.status(400).json({
+        success: false,
+        msg: "Bank account ID and business ID are required",
+      });
+    }
+    const bankAccount = await BusinessBankAccount.findById(id);
+    if (!bankAccount) {
+      return res
+        .status(404)
+        .json({ success: false, msg: "Bank account not found" });
+    }
+
+    if (bankAccount.businessId.toString() !== businessId) {
+      return res.status(400).json({
+        success: false,
+        msg: "Bank account does not belong to this business",
+      });
+    }
+
+    await BusinessBankAccount.updateMany(
+      { businessId, _id: { $ne: id } },
+      { $set: { isActive: false } }
+    );
+
+    bankAccount.isActive = true;
+    await bankAccount.save();
+
+    return res.status(200).json({
+      success: true,
+      msg: "Bank account marked as active",
+      bankAccount,
+    });
+  } catch (error) {
+    console.error("Error marking bank account as active:", error);
+    return res
+      .status(500)
+      .json({ success: false, msg: "Internal server error" });
   }
 }

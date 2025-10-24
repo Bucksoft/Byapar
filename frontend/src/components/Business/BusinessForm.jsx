@@ -2,17 +2,18 @@ import { states } from "../../utils/constants";
 import { LuImagePlus } from "react-icons/lu";
 import { motion } from "framer-motion";
 import { useEffect, useState } from "react";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { queryClient } from "../../main";
-import { MdOutlineCalendarToday } from "react-icons/md";
 import { axiosInstance } from "../../config/axios";
 import CustomLoader from "../Loader";
 import toast from "react-hot-toast";
-import { Cross, Pen, Trash } from "lucide-react";
+import { Trash } from "lucide-react";
 import { useRef } from "react";
 import { useBusinessStore } from "../../store/businessStore";
 import { useNavigate } from "react-router-dom";
 import { RxCross2 } from "react-icons/rx";
+import { FaPlus } from "react-icons/fa";
+import { useBusinessBankAccountStore } from "../../store/businessBankAccountStore";
 
 const BusinessForm = ({ businessToBeUpdated }) => {
   const [additionalInformation, setAdditionalInformation] = useState([]);
@@ -21,6 +22,20 @@ const BusinessForm = ({ businessToBeUpdated }) => {
   const [logoPreviewUrl, setLogoPreviewUrl] = useState("");
   const [singaturePreviewUrl, setSignaturePreviewUrl] = useState("");
   const [fileSizeError, setFileSizeError] = useState(false);
+  const [editIndex, setEditIndex] = useState();
+
+  const [bankAccountNumber, setBankAccountNumber] = useState("");
+  const [ifscCode, setIfscCode] = useState("");
+  const [accountName, setAccountName] = useState("");
+  const [openingBalance, setOpeningBalance] = useState();
+  const [bankAndBranchName, setBankAndBranchName] = useState("");
+  const [accountHoldersName, setAccountHoldersName] = useState("");
+  const [upiId, setUpiId] = useState("");
+  const [asOfDate, setAsOfDate] = useState(new Date());
+  const [isEdit, setIsEdit] = useState(false);
+
+  const { setActiveAccount } = useBusinessBankAccountStore();
+
   const logoRef = useRef(null);
   const signatureRef = useRef(null);
   const { setBusiness } = useBusinessStore();
@@ -42,9 +57,22 @@ const BusinessForm = ({ businessToBeUpdated }) => {
     TDS: false,
     TCS: false,
     pincode: "",
+    notes: "",
+    termsAndCondition: "",
+    bankAccounts: [],
   });
 
-  console.log(businessToBeUpdated);
+  // QUERY TO FETCH ALL THE BANK ACCOUNTS
+  const { data: bankAccounts, isLoading } = useQuery({
+    queryKey: ["bankAccounts"],
+    queryFn: async () => {
+      const res = await axiosInstance.get(
+        `/bank-account/${businessToBeUpdated?._id}`
+      );
+      return res.data;
+    },
+    enabled: !!businessToBeUpdated,
+  });
 
   // THIS IS USED TO AUTOMATICALLY ADD ALL THE FIELDS FOR EDITING
   useEffect(() => {
@@ -65,6 +93,9 @@ const BusinessForm = ({ businessToBeUpdated }) => {
         TDS: businessToBeUpdated.TDS || false,
         TCS: businessToBeUpdated.TCS || false,
         pincode: businessToBeUpdated.pincode || "",
+        notes: businessToBeUpdated.notes || "",
+        termsAndCondition: businessToBeUpdated.termsAndCondition || "",
+        bankAccounts: [],
       });
     }
     if (
@@ -174,7 +205,9 @@ const BusinessForm = ({ businessToBeUpdated }) => {
       formData.append("signature", signatureRef.current);
     }
     Object.entries(data).forEach(([key, value]) => {
-      formData.append(key, value);
+      if (key !== "bankAccounts") {
+        formData.append(key, value);
+      }
     });
 
     if (additionalInformation.length > 0) {
@@ -182,6 +215,10 @@ const BusinessForm = ({ businessToBeUpdated }) => {
         "additionalInformation",
         JSON.stringify(additionalInformation)
       );
+    }
+
+    if (Array.isArray(data.bankAccounts) && data.bankAccounts.length > 0) {
+      formData.append("bankAccounts", JSON.stringify(data.bankAccounts));
     }
 
     if (businessToBeUpdated) {
@@ -195,6 +232,57 @@ const BusinessForm = ({ businessToBeUpdated }) => {
     Array.isArray(additionalInformation) && additionalInformation.length > 0
       ? additionalInformation
       : businessToBeUpdated?.additionalInformation || [];
+
+  // Inside your component
+  useEffect(() => {
+    if (bankAccounts && businessToBeUpdated) {
+      setData((prev) => ({
+        ...prev,
+        bankAccounts: bankAccounts || [],
+      }));
+    }
+  }, [bankAccounts, businessToBeUpdated]);
+
+  const resetBankForm = () => {
+    setAccountName("");
+    setBankAccountNumber("");
+    setIfscCode("");
+    setBankAndBranchName("");
+    setAccountHoldersName("");
+    setUpiId("");
+    setAsOfDate(new Date());
+    setIsEdit(false);
+    setEditIndex(null);
+  };
+
+  // MARK AS ACTIVE
+  const markAsMutation = useMutation({
+    mutationFn: async (id) => {
+      const res = await axiosInstance.patch(
+        `/bank-account/mark-as-active/${id}?businessId=${businessToBeUpdated?._id}`
+      );
+      console.log("BANK ACCOUNT WHICH IS ACTIVE", res.data.bankAccount);
+      return res.data.bankAccount;
+    },
+    onSuccess: (data) => {
+      setActiveAccount(data);
+      toast.success("Bank account marked as active ");
+    },
+  });
+
+  // DELETE BANK ACCOUNT
+  const deleteBank = useMutation({
+    mutationFn: async (id) => {
+      const res = await axiosInstance.delete(
+        `/bank-account/${id}?businessId=${businessToBeUpdated?._id}`
+      );
+      return res.data;
+    },
+    onSuccess: () => {
+      toast.success("Bank account deleted successfully");
+      queryClient.invalidateQueries({ queryKey: ["businessBankAccounts"] });
+    },
+  });
 
   return (
     <>
@@ -748,6 +836,36 @@ const BusinessForm = ({ businessToBeUpdated }) => {
             </p>
           </div>
 
+          {/* NOTES AND TERMS AND CONDITIONS */}
+          <div className="my-2">
+            <div className="flex flex-col gap-2">
+              <label htmlFor="Notes" className="text-xs text-gray-600">
+                Notes
+              </label>
+              <input
+                type="text"
+                placeholder="Add notes"
+                name="notes"
+                value={data.notes}
+                onChange={handleInputChange}
+                className="input input-sm w-full"
+              />
+            </div>
+            <div className="flex flex-col gap-2 mt-3">
+              <label htmlFor="Notes" className="text-xs text-gray-600">
+                Terms & Conditions
+              </label>
+              <textarea
+                type="text"
+                value={data.termsAndCondition}
+                name="termsAndCondition"
+                onChange={handleInputChange}
+                placeholder="Add Terms and Condition"
+                className="textarea w-full text-xs"
+              />
+            </div>
+          </div>
+
           <p className="text-[13px] text-gray-500">Signature</p>
           <div className="flex items-center justify-between py-2 relative ">
             {/* {singaturePreviewUrl ? (
@@ -880,6 +998,351 @@ const BusinessForm = ({ businessToBeUpdated }) => {
           </div>
         </motion.div>
       </form>
+
+      <div className="divider divider-sm" />
+
+      {/* ------------------------------------------------------------------------------------------------------------------- */}
+
+      {/* DISPLAYING BANK DETAILS */}
+      <div className="mt-5 ">
+        <h2 className="font-semibold text-sm mb-2 pl-4 text-gray-700">
+          Added Bank Accounts
+        </h2>
+
+        {!data.bankAccounts || data.bankAccounts.length === 0 ? (
+          <p className="text-xs text-gray-500 italic pl-4">
+            No bank accounts added yet.
+          </p>
+        ) : (
+          <div className="flex flex-col gap-2">
+            {data.bankAccounts.map((bank, index) => (
+              <div
+                key={index}
+                className="grid grid-cols-2 border border-gray-200 rounded ml-3 p-3 shadow-sm"
+              >
+                <div className="text-xs text-gray-700 w-full">
+                  <p>
+                    <span className="font-semibold">Account Name:</span>{" "}
+                    {bank.accountName || "-"}
+                  </p>
+                  <p>
+                    <span className="font-semibold">Account No:</span>{" "}
+                    {bank.bankAccountNumber || "-"}
+                  </p>
+                  <p>
+                    <span className="font-semibold">IFSC:</span>{" "}
+                    {bank.IFSCCode || "-"}
+                  </p>
+                  <p>
+                    <span className="font-semibold">Bank:</span>{" "}
+                    {bank.bankAndBranchName || "-"}
+                  </p>
+                  <p>
+                    <span className="font-semibold">Holder:</span>{" "}
+                    {bank.accountHoldersName || "-"}
+                  </p>
+                  {bank.upiId && (
+                    <p>
+                      <span className="font-semibold">UPI ID:</span>{" "}
+                      {bank.upiId}
+                    </p>
+                  )}
+                </div>
+
+                <div className="flex flex-col gap-2  justify-between items-end ">
+                  {!bank.isActive ? (
+                    <button
+                      onClick={() => markAsMutation.mutate(bank._id)}
+                      className="text-green-500  text-xs hover:underline"
+                    >
+                      Mark as Active
+                    </button>
+                  ) : (
+                    <p className="text-green-600 ring ring-green-500/40 p-1 rounded-full px-3 text-xs font-semibold">
+                      {bank?.isActive ? "Active Account" : ""}
+                    </p>
+                  )}
+                  <div className="space-x-3">
+                    <button
+                      onClick={() => {
+                        setAccountName(bank.accountName);
+                        setBankAccountNumber(bank.bankAccountNumber);
+                        setIfscCode(bank.IFSCCode);
+                        setBankAndBranchName(bank.bankAndBranchName);
+                        setAccountHoldersName(bank.accountHoldersName);
+                        setUpiId(bank.upiId);
+                        setAsOfDate(bank.asOfDate);
+                        setOpeningBalance(bank.openingBalance);
+                        setIsEdit(true);
+                        setEditIndex(index);
+                        document.getElementById("bank-modal").showModal();
+                      }}
+                      className="text-blue-500 text-xs hover:underline"
+                    >
+                      Edit
+                    </button>
+
+                    <button
+                      onClick={() => {
+                        setData((prev) => ({
+                          ...prev,
+                          bankAccounts: prev.bankAccounts.filter(
+                            (_, i) => i !== index
+                          ),
+                        }));
+                        deleteBank.mutate(bank._id);
+                      }}
+                      className="text-red-500 text-xs hover:underline"
+                    >
+                      Delete
+                    </button>
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
+
+      {/* BANK ACCOUNT ADDITION */}
+      <div className="w-full flex items-center justify-center py-12">
+        <button
+          className="text-[var(--primary-btn)] text-xs flex items-center gap-2 p-2 btn btn-dash"
+          onClick={() => {
+            resetBankForm();
+            document.getElementById("bank-modal").showModal();
+          }}
+        >
+          <FaPlus />
+          Add Bank Account
+        </button>
+      </div>
+
+      <dialog id="bank-modal" className="modal text-xs">
+        <div className="modal-box">
+          <form method="dialog">
+            {/* if there is a button in form, it will close the modal */}
+            <button className="btn btn-sm btn-circle btn-ghost absolute right-2 top-4">
+              ✕
+            </button>
+          </form>
+
+          <h3 className="font-bold text-lg">Add Bank Account</h3>
+          <div className="flex flex-col justify-center bg-white p-5 gap-6">
+            <div className="flex justify-between gap-2">
+              <div className="flex flex-col  w-full gap-1">
+                <p className="text-gray-600 text-xs">
+                  Account Name
+                  <span className="text-red-500"> *</span>
+                </p>
+                <input
+                  type="text"
+                  name="account name"
+                  value={accountName}
+                  onChange={(e) => setAccountName(e.target.value)}
+                  placeholder="ex-Personal Account"
+                  className="border border-gray-200  rounded w-full p-1"
+                />
+                <small className="text-red-500">
+                  {/* {bankMutation?.error?.response?.data?.errors
+                    ?.bankAccountNumber?._errors[0] ||
+                    bankMutation?.error?.message} */}
+                </small>
+              </div>
+              <div className="flex flex-col w-full gap-1">
+                <p className="text-gray-600 text-xs">
+                  Bank Account Number
+                  <span className="text-red-500"> *</span>
+                </p>
+                <input
+                  type="number"
+                  name="bankAccountNumber"
+                  value={bankAccountNumber}
+                  onChange={(e) => setBankAccountNumber(e.target.value)}
+                  placeholder="ex-123456789"
+                  className="border border-gray-200  rounded w-full p-1"
+                />
+                <small className="text-red-500">
+                  {/* {bankMutation?.error?.response?.data?.errors
+                    ?.bankAccountNumber?._errors[0] ||
+                    bankMutation?.error?.message} */}
+                </small>
+              </div>
+            </div>
+
+            <div className="flex justify-between gap-2">
+              <div className="flex flex-col w-1/2 gap-1">
+                <p className="text-gray-600 text-xs">IFSC Code</p>
+                <input
+                  type="text"
+                  placeholder="ex-ICIC0001234"
+                  name="IFSCCode"
+                  value={ifscCode}
+                  onChange={(e) => setIfscCode(e.target.value)}
+                  className={`border border-gray-200  rounded w-full p-1`}
+                  maxLength={11}
+                  style={{ textTransform: "uppercase" }}
+                />
+                {/* <small className="text-red-500">{ifscError}</small> */}
+              </div>
+              <div className="flex flex-col  w-1/2 gap-1">
+                <p className="text-gray-600 text-xs">Bank & Branch Name</p>
+                <input
+                  type="text"
+                  placeholder="ex-ICICI Bank, Jharkhand"
+                  name="bankAndBranchName"
+                  value={bankAndBranchName}
+                  onChange={(e) => setBankAndBranchName(e.target.value)}
+                  className="border border-gray-200  rounded w-full p-1"
+                />
+                <small className="text-red-500">
+                  {/* {
+                    bankMutation?.error?.response?.data?.errors
+                      ?.bankAndBranchName?._errors[0]
+                  } */}
+                </small>
+              </div>
+            </div>
+
+            <div className="flex justify-between gap-2">
+              <div className="flex flex-col  w-1/2 gap-1">
+                <p className="text-gray-600 text-xs">Account Holder’s Name</p>
+                <input
+                  type="text"
+                  name="accountHoldersName"
+                  value={accountHoldersName}
+                  onChange={(e) => setAccountHoldersName(e.target.value)}
+                  placeholder="ex-Manish"
+                  className="border border-gray-200  rounded w-full p-1"
+                />
+                <small className="text-red-500">
+                  {/* {
+                    bankMutation?.error?.response?.data?.errors
+                      ?.accountHoldersName?._errors[0]
+                  } */}
+                </small>
+              </div>
+              <div className="flex flex-col  w-1/2 gap-1">
+                <p className="text-gray-600 text-xs">UPI ID</p>
+                <input
+                  type="text"
+                  name="upiId"
+                  value={upiId}
+                  onChange={(e) => setUpiId(e.target.value)}
+                  placeholder="ex:manish@upi"
+                  className="border border-gray-200  rounded w-full p-1"
+                />
+                <small className="text-red-500">
+                  {/* {
+                    bankMutation?.error?.response?.data?.errors?.upiId
+                      ?._errors[0]
+                  } */}
+                </small>
+              </div>
+            </div>
+
+            <div className="flex justify-between gap-2">
+              <div className="flex flex-col  w-1/2 gap-1">
+                <p className="text-gray-600 text-xs">As of Date</p>
+                <input
+                  type="date"
+                  name="asOfDate"
+                  value={asOfDate}
+                  onChange={(e) => setAsOfDate(e.target.value)}
+                  placeholder="ex-Manish"
+                  className="border border-gray-200  rounded w-full p-1"
+                />
+                <small className="text-red-500">
+                  {/* {
+                    bankMutation?.error?.response?.data?.errors
+                      ?.accountHoldersName?._errors[0]
+                  } */}
+                </small>
+              </div>
+              <div className="flex flex-col  w-1/2 gap-1">
+                <p className="text-gray-600 text-xs">Opening Balance</p>
+                <input
+                  type="number"
+                  name="openingBalance"
+                  value={openingBalance}
+                  onChange={(e) => setOpeningBalance(e.target.value)}
+                  placeholder="0"
+                  className="border border-gray-200  rounded w-full p-1"
+                />
+                <small className="text-red-500">
+                  {/* {
+                    bankMutation?.error?.response?.data?.errors
+                      ?.accountHoldersName?._errors[0]
+                  } */}
+                </small>
+              </div>
+            </div>
+          </div>
+          {isEdit ? (
+            <div className="flex justify-end mt-2 gap-3">
+              <button
+                onClick={() => {
+                  const updatedBank = {
+                    accountName,
+                    bankAccountNumber,
+                    ifscCode,
+                    bankAndBranchName,
+                    accountHoldersName,
+                    upiId,
+                    asOfDate,
+                  };
+
+                  setData((prevData) => {
+                    const updatedAccounts = [...prevData.bankAccounts];
+                    updatedAccounts[editIndex] = updatedBank;
+                    return { ...prevData, bankAccounts: updatedAccounts };
+                  });
+
+                  document.getElementById("bank-modal").close();
+                }}
+                className="btn btn-sm bg-[var(--primary-btn)]"
+              >
+                Update
+              </button>
+            </div>
+          ) : (
+            <div className="flex justify-end mt-2 gap-3 ">
+              <button
+                onClick={() => {
+                  // Create a new bank object
+                  const newBankAccount = {
+                    accountName,
+                    bankAccountNumber,
+                    ifscCode,
+                    bankAndBranchName,
+                    accountHoldersName,
+                    upiId,
+                    asOfDate,
+                  };
+
+                  setData((prevData) => ({
+                    ...prevData,
+                    bankAccounts: [...prevData.bankAccounts, newBankAccount],
+                  }));
+
+                  setAccountName("");
+                  setBankAccountNumber("");
+                  setIfscCode("");
+                  setBankAndBranchName("");
+                  setAccountHoldersName("");
+                  setUpiId("");
+                  setAsOfDate(new Date());
+
+                  document.getElementById("bank-modal").close();
+                }}
+                className="btn btn-sm bg-[var(--primary-btn)]"
+              >
+                Add
+              </button>
+            </div>
+          )}
+        </div>
+      </dialog>
     </>
   );
 };

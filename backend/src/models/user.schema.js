@@ -1,4 +1,5 @@
 import mongoose from "mongoose";
+import { lowercase } from "zod";
 
 export const userCredentialSchema = new mongoose.Schema(
   {
@@ -12,6 +13,7 @@ export const userCredentialSchema = new mongoose.Schema(
     email: {
       type: String,
       required: true,
+      lowercase: true,
     },
     userType: {
       type: String,

@@ -10,18 +10,18 @@ import axios from "axios";
 export async function login(req, res) {
   try {
     // get data
-    const { email } = req.body;
+    let { email } = req.body;
     if (!email) {
       return res
         .status(400)
         .json({ status: "Failed", err: "Email not provided" });
     }
 
-    // validation
-    const result = loginSchema.safeParse({
-      email,
-    });
+    // Always normalize to lowercase
+    email = email.trim().toLowerCase();
 
+    // validation
+    const result = loginSchema.safeParse({ email });
     if (!result.success) {
       const errors = result.error.format();
       return res
@@ -29,20 +29,22 @@ export async function login(req, res) {
         .json({ status: "Failed", err: "Invalid email address", errors });
     }
 
-    // check if user already exists
+    // delete any old OTPs for this email to prevent clutter
+    await OTP.deleteMany({ email });
 
-    // login logic
-    // 1. generate OTP - 6 digits
+    // generate 6-digit OTP
     const otp = crypto.randomInt(100000, 1000000).toString();
+
     await OTP.create({
       email,
       otp,
-      expiresIn: Date.now() + 60 * 1000,
+      expiresIn: Date.now() + 60 * 1000, // 1 min validity
     });
-    // 2. Send OTP via email to user.
-    await sendOTPviaMail(email, otp);
 
-    console.log(otp);
+    // send OTP via email
+    // await sendOTPviaMail(email, otp);
+
+    console.log("Generated OTP:", otp);
 
     return res.status(200).json({
       status: "success",
@@ -56,14 +58,20 @@ export async function login(req, res) {
   }
 }
 
-// verify otp and save user in DB.
 export async function verifyOTP(req, res) {
   try {
-    const { email, otp } = req.body;
-    const result = loginSchema.safeParse({
-      email,
-    });
+    let { email, otp } = req.body;
 
+    if (!email || !otp) {
+      return res
+        .status(400)
+        .json({ status: "Failed", err: "Email or OTP missing" });
+    }
+
+    // Always normalize to lowercase
+    email = email.trim().toLowerCase();
+
+    const result = loginSchema.safeParse({ email });
     if (!result.success) {
       const errors = result.error.format();
       return res
@@ -86,7 +94,7 @@ export async function verifyOTP(req, res) {
     // delete OTP
     await OTP.deleteMany({ email });
 
-    // save user in DB
+    // Find or create user (always use lowercase email)
     let user = await UserCredential.findOne({ email });
     if (!user) {
       user = await UserCredential.create({
@@ -100,21 +108,19 @@ export async function verifyOTP(req, res) {
       await user.save();
     }
 
-    // generate jwt token
+    // generate JWT tokens
     const accessToken = jwt.sign(
       { id: user._id, email },
       process.env.JWT_SECRET,
-      {
-        expiresIn: "15m",
-      }
+      { expiresIn: "15m" }
     );
     const refreshToken = jwt.sign(
       { id: user._id, email },
       process.env.JWT_SECRET,
-      {
-        expiresIn: "7d",
-      }
+      { expiresIn: "7d" }
     );
+
+    // send cookies
     res.cookie("accessToken", accessToken, {
       httpOnly: true,
       secure: process.env.NODE_ENV === "production",
@@ -128,10 +134,13 @@ export async function verifyOTP(req, res) {
       maxAge: 7 * 24 * 60 * 60 * 1000,
     });
 
-    return res
-      .status(200)
-      .json({ status: "Success", msg: "Logged in successfully", user });
+    return res.status(200).json({
+      status: "Success",
+      msg: "Logged in successfully",
+      user,
+    });
   } catch (error) {
+    console.log(error);
     console.error(`Internal Server error : ${error}`);
     res.status(500).json({ status: "Failed", err: "Internal Server Error" });
   }

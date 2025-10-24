@@ -67,6 +67,12 @@ const businessSchema = new mongoose.Schema({
   signature: {
     type: String,
   },
+  notes: {
+    type: String,
+  },
+  termsAndCondition: {
+    type: String,
+  },
   clientId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "UserCredential",

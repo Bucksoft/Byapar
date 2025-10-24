@@ -60,11 +60,24 @@ const SalesInvoicePartyDetailsSection = ({
   const { purchaseInvoices } = usePurchaseInvoiceStore(); //  FOR PURCHASE RETURN
   const { business } = useBusinessStore();
 
+  console.log(title);
+
   // Filter parties based on search input
   const filteredParties = useMemo(() => {
     if (!parties?.length) return [];
 
-    return parties
+    let partiesToFilter = [];
+    if (title === "Purchase Invoice") {
+      partiesToFilter = parties
+        .filter((p) => p.businessId === business?._id)
+        .filter((p) => p?.partyType === "Supplier");
+    } else {
+      partiesToFilter = parties
+        .filter((p) => p.businessId === business?._id)
+        .filter((p) => p?.partyType === "Customer");
+    }
+
+    return partiesToFilter
       .filter((p) => p.businessId === business?._id)
       .filter((p) =>
         p?.partyName?.toLowerCase().includes(searchPartyQuery.toLowerCase())
@@ -72,6 +85,7 @@ const SalesInvoicePartyDetailsSection = ({
       .sort((a, b) => a.partyName.localeCompare(b.partyName));
   }, [searchPartyQuery, parties, business?._id]);
 
+  
   const searchedInvoices =
     invoices &&
     invoices.invoices?.filter(

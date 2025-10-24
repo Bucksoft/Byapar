@@ -161,12 +161,14 @@ const PurchaseInvoice = () => {
         </section>
 
         {isLoading ? (
-          <CustomLoader text={"Loading..."} />
+          <div className="w-full flex items-center justify-center py-16">
+            <CustomLoader text={"Loading..."} />
+          </div>
         ) : (
-          <section className="mt-3 bg-sky-50 flex justify-center py-1 overflow-y-scroll flex-1">
+          <section className="mt-3 bg-sky-50 flex justify-center py-1 flex-1">
             {/* Invoice template */}
             <InvoiceTemplate
-              color={"#48B3AF"}
+              color={"#FAB12F"}
               invoice={invoice}
               type={"Purchase Invoice"}
               setInvoiceIdToDownload={setInvoiceIdToDownload}

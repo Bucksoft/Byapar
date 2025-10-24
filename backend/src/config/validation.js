@@ -133,7 +133,9 @@ export const partySchema = z.object({
 
 export const businessSchema = z.object({
   logo: z.string().optional(),
-
+  // bankAccounts: z.array().optional(),
+  notes: z.string().optional(),
+  termsAndCondition: z.string().optional(),
   businessName: z
     .string()
     .min(5, "Business name must be atleast 5 characters long")

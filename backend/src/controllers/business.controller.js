@@ -1,6 +1,7 @@
 import { businessSchema } from "../config/validation.js";
 import { Business } from "../models/business.schema.js";
 import { UserCredential } from "../models/user.schema.js";
+import { BusinessBankAccount } from "../models/businessBankAccount.js";
 import path from "path";
 
 // CREATE BUSINESS API
@@ -11,12 +12,23 @@ export async function createBusiness(req, res) {
     const logoFile = req.files?.logo?.[0];
     const signatureFile = req.files?.signature?.[0];
 
+    console.log(req.body.bankAccounts);
+
     let parsedAdditionalInfo = [];
     if (req.body?.additionalInformation) {
       try {
         parsedAdditionalInfo = JSON.parse(req.body.additionalInformation);
       } catch (e) {
         console.error("Invalid JSON in additionalInformation");
+      }
+    }
+
+    let parsedBankAccounts = [];
+    if (req.body?.bankAccounts) {
+      try {
+        parsedBankAccounts = JSON.parse(req.body.bankAccounts);
+      } catch (e) {
+        console.error("Invalid JSON in bankAccounts");
       }
     }
 
@@ -77,6 +89,27 @@ export async function createBusiness(req, res) {
         .json({ success: false, msg: "Business could not be created" });
     }
 
+    if (Array.isArray(parsedBankAccounts) && parsedBankAccounts.length > 0) {
+      try {
+        await BusinessBankAccount.insertMany(
+          parsedBankAccounts.map((account) => ({
+            accountName: account?.accountName || "",
+            bankAccountNumber: account?.bankAccountNumber || "",
+            IFSCCode: account?.ifscCode || "",
+            bankAndBranchName: account?.bankAndBranchName || "",
+            accountHoldersName: account?.accountHoldersName || "",
+            upiId: account?.upiId || "",
+            openingBalance: account?.openingBalance || 0,
+            asOfDate: account?.asOfDate || "",
+            businessId: business._id,
+            clientId: req?.user?.id,
+          }))
+        );
+      } catch (err) {
+        console.error("Bank accounts could not be saved:", err.message);
+      }
+    }
+
     // RETURN SUCCESS RESPONSE
     return res
       .status(200)
@@ -98,23 +131,21 @@ export async function updateBusiness(req, res) {
         .status(400)
         .json({ success: false, msg: "Please provide business ID" });
     }
+
     const logoFile = req.files?.logo?.[0];
     const signatureFile = req.files?.signature?.[0];
 
     if (logoFile) {
       req.body.logo = `${req.protocol}://${req.get(
         "host"
-      )}/uploads/${path.basename(req.files.logo[0].path)}`;
+      )}/uploads/${path.basename(logoFile.path)}`;
     }
 
     if (signatureFile) {
       req.body.signature = `${req.protocol}://${req.get(
         "host"
-      )}/uploads/${path.basename(req.files.signature[0].path)}`;
+      )}/uploads/${path.basename(signatureFile.path)}`;
     }
-
-    console.log(req.body.logoFile);
-    console.log(req.body.signatureFile);
 
     let parsedAdditionalInfo = [];
     if (req.body?.additionalInformation) {
@@ -139,6 +170,43 @@ export async function updateBusiness(req, res) {
       return res
         .status(400)
         .json({ success: false, msg: "Business could not be updated" });
+    }
+
+    if (req.body?.bankAccounts) {
+      let parsedBankAccounts = [];
+      try {
+        parsedBankAccounts = JSON.parse(req.body.bankAccounts);
+      } catch (e) {
+        console.error("Invalid JSON in bankAccounts");
+      }
+
+      for (const acc of parsedBankAccounts) {
+        if (acc._id) {
+          await BusinessBankAccount.findByIdAndUpdate(acc._id, {
+            accountName: acc.accountName || "",
+            bankAccountNumber: acc.bankAccountNumber || "",
+            IFSCCode: acc.ifscCode || "",
+            bankAndBranchName: acc.bankAndBranchName || "",
+            accountHoldersName: acc.accountHoldersName || "",
+            upiId: acc.upiId || "",
+            openingBalance: acc.openingBalance || 0,
+            asOfDate: acc.asOfDate || "",
+          });
+        } else {
+          await BusinessBankAccount.create({
+            accountName: acc.accountName || "",
+            bankAccountNumber: acc.bankAccountNumber || "",
+            IFSCCode: acc.ifscCode || "",
+            bankAndBranchName: acc.bankAndBranchName || "",
+            accountHoldersName: acc.accountHoldersName || "",
+            upiId: acc.upiId || "",
+            openingBalance: acc.openingBalance || 0,
+            asOfDate: acc.asOfDate || "",
+            clientId: req.user.id,
+            businessId: id,
+          });
+        }
+      }
     }
 
     return res.status(200).json({

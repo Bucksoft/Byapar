@@ -58,6 +58,8 @@ const DashboardPartiesPage = () => {
     keepPreviousData: true,
   });
 
+  console.log(business);
+
   // MUTATION TO UPLOAD BULK PARTY DATA
   const bulkMutation = useMutation({
     mutationFn: async (data) => {

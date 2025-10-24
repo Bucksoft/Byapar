@@ -3,7 +3,6 @@ import mongoose from "mongoose";
 const businessBankAccountSchema = new mongoose.Schema({
   accountName: {
     type: String,
-    required: true,
   },
   openingBalance: {
     type: Number,
@@ -11,22 +10,18 @@ const businessBankAccountSchema = new mongoose.Schema({
   },
   bankAccountNumber: {
     type: String,
-    required: true,
   },
   asOfDate: {
     type: String,
   },
   IFSCCode: {
     type: String,
-    required: true,
   },
   bankAndBranchName: {
     type: String,
-    required: true,
   },
   accountHoldersName: {
     type: String,
-    required: true,
   },
   upiId: {
     type: String,
@@ -38,6 +33,10 @@ const businessBankAccountSchema = new mongoose.Schema({
   clientId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "UserCredential",
+  },
+  isActive: {
+    type: Boolean,
+    default: false,
   },
 });
 

@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { IoCloseCircle } from "react-icons/io5";
 import BankAccountPopup from "../BankAccountPopup";
 import BankAccountPopupForBusiness from "../BankAccountPopupForBusiness";
@@ -22,11 +22,26 @@ const SalesInvoiceFooterSection = ({
   const [discount, setDiscount] = useState(false);
   const [selectCheckBox, setSelectCheckBox] = useState(false);
   const [markAsPaid, setMarkedAsPaid] = useState(false);
+
   const { business } = useBusinessStore();
   const { setBankAccounts } = useBusinessBankAccountStore();
   const [isDeletePopup, setIsDeletePopup] = useState(false);
   const [accountId, setAccountId] = useState("");
   const [isEditingAccount, setIsEditingAccount] = useState(false);
+  const { activeAccount } = useBusinessBankAccountStore();
+
+  useEffect(() => {
+    if (
+      (business && business.notes) ||
+      (business && business.termsAndCondition)
+    ) {
+      setData((prev) => ({
+        ...prev,
+        notes: business?.notes,
+        termsAndCondition: business?.termsAndCondition,
+      }));
+    }
+  }, []);
 
   const { isLoading, data: bankAccounts } = useQuery({
     queryKey: ["businessBankAccounts"],
@@ -55,26 +70,11 @@ const SalesInvoiceFooterSection = ({
   return (
     <div className="grid grid-cols-2 w-full ">
       {/* left grid part */}
-      <div className=" border-l-zinc-300 py-2">
+      <div className=" border-l-zinc-300">
         {/* add notes */}
         <div>
-          <span
-            onClick={() => setNotes(true)}
-            className={`px-2 w-fit text-info text-xs cursor-pointer  ${
-              notes ? "hidden" : ""
-            }`}
-          >
-            + Add Notes
-          </span>
-          {notes && (
+          {data?.notes && (
             <div className="p-2">
-              <div className="flex justify-end  relative">
-                <IoCloseCircle
-                  size={20}
-                  onClick={() => setNotes(false)}
-                  className="text-gray-500 absolute top-0 right-0 z-10"
-                />
-              </div>
               <label htmlFor="notes" className="text-xs">
                 Notes
               </label>
@@ -89,31 +89,16 @@ const SalesInvoiceFooterSection = ({
                   }))
                 }
                 placeholder="Enter Your Notes"
-                className="input  w-full text-xs bg-zinc-200"
+                className="input input-sm w-full text-xs bg-zinc-200"
               />
             </div>
           )}
         </div>
 
         {/* add term & condition */}
-        <div className="border-b border-b-zinc-300 py-2">
-          <span
-            onClick={() => setTermCondition(true)}
-            className={`px-2 w-fit text-info text-xs cursor-pointer ${
-              termCondition ? "hidden" : ""
-            }`}
-          >
-            +Add Terms & Conditions
-          </span>
-          {termCondition && (
+        <div className="border-b border-b-zinc-300 py-1">
+          {data?.termsAndCondition && (
             <div className="p-2">
-              <div className="flex justify-end  relative">
-                <IoCloseCircle
-                  size={20}
-                  onClick={() => setTermCondition(false)}
-                  className="text-gray-500 absolute top-0 right-0 z-10"
-                />
-              </div>
               <label htmlFor="t&c" className="text-xs">
                 Terms and Conditions
               </label>
@@ -129,7 +114,7 @@ const SalesInvoiceFooterSection = ({
                   }))
                 }
                 placeholder="Enter your terms and conditions"
-                className="textarea bg-zinc-200 w-full"
+                className="textarea textarea-sm bg-zinc-200 w-full"
               />
             </div>
           )}
@@ -141,92 +126,91 @@ const SalesInvoiceFooterSection = ({
         ) : title === "Purchase Invoice" ? (
           <></>
         ) : (
-          bankAccounts.map((bankAccount) => (
-            <div
-              key={bankAccount._id}
-              className="bg-white rounded-xl shadow-md border border-zinc-200 p-4 mx-5 mt-4 hover:shadow-lg transition-shadow duration-200"
-            >
-              {/* Header: Account Name */}
-              {bankAccount?.accountName && (
-                <div className="flex items-center justify-between mb-3">
-                  <h2 className="font-semibold text-zinc-800 text-sm">
-                    Account Name
-                  </h2>
-                  <p className="text-zinc-600 text-sm">
-                    {bankAccount.accountName}
-                  </p>
-                </div>
-              )}
+          bankAccounts.map(
+            (bankAccount) =>
+              bankAccount.isActive && (
+                <div key={bankAccount._id} className="bg-white p-4 ">
+                  {/* Header: Account Name */}
+                  {bankAccount?.accountName && (
+                    <div className="flex items-center justify-between ">
+                      <h2 className="font-semibold text-zinc-800 text-sm">
+                        Account Name
+                      </h2>
+                      <p className="text-zinc-600 text-sm">
+                        {bankAccount.accountName}
+                      </p>
+                    </div>
+                  )}
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                {/* Account Number */}
-                {bankAccount?.bankAccountNumber && (
-                  <div className="flex flex-col">
-                    <span className="text-zinc-500 text-xs font-medium">
-                      Account Number
-                    </span>
-                    <p className="text-zinc-700 text-sm">
-                      {bankAccount.bankAccountNumber}
-                    </p>
-                  </div>
-                )}
+                  {/* Account Number */}
+                  {bankAccount?.bankAccountNumber && (
+                    <div className="flex items-center justify-between">
+                      <span className="font-semibold text-zinc-800 text-sm ">
+                        Account Number
+                      </span>
+                      <p className="text-zinc-700 text-sm">
+                        {bankAccount.bankAccountNumber}
+                      </p>
+                    </div>
+                  )}
 
-                {/* IFSC Code */}
-                {bankAccount?.IFSCCode && (
-                  <div className="flex flex-col">
-                    <span className="text-zinc-500 text-xs font-medium">
-                      IFSC Code
-                    </span>
-                    <p className="text-zinc-700 text-sm">
-                      {bankAccount.IFSCCode}
-                    </p>
-                  </div>
-                )}
+                  {/* IFSC Code */}
+                  {bankAccount?.IFSCCode && (
+                    <div className="flex items-center justify-between">
+                      <span className="text-zinc-800 text-sm font-semibold">
+                        IFSC Code
+                      </span>
+                      <p className="text-zinc-700 text-sm">
+                        {bankAccount.IFSCCode}
+                      </p>
+                    </div>
+                  )}
 
-                {/* UPI Id */}
-                {bankAccount?.upiId && (
-                  <div className="flex flex-col">
-                    <span className="text-zinc-500 text-xs font-medium">
-                      UPI ID
-                    </span>
-                    <p className="text-zinc-700 text-sm">{bankAccount.upiId}</p>
-                  </div>
-                )}
+                  {/* UPI Id */}
+                  {bankAccount?.upiId && (
+                    <div className="flex items-center justify-between">
+                      <span className="text-zinc-800 text-sm font-semibold">
+                        UPI ID
+                      </span>
+                      <p className="text-zinc-700 text-sm">
+                        {bankAccount.upiId}
+                      </p>
+                    </div>
+                  )}
 
-                {/* Account Holder's Name */}
-                {bankAccount?.accountHoldersName && (
-                  <div className="flex flex-col">
-                    <span className="text-zinc-500 text-xs font-medium">
-                      Account Holder's Name
-                    </span>
-                    <p className="text-zinc-700 text-sm">
-                      {bankAccount.accountHoldersName}
-                    </p>
-                  </div>
-                )}
-              </div>
+                  {/* Account Holder's Name */}
+                  {bankAccount?.accountHoldersName && (
+                    <div className="flex items-center justify-between">
+                      <span className="text-zinc-800 text-sm font-semibold">
+                        Account Holder's Name
+                      </span>
+                      <p className="text-zinc-700 text-sm">
+                        {bankAccount.accountHoldersName}
+                      </p>
+                    </div>
+                  )}
 
-              {/* Action Buttons */}
-              <div className="flex justify-end gap-2 mt-4">
-                <button
-                  className="btn btn-xs btn-error btn-outline flex items-center gap-1 hover:bg-red-50"
-                  onClick={() => {
-                    document.getElementById("delete-modal").showModal();
-                    setAccountId(bankAccount?._id);
-                  }}
-                >
-                  <Trash size={14} /> Delete
-                </button>
-                {/* Uncomment if edit functionality needed */}
-                {/* <button
+                  {/* Action Buttons */}
+                  {/* <div className="flex justify-end gap-2 mt-4">
+                    <button
+                      className="btn btn-xs btn-error btn-outline flex items-center gap-1 hover:bg-red-50"
+                      onClick={() => {
+                        document.getElementById("delete-modal").showModal();
+                        setAccountId(bankAccount?._id);
+                      }}
+                    >
+                      <Trash size={14} /> Delete
+                    </button>
+                    <button
                       className="btn btn-xs btn-success btn-outline flex items-center gap-1 hover:bg-green-50"
                       onClick={() => setIsEditingAccount(true)}
                     >
                       <Pen size={14} /> Edit
-              </button> */}
-              </div>
-            </div>
-          ))
+                    </button>
+                  </div> */}
+                </div>
+              )
+          )
         )}
       </div>
       {/* Right Grid Part */}

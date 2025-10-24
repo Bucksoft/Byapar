@@ -1,6 +1,6 @@
 import { Mail } from "lucide-react";
 import { FcGoogle } from "react-icons/fc";
-import ByaparLogo from "../assets/Byapar_Logo.svg";
+import ByaparLogo from "../assets/byaparLogo.png";
 import LoginImage from "../assets/Byapar.png";
 import { useMutation } from "@tanstack/react-query";
 import { useRef, useState } from "react";
@@ -86,7 +86,7 @@ const LoginPage = () => {
             <img
               src={ByaparLogo}
               alt="Byapar_logo"
-              width={80}
+              width={100}
               className="mb-8"
               loading="lazy"
             />
