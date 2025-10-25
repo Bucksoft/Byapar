@@ -1,6 +1,6 @@
 import { Mail } from "lucide-react";
 import { FcGoogle } from "react-icons/fc";
-import ByaparLogo from "../assets/byaparLogo.png";
+// import ByaparLogo from "../assets/byaparLogo.png";
 import LoginImage from "../assets/Byapar.png";
 import { useMutation } from "@tanstack/react-query";
 import { useRef, useState } from "react";
@@ -83,15 +83,15 @@ const LoginPage = () => {
         >
           {/* left section */}
           <section className="flex items-start mt-16 h-full px-10 flex-col ">
-            <img
-              src={ByaparLogo}
+            {/* <img
+              src={""}
               alt="Byapar_logo"
               width={100}
               className="mb-8"
               loading="lazy"
-            />
+            /> */}
 
-            <h1 className="font-semibold text-4xl flex justify-between w-full items-center">
+            <h1 className="font-semibold text-4xl mt-8 flex justify-between w-full items-center">
               Login / Register
               <svg
                 xmlns="http://www.w3.org/2000/svg"
