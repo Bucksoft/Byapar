@@ -27,7 +27,6 @@ import { useCategoryStore } from "../store/categoryStore";
 import { useChallanStore } from "../store/challanStore";
 import { BsExclamationCircle } from "react-icons/bs";
 import { useMutation } from "@tanstack/react-query";
-import ByaparLogo from "../assets/byaparLogo.png";
 import { useDebitNoteStore } from "../store/debitNoteStore";
 
 export const container = {
@@ -114,12 +113,12 @@ const Sidebar = () => {
           }}
           className="sticky top-0 z-10 text-md text-black font-semibold flex items-center  gap-3 w-full px-5 py-3 backdrop-blur-md border-b border-b-zinc-200"
         >
-          <img
+          {/* <img
             src={ByaparLogo}
             alt="Byapar_logo"
             className=" w-8 h-8 "
             loading="lazy"
-          />
+          /> */}
           {/* <button
             className="cursor-pointer"
             onClick={() => setSidebarShrink((prev) => !prev)}
