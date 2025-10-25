@@ -5,13 +5,12 @@ import { useBusinessStore } from "../store/businessStore";
 import { IoBusinessSharp, IoLocationSharp } from "react-icons/io5";
 import { IoMdCheckmarkCircleOutline } from "react-icons/io";
 import { PenSquare, Plus } from "lucide-react";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import toast from "react-hot-toast";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { queryClient } from "../main";
 import { BsTrash3 } from "react-icons/bs";
 import businessImg from "../assets/business.svg";
-import { useAuthStore } from "../store/authStore";
 
 const DashboardMyBusinesses = () => {
   const {
@@ -22,6 +21,8 @@ const DashboardMyBusinesses = () => {
   const [activeBusinessId, setActiveBusinessId] = useState();
 
   const navigate = useNavigate();
+
+  // fetch all the businesses
   const { isLoading, data: businesses } = useQuery({
     queryKey: ["business"],
     queryFn: async () => {
@@ -63,6 +64,7 @@ const DashboardMyBusinesses = () => {
           "proformaInvoice",
           "items",
           "parties",
+          "purchaseInvoice",
           id,
         ],
       });
@@ -237,7 +239,7 @@ const DashboardMyBusinesses = () => {
                         >
                           {mutation?.isPending &&
                           business?._id === activeBusinessId ? (
-                            <CustomLoader text={"Loading..."} size={12} />
+                            <CustomLoader text={""} />
                           ) : (
                             <>
                               <IoMdCheckmarkCircleOutline size={15} />

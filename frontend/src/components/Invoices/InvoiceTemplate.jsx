@@ -27,6 +27,8 @@ const InvoiceTemplate = ({
     },
   });
 
+  console.log("BUSINESS ", business);
+
   const { data: supplierBankAccount } = useQuery({
     queryKey: ["bankAccounts", business?._id],
     queryFn: async () => {
@@ -1150,11 +1152,34 @@ const InvoiceTemplate = ({
           >
             {/* TERMS AND CONDITION BLOCK */}
             <div style={{ marginTop: "12px" }}>
-              {invoice?.termsAndCondition && (
-                <div>
-                  <h4 style={{ fontWeight: 600 }}>Terms & Conditions</h4>
-                  <p style={{ whiteSpace: "pre-line" }}>
-                    {invoice?.termsAndCondition}
+              {invoice?.termsAndCondition ||
+                (business?.termsAndCondition && (
+                  <div>
+                    <h4 style={{ fontWeight: 600 }}>Terms & Condition</h4>
+                    <p
+                      style={{
+                        whiteSpace: "pre-line",
+                        color: "#52525c",
+                        fontStyle: "italic",
+                      }}
+                    >
+                      {invoice?.termsAndCondition ||
+                        business?.termsAndCondition}
+                    </p>
+                  </div>
+                ))}
+
+              {business?.notes && (
+                <div style={{ marginTop: "16px" }}>
+                  <h4 style={{ fontWeight: 600 }}>Notes</h4>
+                  <p
+                    style={{
+                      whiteSpace: "pre-line",
+                      color: "#52525c",
+                      fontStyle: "italic",
+                    }}
+                  >
+                    {invoice?.notes || business?.notes}
                   </p>
                 </div>
               )}

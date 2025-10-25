@@ -12,8 +12,6 @@ export async function createBusiness(req, res) {
     const logoFile = req.files?.logo?.[0];
     const signatureFile = req.files?.signature?.[0];
 
-    console.log(req.body.bankAccounts);
-
     let parsedAdditionalInfo = [];
     if (req.body?.additionalInformation) {
       try {
@@ -95,7 +93,7 @@ export async function createBusiness(req, res) {
           parsedBankAccounts.map((account) => ({
             accountName: account?.accountName || "",
             bankAccountNumber: account?.bankAccountNumber || "",
-            IFSCCode: account?.ifscCode || "",
+            IFSCCode: account?.IFSCCode || "",
             bankAndBranchName: account?.bankAndBranchName || "",
             accountHoldersName: account?.accountHoldersName || "",
             upiId: account?.upiId || "",
@@ -132,41 +130,51 @@ export async function updateBusiness(req, res) {
         .json({ success: false, msg: "Please provide business ID" });
     }
 
+    const existingBusiness = await Business.findById(id);
+    if (!existingBusiness) {
+      return res
+        .status(404)
+        .json({ success: false, msg: "Business not found" });
+    }
+
     const logoFile = req.files?.logo?.[0];
     const signatureFile = req.files?.signature?.[0];
 
+    const updateData = {
+      ...req.body,
+      additionalInformation: [],
+      clientId: req.user.id,
+    };
+
     if (logoFile) {
-      req.body.logo = `${req.protocol}://${req.get(
+      updateData.logo = `${req.protocol}://${req.get(
         "host"
       )}/uploads/${path.basename(logoFile.path)}`;
+    } else {
+      updateData.logo = existingBusiness.logo;
     }
 
     if (signatureFile) {
-      req.body.signature = `${req.protocol}://${req.get(
+      updateData.signature = `${req.protocol}://${req.get(
         "host"
       )}/uploads/${path.basename(signatureFile.path)}`;
+    } else {
+      updateData.signature = existingBusiness.signature;
     }
 
-    // Parse additional info
-    let parsedAdditionalInfo = [];
     if (req.body?.additionalInformation) {
       try {
-        parsedAdditionalInfo = JSON.parse(req.body.additionalInformation);
+        updateData.additionalInformation = JSON.parse(
+          req.body.additionalInformation
+        );
       } catch {
         console.error("Invalid JSON in additionalInformation");
       }
     }
 
-    // Update business details
-    const updatedBusiness = await Business.findByIdAndUpdate(
-      id,
-      {
-        ...req.body,
-        additionalInformation: parsedAdditionalInfo,
-        clientId: req.user.id,
-      },
-      { new: true }
-    );
+    const updatedBusiness = await Business.findByIdAndUpdate(id, updateData, {
+      new: true,
+    });
 
     if (!updatedBusiness) {
       return res
@@ -197,7 +205,7 @@ export async function updateBusiness(req, res) {
           await BusinessBankAccount.findByIdAndUpdate(acc._id, {
             accountName: acc.accountName || "",
             bankAccountNumber: acc.bankAccountNumber || "",
-            IFSCCode: acc.ifscCode || "",
+            IFSCCode: acc.IFSCCode || "",
             bankAndBranchName: acc.bankAndBranchName || "",
             accountHoldersName: acc.accountHoldersName || "",
             upiId: acc.upiId || "",
@@ -208,7 +216,7 @@ export async function updateBusiness(req, res) {
           await BusinessBankAccount.create({
             accountName: acc.accountName || "",
             bankAccountNumber: acc.bankAccountNumber || "",
-            IFSCCode: acc.ifscCode || "",
+            IFSCCode: acc.IFSCCode || "",
             bankAndBranchName: acc.bankAndBranchName || "",
             accountHoldersName: acc.accountHoldersName || "",
             upiId: acc.upiId || "",

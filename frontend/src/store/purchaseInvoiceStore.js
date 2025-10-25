@@ -10,6 +10,9 @@ export const usePurchaseInvoiceStore = create(
       setPurchaseInvoices: (data) => set({ purchaseInvoices: data }),
       totalPurchaseInvoices: 0,
       setTotalPurchaseInvoices: (data) => set({ totalPurchaseInvoices: data }),
+      latestPurchaseInvoiceNumber: 0,
+      setLatestPurchaseInvoiceNumber: (data) =>
+        set({ latestPurchaseInvoiceNumber: data }),
     }),
     {
       name: "purchaseInvoice",

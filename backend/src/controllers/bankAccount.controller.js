@@ -235,6 +235,7 @@ export async function getBusinessBankAccounts(req, res) {
       businessId: id,
       clientId: req.user?.id,
     });
+    console.log("BUSINESS BANK ACCOUNTS ", businessBankAccounts);
     if (!businessBankAccounts) {
       return res.status(400).json({ msg: "Business bank accounts not found" });
     }

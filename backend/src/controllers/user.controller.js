@@ -42,7 +42,7 @@ export async function login(req, res) {
     });
 
     // send OTP via email
-    // await sendOTPviaMail(email, otp);
+    await sendOTPviaMail(email, otp);
 
     console.log("Generated OTP:", otp);
 

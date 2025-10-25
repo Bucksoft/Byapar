@@ -442,3 +442,38 @@ export async function getAllInvoicesForAParty(req, res) {
     return res.status(500).json({ msg: "Internal Server Error" });
   }
 }
+
+// CONTROLLER TO GET SALES DATA FOR CHART
+export async function getSalesDataForChart(req, res) {
+  try {
+    const businessId = req.params?.id;
+    const days = parseInt(req.query?.days) || 15;
+    const clientId = req.user?.id;
+
+    const startDate = new Date();
+    startDate.setDate(startDate.getDate() - (days - 1));
+
+    const salesData = await SalesInvoice.aggregate([
+      {
+        $match: {
+          createdAt: { $gte: startDate },
+        },
+      },
+      {
+        $group: {
+          _id: {
+            $dateToString: { format: "%Y-%m-%d", date: "$createdAt" },
+          },
+          totalSales: { $sum: "$totalAmount" },
+        },
+      },
+      { $sort: { _id: 1 } },
+    ]);
+
+    return res.status(200).json({ success: true, salesData });
+  } catch (error) {
+    return res
+      .status(500)
+      .json({ success: false, msg: "Internal Server Error" });
+  }
+}

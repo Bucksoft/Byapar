@@ -32,14 +32,13 @@ import { uploadExcel } from "../../helpers/uploadExcel";
 import { useDebounce } from "../../helpers/useDebounce";
 
 const DashboardSalesPage = () => {
-  const { setInvoices, setTotalInvoices, setLatestInvoiceNumber } =
-    useInvoiceStore();
-  const [showDeletePopup, setShowDeletePopup] = useState(false);
-  const [invoiceId, setInvoiceId] = useState();
-  const [searchQuery, setSearchQuery] = useState("");
   const { business } = useBusinessStore();
-  // const { invoices } = useInvoiceStore();
+  const [searchQuery, setSearchQuery] = useState("");
+  const [invoiceId, setInvoiceId] = useState();
   const navigate = useNavigate();
+  const [showDeletePopup, setShowDeletePopup] = useState(false);
+  const { setInvoices, setTotalInvoices, setLatestInvoiceNumber } =
+  useInvoiceStore();
   const fileRef = useRef(null);
   const [page, setPage] = useState(1);
   const [currentPage, setCurrentPage] = useState(1);
@@ -55,7 +54,6 @@ const DashboardSalesPage = () => {
     queryFn: async () => {
       if (!business) return [];
       const res = await axiosInstance.get(`/sales-invoice/${business._id}`);
-      console.log(res);
       setInvoices(res?.data?.invoices);
       setTotalInvoices(res.data?.totalInvoices);
       setLatestInvoiceNumber(res.data?.latestInvoiceNumber);
@@ -76,6 +74,8 @@ const DashboardSalesPage = () => {
       toast.success(data?.msg);
       document.getElementById("my_modal_2").close();
       queryClient.invalidateQueries({ queryKey: ["invoices"] });
+      setShowDeletePopup(false);
+      setInvoiceId(null);
     },
     onError: (err) => {
       toast.error(err.response.data.msg);

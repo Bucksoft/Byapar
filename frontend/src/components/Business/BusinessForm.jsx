@@ -25,7 +25,7 @@ const BusinessForm = ({ businessToBeUpdated }) => {
   const [editIndex, setEditIndex] = useState();
 
   const [bankAccountNumber, setBankAccountNumber] = useState("");
-  const [ifscCode, setifscCode] = useState("");
+  const [IFSCCode, setIFSCCode] = useState("");
   const [accountName, setAccountName] = useState("");
   const [openingBalance, setOpeningBalance] = useState();
   const [bankAndBranchName, setBankAndBranchName] = useState("");
@@ -63,7 +63,7 @@ const BusinessForm = ({ businessToBeUpdated }) => {
   });
 
   // QUERY TO FETCH ALL THE BANK ACCOUNTS
-  const { data: bankAccounts, isLoading } = useQuery({
+  const { data: bankAccounts } = useQuery({
     queryKey: ["bankAccounts"],
     queryFn: async () => {
       const res = await axiosInstance.get(
@@ -184,7 +184,7 @@ const BusinessForm = ({ businessToBeUpdated }) => {
     },
     onSuccess: (data) => {
       toast.success("Business details updated");
-      queryClient.invalidateQueries({ queryKey: ["business"] });
+      queryClient.invalidateQueries({ queryKey: [] });
       navigate("/dashboard/my-businesses");
       setBusiness(data);
     },
@@ -228,11 +228,6 @@ const BusinessForm = ({ businessToBeUpdated }) => {
     }
   };
 
-  const currentAdditionalInfo =
-    Array.isArray(additionalInformation) && additionalInformation.length > 0
-      ? additionalInformation
-      : businessToBeUpdated?.additionalInformation || [];
-
   // Inside your component
   useEffect(() => {
     if (bankAccounts && businessToBeUpdated) {
@@ -246,7 +241,7 @@ const BusinessForm = ({ businessToBeUpdated }) => {
   const resetBankForm = () => {
     setAccountName("");
     setBankAccountNumber("");
-    setifscCode("");
+    setIFSCCode("");
     setBankAndBranchName("");
     setAccountHoldersName("");
     setUpiId("");
@@ -266,9 +261,8 @@ const BusinessForm = ({ businessToBeUpdated }) => {
     onSuccess: (data) => {
       setActiveAccount(data);
       toast.success("Bank account marked as active ");
-      navigate("/dashboard/my-businesses");
       queryClient.invalidateQueries({
-        queryKey: ["businessBankAccounts", businessToBeUpdated?._id],
+        queryKey: ["bankAccounts"],
       });
     },
   });
@@ -1041,7 +1035,7 @@ const BusinessForm = ({ businessToBeUpdated }) => {
                     {bank.bankAndBranchName || "-"}
                   </p>
                   <p>
-                    <span className="font-semibold">Holder:</span>{" "}
+                    <span className="font-semibold">Account Holder:</span>{" "}
                     {bank.accountHoldersName || "-"}
                   </p>
                   {bank.upiId && (
@@ -1070,7 +1064,7 @@ const BusinessForm = ({ businessToBeUpdated }) => {
                       onClick={() => {
                         setAccountName(bank.accountName);
                         setBankAccountNumber(bank.bankAccountNumber);
-                        setifscCode(bank.ifscCode);
+                        setIFSCCode(bank.IFSCCode);
                         setBankAndBranchName(bank.bankAndBranchName);
                         setAccountHoldersName(bank.accountHoldersName);
                         setUpiId(bank.upiId);
@@ -1179,9 +1173,9 @@ const BusinessForm = ({ businessToBeUpdated }) => {
                 <input
                   type="text"
                   placeholder="ex-ICIC0001234"
-                  name="ifscCode"
-                  value={ifscCode}
-                  onChange={(e) => setifscCode(e.target.value)}
+                  name="IFSCCode"
+                  value={IFSCCode}
+                  onChange={(e) => setIFSCCode(e.target.value)}
                   className={`border border-gray-200  rounded w-full p-1`}
                   maxLength={11}
                   style={{ textTransform: "uppercase" }}
@@ -1288,7 +1282,7 @@ const BusinessForm = ({ businessToBeUpdated }) => {
                   const updatedBank = {
                     accountName,
                     bankAccountNumber,
-                    ifscCode,
+                    IFSCCode,
                     bankAndBranchName,
                     accountHoldersName,
                     upiId,
@@ -1316,7 +1310,7 @@ const BusinessForm = ({ businessToBeUpdated }) => {
                   const newBankAccount = {
                     accountName,
                     bankAccountNumber,
-                    ifscCode,
+                    IFSCCode,
                     bankAndBranchName,
                     accountHoldersName,
                     upiId,
@@ -1330,7 +1324,7 @@ const BusinessForm = ({ businessToBeUpdated }) => {
 
                   setAccountName("");
                   setBankAccountNumber("");
-                  setifscCode("");
+                  setIFSCCode("");
                   setBankAndBranchName("");
                   setAccountHoldersName("");
                   setUpiId("");
