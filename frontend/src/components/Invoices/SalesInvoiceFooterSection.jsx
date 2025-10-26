@@ -68,7 +68,7 @@ const SalesInvoiceFooterSection = ({
   });
 
   return (
-    <div className="grid grid-cols-2 w-full ">
+    <div className="grid grid-cols-2 w-full border-b border-zinc-200">
       {/* left grid part */}
       <div className=" border-l-zinc-300">
         {/* add notes */}
@@ -96,7 +96,7 @@ const SalesInvoiceFooterSection = ({
         </div>
 
         {/* add term & condition */}
-        <div className="border-b border-b-zinc-300 py-1">
+        <div className=" py-1">
           {data?.termsAndCondition && (
             <div className="p-2">
               <label htmlFor="t&c" className="text-xs">
@@ -461,7 +461,7 @@ const SalesInvoiceFooterSection = ({
 
         {/* balance amount */}
         {(title === "Sales Invoice" || title === "Sales Return") && (
-          <div className="p-2 border-b border-b-zinc-300 pb-2">
+          <div className="p-2">
             <div className="flex justify-end p-2 pr-5 space-x-2">
               <span className="text-xs">Mark as fully paid</span>
               <input

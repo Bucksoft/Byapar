@@ -119,12 +119,7 @@ const Sidebar = () => {
             className=" w-8 h-8 "
             loading="lazy"
           /> */}
-          {/* <button
-            className="cursor-pointer"
-            onClick={() => setSidebarShrink((prev) => !prev)}
-          >
-            <RiMenu3Fill />
-          </button> */}
+          ByaparSetu
         </motion.h1>
 
         {/* business details */}

@@ -28,6 +28,7 @@ const DashboardPartyPage = () => {
     );
   }
 
+  // FETCHING THE PARTY
   const { isLoading, data: party } = useQuery({
     queryKey: ["party", id],
     queryFn: async () => {

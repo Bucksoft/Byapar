@@ -84,6 +84,8 @@ const DashboardUpdateInvoicesPage = () => {
     );
   }
 
+  console.log(type);
+
   return (
     <main className="max-h-screen flex w-full overflow-auto">
       <section className="w-full h-screen p-2">
@@ -100,7 +102,7 @@ const DashboardUpdateInvoicesPage = () => {
                 ? "Delivery Challan"
                 : type === "proforma invoice"
                 ? "Proforma Invoice"
-                : type === "purchase Invoice"
+                : type === "purchase invoice"
                 ? "Purchase Invoice"
                 : type === "purchase Return"
                 ? "Purchase Return"

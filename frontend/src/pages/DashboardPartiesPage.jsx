@@ -47,7 +47,6 @@ const DashboardPartiesPage = () => {
       const res = await axiosInstance.get(
         `/parties/all-parties/${business?._id}`
       );
-      console.log(res);
       setToCollect(res.data?.toCollect);
       setToPay(res.data?.toPay);
       setTotalParties(res.data?.totalParties);
@@ -58,7 +57,7 @@ const DashboardPartiesPage = () => {
     keepPreviousData: true,
   });
 
-  console.log(business);
+  console.log("REFETCHED", data);
 
   // MUTATION TO UPLOAD BULK PARTY DATA
   const bulkMutation = useMutation({
