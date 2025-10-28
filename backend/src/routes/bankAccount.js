@@ -11,6 +11,8 @@ import {
 import { isAuth } from "../middleware/auth.middleware.js";
 
 const router = express.Router();
+
+
 router.route("/").post(isAuth, createBankAccount);
 
 router
