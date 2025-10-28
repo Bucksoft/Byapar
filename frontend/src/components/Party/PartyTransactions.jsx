@@ -152,8 +152,10 @@ const PartyTransactions = ({
                       className={`${
                         transaction.status && "badge badge-sm badge-soft"
                       } ${
-                        transaction?.status === "unpaid"
+                        transaction?.status === "cancelled"
                           ? "badge-error"
+                          : transaction.status === "unpaid"
+                          ? "badge-warning"
                           : "badge-success"
                       }`}
                     >

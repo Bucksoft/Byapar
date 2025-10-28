@@ -1,7 +1,17 @@
-import { Plus } from "lucide-react";
+import { useQuery } from "@tanstack/react-query";
 import { LiaRupeeSignSolid } from "react-icons/lia";
+import { axiosInstance } from "../../config/axios";
+import { LuIndianRupee } from "react-icons/lu";
 
 const PartyProfile = ({ party }) => {
+  const { data: bankInfo } = useQuery({
+    queryKey: ["bankAccount"],
+    queryFn: async () => {
+      const res = await axiosInstance.get(`/bank-account/party/${party?._id}`);
+      return res.data;
+    },
+  });
+
   return (
     <section className="grid grid-cols-2 gap-5">
       {/* general details */}
@@ -70,7 +80,19 @@ const PartyProfile = ({ party }) => {
           </div>
           <div>
             <label className="text-zinc-500">Shipping Address</label>
-            <p className="mt-1">{party?.shippingAddress || "-"}</p>
+            <p className="mt-1">
+              {party?.fullShippingAddress &&
+              party.fullShippingAddress.length > 0 ? (
+                party?.fullShippingAddress?.map((party, index) => (
+                  <div key={party?._id} className="flex items-start justify-start gap-1 my-2">
+                    <span>{index + 1}.</span>
+                    <p>{party?.streetAddress}</p>
+                  </div>
+                ))
+              ) : (
+                <></>
+              )}
+            </p>
           </div>
         </div>
       </div>
@@ -101,21 +123,37 @@ const PartyProfile = ({ party }) => {
         </div>
       </div>
 
-      {/* credit details */}
-      {/* <div className=" border border-zinc-200 rounded-md">
+      {/* bank details */}
+      <div className=" border border-zinc-200 rounded-md">
         <h1 className="font-medium bg-zinc-100 border-b p-2 border-zinc-200">
           Party Bank Details
         </h1>
-        <div className="text-sm p-4 gap-5 bg-[var(--secondary-btn)]/10 cursor-pointer">
-          <div className="">
-            <label className="text-zinc-500">Credit Limit</label>
-            <p className="mt-1 flex items-center">
-              <Plus size={15} />
-              Add bank information to manage transactions with this party.
+        <div className="grid grid-cols-2 text-sm p-4 gap-5">
+          <div>
+            <label className="text-zinc-500">Account Number</label>
+            <p className="mt-1">{bankInfo?.bankAccountNumber || "-"}</p>
+          </div>
+          <div>
+            <label className="text-zinc-500">Account Holder's Name</label>
+            <p className="mt-1">{bankInfo?.accountHoldersName || "-"}</p>
+          </div>
+          <div>
+            <label className="text-zinc-500">Bank and Branch</label>
+            <p className="mt-1">{bankInfo?.bankAndBranchName || "-"}</p>
+          </div>
+          <div>
+            <label className="text-zinc-500">IFSC Code</label>
+            <p className="mt-1">{bankInfo?.IFSCCode || "-"}</p>
+          </div>
+          <div>
+            <label className="text-zinc-500">Opening Balance</label>
+            <p className="mt-1 flex items-center gap-1">
+              <LuIndianRupee size={15} />
+              {bankInfo?.openingBalance || 0}
             </p>
           </div>
         </div>
-      </div> */}
+      </div>
     </section>
   );
 };

@@ -90,8 +90,6 @@ const DashboardQuotationPage = () => {
     } else {
       return quotation;
     }
-
-    return true;
   });
 
   return (

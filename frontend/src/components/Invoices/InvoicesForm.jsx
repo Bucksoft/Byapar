@@ -35,7 +35,7 @@ const InvoicesForm = ({
 }) => {
   const { business } = useBusinessStore();
   const { parties } = usePartyStore();
-  const { totalInvoices, latestInvoiceNumber } = useInvoiceStore();
+  const { latestInvoiceNumber } = useInvoiceStore();
   const { totalQuotations } = useQuotationStore();
   const { totalSalesReturn } = useSalesReturnStore();
   const { totalCreditNotes } = useCreditNoteStore();
@@ -361,7 +361,7 @@ const InvoicesForm = ({
   }, [invoiceTotals]);
 
   return (
-    <main className="max-h-screen w-full">
+    <main className="max-h-screen w-full ">
       {/* navbar starts ----------------------------------------------------- */}
       <header className="p-2 w-full flex items-center justify-between">
         <div className="flex items-center justify-center">
