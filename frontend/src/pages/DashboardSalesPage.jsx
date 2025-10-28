@@ -38,7 +38,7 @@ const DashboardSalesPage = () => {
   const navigate = useNavigate();
   const [showDeletePopup, setShowDeletePopup] = useState(false);
   const { setInvoices, setTotalInvoices, setLatestInvoiceNumber } =
-  useInvoiceStore();
+    useInvoiceStore();
   const fileRef = useRef(null);
   const [page, setPage] = useState(1);
   const [currentPage, setCurrentPage] = useState(1);
@@ -333,11 +333,11 @@ const DashboardSalesPage = () => {
                         <p
                           className={`badge badge-soft badge-sm ${
                             invoice?.status === "unpaid"
-                              ? "badge-error"
+                              ? "badge-primary"
                               : invoice?.status === "partially paid"
                               ? "badge-secondary"
                               : invoice?.status === "cancelled"
-                              ? "badge-primary"
+                              ? "badge-error"
                               : "badge-success"
                           }`}
                         >

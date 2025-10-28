@@ -12,6 +12,7 @@ import { motion } from "framer-motion";
 import { useBusinessStore } from "../store/businessStore";
 import BankAccountPopup from "../components/BankAccountPopup";
 import { useCategoryStore } from "../store/categoryStore";
+import BankAccountsModal from "../components/BankAccountModal";
 
 const DashboardAddPartyPage = () => {
   const navigate = useNavigate();
@@ -41,11 +42,7 @@ const DashboardAddPartyPage = () => {
     creditLimit: 0,
     pincode: "",
     businessId: business?._id,
-    bankAccountNumber: "",
-    IFSCCode: "",
-    accountHoldersName: "",
-    bankAndBranchName: "",
-    upiId: "",
+    bankAccounts: [],
   });
   const { setCategories, categories: newCategories } = useCategoryStore();
   const dropdownRef = useRef();
@@ -604,7 +601,7 @@ const DashboardAddPartyPage = () => {
         </section>
 
         <h3 className="p-3 text-sm text-zinc-500">Party Bank Account</h3>
-
+        {/* 
         {isAddedBankInfo ? (
           <div className="flex items-center gap-4 pb-8 pt-1 px-5">
             <section className="bg-white p-2 rounded-md">
@@ -720,7 +717,6 @@ const DashboardAddPartyPage = () => {
           <section className="flex flex-col py-16 items-center justify-center bg-white gap-4 text-xs">
             <Landmark size={30} />
             <p>Add party bank information to manage transactions</p>
-            {/* Bank Account Popup */}
             <BankAccountPopup
               partyName={data?.partyName}
               setData={setData}
@@ -730,7 +726,49 @@ const DashboardAddPartyPage = () => {
               mutation={mutation}
             />
           </section>
+        )} */}
+
+        {data?.bankAccounts?.length > 0 && (
+          <div className="flex items-center  gap-4 pb-8 pt-1 px-5">
+            <section className="bg-white p-2 rounded-md w-full">
+              {data?.bankAccounts?.map((b, i) => (
+                <div
+                  key={i}
+                  className="border border-gray-300 rounded-md p-3 flex justify-between items-start mb-2"
+                >
+                  <div>
+                    <p className="font-medium text-sm">
+                      {b.accountHoldersName} ({b.bankAccountNumber})
+                    </p>
+                    <p className="text-xs text-gray-500">
+                      {b.bankAndBranchName} — {b.IFSCCode}
+                    </p>
+                    {b.upiId && <p className="text-xs">UPI: {b.upiId}</p>}
+                  </div>
+                </div>
+              ))}
+            </section>
+          </div>
         )}
+
+        <div className="flex items-center justify-center gap-4 py-16 px-5">
+
+          <button
+            className="btn btn-sm btn-dash btn-neutral"
+            onClick={() =>
+              document.getElementById("bankAccountModal").showModal()
+            }
+          >
+            Add Bank Account
+          </button>
+        </div>
+
+        <BankAccountsModal
+          data={data}
+          setData={setData}
+          businessId={business?._id}
+          partyId={data?._id}
+        />
 
         {addCategoryPopup && (
           <>

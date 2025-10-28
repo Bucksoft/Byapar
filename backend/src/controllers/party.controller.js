@@ -1,9 +1,9 @@
-import { bankAccountSchema, partySchema } from "../config/validation.js";
+import mongoose from "mongoose";
+
+import { partySchema, bankAccountSchema } from "../config/validation.js";
+import Category from "../models/category.schema.js";
 import Party from "../models/party.schema.js";
 import BankAccount from "../models/bankAccount.schema.js";
-import Category from "../models/category.schema.js";
-
-import mongoose from "mongoose";
 
 export async function createParty(req, res) {
   const session = await mongoose.startSession();
@@ -11,24 +11,15 @@ export async function createParty(req, res) {
 
   try {
     const data = req.body;
-    const { categoryName } = req.body;
 
-    if (categoryName.length > 0) {
-      const existingCategory = await Category.findOne({ categoryName });
-      if (!existingCategory) {
-        await Category.create({
-          categoryName,
-        });
-      }
-    }
-
-    if (!data) {
+    if (!data || Object.keys(data).length === 0) {
       return res.status(400).json({
         success: false,
         msg: "Request body is missing",
       });
     }
 
+    //  Validate Party details
     const validationResult = partySchema.safeParse(data);
     if (!validationResult.success) {
       return res.status(422).json({
@@ -38,95 +29,68 @@ export async function createParty(req, res) {
       });
     }
 
-    const {
-      bankAccountNumber,
-      IFSCCode,
-      bankAndBranchName,
-      accountHoldersName,
-      upiId,
-    } = data;
-
-    let bankValidationResult = { success: true };
-    if (
-      bankAccountNumber ||
-      IFSCCode ||
-      bankAndBranchName ||
-      accountHoldersName ||
-      upiId
-    ) {
-      bankValidationResult = bankAccountSchema.safeParse({
-        bankAccountNumber,
-        IFSCCode,
-        bankAndBranchName,
-        accountHoldersName,
-        upiId,
-      });
-
-      if (!bankValidationResult.success) {
-        return res.status(422).json({
-          success: false,
-          msg: "Bank account validation failed",
-          validationError: bankValidationResult.error.format(),
-        });
+    //  Create Category if not exists
+    const { categoryName } = data;
+    if (categoryName && categoryName.trim().length > 0) {
+      const existingCategory = await Category.findOne({ categoryName }).session(
+        session
+      );
+      if (!existingCategory) {
+        await Category.create([{ categoryName }], { session });
       }
     }
 
     const { partyName } = validationResult.data;
 
-    const partyExists = await Party.findOne({
+    //  Prevent duplicate party
+    const existingParty = await Party.findOne({
       partyName,
       businessId: req.body?.businessId,
     }).session(session);
 
-    if (partyExists) {
+    if (existingParty) {
       return res.status(400).json({
         success: false,
         msg: `Party "${partyName}" already exists in this business`,
       });
     }
 
+    //  Create Party
     const partyDoc = {
       ...validationResult.data,
       businessId: req.body?.businessId,
       clientId: req.user?.id,
+      currentBalance: validationResult.data.openingBalance || 0,
     };
 
-    partyDoc.currentBalance = validationResult.data.openingBalance || 0;
+    const [party] = await Party.create([partyDoc], { session });
 
-    const party = await Party.create([partyDoc], { session });
-    const partyData = party[0];
-
-    let bankAccount = null;
-    if (
-      bankValidationResult.success &&
-      bankValidationResult.data?.bankAccountNumber
-    ) {
-      bankAccount = await BankAccount.create(
-        [
-          {
-            ...bankValidationResult.data,
-            clientId: req.user?.id,
-            businessId: req.body?.businessId,
-            partyId: partyData._id,
-          },
-        ],
-        { session }
-      );
-      bankAccount = bankAccount[0];
-    }
-
+    // Update existing bank accounts with this new Party ID
+    const updatedBankAccounts = await BankAccount.updateMany(
+      {
+        businessId: req.body?.businessId,
+        clientId: req.user?.id,
+        $or: [{ partyId: { $exists: false } }, { partyId: null }],
+      },
+      { $set: { partyId: party._id } },
+      { session }
+    );
     await session.commitTransaction();
     session.endSession();
 
     return res.status(201).json({
       success: true,
       msg: "Party created successfully",
-      party: partyData,
-      bankAccount,
+      data: {
+        party,
+        updatedBankAccountsCount: updatedBankAccounts.modifiedCount,
+      },
     });
   } catch (error) {
     await session.abortTransaction();
     session.endSession();
+
+    console.error("❌ Error in createParty:", error);
 
     if (error.code === 11000) {
       const field = Object.keys(error.keyValue)[0];
@@ -527,6 +491,37 @@ export async function allParties(req, res) {
       .json({ totalParties, toCollect, toPay, data: parties });
   } catch (error) {
     console.log(error);
+    return res
+      .status(500)
+      .json({ success: false, msg: "Internal Server Error" });
+  }
+}
+
+// delete shipping address
+export async function deleteShippingAddress(req, res) {
+  try {
+    const { id } = req.params;
+    const partyId = req.query?.partyId;
+    const businessId = req.query?.businessId;
+    // FINDING THE PARTY
+    const party = await Party.findOne({
+      _id: partyId,
+      businessId: businessId,
+    });
+    if (!party) {
+      return res
+        .status(400)
+        .json({ success: false, msg: "Party does not exists" });
+    }
+    const updatedShippingAddresses = party.fullShippingAddress.filter(
+      (address) => address._id.toString() !== id
+    );
+    party.fullShippingAddress = updatedShippingAddresses;
+    await party.save();
+    return res
+      .status(200)
+      .json({ success: true, msg: "Deleted successfully", party });
+  } catch (error) {
     return res
       .status(500)
       .json({ success: false, msg: "Internal Server Error" });

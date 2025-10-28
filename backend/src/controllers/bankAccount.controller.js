@@ -8,68 +8,80 @@ import { BusinessBankAccount } from "../models/businessBankAccount.js";
 
 export async function createBankAccount(req, res) {
   try {
-    // GET THE DATA FROM THE FRONTEND
+    const { businessId, partyId } = req.query;
+    const businessObjectId = new mongoose.Types.ObjectId(businessId);
+    const partyObjectId = partyId ? new mongoose.Types.ObjectId(partyId) : null;
+    const clientId = req.user?.id;
     const data = req.body;
-    console.log(data);
 
-    const businessId = new mongoose.Types.ObjectId(req.query.businessId);
-    console.log("BUSINESS ID", businessId);
-    if (!data) {
-      return res
-        .status(400)
-        .json({ success: false, msg: "Please provide the data" });
+    if (
+      !data ||
+      !Array.isArray(data.bankAccounts) ||
+      data.bankAccounts.length === 0
+    ) {
+      return res.status(400).json({
+        success: false,
+        msg: "Please provide valid bank account data",
+      });
     }
 
-    // VALIDATE THE DATA
-    const validatedResult = bankAccountSchema.safeParse({
-      accountName: data?.accountHoldersName,
-      bankAccountNumber: data?.bankAccountNumber,
-      IFSCCode: data?.IFSCCode,
-      bankAndBranchName: data?.bankAndBranchName,
-      upiId: data?.upiId,
-    });
-    if (!validatedResult.success) {
-      const errors = validatedResult.error.format();
-      return res
-        .status(400)
-        .json({ success: true, msg: "Validation failed", errors });
+    // Validate each bank account in the array
+    const validatedAccounts = [];
+    for (const account of data?.bankAccounts) {
+      const validatedResult = bankAccountSchema.safeParse({
+        accountName: account?.accountHoldersName,
+        bankAccountNumber: account?.bankAccountNumber,
+        IFSCCode: account?.IFSCCode,
+        bankAndBranchName: account?.bankAndBranchName,
+        upiId: account?.upiId,
+      });
+
+      if (!validatedResult.success) {
+        const errors = validatedResult.error.format();
+        return res.status(400).json({
+          success: false,
+          msg: "Validation failed",
+          validationError: errors,
+        });
+      }
+
+      // Check if the same bank account already exists
+      const existingAccount = await BankAccount.findOne({
+        bankAccountNumber: account?.bankAccountNumber,
+        IFSCCode: account?.IFSCCode,
+        businessId: businessObjectId,
+      });
+
+      if (existingAccount) {
+        return res.status(400).json({
+          success: false,
+          msg: `Bank account ${account.bankAccountNumber} already exists`,
+        });
+      }
+
+      // Push validated data to array for bulk insert
+      validatedAccounts.push({
+        accountHoldersName: account?.accountHoldersName,
+        bankAccountNumber: account?.bankAccountNumber,
+        IFSCCode: account?.IFSCCode,
+        bankAndBranchName: account?.bankAndBranchName,
+        upiId: account?.upiId,
+        businessId: businessObjectId,
+        partyId: partyObjectId || null, // might be null during party creation
+        clientId,
+      });
     }
 
-    // CHECK BANK ACCOUNT ALREADY EXISTS OR NOT
-    const { bankAccountNumber, accountHolderName, ifscCode } = data;
-    const customerExists = await BankAccount.findOne({
-      bankAccountNumber,
-      accountHolderName,
-      ifscCode,
-    });
+    // Create multiple bank accounts
+    const createdAccounts = await BankAccount.insertMany(validatedAccounts);
 
-    // IF EXISTS, RETURN FAILURE RESPONSE
-    if (customerExists) {
-      return res
-        .status(400)
-        .json({ success: false, msg: "Account already exists" });
-    }
-
-    // CREATE BANK ACCOUNT
-    const bankAccount = await BankAccount.create({
-      ...validatedResult.data,
-      businessId,
-      clientId: req.user?.id,
-    });
-    if (!bankAccount) {
-      return res
-        .status(400)
-        .json({ success: false, msg: "Bank Account could not be created" });
-    }
-
-    // RETURN SUCCESS RESPONSE
     return res.status(200).json({
       success: true,
-      msg: "Bank Account created successfully",
-      bankAccount,
+      msg: "Bank accounts created successfully",
+      data: createdAccounts,
     });
   } catch (error) {
-    console.log("Error in creating business ", error);
+    console.log("Error in creating bank accounts:", error);
     return res
       .status(500)
       .json({ success: false, msg: "Internal server error" });
@@ -112,9 +124,11 @@ export async function deleteBankAccount(req, res) {
 // UPDATE BANK ACCOUNT DETAILS
 export async function updateBankAccountDetails(req, res) {
   try {
-    // GET THE BANK ACCOUNT ID FROM THE PARAMETERS
-    const { id } = req.params;
-    if (!id) {
+    const businessId = new mongoose.Types.ObjectId(req.query?.businessId);
+    const partyId = new mongoose.Types.ObjectId(req.query?.partyId);
+    const accountId = new mongoose.Types.ObjectId(req.query?.accountId);
+
+    if (!accountId) {
       return res
         .status(400)
         .json({ success: false, msg: "Please Provide Bank Account ID" });
@@ -122,7 +136,7 @@ export async function updateBankAccountDetails(req, res) {
 
     // FIND THE BANK ACCOUNT BASED ON THE ID AND UPDATE
     const updateBankAccountDetails = await BankAccount.findByIdAndUpdate(
-      id,
+      { _id: accountId },
       req.body,
       { new: true }
     );
@@ -264,17 +278,19 @@ export async function deleteBusinessBankAccount(req, res) {
 
 export async function getSinglePartyBankDetails(req, res) {
   try {
-    const partyId = req.params.id;
+    const partyId = new mongoose.Types.ObjectId(req.params.id);
     if (!partyId) {
       return res.status(400).json({ msg: "Please provide party id" });
     }
-    const bankAccount = await BankAccount.findOne({
+    const bankAccounts = await BankAccount.find({
       partyId: partyId,
+      clientId: req.user?.id,
+      businessId: req.query?.businessId,
     });
-    if (!bankAccount) {
+    if (!bankAccounts) {
       return res.status(400).json({ msg: "Bank account not found" });
     }
-    return res.status(200).json(bankAccount);
+    return res.status(200).json(bankAccounts);
   } catch (error) {
     return res.status(500).json({ msg: "Internal Server Error" });
   }

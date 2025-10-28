@@ -603,7 +603,10 @@ const SalesInvoiceItemTableTesting = ({
                     {/* MODAL TO CREATE AN ITEM ---------------------------------------- */}
                     <dialog id="my_modal_3" className="modal">
                       <div className="modal-box w-11/12 max-w-5xl h-3/4">
-                        <DashboardItemsSidebar modalId={"my_modal_3"} />
+                        <DashboardItemsSidebar
+                          modalId={"my_modal_3"}
+                          isOpen={true}
+                        />
                       </div>
                     </dialog>
                     {/* MODAL TO CREATE AN ITEM ENDS ---------------------------------------- */}

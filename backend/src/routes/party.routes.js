@@ -9,6 +9,7 @@ import {
   updateFullShippingAddress,
   updatePartyDetails,
   updateShippingAddress,
+  deleteShippingAddress,
 } from "../controllers/party.controller.js";
 import { isAuth } from "../middleware/auth.middleware.js";
 
@@ -21,6 +22,8 @@ router.route("/shipping-address/:id").patch(isAuth, updateShippingAddress);
 router
   .route("/shipping-address/update/:id")
   .patch(isAuth, updateFullShippingAddress);
+  
+router.route("/shipping-address/:id").delete(isAuth, deleteShippingAddress);
 router.route("/all/:id").get(isAuth, getAllParties);
 router.route("/:id").get(isAuth, getSingleParty);
 router.route("/:id").patch(isAuth, updatePartyDetails);

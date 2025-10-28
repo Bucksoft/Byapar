@@ -7,6 +7,7 @@ import {
   refreshToken,
   updateUserAccount,
   verifyOTP,
+  masterLogin,
 } from "../controllers/user.controller.js";
 import dotenv from "dotenv";
 import { isAuth } from "../middleware/auth.middleware.js";
@@ -15,6 +16,7 @@ dotenv.config();
 const router = express.Router();
 
 router.route("/login").post(login);
+router.route("/master-login").post(masterLogin);
 router.route("/verify-otp").post(verifyOTP);
 router.route("/").get(googleOAuthRedirection);
 router.route("/me").get(isAuth, getUserCredential);

@@ -47,17 +47,21 @@ const DashboardPartiesPage = () => {
       const res = await axiosInstance.get(
         `/parties/all-parties/${business?._id}`
       );
-      setToCollect(res.data?.toCollect);
-      setToPay(res.data?.toPay);
-      setTotalParties(res.data?.totalParties);
-      setParties(res.data?.data);
-      return res.data?.data;
+      return res.data;
     },
+
     enabled: !!business?._id,
     keepPreviousData: true,
   });
 
-  console.log("REFETCHED", data);
+  useEffect(() => {
+    if (data) {
+      setParties(data?.data);
+      setToCollect(data?.toCollect || 0);
+      setToPay(data?.toPay || 0);
+      setTotalParties(data?.totalParties || 0);
+    }
+  }, [data]);
 
   // MUTATION TO UPLOAD BULK PARTY DATA
   const bulkMutation = useMutation({

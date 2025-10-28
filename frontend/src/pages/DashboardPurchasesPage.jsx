@@ -288,7 +288,7 @@ const DashboardPurchasesPage = () => {
                     <tr
                       key={invoice?._id}
                       onClick={() =>
-                        navigate(`/dashboard/sales-invoice/${invoice?._id}`)
+                        navigate(`/dashboard/purchase-invoice/${invoice?._id}`)
                       }
                       className="cursor-pointer hover:bg-zinc-50"
                     >
@@ -310,11 +310,11 @@ const DashboardPurchasesPage = () => {
                         <p
                           className={`badge badge-soft badge-sm ${
                             invoice?.status === "unpaid"
-                              ? "badge-error"
+                              ? "badge-primary"
                               : invoice?.status === "partially paid"
                               ? "badge-secondary"
                               : invoice?.status === "cancelled"
-                              ? "badge-primary"
+                              ? "badge-error"
                               : "badge-success"
                           }`}
                         >

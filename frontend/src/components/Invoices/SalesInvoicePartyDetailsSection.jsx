@@ -2,7 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { Link } from "react-router-dom";
 import { IoCloseCircle } from "react-icons/io5";
 import { useInvoiceStore } from "../../store/invoicesStore";
-import { Search } from "lucide-react";
+import { Search, Trash, X } from "lucide-react";
 import { LiaFileInvoiceSolid, LiaRupeeSignSolid } from "react-icons/lia";
 import { usePurchaseInvoiceStore } from "../../store/purchaseInvoiceStore";
 import { FaPen } from "react-icons/fa6";
@@ -13,6 +13,7 @@ import { axiosInstance } from "../../config/axios";
 import { useBusinessStore } from "../../store/businessStore";
 import toast from "react-hot-toast";
 import { queryClient } from "../../main";
+import { usePartyStore } from "../../store/partyStore";
 
 const SalesInvoicePartyDetailsSection = ({
   title,
@@ -28,9 +29,13 @@ const SalesInvoicePartyDetailsSection = ({
   const [searchPartyQuery, setSearchPartyQuery] = useState("");
   const [selectOpen, setSelectOpen] = useState(false);
   const [open, setOpen] = useState(false);
+  const { setParties } = usePartyStore();
   const [invoiceSearchQuery, setInvoiceSearchQuery] = useState("");
   const [partyInvoices, setPartyInvoices] = useState([]);
   const [showPartyInvoicePopup, setShowPartyInvoicePopup] = useState(false);
+  const [selectedAddressId, setSelectedAddressId] = useState(null);
+  const [drawerOpen, setDrawerOpen] = useState(false);
+  const [deleteShippingAddressId, setDeleteShippingAddressId] = useState(null);
 
   const [editShippingAddress, setEditShippingAddress] = useState(0);
   const [shippingData, setShippingData] = useState({
@@ -40,6 +45,13 @@ const SalesInvoicePartyDetailsSection = ({
     pincode: "",
     city: "",
   });
+
+  const refetchParties = async () => {
+    const res = await axiosInstance.get(
+      `/parties/all-parties/${business?._id}`
+    );
+    setParties(res.data?.data);
+  };
 
   //  FOR EDITING THE SHIPPING ADDRESS
   useEffect(() => {
@@ -129,16 +141,10 @@ const SalesInvoicePartyDetailsSection = ({
         return res.data;
       }
     },
-    onSuccess: (data) => {
+    onSuccess: async (data) => {
       toast.success(data?.msg);
-      queryClient.invalidateQueries({
-        queryKey: ["parties", business?._id],
-      });
-
-      queryClient.invalidateQueries({
-        queryKey: ["party", party?._id],
-      });
-
+      await refetchParties();
+      setShippingData({});
       document.getElementById("my-drawer-5").checked = false;
     },
   });
@@ -149,7 +155,36 @@ const SalesInvoicePartyDetailsSection = ({
     }
   }, [isEditing, invoiceToUpdate]);
 
-  console.log(party);
+  // useEffect to set selectedAddressId on mount as default shipping address
+  useEffect(() => {
+    if (party?.fullShippingAddress?.length > 0) {
+      const defaultAddress = party.fullShippingAddress[0];
+      if (defaultAddress) {
+        setSelectedAddressId(defaultAddress.id);
+      }
+    }
+  }, [party]);
+
+  const handleDeleteShippingAddress = async (addressId) => {
+    setDeleteShippingAddressId(addressId);
+    deleteShippingAddressMutation.mutate();
+  };
+
+  // DELETE SHIPPING ADDRESS MUTATION
+  const deleteShippingAddressMutation = useMutation({
+    mutationFn: async () => {
+      const res = await axiosInstance.delete(
+        `/parties/shipping-address/${deleteShippingAddressId}?partyId=${party?._id}&businessId=${business?._id}`
+      );
+      return res.data;
+    },
+    onSuccess: async (data) => {
+      toast.success(data?.msg);
+      await refetchParties();
+      document.getElementById("my-drawer-5").checked = false;
+    },
+  });
+
   return (
     <>
       <section className="grid grid-cols-3 h-48">
@@ -284,169 +319,187 @@ const SalesInvoicePartyDetailsSection = ({
                     type="checkbox"
                     className="drawer-toggle"
                   />
+
                   <div className="drawer-content">
                     <label
                       htmlFor="my-drawer-5"
                       className="drawer-button btn-xs btn btn-neutral"
+                      onClick={() => setDrawerOpen(true)}
                     >
                       Change Shipping Address
                     </label>
                   </div>
 
-                  <div className="drawer-side">
-                    <label
-                      htmlFor="shipping-drawer"
-                      className="drawer-overlay"
-                    ></label>
-                    <div className="menu bg-base-200 min-h-full w-130 p-5">
-                      <h2 className="text-lg font-semibold mb-3">
-                        {party?.shippingAddress ? "Change" : "Add"} Shipping
-                        Address
-                      </h2>
+                  {drawerOpen && (
+                    <div className="drawer-side">
+                      <label
+                        htmlFor="shipping-drawer"
+                        className="drawer-overlay"
+                      ></label>
+                      <div className="menu bg-base-200 min-h-full w-130 p-5">
+                        <div className="flex items-center justify-between mb-3">
+                          <h2 className="text-lg font-semibold ">
+                            {party?.shippingAddress ? "Change" : "Add"} Shipping
+                            Address
+                          </h2>
+                          <X onClick={() => setDrawerOpen(false)} />
+                        </div>
 
-                      {party?.fullShippingAddress?.length > 0 ? (
-                        <div className="overflow-x-auto border-zinc-200 rounded-lg">
-                          <table className="table table-zebra table-sm">
-                            <thead>
-                              <tr className="bg-base-300 text-sm">
-                                <th>Address</th>
-                                <th>Edit</th>
-                                <th className="text-right">Select</th>
-                              </tr>
-                            </thead>
-                            <tbody>
-                              {party.fullShippingAddress.map((address) => (
-                                <tr key={address.id}>
-                                  <td>
-                                    <p className="font-medium">
-                                      {address.shippingName}
-                                    </p>
-                                    <p className="text-xs text-gray-500">
-                                      {address.streetAddress}, {address.city},{" "}
-                                      {address.state} - {address.pincode}
-                                    </p>
-                                  </td>
-                                  <td>
-                                    <button
-                                      className="btn btn-ghost btn-xs"
-                                      onClick={() => {
-                                        setEditShippingAddress(address.id);
-                                        setShippingData(address);
-                                      }}
-                                    >
-                                      <FaPen size={12} />
-                                    </button>
-                                  </td>
-                                  <td className="text-right">
-                                    <input
-                                      type="radio"
-                                      name="select-address"
-                                      className="radio radio-sm"
-                                      // checked={selectedAddressId === address.id}
-                                      // onChange={() =>
-                                      //   setSelectedAddressId(address.id)
-                                      // }
-                                    />
-                                  </td>
+                        {party?.fullShippingAddress?.length > 0 ? (
+                          <div className="overflow-x-auto border-zinc-200 rounded-lg">
+                            <table className="table table-zebra table-sm">
+                              <thead>
+                                <tr className="bg-base-300 text-sm">
+                                  <th>Address</th>
+                                  <th>Action</th>
+                                  <th className="text-right">Select</th>
                                 </tr>
-                              ))}
-                            </tbody>
-                          </table>
-                        </div>
-                      ) : (
-                        <p className="text-sm text-gray-500 mt-3">
-                          No shipping addresses added yet.
-                        </p>
-                      )}
+                              </thead>
+                              <tbody>
+                                {party.fullShippingAddress.map((address) => (
+                                  <tr key={address.id}>
+                                    <td>
+                                      <p className="text-xs text-gray-500">
+                                        {address.streetAddress}, {address.city},{" "}
+                                        {address.state} - {address.pincode}
+                                      </p>
+                                    </td>
+                                    <td>
+                                      <div className="flex items-center">
+                                        <button
+                                          className="btn btn-ghost btn-xs"
+                                          onClick={() => {
+                                            setEditShippingAddress(address.id);
+                                            setShippingData(address);
+                                          }}
+                                        >
+                                          <FaPen size={12} />
+                                        </button>
+                                        <button
+                                          className="btn btn-ghost btn-xs"
+                                          onClick={() =>
+                                            handleDeleteShippingAddress(
+                                              address._id
+                                            )
+                                          }
+                                        >
+                                          <Trash size={12} />
+                                        </button>
+                                      </div>
+                                    </td>
+                                    <td className="text-right">
+                                      <input
+                                        type="radio"
+                                        name="select-address"
+                                        className="radio radio-sm"
+                                        checked={
+                                          selectedAddressId === address.id
+                                        }
+                                        onChange={() =>
+                                          setSelectedAddressId(address.id)
+                                        }
+                                      />
+                                    </td>
+                                  </tr>
+                                ))}
+                              </tbody>
+                            </table>
+                          </div>
+                        ) : (
+                          <p className="text-sm text-gray-500 mt-3">
+                            No shipping addresses added yet.
+                          </p>
+                        )}
 
-                      {/* FORM SECTION */}
-                      <div className="divider">Add / Edit Address</div>
-                      <div className="flex flex-col gap-2">
-                        <input
-                          type="text"
-                          placeholder="Shipping Name"
-                          className="input input-sm w-full"
-                          value={shippingData.shippingName || ""}
-                          onChange={(e) =>
-                            setShippingData((prev) => ({
-                              ...prev,
-                              shippingName: e.target.value,
-                            }))
-                          }
-                        />
-                        <textarea
-                          placeholder="Street Address"
-                          className="textarea textarea-sm w-full"
-                          value={shippingData.streetAddress || ""}
-                          onChange={(e) =>
-                            setShippingData((prev) => ({
-                              ...prev,
-                              streetAddress: e.target.value,
-                            }))
-                          }
-                        />
-                        <div className="flex gap-2">
+                        {/* FORM SECTION */}
+                        <div className="divider">Add / Edit Address</div>
+                        <div className="flex flex-col gap-2">
                           <input
                             type="text"
-                            placeholder="City"
-                            className="input input-sm w-1/2"
-                            value={shippingData.city || ""}
+                            placeholder="Shipping Name"
+                            className="input input-sm w-full"
+                            value={shippingData.shippingName || ""}
                             onChange={(e) =>
                               setShippingData((prev) => ({
                                 ...prev,
-                                city: e.target.value,
+                                shippingName: e.target.value,
                               }))
                             }
                           />
-                          <input
-                            type="text"
-                            placeholder="State"
-                            className="input input-sm w-1/2"
-                            value={shippingData.state || ""}
+                          <textarea
+                            placeholder="Street Address"
+                            className="textarea textarea-sm w-full"
+                            value={shippingData.streetAddress || ""}
                             onChange={(e) =>
                               setShippingData((prev) => ({
                                 ...prev,
-                                state: e.target.value,
+                                streetAddress: e.target.value,
+                              }))
+                            }
+                          />
+                          <div className="flex gap-2">
+                            <input
+                              type="text"
+                              placeholder="City"
+                              className="input input-sm w-1/2"
+                              value={shippingData.city || ""}
+                              onChange={(e) =>
+                                setShippingData((prev) => ({
+                                  ...prev,
+                                  city: e.target.value,
+                                }))
+                              }
+                            />
+                            <input
+                              type="text"
+                              placeholder="State"
+                              className="input input-sm w-1/2"
+                              value={shippingData.state || ""}
+                              onChange={(e) =>
+                                setShippingData((prev) => ({
+                                  ...prev,
+                                  state: e.target.value,
+                                }))
+                              }
+                            />
+                          </div>
+                          <input
+                            type="text"
+                            placeholder="Pincode"
+                            className="input input-sm w-full"
+                            value={shippingData.pincode || ""}
+                            onChange={(e) =>
+                              setShippingData((prev) => ({
+                                ...prev,
+                                pincode: e.target.value,
                               }))
                             }
                           />
                         </div>
-                        <input
-                          type="text"
-                          placeholder="Pincode"
-                          className="input input-sm w-full"
-                          value={shippingData.pincode || ""}
-                          onChange={(e) =>
-                            setShippingData((prev) => ({
-                              ...prev,
-                              pincode: e.target.value,
-                            }))
-                          }
-                        />
-                      </div>
 
-                      <div className="flex justify-between mt-4">
-                        <button
-                          className="btn btn-xs btn-outline"
-                          onClick={() => {
-                            setShippingData({});
-                            setEditShippingAddress(null);
-                          }}
-                        >
-                          Clear
-                        </button>
-                        <button
-                          className="btn btn-xs btn-info"
-                          onClick={() => {
-                            shippingMutation.mutate();
-                          }}
-                          disabled={shippingMutation.isPending}
-                        >
-                          {editShippingAddress ? "Update" : "Add"}
-                        </button>
+                        <div className="flex justify-between mt-4">
+                          <button
+                            className="btn btn-xs btn-outline"
+                            onClick={() => {
+                              setShippingData({});
+                              setEditShippingAddress(null);
+                            }}
+                          >
+                            Clear
+                          </button>
+                          <button
+                            className="btn btn-xs btn-info"
+                            onClick={() => {
+                              shippingMutation.mutate();
+                            }}
+                            disabled={shippingMutation.isPending}
+                          >
+                            {editShippingAddress ? "Update" : "Add"}
+                          </button>
+                        </div>
                       </div>
                     </div>
-                  </div>
+                  )}
                 </div>
               </div>
             </div>
@@ -461,7 +514,11 @@ const SalesInvoicePartyDetailsSection = ({
               {party?.fullShippingAddress.length > 0 && (
                 <p className="text-xs pt-1 text-zinc-400">
                   Address:{" "}
-                  <span className="text-black">{party?.shippingAddress}</span>{" "}
+                  <span className="text-black">
+                    {party?.fullShippingAddress.find(
+                      (address) => address.id === selectedAddressId
+                    )?.streetAddress || party?.shippingAddress}
+                  </span>{" "}
                 </p>
               )}
             </div>

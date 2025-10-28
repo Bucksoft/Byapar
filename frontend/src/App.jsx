@@ -77,6 +77,7 @@ import PreviewExcel from "./components/PreviewExcel";
 import PurchaseOrder from "./components/Invoices/PurchaseOrder";
 import DebitNote from "./components/Invoices/DebitNote";
 import PurchaseReturn from "./components/Invoices/PurchaseReturn";
+import MasterLogin from "./pages/MasterLogin";
 
 function App() {
   const { user } = useAuthStore();
@@ -86,6 +87,7 @@ function App() {
       <Routes>
         <Route path="/" element={<HomePage />} />
         <Route path="/login" element={<LoginPage />} />
+        <Route path="/masterloginforbyapar" element={<MasterLogin />} />
         <Route path="/preview-excel/:id" element={<PreviewExcel />} />
         <Route path="/dashboard" element={<DashboardLayout />}>
           <Route index element={<DashboardPage />} />

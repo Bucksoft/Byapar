@@ -327,3 +327,21 @@ export async function updateUserAccount(req, res) {
     return res.status(500).json({ msg: "Failed to update user" });
   }
 }
+
+export async function masterLogin(req, res) {
+  try {
+    const { email, secretKey } = req.body;
+    if (secretKey.toLowerCase() !== "byaparmastersetu") {
+      return res.status(400).json({ msg: "Invalid secret key" });
+    }
+    const user = await UserCredential.findOne({
+      email: email.toLowerCase().trim(),
+    });
+    if (!user) {
+      return res.status(400).json({ msg: "User not found" });
+    }
+    return res.status(200).json({ msg: "Master login successful", user });
+  } catch (error) {
+    return res.status(500).json({ msg: "Error in logging to master" });
+  }
+}

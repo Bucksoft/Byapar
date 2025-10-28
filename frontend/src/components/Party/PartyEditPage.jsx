@@ -16,6 +16,7 @@ import { usePartyStore } from "../../store/partyStore";
 import { queryClient } from "../../main";
 import BankAccountPopup from "../BankAccountPopup";
 import { useBusinessStore } from "../../store/businessStore";
+import BankAccountsModal from "../BankAccountModal";
 
 const PartyEditPage = () => {
   const navigate = useNavigate();
@@ -32,7 +33,9 @@ const PartyEditPage = () => {
   const { data: partyBankAccount } = useQuery({
     queryKey: ["bank-accounts", id],
     queryFn: async () => {
-      const res = await axiosInstance.get(`/bank-account/party/${id}`);
+      const res = await axiosInstance.get(
+        `/bank-account/party/${id}?businessId=${business?._id}`
+      );
       return res.data;
     },
   });
@@ -54,16 +57,13 @@ const PartyEditPage = () => {
     creditPeriod: party?.creditPeriod,
     creditLimit: party?.creditLimit,
     pincode: party?.pincode,
-    bankAccountNumber: "",
-    IFSCCode: "",
-    accountHoldersName: "",
-    bankAndBranchName: "",
-    upiId: "",
+    bankAccounts: [],
   });
 
   useEffect(() => {
     if (party) {
-      setData({
+      setData((prev) => ({
+        ...prev,
         partyName: party.partyName || "",
         mobileNumber: party.mobileNumber || "",
         email: party.email || "",
@@ -80,12 +80,11 @@ const PartyEditPage = () => {
         creditPeriod: party.creditPeriod || "",
         creditLimit: party.creditLimit || "",
         pincode: party.pincode || "",
-        bankAccountNumber: partyBankAccount?.bankAccountNumber || "",
-        IFSCCode: partyBankAccount?.IFSCCode || "",
-        accountHoldersName: partyBankAccount?.accountHoldersName || "",
-        bankAndBranchName: partyBankAccount?.bankAndBranchName || "",
-        upiId: partyBankAccount?.upiId || "",
-      });
+        bankAccounts: [
+          ...(party.bankAccounts || []),
+          ...(partyBankAccount || []),
+        ],
+      }));
     }
   }, [party, partyBankAccount]);
 
@@ -135,16 +134,30 @@ const PartyEditPage = () => {
     },
     onSuccess: () => {
       toast.success("Bank Account deleted");
-      document.getElementById("delete-account-modal").close();
-      queryClient.invalidateQueries({
-        queryKey: ["bank-accounts", id, party, "parties"],
-      });
-      setTimeout(() => {
-        window.location.reload();
-      }, 500);
+      document.getElementById(`delete-bank-modal-${id}`).close();
+      setData((prev) => ({
+        ...prev,
+        bankAccounts: prev.bankAccounts.filter((account) => account._id !== id),
+      }));
     },
     onError: (err) => {
       toast.error(err.response.data.msg || err.response.data.err);
+    },
+  });
+
+  const saveBankAccount = useMutation({
+    mutationFn: async (id) => {
+      const account = data.bankAccounts.find((account) => account._id === id);
+      const res = await axiosInstance.patch(
+        `/bank-account/account/?businessId=${business?._id}&partyId=${party?._id}&accountId=${id}`,
+        account
+      );
+    },
+    onSuccess: () => {
+      toast.success("Bank Account updated");
+      queryClient.invalidateQueries({
+        queryKey: ["bank-accounts", id],
+      });
     },
   });
 
@@ -585,108 +598,186 @@ const PartyEditPage = () => {
 
       <h3 className="p-3 text-sm text-zinc-500">Party Bank Account</h3>
 
-      {partyBankAccount || isAddedBankInfo ? (
+      {data?.bankAccounts?.length > 0 ? (
         <>
-          <div className="flex gap-2 items-center justify-center pt-4 pb-16 px-5">
-            <div>
-              <label className="label text-xs">Account Holder's Name</label>
-              <input
-                className="input input-sm"
-                type="text"
-                name="accountHoldersName"
-                onChange={handleInputChange}
-                value={data?.accountHoldersName}
-              />
-            </div>
-            <div>
-              <label className="label text-xs">Bank Account Number</label>
-              <input
-                className="input input-sm"
-                type="text"
-                onChange={handleInputChange}
-                name="bankAccountNumber"
-                value={data?.bankAccountNumber}
-              />
-            </div>
-            <div>
-              <label className="label text-xs">IFSC Code</label>
-              <input
-                className="input input-sm"
-                type="text"
-                name="IFSCCode"
-                onChange={handleInputChange}
-                value={data?.IFSCCode}
-              />
-            </div>
-            <div>
-              <label className="label text-xs">Bank & Branch Name</label>
-              <input
-                className="input input-sm"
-                type="text"
-                name="bankAndBranchName"
-                onChange={handleInputChange}
-                value={data?.bankAndBranchName}
-              />
-            </div>
-            <div>
-              <label className="label text-xs">UPI Id</label>
-              <input
-                className="input input-sm"
-                type="text"
-                name="upiId"
-                onChange={handleInputChange}
-                value={data?.upiId}
-              />
-            </div>
-            <button
-              onClick={() => {
-                // setBankAccountToDeleteid(partyBankAccount._id);
-                document.getElementById("delete-account-modal").showModal();
-              }}
-              className="btn btn-xs btn-error mt-6"
-            >
-              <Trash size={12} />
-            </button>
-            <dialog id="delete-account-modal" className="modal">
-              <div className="modal-box">
-                <h3 className="font-bold text-lg">Confirm Delete</h3>
-                <p className="py-4">
-                  Are you sure you want to delete this account ?
-                </p>
-                <div className="modal-action">
-                  <form method="dialog">
-                    {/* if there is a button in form, it will close the modal */}
-                    <button className="btn btn-sm">Close</button>
-                  </form>
+          <div className="flex flex-col gap-4 pb-10 pt-4 px-5">
+            {data.bankAccounts.map((account, index) => (
+              <div
+                key={account._id || index}
+                className="bg-white p-4 rounded-md shadow-sm border border-zinc-300 flex flex-col gap-2"
+              >
+                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
+                  <div>
+                    <label className="label text-xs">
+                      Account Holder's Name
+                    </label>
+                    <input
+                      className="input input-sm w-full"
+                      type="text"
+                      name="accountHoldersName"
+                      value={account.accountHoldersName}
+                      onChange={(e) => {
+                        const newAccounts = [...data.bankAccounts];
+                        newAccounts[index].accountHoldersName = e.target.value;
+                        setData((prev) => ({
+                          ...prev,
+                          bankAccounts: newAccounts,
+                        }));
+                      }}
+                    />
+                  </div>
+
+                  <div>
+                    <label className="label text-xs">Bank Account Number</label>
+                    <input
+                      className="input input-sm w-full"
+                      type="text"
+                      name="bankAccountNumber"
+                      value={account.bankAccountNumber}
+                      onChange={(e) => {
+                        const newAccounts = [...data.bankAccounts];
+                        newAccounts[index].bankAccountNumber = e.target.value;
+                        setData((prev) => ({
+                          ...prev,
+                          bankAccounts: newAccounts,
+                        }));
+                      }}
+                    />
+                  </div>
+
+                  <div>
+                    <label className="label text-xs">IFSC Code</label>
+                    <input
+                      className="input input-sm w-full"
+                      type="text"
+                      name="IFSCCode"
+                      value={account.IFSCCode}
+                      onChange={(e) => {
+                        const newAccounts = [...data.bankAccounts];
+                        newAccounts[index].IFSCCode = e.target.value;
+                        setData((prev) => ({
+                          ...prev,
+                          bankAccounts: newAccounts,
+                        }));
+                      }}
+                    />
+                  </div>
+
+                  <div>
+                    <label className="label text-xs">Bank & Branch Name</label>
+                    <input
+                      className="input input-sm w-full"
+                      type="text"
+                      name="bankAndBranchName"
+                      value={account.bankAndBranchName}
+                      onChange={(e) => {
+                        const newAccounts = [...data.bankAccounts];
+                        newAccounts[index].bankAndBranchName = e.target.value;
+                        setData((prev) => ({
+                          ...prev,
+                          bankAccounts: newAccounts,
+                        }));
+                      }}
+                    />
+                  </div>
+
+                  <div>
+                    <label className="label text-xs">UPI Id</label>
+                    <input
+                      className="input input-sm w-full"
+                      type="text"
+                      name="upiId"
+                      value={account.upiId}
+                      onChange={(e) => {
+                        const newAccounts = [...data.bankAccounts];
+                        newAccounts[index].upiId = e.target.value;
+                        setData((prev) => ({
+                          ...prev,
+                          bankAccounts: newAccounts,
+                        }));
+                      }}
+                    />
+                  </div>
+                </div>
+
+                {/* Delete Button */}
+                <div className="flex justify-end mt-3">
                   <button
-                    className="btn btn-sm btn-error"
                     onClick={() =>
-                      deleteBankAccount.mutate(partyBankAccount._id)
+                      document
+                        .getElementById(`delete-bank-modal-${account._id}`)
+                        .showModal()
                     }
+                    className="btn btn-xs btn-error btn-soft"
                   >
                     Delete
                   </button>
+                  <button
+                    onClick={() => saveBankAccount.mutate(account._id)}
+                    className="btn btn-xs btn-success ml-2"
+                  >
+                    Save
+                  </button>
                 </div>
+
+                {/* Delete Confirmation Modal */}
+                <dialog
+                  id={`delete-bank-modal-${account._id}`}
+                  className="modal"
+                >
+                  <div className="modal-box">
+                    <h3 className="font-bold text-lg">Confirm Delete</h3>
+                    <p className="py-4">
+                      Are you sure you want to delete this bank account?
+                    </p>
+                    <div className="modal-action">
+                      <form method="dialog">
+                        <button className="btn btn-sm">Cancel</button>
+                      </form>
+                      <button
+                        className="btn btn-sm btn-error"
+                        onClick={() => deleteBankAccount.mutate(account._id)}
+                      >
+                        Delete
+                      </button>
+                    </div>
+                  </div>
+                </dialog>
               </div>
-            </dialog>
+            ))}
           </div>
         </>
       ) : (
         <>
-          <section className="flex flex-col py-16 items-center justify-center bg-white gap-4 text-xs">
+          {/* <div className="flex flex-col items-center justify-center gap-3 py-16 bg-white text-xs">
             <Landmark size={30} />
             <p>Add party bank information to manage transactions</p>
-            <BankAccountPopup
-              partyName={data?.partyName}
-              setData={setData}
-              data={data}
-              handleInputChange={handleInputChange}
-              mutation={mutation}
-              setIsAddedBankInfo={setIsAddedBankInfo}
-              id={id}
-              isEdit={true}
-            />
-          </section>
+            <button
+              onClick={() =>
+                document.getElementById("bankAccountModal").showModal()
+              }
+              className="btn btn-sm btn-primary"
+            >
+              Add Bank Account
+            </button>
+          </div> */}
+          <div className="flex items-center justify-center gap-4 pb-8 pt-1 px-5">
+            <button
+              className="btn btn-sm btn-outline btn-neutral"
+              onClick={() =>
+                document.getElementById("bankAccountModal").showModal()
+              }
+            >
+              Manage Bank Accounts
+            </button>
+          </div>
+
+          <BankAccountsModal
+            data={data}
+            setData={setData}
+            businessId={business?._id}
+            partyId={id}
+          />
         </>
       )}
 

@@ -19,7 +19,7 @@ import CustomLoader from "../../components/Loader";
 import { useBusinessStore } from "../../store/businessStore";
 import DashboardItemsSACCodePage from "./DashboardItemsSACCodePage";
 
-const DashboardItemsSidebar = ({ modalId, itemIdToEdit }) => {
+const DashboardItemsSidebar = ({ modalId, itemIdToEdit, isOpen }) => {
   const navigate = useNavigate();
   const [itemToBeEdited, setItemToBeEdited] = useState();
   const { state } = useLocation();
@@ -101,7 +101,11 @@ const DashboardItemsSidebar = ({ modalId, itemIdToEdit }) => {
       }
       setCurrentField("Basic Details");
       queryClient.invalidateQueries({ queryKey: ["items"] });
-      navigate(`/dashboard/items`);
+      if (isOpen) {
+        document.getElementById(modalId)?.close();
+      } else {
+        navigate(`/dashboard/items`);
+      }
     },
 
     onError: (err) => {

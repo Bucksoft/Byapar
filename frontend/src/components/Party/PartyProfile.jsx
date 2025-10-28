@@ -3,11 +3,13 @@ import { LiaRupeeSignSolid } from "react-icons/lia";
 import { axiosInstance } from "../../config/axios";
 import { LuIndianRupee } from "react-icons/lu";
 
-const PartyProfile = ({ party }) => {
+const PartyProfile = ({ party, business }) => {
   const { data: bankInfo } = useQuery({
     queryKey: ["bankAccount"],
     queryFn: async () => {
-      const res = await axiosInstance.get(`/bank-account/party/${party?._id}`);
+      const res = await axiosInstance.get(
+        `/bank-account/party/${party?._id}/?businessId=${business?._id}`
+      );
       return res.data;
     },
   });
@@ -80,11 +82,14 @@ const PartyProfile = ({ party }) => {
           </div>
           <div>
             <label className="text-zinc-500">Shipping Address</label>
-            <p className="mt-1">
+            <div className="mt-1">
               {party?.fullShippingAddress &&
               party.fullShippingAddress.length > 0 ? (
                 party?.fullShippingAddress?.map((party, index) => (
-                  <div key={party?._id} className="flex items-start justify-start gap-1 my-2">
+                  <div
+                    key={party?._id}
+                    className="flex items-start justify-start gap-1 my-2"
+                  >
                     <span>{index + 1}.</span>
                     <p>{party?.streetAddress}</p>
                   </div>
@@ -92,7 +97,7 @@ const PartyProfile = ({ party }) => {
               ) : (
                 <></>
               )}
-            </p>
+            </div>
           </div>
         </div>
       </div>
@@ -124,36 +129,39 @@ const PartyProfile = ({ party }) => {
       </div>
 
       {/* bank details */}
-      <div className=" border border-zinc-200 rounded-md">
-        <h1 className="font-medium bg-zinc-100 border-b p-2 border-zinc-200">
-          Party Bank Details
-        </h1>
-        <div className="grid grid-cols-2 text-sm p-4 gap-5">
-          <div>
-            <label className="text-zinc-500">Account Number</label>
-            <p className="mt-1">{bankInfo?.bankAccountNumber || "-"}</p>
+      {bankInfo?.length > 0 &&
+        bankInfo?.map((bank) => (
+          <div className=" border border-zinc-200 rounded-md">
+            <h1 className="font-medium bg-zinc-100 border-b p-2 border-zinc-200">
+              Party Bank Details
+            </h1>
+            <div className="grid grid-cols-2 text-sm p-4 gap-5">
+              <div>
+                <label className="text-zinc-500">Account Number</label>
+                <p className="mt-1">{bank?.bankAccountNumber || "-"}</p>
+              </div>
+              <div>
+                <label className="text-zinc-500">Account Holder's Name</label>
+                <p className="mt-1">{bank?.accountHoldersName || "-"}</p>
+              </div>
+              <div>
+                <label className="text-zinc-500">Bank and Branch</label>
+                <p className="mt-1">{bank?.bankAndBranchName || "-"}</p>
+              </div>
+              <div>
+                <label className="text-zinc-500">IFSC Code</label>
+                <p className="mt-1">{bank?.IFSCCode || "-"}</p>
+              </div>
+              <div>
+                <label className="text-zinc-500">Opening Balance</label>
+                <p className="mt-1 flex items-center gap-1">
+                  <LuIndianRupee size={15} />
+                  {bank?.openingBalance || 0}
+                </p>
+              </div>
+            </div>
           </div>
-          <div>
-            <label className="text-zinc-500">Account Holder's Name</label>
-            <p className="mt-1">{bankInfo?.accountHoldersName || "-"}</p>
-          </div>
-          <div>
-            <label className="text-zinc-500">Bank and Branch</label>
-            <p className="mt-1">{bankInfo?.bankAndBranchName || "-"}</p>
-          </div>
-          <div>
-            <label className="text-zinc-500">IFSC Code</label>
-            <p className="mt-1">{bankInfo?.IFSCCode || "-"}</p>
-          </div>
-          <div>
-            <label className="text-zinc-500">Opening Balance</label>
-            <p className="mt-1 flex items-center gap-1">
-              <LuIndianRupee size={15} />
-              {bankInfo?.openingBalance || 0}
-            </p>
-          </div>
-        </div>
-      </div>
+        ))}
     </section>
   );
 };

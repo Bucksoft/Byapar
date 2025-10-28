@@ -247,7 +247,9 @@ const DashboardPartyPage = () => {
           />
         )}
 
-        {selectedMenu === "profile" && <PartyProfile party={party ?? null} />}
+        {selectedMenu === "profile" && (
+          <PartyProfile party={party ?? null} business={business ?? null} />
+        )}
 
         {selectedMenu === "ledger (statement)" && (
           <PartyLedgerStatement

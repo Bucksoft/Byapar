@@ -177,7 +177,7 @@ const Sidebar = () => {
                         `flex items-center justify-between text-xs font-medium cursor-pointer py-2 pl-[13.5px] w-full transition-all duration-200 ease-in-out text-black/70
                 ${
                   isActive
-                    ? "bg-[var(--primary-btn)]/10 text-[var(--primary-btn)]  scale-105"
+                    ? "bg-[var(--primary-btn)]/10 text-[var(--primary-btn)] scale-105"
                     : "hover:text-[var(--primary-btn)]"
                 }`
                       }
@@ -195,7 +195,7 @@ const Sidebar = () => {
                     {currentLink === field.label && (
                       <div
                         name={field.label}
-                        className="bg-gradient-to-r from-transparent to-zinc-500/10 text-black overflow-hidden text-xs cursor-pointer outline-none w-[80%] my-2 ml-7 z-10 transition-all duration-200  ease-in-out border-l border-l-zinc-200  rounded-tr-xl rounded-br-xl "
+                        className="bg-gradient-to-r from-transparent to-zinc-500/10 text-black overflow-hidden text-xs cursor-pointer outline-none w-[80%] my-2 ml-7 z-10 transition-all duration-200  ease-in-out border-l border-l-zinc-200 "
                       >
                         {field.subLinks?.map((sublink) => (
                           <NavLink

@@ -7,18 +7,18 @@ import {
   getSinglePartyBankDetails,
   deletePartyBankAccount,
   markBusinessBankAccountAsActive,
+  updateBankAccountDetails,
 } from "../controllers/bankAccount.controller.js";
 import { isAuth } from "../middleware/auth.middleware.js";
 
 const router = express.Router();
 
-
-router.route("/").post(isAuth, createBankAccount);
-
+router.route("/").patch(isAuth, createBankAccount);
 router
   .route("/mark-as-active/:id")
   .patch(isAuth, markBusinessBankAccountAsActive);
 
+router.route("/account").patch(isAuth, updateBankAccountDetails);
 router.route("/party/:id").get(isAuth, getSinglePartyBankDetails);
 router.route("/:id").post(isAuth, createBankAccountForBusiness);
 router.route("/:id").get(isAuth, getBusinessBankAccounts);
