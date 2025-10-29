@@ -37,6 +37,7 @@ app.use(
       "https://byapar-frontend.onrender.com",
       "http://localhost:5173",
       "https://byapar.bucksoftech.top/",
+      "https://byaparsetu.com",
     ],
     credentials: true,
   })
