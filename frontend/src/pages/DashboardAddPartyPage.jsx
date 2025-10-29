@@ -144,11 +144,11 @@ const DashboardAddPartyPage = () => {
             Create Party
           </h1>
           <div className="space-x-3">
-            {/* <button className="btn btn-sm">
+            {/* <button className="btn btn-sm rounded-xl">
               Party Settings <Settings size="16" />{" "}
             </button> */}
             <button
-              className={`btn btn-sm bg-[var(--primary-btn)] ${
+              className={`btn  rounded-xl btn-sm bg-[var(--primary-btn)] ${
                 mutation.isPending && ""
               } `}
               disabled={mutation.isPending}
@@ -167,7 +167,7 @@ const DashboardAddPartyPage = () => {
 
         {/* Main content */}
         <section className="p-3 bg-white">
-          <div className="grid grid-cols-4 gap-3">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-3">
             <div>
               <label htmlFor="party_name" className="text-xs text-zinc-700">
                 Party Name
@@ -354,7 +354,7 @@ const DashboardAddPartyPage = () => {
                 Party Category
                 <button
                   onClick={() => setAddCategoryPopup(true)}
-                  className=" text-[var(--primary-btn)] cursor-pointer"
+                  className=" rounded-xl text-[var(--primary-btn)] cursor-pointer"
                 >
                   + Add Category
                 </button>
@@ -751,13 +751,14 @@ const DashboardAddPartyPage = () => {
           </div>
         )}
 
-        <div className="flex items-center justify-center gap-4 py-16 px-5">
-
+        <div className="flex flex-col items-center justify-center gap-3 py-16 bg-white text-xs">
+          <Landmark size={30} />
+          <p>Add party bank information to manage transactions</p>
           <button
-            className="btn btn-sm btn-dash btn-neutral"
             onClick={() =>
               document.getElementById("bankAccountModal").showModal()
             }
+            className="rounded-xl btn btn-sm btn-neutral btn-soft"
           >
             Add Bank Account
           </button>
@@ -810,7 +811,7 @@ const DashboardAddPartyPage = () => {
                   </button>
                   <button
                     onClick={() => categoryMutation.mutate(data?.categoryName)}
-                    className="btn btn-sm bg-[var(--secondary-btn)]"
+                    className="rounded-xl rounded-xl btn btn-sm bg-[var(--secondary-btn)]"
                   >
                     Add
                   </button>

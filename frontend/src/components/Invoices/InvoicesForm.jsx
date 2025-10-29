@@ -181,7 +181,7 @@ const InvoicesForm = ({
     },
     onSuccess: (data) => {
       toast.success(data?.msg);
-      queryClient.invalidateQueries({ queryKey: ["invoices", business?._id] });
+      queryClient.invalidateQueries({ queryKey: ["invoices"] });
       navigate("/dashboard/sales");
       if (data?.quotation?._id) {
         navigate(`/dashboard/quotations/${data?.quotation?._id}`);
@@ -330,7 +330,7 @@ const InvoicesForm = ({
       totalDiscount: Number(totalDiscount.toFixed(2)),
       totalTaxableValue: Number(totalTaxableValue.toFixed(2)),
       totalTax: Number(totalTax.toFixed(2)),
-      totalAmount: Number(totalAmount.toFixed(2)),
+      totalAmount: Number(Math.round(totalAmount)),
       totalCGST: Number((totalTax / 2).toFixed(2)),
       totalSGST: Number((totalTax / 2).toFixed(2)),
       additionalCharge: Number(totalAdditionalCharge.toFixed(2)),
@@ -372,11 +372,11 @@ const InvoicesForm = ({
           </span>
         </div>
         <div className="flex items-center justify-center gap-5">
-          {/* <button className="btn btn-sm">Settings</button> */}
+          {/* <button className="btn btn-sm rounded-xl">Settings</button> */}
           <button
             onClick={() => mutation.mutate(data)}
             disabled={mutation?.isPending}
-            className="btn bg-[var(--primary-btn)] btn-sm hover:bg-[var(--primary-btn)]/80"
+            className="btn rounded-xl bg-[var(--primary-btn)] btn-sm hover:bg-[var(--primary-btn)]/80"
           >
             {mutation.isPending ? (
               <CustomLoader text={"Saving..."} />

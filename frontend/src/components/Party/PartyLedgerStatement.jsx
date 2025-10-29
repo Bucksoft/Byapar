@@ -204,7 +204,7 @@ const PartyLedgerStatement = ({
               setIsDownloading
             )
           }
-          className="btn btn-sm btn-dash"
+          className="btn btn-sm btn-dash rounded-xl"
         >
           {isDownloading ? (
             <div className="">
@@ -220,14 +220,14 @@ const PartyLedgerStatement = ({
         {/* PRINTER */}
         <button
           onClick={() => handlePrint(printRef)}
-          className="btn btn-sm ml-2 w-1/8"
+          className="btn btn-sm ml-2 w-1/8 rounded-xl"
         >
           <Printer size={14} /> Print
         </button>
 
         {/* SHARE */}
         {/* <button
-          className="btn btn-sm ml-2 w-1/8"
+          className="btn btn-sm ml-2 w-1/8 rounded-xl"
           popoverTarget="popover-1"
           style={{ anchorName: "--anchor-1" }}
         >
@@ -238,7 +238,7 @@ const PartyLedgerStatement = ({
 
         {/* CUSTOM DAY PICKER */}
         <button
-          className="btn btn-sm ml-2"
+          className="btn btn-sm ml-2 rounded-xl"
           onClick={() => setOpenDatePicker(!openDatePicker)}
         >
           Select Custom Date

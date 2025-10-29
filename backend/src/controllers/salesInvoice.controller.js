@@ -115,13 +115,21 @@ export async function getAllInvoices(req, res) {
       .populate("partyId");
 
     if (!invoices || invoices.length === 0) {
-      return res
-        .status(404)
-        .json({ success: false, msg: "Invoices not found" });
+      return res.status(404).json({
+        success: false,
+        msg: "Invoices not found",
+        invoices: [],
+        totalInvoices: 0,
+        latestInvoiceNumber: 0,
+        totalSales: 0,
+        totalPaid: 0,
+        totalUnpaid: 0,
+      });
     }
 
     const latestInvoice = await SalesInvoice.findOne({
       businessId: req.params.id,
+      clientId: req.user?.id,
     })
       .sort({ salesInvoiceNumber: -1 })
       .limit(1);
@@ -166,7 +174,7 @@ export async function getAllInvoices(req, res) {
       success: true,
       invoices,
       totalInvoices: invoices.length,
-      latestInvoiceNumber: latestInvoice?.salesInvoiceNumber,
+      latestInvoiceNumber: latestInvoice?.salesInvoiceNumber || 0,
       totalSales,
       totalPaid,
       totalUnpaid,

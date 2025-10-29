@@ -195,7 +195,7 @@ const DashboardDeliveryChallanPage = () => {
                                   `/dashboard/update/${challan?._id}?type=delivery challan`
                                 )
                               }
-                              className="flex items-center gap-2"
+                              className="flex rounded-xl items-center gap-2"
                             >
                               <FaRegEdit /> Edit
                             </button>
@@ -255,7 +255,7 @@ const DashboardDeliveryChallanPage = () => {
               <div className="flex w-full">
                 <button
                   onClick={() => mutation.mutate()}
-                  className="btn btn-sm btn-ghost  ml-auto text-[var(--error-text-color)]"
+                  className="btn rounded-xl btn-sm btn-ghost  ml-auto text-[var(--error-text-color)]"
                 >
                   Delete
                 </button>

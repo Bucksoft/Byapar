@@ -40,12 +40,12 @@ const CreateExpenseForm = ({ setOpenCreateExpense }) => {
                 <Settings size={16} className="text-zinc-500" />
               </div>
               <div>
-                <button className="btn text-sm font-norma btn-sm">
+                <button className="btn rounded-xl text-sm font-norma btn-sm">
                   Cancel
                 </button>
               </div>
               <div>
-                <button className="btn btn-sm bg-[var(--primary-btn)] w-35 text-sm font-normal">
+                <button className="btn rounded-xl btn-sm bg-[var(--primary-btn)] w-35 text-sm font-normal">
                   Save
                 </button>
               </div>
@@ -124,7 +124,7 @@ const CreateExpenseForm = ({ setOpenCreateExpense }) => {
                     </li>
                     <li>
                       <a>
-                        <button className="btn btn-dash btn-info w-full">
+                        <button className="btn rounded-xl btn-dash btn-info w-full">
                           Add/Manage Category
                         </button>
                       </a>
@@ -226,7 +226,7 @@ const CreateExpenseForm = ({ setOpenCreateExpense }) => {
               <button
                 className={`${
                   checked ? "w-full" : "w-200"
-                } flex items-center border border-info text-info cursor-pointer my-2 p-2 text-xs font-medium rounded-md border-dashed justify-center`}
+                } flex items-center rounded-xl border border-info text-info cursor-pointer my-2 p-2 text-xs font-medium rounded-md border-dashed justify-center`}
               >
                 <Plus size={8} />
                 Add Item

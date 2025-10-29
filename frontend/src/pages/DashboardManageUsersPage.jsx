@@ -157,12 +157,12 @@ const DashboardManageUsersPage = () => {
                   }}
                   className="flex gap-4"
                 >
-                  <button className="btn bg-[var(--primary-btn)] btn-sm ">
+                  <button className="btn rounded-xl bg-[var(--primary-btn)] btn-sm ">
                     <FaPlus />
                     Add New User
                   </button>
                   <button
-                    className="btn btn-sm"
+                    className="btn btn-sm rounded-xl"
                     onClick={() =>
                       document.getElementById("my_modal_2").showModal()
                     }
@@ -214,7 +214,7 @@ const DashboardManageUsersPage = () => {
                         </div>
                       </div>
                       <div className="flex justify-end">
-                        <button className="btn btn-sm w-3/12 mr-2 bg-[var(--primary-btn)]">
+                        <button className="btn rounded-xl btn-sm w-3/12 mr-2 bg-[var(--primary-btn)]">
                           Save
                         </button>
                       </div>
@@ -244,7 +244,7 @@ const DashboardManageUsersPage = () => {
                   }}
                   className="flex items-center gap-3"
                 >
-                  <button className="btn btn-sm">
+                  <button className="btn btn-sm rounded-xl">
                     <IoSearchOutline size={16} />
                   </button>
                   <select
@@ -344,7 +344,7 @@ const DashboardManageUsersPage = () => {
                         </p>
                       </div>
                     </div>
-                    <button className="btn bg-[var(--primary-btn)] btn-sm">
+                    <button className="btn rounded-xl bg-[var(--primary-btn)] btn-sm">
                       Track All Activities
                     </button>
                   </motion.div>

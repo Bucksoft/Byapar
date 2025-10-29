@@ -27,8 +27,6 @@ const InvoiceTemplate = ({
     },
   });
 
-  console.log("BUSINESS ", business);
-
   const { data: supplierBankAccount } = useQuery({
     queryKey: ["bankAccounts", business?._id],
     queryFn: async () => {

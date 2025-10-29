@@ -149,7 +149,7 @@ const DashboardAllTransactionsPage = () => {
                 clear your search.
               </p>
               <button
-                className="btn btn-outline btn-sm mt-3"
+                className="rounded-xl btn btn-outline btn-sm mt-3"
                 onClick={() => setSearchQuery("")}
               >
                 Clear search

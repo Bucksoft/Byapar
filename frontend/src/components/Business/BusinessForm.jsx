@@ -305,16 +305,13 @@ const BusinessForm = ({ businessToBeUpdated }) => {
               Edit your company settings and information
             </p>
           </div>
-          <button className="btn btn-sm bg-[var(--secondary-btn)]">
-            Create New Business
-          </button>
         </div>
 
         <div className="flex items-center justify-center mr-3 gap-4 ">
           {/* <p className="text-gray-500 cursor-pointer">
                     <MdKeyboard size={25} />
                   </p> */}
-          {/* <button className="btn btn-sm  ">
+          {/* <button className="btn rounded-xl rounded-xl btn-sm  ">
                     <RiChat1Line size={14} />
                     Chat Support
                   </button> */}
@@ -322,14 +319,17 @@ const BusinessForm = ({ businessToBeUpdated }) => {
             <MdOutlineCalendarToday size={14} />
             Close Financial Year
           </button> */}
-          <button className="btn btn-sm" onClick={() => navigate(-1)}>
+          <button
+            className="btn rounded-xl btn-sm"
+            onClick={() => navigate(-1)}
+          >
             Cancel
           </button>
           {businessToBeUpdated ? (
             <button
               onClick={handleSubmit}
               disabled={mutation.isPending}
-              className="btn btn-sm bg-[var(--primary-btn)]"
+              className="btn rounded-xl btn-sm bg-[var(--primary-btn)]"
             >
               {updateMutation.isPending ? (
                 <CustomLoader text={"Saving..."} />
@@ -341,7 +341,7 @@ const BusinessForm = ({ businessToBeUpdated }) => {
             <button
               onClick={handleSubmit}
               disabled={mutation.isPending}
-              className="btn btn-sm bg-[var(--primary-btn)]"
+              className="btn rounded-xl btn-sm bg-[var(--primary-btn)]"
             >
               {mutation.isPending ? (
                 <CustomLoader text={"Saving..."} />
@@ -959,7 +959,7 @@ const BusinessForm = ({ businessToBeUpdated }) => {
                   setAdditionalInfoKey("");
                   setAdditionalInfoValue("");
                 }}
-                className="btn btn-sm bg-[var(--primary-btn)] ml-3"
+                className="btn btn-sm rounded-xl bg-[var(--primary-btn)] ml-3"
               >
                 Add
               </div>
@@ -993,6 +993,14 @@ const BusinessForm = ({ businessToBeUpdated }) => {
               </div>
             ))}
           </div>
+
+          {/* ADD COVER LETTER */}
+          {/* <div className="my-2">
+            <label htmlFor="Notes" className="text-xs text-gray-600">
+              Cover Letter
+            </label>
+
+          </div> */}
         </motion.div>
       </form>
 
@@ -1050,7 +1058,7 @@ const BusinessForm = ({ businessToBeUpdated }) => {
                   {!bank.isActive ? (
                     <button
                       onClick={() => markAsMutation.mutate(bank._id)}
-                      className="text-green-500  text-xs hover:underline"
+                      className="text-green-500 rounded-xl  text-xs hover:underline"
                     >
                       Mark as Active
                     </button>
@@ -1074,7 +1082,7 @@ const BusinessForm = ({ businessToBeUpdated }) => {
                         setEditIndex(index);
                         document.getElementById("bank-modal").showModal();
                       }}
-                      className="text-blue-500 text-xs hover:underline"
+                      className="text-blue-500 rounded-xl text-xs hover:underline"
                     >
                       Edit
                     </button>
@@ -1089,7 +1097,7 @@ const BusinessForm = ({ businessToBeUpdated }) => {
                         }));
                         deleteBank.mutate(bank._id);
                       }}
-                      className="text-red-500 text-xs hover:underline"
+                      className="text-red-500 rounded-xl text-xs hover:underline"
                     >
                       Delete
                     </button>
@@ -1104,7 +1112,7 @@ const BusinessForm = ({ businessToBeUpdated }) => {
       {/* BANK ACCOUNT ADDITION */}
       <div className="w-full flex items-center justify-center py-12">
         <button
-          className="text-[var(--primary-btn)] text-xs flex items-center gap-2 p-2 btn btn-dash"
+          className="text-[var(--primary-btn)] rounded-xl text-xs flex items-center gap-2 p-2 btn btn-dash"
           onClick={() => {
             resetBankForm();
             document.getElementById("bank-modal").showModal();
@@ -1119,7 +1127,7 @@ const BusinessForm = ({ businessToBeUpdated }) => {
         <div className="modal-box">
           <form method="dialog">
             {/* if there is a button in form, it will close the modal */}
-            <button className="btn btn-sm btn-circle btn-ghost absolute right-2 top-4">
+            <button className="btn rounded-xl rounded-xl btn-sm btn-circle btn-ghost absolute right-2 top-4">
               ✕
             </button>
           </form>
@@ -1297,7 +1305,7 @@ const BusinessForm = ({ businessToBeUpdated }) => {
 
                   document.getElementById("bank-modal").close();
                 }}
-                className="btn btn-sm bg-[var(--primary-btn)]"
+                className="btn rounded-xl btn-sm bg-[var(--primary-btn)]"
               >
                 Update
               </button>
@@ -1332,7 +1340,7 @@ const BusinessForm = ({ businessToBeUpdated }) => {
 
                   document.getElementById("bank-modal").close();
                 }}
-                className="btn btn-sm bg-[var(--primary-btn)]"
+                className="btn rounded-xl btn-sm bg-[var(--primary-btn)]"
               >
                 Add
               </button>

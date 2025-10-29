@@ -30,7 +30,7 @@ const DashboardCashAndBank = () => {
           <div className="w-full flex items-center justify-between px-5">
             <h1 className="text-xl font-semibold">Cash and Bank</h1>
             <div className="flex items-center justify-between gap-2">
-              <button className="flex border font-normal border-[var(--primary-border)] hover gap-2 px-4 py-2 btn btn-sm  rounded text-sm">
+              <button className="flex  border font-normal border-[var(--primary-border)] hover gap-2 px-4 py-2 btn btn-sm  rounded text-sm">
                 <FaPlusMinus />
                 Add/reduce Money
               </button>
@@ -177,7 +177,7 @@ const DashboardCashAndBank = () => {
                   </li>
                 </ul>
               </div>
-              <button className="border border-[var(--primary-border)]  p-1  flex justify-center hover:bg-zinc-200 cursor-pointer rounded-lg text-zinc-500 items-center">
+              <button className="border rounded-xl border-[var(--primary-border)]  p-1  flex justify-center hover:bg-zinc-200 cursor-pointer rounded-lg text-zinc-500 items-center">
                 <MdOutlineFileDownload size={25} />
               </button>
             </motion.div>

@@ -253,12 +253,12 @@ const PaymentInForm = () => {
           <div className="flex items-center gap-2">
             <button
               onClick={() => navigate(-1)}
-              className="btn btn-soft btn-sm"
+              className="btn btn-soft btn-sm rounded-xl"
             >
               Cancel
             </button>
             <button
-              className={`btn btn-sm bg-[var(--primary-btn)]  ${
+              className={`btn btn-sm bg-[var(--primary-btn)]  rounded-xl ${
                 mutation?.isPending && "opacity-70 cursor-not-allowed"
               }`}
               disabled={mutation?.isPending}

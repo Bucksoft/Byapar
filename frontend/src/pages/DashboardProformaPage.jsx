@@ -203,7 +203,7 @@ const DashboardProformaPage = () => {
                                     `/dashboard/update/${proforma?._id}?type=proforma invoice`
                                   )
                                 }
-                                className="flex items-center gap-2"
+                                className="flex rounded-xl items-center gap-2"
                               >
                                 <FaRegEdit /> Edit
                               </button>
@@ -264,7 +264,7 @@ const DashboardProformaPage = () => {
               <div className="flex w-full">
                 <button
                   onClick={() => mutation.mutate()}
-                  className="btn btn-sm btn-ghost  ml-auto text-[var(--error-text-color)]"
+                  className="btn rounded-xl btn-sm btn-ghost  ml-auto text-[var(--error-text-color)]"
                 >
                   Delete
                 </button>

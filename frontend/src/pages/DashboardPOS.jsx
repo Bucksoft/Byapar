@@ -29,7 +29,7 @@ const DashboardPOS = () => {
           className="p-2 flex items-center justify-between bg-zinc-100 border-b border-zinc-200"
         >
           <p>POS Billing</p>
-          <button className="btn btn-sm">
+          <button className="btn btn-sm rounded-xl">
             <Settings size={16} />
             Settings
           </button>
@@ -87,9 +87,9 @@ const DashboardPOS = () => {
               <button className="btn btn-sm ">
                 <Plus size={15} /> New Item
               </button>
-              <button className="btn btn-sm">Change price</button>
-              <button className="btn btn-sm">Change quantity</button>
-              <button className="btn btn-sm text-error bg-error/10">
+              <button className="btn btn-sm rounded-xl">Change price</button>
+              <button className="btn btn-sm rounded-xl">Change quantity</button>
+              <button className="btn btn-sm text-error bg-error/10 rounded-xl">
                 Delete Item
               </button>
             </motion.div>
@@ -197,8 +197,8 @@ const DashboardPOS = () => {
             className="p-4"
           >
             <div className="grid grid-cols-2 text-xs gap-3">
-              <button className="btn btn-sm">Add Discount</button>
-              <button className="btn btn-sm text-nowrap">
+              <button className="btn btn-sm rounded-xl">Add Discount</button>
+              <button className="btn btn-sm text-nowrap rounded-xl">
                 Add Additional Charge
               </button>
             </div>
@@ -258,10 +258,10 @@ const DashboardPOS = () => {
             </div>
 
             <div className="flex items-center gap-1 p-4">
-              <button className="btn btn-sm btn-soft w-1/2 bg-[var(--primary-btn)]/20">
+              <button className="btn rounded-xl btn-sm btn-soft w-1/2 bg-[var(--primary-btn)]/20">
                 Save & Print
               </button>
-              <button className="btn btn-sm w-1/2 bg-[var(--primary-btn)]">
+              <button className="btn rounded-xl btn-sm w-1/2 bg-[var(--primary-btn)]">
                 Save Bill
               </button>
             </div>

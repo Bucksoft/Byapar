@@ -36,7 +36,7 @@ const DashboardManageBusinessPage = () => {
             </div>
 
             <div className="m-4">
-              <button className="px-3 flex items-center gap-6 rounded-2xl p-2 border border-zinc-200 hover:shadow-md cursor-pointer ">
+              <button className="px-3 rounded-xl flex items-center gap-6 rounded-2xl p-2 border border-zinc-200 hover:shadow-md cursor-pointer ">
                 <img
                   src={tally}
                   alt="/src/assets/tally"
@@ -73,7 +73,7 @@ const DashboardManageBusinessPage = () => {
               <p className="text-[13px] mb-3">
                 Easily Manage all your businesses in one place on myBillBook app
               </p>
-              <button className="btn btn-sm btn-soft font-bold text-success-content rounded bg-success  cursor-pointer">
+              <button className="btn rounded-xl btn-sm btn-soft font-bold text-success-content rounded bg-success  cursor-pointer">
                 Create New Business
               </button>
             </div> */}

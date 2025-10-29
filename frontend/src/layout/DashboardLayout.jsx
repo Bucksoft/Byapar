@@ -50,7 +50,7 @@ const DashboardLayout = () => {
         {/* Mobile menu button */}
         <button
           onClick={() => setShowSidebar(!showSidebar)}
-          className="p-3 border-b w-full text-left bg-white shadow flex items-center gap-2"
+          className="p-3 border-b rounded-xl w-full text-left bg-white shadow flex items-center gap-2"
         >
           <RiMenu2Fill />
           Menu
@@ -64,7 +64,7 @@ const DashboardLayout = () => {
           <Sidebar />
           <button
             onClick={() => setShowSidebar(false)}
-            className="p-3 w-full text-left border-t"
+            className="p-3 w-full rounded-xl text-left border-t"
           >
             Close
           </button>

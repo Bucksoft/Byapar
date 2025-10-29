@@ -84,7 +84,7 @@ const BankAccountsModal = ({ data, setData, businessId, partyId }) => {
                 {b.upiId && <p className="text-xs">UPI: {b.upiId}</p>}
               </div>
               <button
-                className="btn btn-xs btn-error btn-outline"
+                className="btn btn-xs rounded-xl btn-error btn-outline"
                 onClick={() => handleDeleteBank(b.id)}
               >
                 Delete
@@ -139,17 +139,20 @@ const BankAccountsModal = ({ data, setData, businessId, partyId }) => {
             value={newBank.upiId}
             onChange={(e) => setNewBank({ ...newBank, upiId: e.target.value })}
           />
-          <button onClick={handleAddBank} className="btn btn-sm  btn-dash">
+          <button
+            onClick={handleAddBank}
+            className="btn btn-sm rounded-xl btn-dash"
+          >
             Add
           </button>
         </div>
 
         <div className="modal-action">
           <form method="dialog">
-            <button className="btn btn-sm">Cancel</button>
+            <button className="btn btn-sm rounded-xl">Cancel</button>
           </form>
           <button
-            className="btn btn-sm bg-[var(--primary-btn)]"
+            className="btn btn-sm bg-[var(--primary-btn)] rounded-xl"
             onClick={() => mutation.mutate()}
           >
             Save Changes

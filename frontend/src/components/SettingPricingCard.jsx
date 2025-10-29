@@ -31,7 +31,7 @@ const SettingPricingCard = ({ plan }) => {
           </div>
           <span className="text-md font-medium ">{plan.yearlyPrice}</span>
           <button
-            className={`p-2  cursor-pointer border font-semibold ${
+            className={`p-2 rounded-xl cursor-pointer border font-semibold ${
               plan.id === 1
                 ? "border-error text-error hover:bg-error/10 "
                 : plan.id === 2

@@ -13,11 +13,11 @@ const HomePageHighlight = () => {
           with BYAPAR. Start your free trial today.
         </p>
         <div className="flex flex-col sm:flex-row justify-center gap-4 mb-8">
-          <button className="bg-white text-info px-8 py-4 rounded-xl text-lg font-semibold hover:bg-gray-100 transition-colors shadow-lg transform hover:scale-105">
+          <button className="bg-white  text-info px-8 py-4 rounded-xl text-lg font-semibold hover:bg-gray-100 transition-colors shadow-lg transform hover:scale-105">
             Start Free Trial
             <ArrowRight className="w-5 h-5 ml-2 inline" />
           </button>
-          <button className="border-2 border-white text-white px-8 py-4 rounded-xl text-lg font-semibold hover:bg-white hover:text-info transition-colors">
+          <button className="border-2  border-white text-white px-8 py-4 rounded-xl text-lg font-semibold hover:bg-white hover:text-info transition-colors">
             Schedule Demo
           </button>
         </div>

@@ -20,7 +20,7 @@ import { useNavigate } from "react-router-dom";
 import { downloadPDF } from "../../../helpers/downloadPdf";
 import InvoiceTemplate from "../Invoices/InvoiceTemplate";
 
-const InvoiceReport = () => {
+const PaymentCollectionReport = () => {
   const [openDatePicker, setOpenDatePicker] = useState(false);
   const [isDownloading, setIsDownloading] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
@@ -29,33 +29,37 @@ const InvoiceReport = () => {
   const printRef = useRef();
   const { business } = useBusinessStore();
   const navigate = useNavigate();
+
   const [dateRange, setDateRange] = useState({
-    from: new Date(),
-    to: new Date(new Date().getTime() + 30 * 24 * 60 * 60 * 1000),
+    from: new Date(new Date().setDate(new Date().getDate() - 1)),
+    to: new Date(),
   });
+
   const [sortType, setSortType] = useState("");
+
   const { isLoading, data: invoices } = useQuery({
-    queryKey: ["invoices", dateRange],
+    queryKey: ["paymentIns", dateRange],
     queryFn: async () => {
-      const res = await axiosInstance.get(`/sales-invoice/${business?._id}`);
+      const res = await axiosInstance.get(`/payment-in/all/${business?._id}`);
+      console.log(res);
       return res.data;
     },
   });
 
   // SEARCH INVOICES
   const searchedInvoices = useMemo(() => {
-    const byDate = invoices?.invoices.filter((invoice) => {
+    const byDate = invoices?.paymentIns.filter((invoice) => {
       return (
-        new Date(invoice?.salesInvoiceDate) >= dateRange.from &&
-        new Date(invoice?.salesInvoiceDate) <= dateRange.to
+        new Date(invoice?.paymentDate) >= dateRange.from &&
+        new Date(invoice?.paymentDate) <= dateRange.to
       );
     });
 
     const filteredInvoices =
-      invoices?.invoices.length &&
-      invoices?.invoices?.filter((invoice) => {
-        return invoice?.salesInvoiceNumber
-          ?.toString()
+      invoices?.paymentIns.length &&
+      invoices?.paymentIns?.filter((invoice) => {
+        return invoice?.paymentInNumber
+          .toString()
           .toLowerCase()
           .includes(searchQuery.toLowerCase());
       });
@@ -70,11 +74,11 @@ const InvoiceReport = () => {
   // CANCEL INVOICE
   const cancelMutation = useMutation({
     mutationFn: async (id) => {
-      await axiosInstance.delete(`/sales-invoice/${id}`);
+      await axiosInstance.delete(`/payment-in/${id}`);
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["invoices"] });
-      toast.success("Invoice cancelled successfully");
+      queryClient.invalidateQueries({ queryKey: ["invoices", dateRange] });
+      toast.success("Payment In cancelled successfully");
     },
   });
 
@@ -83,11 +87,11 @@ const InvoiceReport = () => {
     if (searchedInvoices?.length === 0) return [];
     if (sortType === "date") {
       return searchedInvoices?.sort((a, b) => {
-        return new Date(a?.salesInvoiceDate) - new Date(b?.salesInvoiceDate);
+        return new Date(a?.paymentDate) - new Date(b?.paymentDate);
       });
     } else if (sortType === "invoiceNo") {
       return searchedInvoices?.sort((a, b) => {
-        return a?.salesInvoiceNumber - b?.salesInvoiceNumber;
+        return a?.paymentInNumber - b?.paymentInNumber;
       });
     } else if (sortType === "partyName") {
       return searchedInvoices?.sort((a, b) => {
@@ -103,7 +107,7 @@ const InvoiceReport = () => {
       });
     } else if (sortType === "amount") {
       return searchedInvoices?.sort((a, b) => {
-        return a?.totalAmount - b?.totalAmount;
+        return a?.paymentAmount - b?.paymentAmount;
       });
     } else if (sortType === "balance") {
       return searchedInvoices?.sort((a, b) => {
@@ -111,7 +115,7 @@ const InvoiceReport = () => {
       });
     } else if (sortType === "status") {
       return searchedInvoices?.sort((a, b) => {
-        return a?.balanceAmount - b?.balanceAmount;
+        return a?.status?.localeCompare(b?.status);
       });
     }
   }, [sortType]);
@@ -159,17 +163,17 @@ const InvoiceReport = () => {
       {/* CARD TO DISPLAY TOTAL SALES */}
       <div className="w-full my-5">
         <div className="border w-1/4 p-2 border-zinc-300 shadow-md rounded-md bg-zinc-500/10">
-          <span className="text-sm text-zinc-500">Total Sales</span>
+          <span className="text-sm text-zinc-500">Total Collection</span>
           <p className="flex items-center gap-1">
             <LuIndianRupee size={12} />
-            {invoices?.totalSales}
+            {invoices?.totalPaymentAmount.toLocaleString("en-IN") || 0}
           </p>
         </div>
       </div>
 
       <div className="divider divider-sm" />
 
-      {/* TABLE TO DISPLAY TOTAL SALES */}
+      {/* TABLE TO DISPLAY TOTAL PAYMENT INS */}
       <section className="w-full">
         {/* SEARCH AND PRINT BUTTON */}
         <div className="w-full flex items-center justify-between">
@@ -178,7 +182,7 @@ const InvoiceReport = () => {
             <input
               className="input input-sm"
               type="text"
-              placeholder="Search by invoice number"
+              placeholder="Search by payment in number"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
             />
@@ -316,24 +320,7 @@ const InvoiceReport = () => {
                       />
                     </div>
                   </th>
-                  <th>
-                    <div
-                      style={{
-                        display: "flex",
-                        alignItems: "center",
-                        justifyContent: "space-between",
-                      }}
-                    >
-                      <span>Balance</span>
-                      <ArrowUpDown
-                        onClick={() => setSortType("balance")}
-                        size={12}
-                        style={{
-                          cursor: "pointer",
-                        }}
-                      />
-                    </div>
-                  </th>
+
                   <th>
                     <div
                       style={{
@@ -355,7 +342,7 @@ const InvoiceReport = () => {
                   <th>Actions</th>
                 </tr>
               </thead>
-              <tbody className="text-xs">
+              <tbody className="text-xs ">
                 {isLoading ? (
                   <tr>
                     <td colSpan={8}>
@@ -387,31 +374,22 @@ const InvoiceReport = () => {
                       onClick={() =>
                         navigate(`/dashboard/sales-invoice/${invoice?._id}`)
                       }
-                      className="cursor-pointer"
+                      className="cursor-pointer "
                     >
-                      <td>{invoice?.salesInvoiceDate?.split("T")[0] || "-"}</td>
-                      <td>{invoice?.salesInvoiceNumber || "-"}</td>
+                      <td>{invoice?.paymentDate?.split("T")[0] || "-"}</td>
+                      <td>{invoice?.paymentInNumber || "-"}</td>
                       <td>{invoice?.partyName || "-"}</td>
                       <td>{invoice?.type || "-"}</td>
-                      <td>{invoice?.paymentType || "-"}</td>
+                      <td>{invoice?.paymentMode || "-"}</td>
                       <td>
                         <div className="flex items-center gap-1">
                           <LuIndianRupee size={10} />
-                          {Number(invoice?.totalAmount).toLocaleString(
+                          {Number(invoice?.paymentAmount).toLocaleString(
                             "en-IN"
                           ) || 0}
                         </div>
                       </td>
-                      <td>
-                        <div className="flex items-center gap-1">
-                          <LuIndianRupee size={10} />
-                          {invoice?.balance
-                            ? Number(invoice?.balanceAmount).toLocaleString(
-                                "en-IN"
-                              )
-                            : 0}
-                        </div>
-                      </td>
+
                       <td>
                         <div
                           className={`badge badge-sm badge-soft ${
@@ -426,55 +404,34 @@ const InvoiceReport = () => {
                         </div>
                       </td>
                       <td>
-                        <div className="flex items-center gap-2">
-                          {/* <button
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              handlePrint("invoice");
-                            }}
-                            className="btn btn-xs bg-white rounded-xl"
-                          >
-                            <Printer size={12} />
-                          </button> */}
+                        <div
+                          onClick={(e) => e.stopPropagation()}
+                          className="dropdown dropdown-bottom dropdown-end"
+                        >
                           <div
-                            onClick={(e) => e.stopPropagation()}
-                            className="dropdown dropdown-bottom dropdown-end "
+                            tabIndex={0}
+                            role="button"
+                            className="btn btn-xs m-1 bg-white"
                           >
-                            <div
-                              tabIndex={0}
-                              role="button"
-                              className="btn btn-xs m-1 bg-white"
+                            <EllipsisVertical size={12} />
+                          </div>
+                          <ul
+                            tabIndex="-1"
+                            className="border border-zinc-300 dropdown-content menu bg-base-100 rounded-box z-100 w-52 p-1 text-xs shadow-sm"
+                          >
+                            <li
+                              onClick={() =>
+                                navigate(`/parties/create-payment-in`, {
+                                  state: {
+                                    invoiceId: invoice?._id,
+                                    partyName: invoice?.partyName,
+                                  },
+                                })
+                              }
                             >
-                              <EllipsisVertical size={12} />
-                            </div>
-                            <ul
-                              tabIndex="-1"
-                              className="border border-zinc-300 dropdown-content menu bg-base-100 rounded-box z-100 w-52 p-1 text-xs shadow-sm"
-                            >
-                              <li
-                                onClick={() =>
-                                  navigate(
-                                    `/dashboard/update/${invoice?._id}?type=sales invoice`
-                                  )
-                                }
-                              >
-                                <a>View/Edit</a>
-                              </li>
-                              <li
-                                onClick={() =>
-                                  navigate(
-                                    `/dashboard/parties/create-payment-in`,
-                                    {
-                                      state: {
-                                        invoiceId: invoice?._id,
-                                        partyName: invoice?.partyName,
-                                      },
-                                    }
-                                  )
-                                }
-                              >
-                                <a>Receive Payment</a>
-                              </li>
+                              <a>View/Edit</a>
+                            </li>
+                            {/* 
                               <li
                                 onClick={(e) => {
                                   setInvoiceToDownload(invoice);
@@ -484,18 +441,17 @@ const InvoiceReport = () => {
                                 }}
                               >
                                 <a>Open PDF</a>
-                              </li>
+                              </li> */}
 
-                              <li
-                                onClick={() =>
-                                  cancelMutation.mutate(invoice?._id)
-                                }
-                                className="text-[var(--error-text-color)]"
-                              >
-                                <a>Cancel Invoice</a>
-                              </li>
-                            </ul>
-                          </div>
+                            <li
+                              onClick={() =>
+                                cancelMutation.mutate(invoice?._id)
+                              }
+                              className="text-[var(--error-text-color)]"
+                            >
+                              <a>Cancel Invoice</a>
+                            </li>
+                          </ul>
                         </div>
                       </td>
                     </tr>
@@ -512,13 +468,17 @@ const InvoiceReport = () => {
         <div className="modal-box w-11/12 max-w-7xl">
           <div className="modal-action sticky top-0 z-10 mb-10 w-full">
             <form method="dialog">
-              <button className="btn btn-sm shadow">Close</button>
+              <button className="btn btn-sm shadow rounded-xl">Close</button>
             </form>
             <button
               onClick={() =>
-                downloadPDF("sales_report", "sales_report", setIsDownloading)
+                downloadPDF(
+                  "collection_report",
+                  "payment_collection",
+                  setIsDownloading
+                )
               }
-              className="btn rounded-xl rounded-xl btn-sm bg-[var(--primary-btn)] shadow"
+              className="btn rounded-xl  btn-sm bg-[var(--primary-btn)] shadow"
             >
               {isDownloading ? (
                 <div className="">
@@ -539,7 +499,7 @@ const InvoiceReport = () => {
           </div>
           {/* INVOICE TO DOWNLOAD */}
           <div
-            id="sales_report"
+            id="collection_report"
             ref={printRef}
             style={{
               width: "100%",
@@ -615,7 +575,7 @@ const InvoiceReport = () => {
                   textAlign: "center",
                 }}
               >
-                Sale Report
+                Payment Collection Report
               </h4>
               <h5>
                 Duration : {dateRange?.from.toLocaleDateString("en-GB")} to{" "}
@@ -707,17 +667,7 @@ const InvoiceReport = () => {
                         <span>Amount</span>
                       </div>
                     </th>
-                    <th>
-                      <div
-                        style={{
-                          display: "flex",
-                          alignItems: "center",
-                          justifyContent: "space-between",
-                        }}
-                      >
-                        <span>Balance</span>
-                      </div>
-                    </th>
+
                     <th>
                       <div
                         style={{
@@ -790,13 +740,11 @@ const InvoiceReport = () => {
                           cursor: "pointer",
                         }}
                       >
-                        <td>
-                          {invoice?.salesInvoiceDate?.split("T")[0] || "-"}
-                        </td>
-                        <td>{invoice?.salesInvoiceNumber || "-"}</td>
+                        <td>{invoice?.paymentDate?.split("T")[0] || "-"}</td>
+                        <td>{invoice?.paymentInNumber || "-"}</td>
                         <td>{invoice?.partyName || "-"}</td>
                         <td>{invoice?.type || "-"}</td>
-                        <td>{invoice?.paymentType || "-"}</td>
+                        <td>{invoice?.paymentMode || "-"}</td>
                         <td>
                           <div
                             style={{
@@ -806,27 +754,12 @@ const InvoiceReport = () => {
                             }}
                           >
                             <LuIndianRupee size={10} />
-                            {Number(invoice?.totalAmount).toLocaleString(
+                            {Number(invoice?.paymentAmount).toLocaleString(
                               "en-IN"
                             ) || 0}
                           </div>
                         </td>
-                        <td>
-                          <div
-                            style={{
-                              display: "flex",
-                              alignItems: "center",
-                              gap: "4px",
-                            }}
-                          >
-                            <LuIndianRupee size={10} />
-                            {invoice?.balance
-                              ? Number(invoice?.balanceAmount).toLocaleString(
-                                  "en-IN"
-                                )
-                              : 0}
-                          </div>
-                        </td>
+
                         <td>
                           <div
                             className={`badge badge-sm badge-soft ${
@@ -857,7 +790,8 @@ const InvoiceReport = () => {
                 width: "100%",
               }}
             >
-              Total Sale : <LuIndianRupee size={15} /> {invoices?.totalSales}
+              Total Collection : <LuIndianRupee size={15} />{" "}
+              {invoices?.totalPaymentAmount.toLocaleString("en-IN") || 0}
             </h4>
           </div>
         </div>
@@ -882,7 +816,7 @@ const InvoiceReport = () => {
                     `${invoiceToDownload?.partyName
                       ?.split(" ")
                       .join("_")
-                      .concat("_invoice")}`,
+                      .concat("_collection")}`,
                     setIsDownloading
                   )
                 }
@@ -914,4 +848,4 @@ const InvoiceReport = () => {
   );
 };
 
-export default InvoiceReport;
+export default PaymentCollectionReport;

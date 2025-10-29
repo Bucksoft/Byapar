@@ -56,7 +56,7 @@ const SalesInvoiceItemTable = ({
   // handle base price change
   const handleBasePriceChange = (itemId, value) => {
     console.log(value);
-    setAddedItems((prev) =>  
+    setAddedItems((prev) =>
       prev.map((item) =>
         item._id === itemId
           ? { ...item, basePrice: Number(value), isManualBase: true }
@@ -435,7 +435,7 @@ const SalesInvoiceItemTable = ({
         <div className="w-7/10 ">
           <button
             onClick={() => document.getElementById("my_modal_10").showModal()}
-            className="btn btn-info w-full hover:btn-dash"
+            className="btn rounded-xl btn-info w-full hover:btn-dash"
           >
             + Add Item
           </button>
@@ -467,7 +467,7 @@ const SalesInvoiceItemTable = ({
                       onClick={() =>
                         document.getElementById("my_modal_3").showModal()
                       }
-                      className="btn btn-sm btn-outline btn-info"
+                      className="btn rounded-xl btn-sm btn-outline btn-info"
                     >
                       <Plus size={14} /> Create Item
                     </button>
@@ -480,7 +480,7 @@ const SalesInvoiceItemTable = ({
                         />
                         {/* <div className="modal-action">
                   <form method="dialog">
-                    <button className="btn">Close</button>
+                    <button className="btn rounded-xl">Close</button>
                   </form>
                 </div> */}
                       </div>
@@ -585,7 +585,7 @@ const SalesInvoiceItemTable = ({
                                       [item._id]: prev[item._id] ?? 1,
                                     }));
                                   }}
-                                  className="btn btn-xs w-full btn-dash"
+                                  className="btn rounded-xl btn-xs w-full btn-dash"
                                 >
                                   Add
                                 </button>
@@ -600,10 +600,10 @@ const SalesInvoiceItemTable = ({
               <div className="modal-action p-4 ">
                 <form method="dialog">
                   {/* if there is a button in form, it will close the modal */}
-                  <button className="btn btn-sm w-32">Cancel</button>
+                  <button className="btn btn-sm w-32 rounded-xl">Cancel</button>
                 </form>
                 <button
-                  className="btn btn-sm w-32 bg-[var(--primary-btn)]"
+                  className="btn btn-sm  rounded-xl w-32 bg-[var(--primary-btn)]"
                   onClick={() => {
                     const selected = items
                       ?.filter((item) => (quantities[item._id] || 0) > 0)

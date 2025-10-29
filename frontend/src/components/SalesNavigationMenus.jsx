@@ -106,7 +106,7 @@ const SalesNavigationMenus = ({
                   }`
                 );
               }}
-              className="btn bg-[var(--primary-btn)] btn-sm text-zinc-700"
+              className="btn rounded-xl bg-[var(--primary-btn)] btn-sm text-zinc-700"
             >
               Create {btnText}
             </button>

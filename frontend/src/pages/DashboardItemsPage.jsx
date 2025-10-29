@@ -194,7 +194,7 @@ const DashboardItemsPage = () => {
             </label>
             <button
               onClick={() => setShowLowStock(!showLowStock)}
-              className="btn btn-ghost btn-sm "
+              className="btn rounded-xl btn-ghost btn-sm "
             >
               <LuPackageSearch className="flex items-center" /> Show{" "}
               {!showLowStock ? "Low Stock" : "All Items"}
@@ -204,7 +204,7 @@ const DashboardItemsPage = () => {
           {/* CREATE ITEM */}
           <button
             onClick={() => document.getElementById("my_modal_3").showModal()}
-            className="btn btn-sm bg-[var(--primary-btn)]"
+            className="btn rounded-xl btn-sm bg-[var(--primary-btn)]"
           >
             <Plus size={14} /> Create Item
           </button>
@@ -251,7 +251,7 @@ const DashboardItemsPage = () => {
                       name or clear your search.
                     </p>
                     <button
-                      className="btn btn-outline btn-sm mt-3"
+                      className="btn rounded-xl btn-outline btn-sm mt-3"
                       onClick={() => setSearchQuery("")}
                     >
                       Clear search
@@ -299,7 +299,7 @@ const DashboardItemsPage = () => {
         <div className="w-full flex items-center justify-end p-4">
           <div className="join join-sm flex items-center">
             <button
-              className="btn btn-sm btn-neutral"
+              className="btn rounded-xl btn-sm btn-neutral"
               disabled={currentPage === 1}
               onClick={() => setCurrentPage((p) => p - 1)}
             >
@@ -311,7 +311,7 @@ const DashboardItemsPage = () => {
             </span>
 
             <button
-              className="btn btn-sm btn-neutral"
+              className="btn rounded-xl btn-sm btn-neutral"
               disabled={currentPage === totalPages}
               onClick={() => setCurrentPage((p) => p + 1)}
             >
@@ -340,7 +340,7 @@ const DashboardItemsPage = () => {
           <button
             onClick={() => fileRef.current.click()}
             disabled={bulkMutation.isPending}
-            className="btn btn-success btn-sm mt-3 "
+            className="btn rounded-xl btn-success btn-sm mt-3 "
           >
             {bulkMutation.isPending ? (
               <CustomLoader text={"Adding items..."} />
@@ -372,7 +372,7 @@ const DashboardItemsPage = () => {
 
           <button
             onClick={() => window.open("/sample-items.xlsx", "_blank")}
-            className="btn text-neutral btn-link btn-xs mt-3 ml-3"
+            className="btn rounded-xl text-neutral btn-link btn-xs mt-3 ml-3"
           >
             <svg
               xmlns="http://www.w3.org/2000/svg"

@@ -90,7 +90,7 @@ const ItemsList = ({ showLowStock, items }) => {
         <div className="py-3 w-full flex justify-start">
           {/* Open the modal using document.getElementById('ID').showModal() method */}
           <button
-            className="btn btn-sm text-[var(--primary-text-color)] bg-[var(--error-text-color)] mr-2"
+            className="btn rounded-xl btn-sm text-[var(--primary-text-color)] bg-[var(--error-text-color)] mr-2"
             onClick={() => document.getElementById("my_modal_2").showModal()}
           >
             <BsTrash3 /> Delete Items
@@ -105,7 +105,7 @@ const ItemsList = ({ showLowStock, items }) => {
               <div className="flex w-full">
                 <button
                   onClick={() => mutation.mutate(selectedItems)}
-                  className="btn btn-sm btn-ghost  ml-auto text-[var(--error-text-color)]"
+                  className="btn rounded-xl btn-sm btn-ghost  ml-auto text-[var(--error-text-color)]"
                 >
                   Delete
                 </button>
@@ -370,7 +370,7 @@ const ItemsList = ({ showLowStock, items }) => {
 
                             <div className="modal-action">
                               <button
-                                className="btn btn-sm"
+                                className="btn btn-sm rounded-xl"
                                 onClick={(e) => {
                                   e.stopPropagation();
                                   document.getElementById("my_modal_1").close();
@@ -379,7 +379,7 @@ const ItemsList = ({ showLowStock, items }) => {
                                 Close
                               </button>
                               <button
-                                className="btn btn-sm bg-[var(--primary-btn)] ml-2"
+                                className="btn rounded-xl btn-sm bg-[var(--primary-btn)] ml-2"
                                 onClick={(e) => {
                                   e.stopPropagation();
                                   stockMutation.mutate({

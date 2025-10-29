@@ -59,7 +59,7 @@ const CreditNote = () => {
             </button> */}
             <button
               onClick={() => handlePrint(printRef)}
-              className="btn btn-sm btn-dash"
+              className="btn btn-sm btn-dash  rounded-xl"
             >
               <Printer size={15} /> Print PDF
             </button>
@@ -103,7 +103,7 @@ const CreditNote = () => {
                       document.getElementById("my_modal_3").showModal();
                       setInvoiceIdToDelete(creditNote?._id);
                     }}
-                    className="text-error"
+                    className="text-error rounded-xl"
                   >
                     Delete
                   </button>
@@ -132,10 +132,10 @@ const CreditNote = () => {
           </div>
 
           {/* <div className="flex items-center gap-2">
-            <button className="btn btn-sm btn-soft btn-info">
+            <button className="btn rounded-xl btn-sm btn-soft btn-info">
               Generate E-way Bill
             </button>
-            <button className="btn btn-sm btn-soft btn-info">
+            <button className="btn rounded-xl btn-sm btn-soft btn-info">
               <TbFileInvoice /> Generate e-Invoice
             </button>
           </div> */}
@@ -159,7 +159,7 @@ const CreditNote = () => {
       <dialog id="my_modal_3" className="modal">
         <div className="modal-box">
           <form method="dialog">
-            <button className="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">
+            <button className="btn rounded-xl btn-sm btn-circle btn-ghost absolute right-2 top-2">
               ✕
             </button>
           </form>
@@ -171,7 +171,7 @@ const CreditNote = () => {
           <div className="w-full grid place-items-end">
             <button
               onClick={() => mutation.mutate()}
-              className="btn btn-sm bg-[var(--error-text-color)] text-[var(--primary-text-color)]"
+              className="btn rounded-xl btn-sm bg-[var(--error-text-color)] text-[var(--primary-text-color)]"
             >
               Delete
             </button>

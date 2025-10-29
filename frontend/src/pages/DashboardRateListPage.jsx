@@ -33,7 +33,7 @@ const DashboardRateListPage = () => {
           {/* Body Section */}
           <section className="p-6 flex flex-col">
             <div className="w-full flex mb-5">
-              <button className="btn btn-sm ml-auto flex items-center">
+              <button className="btn rounded-xl btn-sm ml-auto flex items-center">
                 <FaFilePdf size={15} />
                 Download PDF
               </button>

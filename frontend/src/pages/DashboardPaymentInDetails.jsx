@@ -72,14 +72,14 @@ const DashboardPaymentInDetails = () => {
                   state: { id: id },
                 })
               }
-              className="btn btn-sm"
+              className="btn btn-sm rounded-xl"
             >
               <SquarePen size={15} />
               Edit
             </button>
 
             <button
-              className=" btn btn-sm text-[var(--error-text-color)]"
+              className=" btn rounded-xl btn-sm text-[var(--error-text-color)]"
               onClick={() => document.getElementById("my_modal_2").showModal()}
             >
               <BsTrash3 />
@@ -94,7 +94,7 @@ const DashboardPaymentInDetails = () => {
                 <div className="flex w-full">
                   <button
                     onClick={() => mutation.mutate()}
-                    className="btn btn-sm btn-ghost  ml-auto text-[var(--error-text-color)]"
+                    className="btn rounded-xl btn-sm btn-ghost  ml-auto text-[var(--error-text-color)]"
                   >
                     Delete
                   </button>
@@ -110,7 +110,7 @@ const DashboardPaymentInDetails = () => {
         {/* MENUS */}
         <section className="flex items-center gap-2 mt-7 w-3/4 ">
           <button
-            className="btn btn-sm"
+            className="btn btn-sm rounded-xl"
             onClick={() => {
               setPaymentIdToDownload(PaymentIn?.paymentIn?._id);
               document.getElementById("my_modal_1").showModal();
@@ -241,7 +241,7 @@ const DashboardPaymentInDetails = () => {
             </form>
             <button
               onClick={() => downloadPDF(paymentInIdToDownload, "payment in")}
-              className="btn btn-sm btn-info"
+              className="btn rounded-xl btn-sm btn-info rounded-xl"
             >
               <Download size={15} /> Download
             </button>

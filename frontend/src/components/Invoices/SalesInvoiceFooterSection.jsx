@@ -7,7 +7,7 @@ import { axiosInstance } from "../../config/axios";
 import { useBusinessStore } from "../../store/businessStore";
 import { useBusinessBankAccountStore } from "../../store/businessBankAccountStore";
 import toast from "react-hot-toast";
-import { Pen, Trash } from "lucide-react";
+import { Landmark, Pen, Trash } from "lucide-react";
 
 const SalesInvoiceFooterSection = ({
   data,
@@ -81,7 +81,7 @@ const SalesInvoiceFooterSection = ({
               <input
                 id="notes"
                 type="text"
-                value={data.notes}
+                value={data?.notes || ""}
                 onChange={(e) =>
                   setData((prev) => ({
                     ...prev,
@@ -106,7 +106,7 @@ const SalesInvoiceFooterSection = ({
               <textarea
                 type="text"
                 id="t&c"
-                value={data.termsAndCondition}
+                value={data?.termsAndCondition || ""}
                 onChange={(e) =>
                   setData((prev) => ({
                     ...prev,
@@ -130,6 +130,8 @@ const SalesInvoiceFooterSection = ({
             (bankAccount) =>
               bankAccount.isActive && (
                 <div key={bankAccount._id} className="bg-white p-4 ">
+                  <Landmark className="text-zinc-400 mb-1" />
+                  <h2 className="font-bold">Bank Details</h2>
                   {/* Header: Account Name */}
                   {bankAccount?.accountName && (
                     <div className="flex items-center justify-between ">
@@ -193,7 +195,7 @@ const SalesInvoiceFooterSection = ({
                   {/* Action Buttons */}
                   {/* <div className="flex justify-end gap-2 mt-4">
                     <button
-                      className="btn btn-xs btn-error btn-outline flex items-center gap-1 hover:bg-red-50"
+                      className="btn rounded-xl btn-xs btn-error btn-outline flex items-center gap-1 hover:bg-red-50"
                       onClick={() => {
                         document.getElementById("delete-modal").showModal();
                         setAccountId(bankAccount?._id);
@@ -202,7 +204,7 @@ const SalesInvoiceFooterSection = ({
                       <Trash size={14} /> Delete
                     </button>
                     <button
-                      className="btn btn-xs btn-success btn-outline flex items-center gap-1 hover:bg-green-50"
+                      className="btn rounded-xl btn-xs btn-success btn-outline flex items-center gap-1 hover:bg-green-50"
                       onClick={() => setIsEditingAccount(true)}
                     >
                       <Pen size={14} /> Edit
@@ -218,7 +220,10 @@ const SalesInvoiceFooterSection = ({
         {/* add additional charges */}
         <div>
           {data?.additionalCharges?.map((charge, index) => (
-            <div key={index} className="px-2 mb-2 relative">
+            <div
+              key={index}
+              className="px-2 mb-2 relative flex items-center justify-between"
+            >
               {/* Close button for removing a charge */}
               <IoCloseCircle
                 size={18}
@@ -230,7 +235,7 @@ const SalesInvoiceFooterSection = ({
                     ),
                   }))
                 }
-                className="text-gray-500 absolute top-0 right-0 cursor-pointer"
+                className="text-gray-500 absolute top-0 right-0 z-10 cursor-pointer"
               />
 
               {/* Reason Input */}
@@ -245,7 +250,7 @@ const SalesInvoiceFooterSection = ({
                   })
                 }
                 placeholder="Enter charge (ex. Transport Charge)"
-                className="input input-xs border-none text-xs bg-zinc-200 w-[160px]"
+                className="input input-xs border-none text-xs bg-zinc-200 w-1/3"
               />
 
               {/* Amount Input */}
@@ -264,7 +269,7 @@ const SalesInvoiceFooterSection = ({
                     return { ...prev, additionalCharges: updated };
                   })
                 }
-                className="input input-xs text-xs bg-zinc-200 w-[70px] ml-2"
+                className="input input-xs text-xs bg-zinc-200 w-1/3 ml-2"
               />
 
               {/* Tax Dropdown */}
@@ -277,7 +282,7 @@ const SalesInvoiceFooterSection = ({
                     return { ...prev, additionalCharges: updated };
                   })
                 }
-                className="select select-xs text-xs bg-zinc-200 ml-2 w-[130px]"
+                className="select select-xs text-xs bg-zinc-200 ml-2 w-1/3"
               >
                 <option value="">No Tax Applicable</option>
                 {data?.items?.map((item) => (
@@ -288,7 +293,7 @@ const SalesInvoiceFooterSection = ({
           ))}
 
           {/* Add Another Charge Button */}
-          <div className="flex justify-between py-2 px-2">
+          <div className="flex justify-between py-2 pl-2">
             <span
               onClick={() =>
                 setData((prev) => ({
@@ -299,7 +304,7 @@ const SalesInvoiceFooterSection = ({
                   ],
                 }))
               }
-              className="px-2 w-fit text-info text-xs cursor-pointer"
+              className="w-fit text-info text-xs cursor-pointer"
             >
               + Add Another Charge
             </span>

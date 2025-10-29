@@ -179,7 +179,7 @@ const DashboardPartyPage = () => {
 
               {party?._id && (
                 <Link to={`/dashboard/edit-party/${party._id}`}>
-                  <button className="btn btn-sm">
+                  <button className="btn btn-sm rounded-xl">
                     <FaRegEdit />
                     Edit
                   </button>
@@ -195,7 +195,7 @@ const DashboardPartyPage = () => {
             dashboardSinglePartyMenus.map((menu) => (
               <button
                 key={menu.id}
-                className={`flex items-center text-xs mt-5 gap-3 p-3 cursor-pointer ${
+                className={`flex rounded-xl items-center text-xs mt-5 gap-3 p-3 cursor-pointer ${
                   selectedMenu === menu.title?.toLowerCase() &&
                   "text-[var(--secondary-text-color)]  border-b"
                 }`}

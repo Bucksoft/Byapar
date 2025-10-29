@@ -78,6 +78,7 @@ import PurchaseOrder from "./components/Invoices/PurchaseOrder";
 import DebitNote from "./components/Invoices/DebitNote";
 import PurchaseReturn from "./components/Invoices/PurchaseReturn";
 import MasterLogin from "./pages/MasterLogin";
+import ProtectedRoute from "./components/ProtectedRoute";
 
 function App() {
   const { user } = useAuthStore();
@@ -85,265 +86,291 @@ function App() {
   return (
     <>
       <Routes>
+        {/* PUBLIC ROUTES */}
         <Route path="/" element={<HomePage />} />
         <Route path="/login" element={<LoginPage />} />
         <Route path="/masterloginforbyapar" element={<MasterLogin />} />
         <Route path="/preview-excel/:id" element={<PreviewExcel />} />
-        <Route path="/dashboard" element={<DashboardLayout />}>
-          <Route index element={<DashboardPage />} />
-          <Route path="/dashboard/parties" element={<DashboardPartiesPage />} />
 
-          <Route
-            path="/dashboard/my-businesses"
-            element={<DashboardMyBusinesses />}
-          />
+        {/* PROTECTED ROUTES */}
+        <Route element={<ProtectedRoute />}>
+          <Route path="/dashboard" element={<DashboardLayout />}>
+            <Route index element={<DashboardPage />} />
+            <Route
+              path="/dashboard/parties"
+              element={<DashboardPartiesPage />}
+            />
 
-          <Route
-            path="/dashboard/update/:id"
-            element={<DashboardUpdateInvoicesPage />}
-          />
+            <Route
+              path="/dashboard/my-businesses"
+              element={<DashboardMyBusinesses />}
+            />
 
-          <Route
-            path="/dashboard/parties/:id"
-            element={<DashboardPartyPage />}
-          />
+            <Route
+              path="/dashboard/update/:id"
+              element={<DashboardUpdateInvoicesPage />}
+            />
 
-          <Route
-            path="/dashboard/all-transactions"
-            element={<DashboardAllTransactionsPage />}
-          />
+            <Route
+              path="/dashboard/parties/:id"
+              element={<DashboardPartyPage />}
+            />
 
-          <Route
-            path="/dashboard/parties/sales-invoice"
-            element={<DashboardSalesInvoicePage />}
-          />
+            <Route
+              path="/dashboard/all-transactions"
+              element={<DashboardAllTransactionsPage />}
+            />
 
-          <Route
-            path="/dashboard/parties/create-sales-return"
-            element={<DashboardSalesReturnInvoicePage />}
-          />
+            <Route
+              path="/dashboard/parties/sales-invoice"
+              element={<DashboardSalesInvoicePage />}
+            />
 
-          <Route
-            path="/dashboard/purchase-invoice"
-            element={<DashboardCreatePurchaseInvoicePage />}
-          />
+            <Route
+              path="/dashboard/parties/create-sales-return"
+              element={<DashboardSalesReturnInvoicePage />}
+            />
 
-          <Route
-            path="/dashboard/purchase-invoice/:id"
-            element={<PurchaseInvoice />}
-          />
+            <Route
+              path="/dashboard/purchase-invoice"
+              element={<DashboardCreatePurchaseInvoicePage />}
+            />
 
-          <Route
-            path="/dashboard/sales-invoice/:id"
-            element={<SalesInvoice />}
-          />
+            <Route
+              path="/dashboard/purchase-invoice/:id"
+              element={<PurchaseInvoice />}
+            />
 
-          <Route
-            path="/dashboard/parties/create-proforma-invoice"
-            element={<DashboardProformaInvoicePage />}
-          />
+            <Route
+              path="/dashboard/sales-invoice/:id"
+              element={<SalesInvoice />}
+            />
 
-          <Route path="/dashboard/items" element={<DashboardItemsPage />} />
-          <Route path="/dashboard/items/:id" element={<SingleItemPage />} />
+            <Route
+              path="/dashboard/parties/create-proforma-invoice"
+              element={<DashboardProformaInvoicePage />}
+            />
 
-          <Route
-            path="/dashboard/items/basic-details"
-            element={<DashboardItemsSidebar />}
-          />
+            <Route path="/dashboard/items" element={<DashboardItemsPage />} />
+            <Route path="/dashboard/items/:id" element={<SingleItemPage />} />
 
-          <Route path="/dashboard/godown" element={<DashboardGodownPage />} />
+            <Route
+              path="/dashboard/items/basic-details"
+              element={<DashboardItemsSidebar />}
+            />
 
-          <Route
-            path="/dashboard/purchases"
-            element={<DashboardPurchasesPage />}
-          />
+            <Route path="/dashboard/godown" element={<DashboardGodownPage />} />
 
-          <Route
-            path="/dashboard/add-party"
-            element={<DashboardAddPartyPage />}
-          />
+            <Route
+              path="/dashboard/purchases"
+              element={<DashboardPurchasesPage />}
+            />
 
-          <Route path="/dashboard/edit-party/:id" element={<PartyEditPage />} />
+            <Route
+              path="/dashboard/add-party"
+              element={<DashboardAddPartyPage />}
+            />
 
-          <Route
-            path="/dashboard/payment-out"
-            element={<DashboardPaymentOutPage />}
-          />
+            <Route
+              path="/dashboard/edit-party/:id"
+              element={<PartyEditPage />}
+            />
 
-          <Route
-            path="/dashboard/payment-out/:id"
-            element={<DashboardPaymentOutDetails />}
-          />
+            <Route
+              path="/dashboard/payment-out"
+              element={<DashboardPaymentOutPage />}
+            />
 
-          <Route
-            path="/dashboard/parties/create-payment-out"
-            element={<DashboardCreatePaymentOutPage />}
-          />
-          <Route
-            path="/dashboard/parties/create-payment-in"
-            element={<PaymentInForm />}
-          />
+            <Route
+              path="/dashboard/payment-out/:id"
+              element={<DashboardPaymentOutDetails />}
+            />
 
-          <Route
-            path="/dashboard/debit-note"
-            element={<DashboardDebitNotePage />}
-          />
+            <Route
+              path="/dashboard/parties/create-payment-out"
+              element={<DashboardCreatePaymentOutPage />}
+            />
+            <Route
+              path="/dashboard/parties/create-payment-in"
+              element={<PaymentInForm />}
+            />
 
-          <Route
-            path="/dashboard/parties/create-debit-note"
-            element={<DashboardCreateDebitNotePage />}
-          />
+            <Route
+              path="/dashboard/debit-note"
+              element={<DashboardDebitNotePage />}
+            />
 
-          <Route path="/dashboard/debit-note/:id" element={<DebitNote />} />
+            <Route
+              path="/dashboard/parties/create-debit-note"
+              element={<DashboardCreateDebitNotePage />}
+            />
 
-          <Route
-            path="/dashboard/purchase-return"
-            element={<DashboardPurchaseReturnPage />}
-          />
+            <Route path="/dashboard/debit-note/:id" element={<DebitNote />} />
 
-          <Route
-            path="/dashboard/purchase-return/:id"
-            element={<PurchaseReturn />}
-          />
+            <Route
+              path="/dashboard/purchase-return"
+              element={<DashboardPurchaseReturnPage />}
+            />
 
-          <Route
-            path="/dashboard/parties/create-purchase-return"
-            element={<DashboardCreatePurchaseReturnPage />}
-          />
+            <Route
+              path="/dashboard/purchase-return/:id"
+              element={<PurchaseReturn />}
+            />
 
-          <Route
-            path="/dashboard/purchase-order"
-            element={<DashoardPurchaseOrderPage />}
-          />
+            <Route
+              path="/dashboard/parties/create-purchase-return"
+              element={<DashboardCreatePurchaseReturnPage />}
+            />
 
-          <Route
-            path="/dashboard/purchase-order/:id"
-            element={<PurchaseOrder />}
-          />
+            <Route
+              path="/dashboard/purchase-order"
+              element={<DashoardPurchaseOrderPage />}
+            />
 
-          <Route
-            path="/dashboard/parties/create-purchase-order"
-            element={<DashboardCreatePurchaseOrder />}
-          />
+            <Route
+              path="/dashboard/purchase-order/:id"
+              element={<PurchaseOrder />}
+            />
 
-          <Route path="/dashboard/reports" element={<DashboardReportPage />} />
-          <Route path="/dashboard/sales" element={<DashboardSalesPage />} />
-          <Route
-            path="/dashboard/quotations"
-            element={<DashboardQuotationPage />}
-          />
-          <Route
-            path="/dashboard/quotations/:id"
-            element={<QuotationInvoice />}
-          />
-          <Route
-            path="/dashboard/parties/create-quotation"
-            element={<DashboardQuotationInvoiceForm />}
-          />
-          <Route
-            path="/dashboard/payment-in"
-            element={<DashboardPaymentInPage />}
-          />
-          <Route
-            path="/dashboard/payment-in/:id"
-            element={<DashboardPaymentInDetails />}
-          />
+            <Route
+              path="/dashboard/parties/create-purchase-order"
+              element={<DashboardCreatePurchaseOrder />}
+            />
 
-          <Route
-            path="/dashboard/sales-return"
-            element={<DashboardSalesReturnPage />}
-          />
+            <Route
+              path="/dashboard/reports"
+              element={<DashboardReportPage />}
+            />
+            <Route path="/dashboard/sales" element={<DashboardSalesPage />} />
+            <Route
+              path="/dashboard/quotations"
+              element={<DashboardQuotationPage />}
+            />
+            <Route
+              path="/dashboard/quotations/:id"
+              element={<QuotationInvoice />}
+            />
+            <Route
+              path="/dashboard/parties/create-quotation"
+              element={<DashboardQuotationInvoiceForm />}
+            />
+            <Route
+              path="/dashboard/payment-in"
+              element={<DashboardPaymentInPage />}
+            />
+            <Route
+              path="/dashboard/payment-in/:id"
+              element={<DashboardPaymentInDetails />}
+            />
 
-          <Route path="/dashboard/sales-return/:id" element={<SalesReturn />} />
+            <Route
+              path="/dashboard/sales-return"
+              element={<DashboardSalesReturnPage />}
+            />
 
-          <Route
-            path="/dashboard/credit-note"
-            element={<DashboardCreditNotePage />}
-          />
-          <Route path="/dashboard/credit-note/:id" element={<CreditNote />} />
+            <Route
+              path="/dashboard/sales-return/:id"
+              element={<SalesReturn />}
+            />
 
-          <Route
-            path="/dashboard/parties/create-credit-note"
-            element={<DashboardCreateCreditNoteInvoicePage />}
-          />
+            <Route
+              path="/dashboard/credit-note"
+              element={<DashboardCreditNotePage />}
+            />
+            <Route path="/dashboard/credit-note/:id" element={<CreditNote />} />
 
-          <Route
-            path="/dashboard/delivery-challan"
-            element={<DashboardDeliveryChallanPage />}
-          />
+            <Route
+              path="/dashboard/parties/create-credit-note"
+              element={<DashboardCreateCreditNoteInvoicePage />}
+            />
 
-          <Route
-            path="/dashboard/delivery-challan/:id"
-            element={<DeliveryChallan />}
-          />
+            <Route
+              path="/dashboard/delivery-challan"
+              element={<DashboardDeliveryChallanPage />}
+            />
 
-          <Route
-            path="/dashboard/parties/create-delivery-challan"
-            element={<DashboardCreateChallanPage />}
-          />
+            <Route
+              path="/dashboard/delivery-challan/:id"
+              element={<DeliveryChallan />}
+            />
 
-          <Route
-            path="/dashboard/proforma"
-            element={<DashboardProformaPage />}
-          />
+            <Route
+              path="/dashboard/parties/create-delivery-challan"
+              element={<DashboardCreateChallanPage />}
+            />
 
-          <Route
-            path="/dashboard/proforma-invoice/:id"
-            element={<ProformaInvoice />}
-          />
+            <Route
+              path="/dashboard/proforma"
+              element={<DashboardProformaPage />}
+            />
 
-          <Route
-            path="/dashboard/invoicing"
-            element={<DashboardEInvoicing />}
-          />
-          <Route path="/dashboard/expenses" element={<DashboardExpenses />} />
-          <Route path="/dashboard/pos" element={<DashboardPOS />} />
-          <Route
-            path="/dashboard/cashandbank"
-            element={<DashboardCashAndBank />}
-          />
-          <Route path="/dashboard/bills" element={<DashboardBills />} />
-          <Route path="/dashboard/account" element={<DashboardAccountPage />} />
-          <Route
-            path="/dashboard/business"
-            element={<DashboardManageBusinessPage />}
-          />
-          <Route path="/dashboard/invoice" element={<DashboardInvoicePage />} />
-          <Route
-            path="/dashboard/print"
-            element={<DashboardPrintSettingsPage />}
-          />
-          <Route
-            path="/dashboard/users"
-            element={<DashboardManageUsersPage />}
-          />
-          <Route
-            path="/dashboard/reminders"
-            element={<DashboardRemindersPage />}
-          />
-          <Route
-            path="/dashboard/ca-reports"
-            element={<DashboardCAReportsSharingPage />}
-          />
-          <Route path="/dashboard/pricing" element={<DashboardPricingPage />} />
-          <Route
-            path="/dashboard/refer-and-earn"
-            element={<DashboardReferAndEarnPage />}
-          />
-          <Route
-            path="/dashboard/help-and-support"
-            element={<DashboardHelpAndSupportPage />}
-          />
-          <Route path="/dashboard/staff" element={<DashboardStaffPage />} />
-          <Route
-            path="/dashboard/online-store"
-            element={<DashboardOnlineStorePage />}
-          />
-          <Route
-            path="/dashboard/sms-marketing"
-            element={<DashboardSMSMarketingPage />}
-          />
-          <Route path="/dashboard/loan" element={<DashboardLoanPage />} />
+            <Route
+              path="/dashboard/proforma-invoice/:id"
+              element={<ProformaInvoice />}
+            />
+
+            <Route
+              path="/dashboard/invoicing"
+              element={<DashboardEInvoicing />}
+            />
+            <Route path="/dashboard/expenses" element={<DashboardExpenses />} />
+            <Route path="/dashboard/pos" element={<DashboardPOS />} />
+            <Route
+              path="/dashboard/cashandbank"
+              element={<DashboardCashAndBank />}
+            />
+            <Route path="/dashboard/bills" element={<DashboardBills />} />
+            <Route
+              path="/dashboard/account"
+              element={<DashboardAccountPage />}
+            />
+            <Route
+              path="/dashboard/business"
+              element={<DashboardManageBusinessPage />}
+            />
+            <Route
+              path="/dashboard/invoice"
+              element={<DashboardInvoicePage />}
+            />
+            <Route
+              path="/dashboard/print"
+              element={<DashboardPrintSettingsPage />}
+            />
+            <Route
+              path="/dashboard/users"
+              element={<DashboardManageUsersPage />}
+            />
+            <Route
+              path="/dashboard/reminders"
+              element={<DashboardRemindersPage />}
+            />
+            <Route
+              path="/dashboard/ca-reports"
+              element={<DashboardCAReportsSharingPage />}
+            />
+            <Route
+              path="/dashboard/pricing"
+              element={<DashboardPricingPage />}
+            />
+            <Route
+              path="/dashboard/refer-and-earn"
+              element={<DashboardReferAndEarnPage />}
+            />
+            <Route
+              path="/dashboard/help-and-support"
+              element={<DashboardHelpAndSupportPage />}
+            />
+            <Route path="/dashboard/staff" element={<DashboardStaffPage />} />
+            <Route
+              path="/dashboard/online-store"
+              element={<DashboardOnlineStorePage />}
+            />
+            <Route
+              path="/dashboard/sms-marketing"
+              element={<DashboardSMSMarketingPage />}
+            />
+            <Route path="/dashboard/loan" element={<DashboardLoanPage />} />
+          </Route>
         </Route>
       </Routes>
     </>

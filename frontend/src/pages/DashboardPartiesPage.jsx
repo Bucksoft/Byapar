@@ -204,7 +204,7 @@ const DashboardPartiesPage = () => {
             <div className="w-full sm:w-auto">
               <Link
                 to="/dashboard/add-party"
-                className="btn btn-sm bg-[var(--primary-btn)] w-full sm:w-auto flex items-center justify-center gap-2"
+                className="btn rounded-xl btn-sm bg-[var(--primary-btn)] w-full sm:w-auto flex items-center justify-center gap-2"
               >
                 <Plus size={14} /> Create Party
               </Link>
@@ -238,7 +238,7 @@ const DashboardPartiesPage = () => {
                 or clear your search.
               </p>
               <button
-                className="btn btn-outline btn-sm mt-3"
+                className="btn rounded-xl btn-outline btn-sm mt-3"
                 onClick={() => setSearchQuery("")}
               >
                 Clear search
@@ -296,7 +296,7 @@ const DashboardPartiesPage = () => {
                       >
                         <Trash2
                           size={14}
-                          className="text-[var(--error-text-color)] cursor-pointer"
+                          className="rounded-xl text-[var(--error-text-color)] cursor-pointer"
                         />
                       </button>
                     </td>
@@ -318,7 +318,7 @@ const DashboardPartiesPage = () => {
         <div className="w-full flex items-center justify-end p-3 sm:p-4">
           <div className="join join-sm flex items-center">
             <button
-              className="btn btn-sm btn-neutral"
+              className="btn rounded-xl btn-sm btn-neutral"
               disabled={currentPage === 1}
               onClick={() => setCurrentPage((p) => p - 1)}
             >
@@ -330,7 +330,7 @@ const DashboardPartiesPage = () => {
             </span>
 
             <button
-              className="btn btn-sm btn-neutral"
+              className="btn rounded-xl btn-sm btn-neutral"
               disabled={currentPage === totalPages}
               onClick={() => setCurrentPage((p) => p + 1)}
             >
@@ -357,7 +357,7 @@ const DashboardPartiesPage = () => {
             <button
               onClick={() => fileRef.current.click()}
               disabled={bulkMutation.isPending}
-              className="btn btn-success btn-sm flex items-center gap-2"
+              className="btn rounded-xl btn-success btn-sm flex items-center gap-2"
             >
               {bulkMutation.isPending ? (
                 <CustomLoader text="Adding parties..." />
@@ -388,7 +388,7 @@ const DashboardPartiesPage = () => {
 
             <button
               onClick={() => window.open("/sample-party.xlsx", "_blank")}
-              className="btn text-neutral btn-link btn-xs"
+              className="btn rounded-xl text-neutral btn-link btn-xs"
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -422,7 +422,7 @@ const DashboardPartiesPage = () => {
           <div className="flex justify-end">
             <button
               onClick={() => mutation.mutate()}
-              className="btn btn-sm btn-ghost text-[var(--error-text-color)]"
+              className="btn rounded-xl btn-sm btn-ghost text-[var(--error-text-color)]"
             >
               Delete
             </button>

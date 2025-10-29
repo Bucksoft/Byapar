@@ -58,13 +58,13 @@ const DashboardPaymentOutDetails = () => {
             </p>
           </div>
           <div className="flex items-center gap-2">
-            <button className="btn btn-sm">
+            <button className="btn btn-sm rounded-xl">
               <SquarePen size={15} />
               Edit
             </button>
 
             <button
-              className=" btn btn-sm text-[var(--error-text-color)]"
+              className=" btn btn-sm text-[var(--error-text-color)] rounded-xl"
               onClick={() => document.getElementById("my_modal_2").showModal()}
             >
               <BsTrash3 />
@@ -79,7 +79,7 @@ const DashboardPaymentOutDetails = () => {
                 <div className="flex w-full">
                   <button
                     onClick={() => mutation.mutate()}
-                    className="btn btn-sm btn-ghost  ml-auto text-[var(--error-text-color)]"
+                    className="btn rounded-xl btn-sm btn-ghost  ml-auto text-[var(--error-text-color)]"
                   >
                     Delete
                   </button>
@@ -94,7 +94,7 @@ const DashboardPaymentOutDetails = () => {
 
         {/* MENUS */}
         <section className="flex items-center gap-2 mt-7 w-3/4 ">
-          <button className="btn btn-sm">
+          <button className="btn btn-sm rounded-xl">
             <Download size={15} /> Download PDF
           </button>
           <select className="select select-sm w-1/6">

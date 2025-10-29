@@ -204,7 +204,7 @@ const SalesInvoicePartyDetailsSection = ({
               {/* Select Button */}
               <button
                 onClick={() => setSelectOpen(!selectOpen)}
-                className="w-full truncate  flex justify-between items-center btn btn-xs btn-outline btn-neutral text-xs shadow"
+                className="w-full truncate rounded-xl flex justify-between items-center btn btn-xs btn-outline btn-neutral text-xs shadow"
               >
                 {party ? party?.partyName : "Select Party"}
                 <svg
@@ -367,7 +367,7 @@ const SalesInvoicePartyDetailsSection = ({
                                     <td>
                                       <div className="flex items-center">
                                         <button
-                                          className="btn btn-ghost btn-xs"
+                                          className="btn rounded-xl btn-ghost btn-xs"
                                           onClick={() => {
                                             setEditShippingAddress(address.id);
                                             setShippingData(address);
@@ -376,7 +376,7 @@ const SalesInvoicePartyDetailsSection = ({
                                           <FaPen size={12} />
                                         </button>
                                         <button
-                                          className="btn btn-ghost btn-xs"
+                                          className="btn rounded-xl btn-ghost btn-xs"
                                           onClick={() =>
                                             handleDeleteShippingAddress(
                                               address._id
@@ -479,7 +479,7 @@ const SalesInvoicePartyDetailsSection = ({
 
                         <div className="flex justify-between mt-4">
                           <button
-                            className="btn btn-xs btn-outline"
+                            className="btn btn-xs rounded-xl btn-outline"
                             onClick={() => {
                               setShippingData({});
                               setEditShippingAddress(null);
@@ -488,7 +488,7 @@ const SalesInvoicePartyDetailsSection = ({
                             Clear
                           </button>
                           <button
-                            className="btn btn-xs btn-info"
+                            className="btn btn-xs rounded-xl btn-info"
                             onClick={() => {
                               shippingMutation.mutate();
                             }}
@@ -585,7 +585,7 @@ const SalesInvoicePartyDetailsSection = ({
                   {/* Close Button */}
                   <button
                     onClick={() => setOpen(false)}
-                    className="absolute top-1 right-1 text-gray-500 hover:text-gray-700"
+                    className="absolute rounded-xl top-1 right-1 text-gray-500 hover:text-gray-700"
                   >
                     <IoCloseCircle size={22} />
                   </button>

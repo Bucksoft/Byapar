@@ -221,7 +221,7 @@ const DashboardPurchasesPage = () => {
           </div>
 
           <Link to={"/dashboard/purchase-invoice"}>
-            <button className="btn btn-sm bg-[var(--primary-btn)]">
+            <button className="btn btn-sm bg-[var(--primary-btn)] rounded-xl">
               <Plus size={14} /> Create Purchase Invoice
             </button>
           </Link>
@@ -275,7 +275,7 @@ const DashboardPurchasesPage = () => {
                           different name or clear your search.
                         </p>
                         <button
-                          className="btn btn-outline btn-sm mt-3"
+                          className="btn btn-outline btn-sm mt-3 rounded-xl"
                           onClick={() => setSearchQuery("")}
                         >
                           Clear search
@@ -345,7 +345,7 @@ const DashboardPurchasesPage = () => {
                                       `/dashboard/update/${invoice?._id}?type=purchase invoice`
                                     )
                                   }
-                                  className="flex items-center gap-2"
+                                  className="flex items-center gap-2 rounded-xl"
                                 >
                                   <FaRegEdit /> Edit
                                 </button>
@@ -394,7 +394,7 @@ const DashboardPurchasesPage = () => {
         <div className="w-full flex items-center justify-end p-4">
           <div className="join join-sm flex items-center">
             <button
-              className="btn btn-sm btn-neutral"
+              className="btn btn-sm btn-neutral rounded-xl"
               disabled={currentPage === 1}
               onClick={() => setCurrentPage((p) => p - 1)}
             >
@@ -406,7 +406,7 @@ const DashboardPurchasesPage = () => {
             </span>
 
             <button
-              className="btn btn-sm btn-neutral"
+              className="btn btn-sm btn-neutral rounded-xl"
               disabled={currentPage === totalPages}
               onClick={() => setCurrentPage((p) => p + 1)}
             >
@@ -428,7 +428,7 @@ const DashboardPurchasesPage = () => {
               <div className="flex w-full">
                 <button
                   onClick={() => mutation.mutate(invoiceId)}
-                  className="btn btn-sm btn-ghost  ml-auto text-[var(--error-text-color)]"
+                  className="btn btn-sm rounded-xl btn-ghost  ml-auto text-[var(--error-text-color)]"
                 >
                   Delete
                 </button>

@@ -44,25 +44,39 @@ const DashboardSalesPage = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
 
-  // FETCH ALL THE INVOICES FOR A BUSINESS
+  // FETCH ALL INVOICES
   const {
-    isLoading,
     data: invoices,
+    isError,
     isSuccess,
+    error,
   } = useQuery({
     queryKey: ["invoices", business?._id],
     queryFn: async () => {
       if (!business) return [];
       const res = await axiosInstance.get(`/sales-invoice/${business._id}`);
-      setInvoices(res?.data?.invoices);
-      setTotalInvoices(res.data?.totalInvoices);
-      setLatestInvoiceNumber(res.data?.latestInvoiceNumber);
-      return res.data || [];
+      return res.data;
     },
     enabled: !!business,
     keepPreviousData: true,
     retry: 1,
   });
+
+  useEffect(() => {
+    if (isSuccess && invoices) {
+      setInvoices(invoices?.invoices || []);
+      setTotalInvoices(invoices?.totalInvoices || 0);
+      setLatestInvoiceNumber(invoices?.latestInvoiceNumber || null);
+    }
+  }, [isSuccess, invoices]);
+
+  useEffect(() => {
+    if (isError) {
+      setInvoices([]);
+      setTotalInvoices(0);
+      setLatestInvoiceNumber(0);
+    }
+  }, [isError, error]);
 
   // mutation to delete an invoice
   const mutation = useMutation({
@@ -232,7 +246,7 @@ const DashboardSalesPage = () => {
           <div>
             <Link
               to={"/dashboard/parties/sales-invoice"}
-              className="btn btn-sm bg-[var(--primary-btn)]"
+              className="btn rounded-xl btn-sm bg-[var(--primary-btn)]"
             >
               <Plus size={14} /> Create Sales Invoice
             </Link>
@@ -318,7 +332,7 @@ const DashboardSalesPage = () => {
                           {Number(invoice?.totalAmount).toLocaleString("en-IN")}
                         </div>
 
-                        {invoice?.pendingAmount &&
+                        {/* {invoice?.pendingAmount &&
                           invoice.pendingAmount > 0 && (
                             <small className="flex items-center text-error">
                               <LiaRupeeSignSolid />{" "}
@@ -327,7 +341,7 @@ const DashboardSalesPage = () => {
                               )}{" "}
                               unpaid
                             </small>
-                          )}
+                          )} */}
                       </td>
                       <td>
                         <p

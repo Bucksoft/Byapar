@@ -47,12 +47,12 @@ const DashboardEInvoicing = () => {
             <div className="flex justify-between items-center mr-16 space-x-5">
               <div className="font-semibold text-lg pl-2">E-Invoicing</div>
 
-              <button className="btn btn-dash btn-info btn-sm">
+              <button className="btn rounded-xl btn-dash btn-info btn-sm">
                 What is e-Invoicing
               </button>
             </div>
             <div className="pr-10">
-              <button className="btn btn-soft bg-[var(--primary-btn)] btn-sm">
+              <button className="btn rounded-xl btn-soft bg-[var(--primary-btn)] btn-sm">
                 <MessageCircle size={16} /> Chat Support
               </button>
             </div>
