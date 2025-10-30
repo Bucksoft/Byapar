@@ -170,7 +170,7 @@ export async function getAllPaymentInDetails(req, res) {
     return res.status(200).json({
       success: true,
       paymentIns,
-      latestPaymentIn: Number(latestPaymentIns?.paymentInNumber) || 0,
+      latestPaymentIn: Number(latestPaymentIns[0]?.paymentInNumber) || 0,
       totalPaymentIns: paymentIns.length,
       totalPaymentAmount,
     });

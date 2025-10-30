@@ -16,6 +16,7 @@ const SalesInvoiceItemTableTesting = ({
   data,
   setData,
   invoiceTotals,
+  invoiceToUpdate,
 }) => {
   const { business } = useBusinessStore();
   const [searchItemQuery, setSearchItemQuery] = useState("");
@@ -313,8 +314,6 @@ const SalesInvoiceItemTableTesting = ({
     JSON.stringify(data.items.map((i) => i.gstTaxRate)),
   ]);
 
-  console.log(invoiceTotals);
-
   return (
     <>
       <div className="w-full grid grid-cols-12 text-xs ">
@@ -423,8 +422,8 @@ const SalesInvoiceItemTableTesting = ({
               value={
                 basePrices[item._id] !== undefined
                   ? basePrices[item._id]
-                  : item?.basePrice
-                  ? Number(item.basePrice).toFixed(2)
+                  : item?.taxableAmount
+                  ? Number(item.taxableAmount).toFixed(2)
                   : ""
               }
               className="input input-xs bg-zinc-100 text-right"

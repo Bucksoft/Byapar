@@ -3,6 +3,10 @@
 @plugin "daisyui";
 @custom-variant print (@media print);
 
+html {
+  scrollbar-gutter: stable;
+}
+
 body {
   font-family: "Inter", sans-serif;
   font-optical-sizing: auto;

@@ -163,9 +163,7 @@ export async function getAllInvoices(req, res) {
     const totalUnpaid = Number(
       invoicesInFY.reduce(
         (sum, invoice) =>
-          sum +
-          (invoice.pendingAmount ??
-            invoice.totalAmount - (invoice.settledAmount || 0)),
+          sum + (invoice.totalAmount - (invoice.settledAmount || 0)),
         0
       )
     ).toLocaleString("en-IN");

@@ -17,6 +17,7 @@ import { handlePrint } from "../../helpers/print";
 const DashboardPaymentInDetails = () => {
   const { id } = useParams();
   const { setPaymentIn } = usePaymentInStore();
+  const [isDownloading, setIsDownloading] = useState(false);
   const [paymentInIdToDownload, setPaymentIdToDownload] = useState("");
   const printRef = useRef();
   const navigate = useNavigate();
@@ -63,27 +64,39 @@ const DashboardPaymentInDetails = () => {
               <span className="font-semibold">
                 #{PaymentIn?.paymentIn?.paymentInNumber}
               </span>{" "}
+              {PaymentIn?.paymentIn?.status === "cancelled" && (
+                <span className="badge badge-error badge-soft ml-2">
+                  Cancelled
+                </span>
+              )}
             </p>
           </div>
           <div className="flex items-center gap-2">
-            <button
-              onClick={() =>
-                navigate(`/dashboard/parties/create-payment-in`, {
-                  state: { id: id },
-                })
-              }
-              className="btn btn-sm rounded-xl"
-            >
-              <SquarePen size={15} />
-              Edit
-            </button>
+            {PaymentIn?.paymentIn?.status !== "cancelled" && (
+              <button
+                onClick={() =>
+                  navigate(`/dashboard/parties/create-payment-in`, {
+                    state: { id: id },
+                  })
+                }
+                className="btn btn-sm rounded-xl"
+              >
+                <SquarePen size={15} />
+                Edit
+              </button>
+            )}
 
-            <button
-              className=" btn rounded-xl btn-sm text-[var(--error-text-color)]"
-              onClick={() => document.getElementById("my_modal_2").showModal()}
-            >
-              <BsTrash3 />
-            </button>
+            {PaymentIn?.paymentIn?.status !== "cancelled" && (
+              <button
+                className="btn rounded-xl btn-sm text-[var(--error-text-color)]"
+                onClick={() =>
+                  document.getElementById("my_modal_2").showModal()
+                }
+              >
+                <BsTrash3 />
+              </button>
+            )}
+
             <dialog id="my_modal_2" className="modal">
               <div className="modal-box">
                 <h3 className="font-bold text-lg">Confirm Deletion</h3>
@@ -101,7 +114,7 @@ const DashboardPaymentInDetails = () => {
                 </div>
               </div>
               <form method="dialog" className="modal-backdrop">
-                <button>close</button>
+                <button className="btn btn-sm rounded-xl">close</button>
               </form>
             </dialog>
           </div>
@@ -109,27 +122,32 @@ const DashboardPaymentInDetails = () => {
 
         {/* MENUS */}
         <section className="flex items-center gap-2 mt-7 w-3/4 ">
-          <button
-            className="btn btn-sm rounded-xl"
-            onClick={() => {
-              setPaymentIdToDownload(PaymentIn?.paymentIn?._id);
-              document.getElementById("my_modal_1").showModal();
-            }}
-          >
-            <Download size={15} /> Download PDF
-          </button>
+          {PaymentIn?.paymentIn?.status !== "cancelled" && (
+            <button
+              className="btn btn-sm rounded-xl"
+              onClick={() => {
+                setPaymentIdToDownload(PaymentIn?.paymentIn?._id);
+                document.getElementById("my_modal_1").showModal();
+              }}
+            >
+              <Download size={15} /> Download PDF
+            </button>
+          )}
 
-          <button
-            onClick={() => handlePrint(printRef)}
-            className="btn btn-sm btn-dash"
-          >
-            <Printer size={15} /> Print
-          </button>
-
-          <select onChange={handleShare} className="select select-sm w-1/6">
-            <option className="hidden">Share</option>
-            <option value={"whatsapp"}>Whatsapp</option>
-          </select>
+          {PaymentIn?.paymentIn?.status !== "cancelled" && (
+            <button
+              onClick={() => handlePrint(printRef)}
+              className="btn btn-sm btn-dash rounded-xl"
+            >
+              <Printer size={15} /> Print
+            </button>
+          )}
+          {PaymentIn?.paymentIn?.status !== "cancelled" && (
+            <select onChange={handleShare} className="select select-sm w-1/6">
+              <option className="hidden">Share</option>
+              <option value={"whatsapp"}>Whatsapp</option>
+            </select>
+          )}
         </section>
 
         {isLoading ? (
@@ -194,7 +212,7 @@ const DashboardPaymentInDetails = () => {
                   </thead>
                   <tbody>
                     {PaymentIn?.invoices?.map((invoice, index) => (
-                      <tr>
+                      <tr key={invoice?._id}>
                         <td>{index + 1}</td>
                         <td>{invoice?.salesInvoiceNumber}</td>
                         <td>
@@ -237,13 +255,28 @@ const DashboardPaymentInDetails = () => {
           <div className="modal-action">
             <form method="dialog">
               {/* if there is a button in form, it will close the modal */}
-              <button className="btn btn-sm">Close</button>
+              <button className="btn btn-sm rounded-xl">Close</button>
             </form>
             <button
-              onClick={() => downloadPDF(paymentInIdToDownload, "payment in")}
-              className="btn rounded-xl btn-sm btn-info rounded-xl"
+              onClick={() =>
+                downloadPDF(
+                  paymentInIdToDownload,
+                  `${PaymentIn?.paymentIn?.partyId?.partyName
+                    ?.split(" ")
+                    .join("-")
+                    .concat("_paymentIn")}`,
+                  setIsDownloading
+                )
+              }
+              className="btn rounded-xl btn-sm btn-info"
             >
-              <Download size={15} /> Download
+              {isDownloading ? (
+                <CustomLoader text={""} />
+              ) : (
+                <>
+                  <Download size={15} /> Download
+                </>
+              )}
             </button>
           </div>
         </div>

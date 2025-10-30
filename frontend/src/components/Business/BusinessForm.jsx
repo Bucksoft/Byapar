@@ -7,13 +7,15 @@ import { queryClient } from "../../main";
 import { axiosInstance } from "../../config/axios";
 import CustomLoader from "../Loader";
 import toast from "react-hot-toast";
-import { Trash } from "lucide-react";
+import { Plus, Trash } from "lucide-react";
 import { useRef } from "react";
 import { useBusinessStore } from "../../store/businessStore";
 import { useNavigate } from "react-router-dom";
 import { RxCross2 } from "react-icons/rx";
 import { FaPlus } from "react-icons/fa";
 import { useBusinessBankAccountStore } from "../../store/businessBankAccountStore";
+import ReactQuill from "react-quill-new";
+import "react-quill-new/dist/quill.snow.css";
 
 const BusinessForm = ({ businessToBeUpdated }) => {
   const [additionalInformation, setAdditionalInformation] = useState([]);
@@ -994,14 +996,36 @@ const BusinessForm = ({ businessToBeUpdated }) => {
             ))}
           </div>
 
-          {/* ADD COVER LETTER */}
-          {/* <div className="my-2">
-            <label htmlFor="Notes" className="text-xs text-gray-600">
-              Cover Letter
-            </label>
+          <h3 className="text-xs text-red-500 my-3 badge badge-error badge-soft">
+            Note: T&C for quotation is under development.
+          </h3>
 
-          </div> */}
+          {/* ADD TERMS AND CONDITION FOR QUOTATION */}
+          <div className="flex flex-col items-start gap-1 ">
+            <label htmlFor="Notes" className="text-xs text-gray-600">
+              Terms & Conditions for quotation
+            </label>
+            <textarea
+              className="textarea w-full text-xs bg-zinc-100"
+              placeholder="T&C"
+            ></textarea>
+          </div>
         </motion.div>
+
+        {/* COVER LETTER */}
+        <div className="p-4 flex flex-col">
+          <h3 className="text-xs text-red-500 my-3 badge badge-error badge-soft">
+            Note: Cover Letter for quotation is under development.
+          </h3>
+          <label className="text-gray-600 text-xs">Cover Letter</label>
+          <p className="text-xs text-zinc-800">
+            Add a cover letter for your quotation
+          </p>
+
+          <div className="mt-3">
+            <ReactQuill theme="snow" className="rounded-lg" />
+          </div>
+        </div>
       </form>
 
       <div className="divider divider-sm" />

@@ -29,7 +29,6 @@ const InvoicesForm = ({
   title,
   party,
   setParty,
-  type,
   isEditing,
   invoiceToUpdate,
 }) => {

@@ -372,9 +372,10 @@ const PaymentCollectionReport = () => {
                     <tr
                       key={invoice?._id}
                       onClick={() =>
-                        navigate(`/dashboard/sales-invoice/${invoice?._id}`)
+                        invoice.status !== "cancelled" &&
+                        navigate(`/dashboard/payment-in/${invoice?._id}`)
                       }
-                      className="cursor-pointer "
+                      className="cursor-pointer"
                     >
                       <td>{invoice?.paymentDate?.split("T")[0] || "-"}</td>
                       <td>{invoice?.paymentInNumber || "-"}</td>

@@ -8,6 +8,7 @@ import { useBusinessStore } from "../../store/businessStore";
 import { useBusinessBankAccountStore } from "../../store/businessBankAccountStore";
 import toast from "react-hot-toast";
 import { Landmark, Pen, Trash } from "lucide-react";
+import { usePartyBankAccountStore } from "../../store/partyBankAccount";
 
 const SalesInvoiceFooterSection = ({
   data,
@@ -24,6 +25,7 @@ const SalesInvoiceFooterSection = ({
   const [markAsPaid, setMarkedAsPaid] = useState(false);
 
   const { business } = useBusinessStore();
+  const { partyBankAccount } = usePartyBankAccountStore();
   const { setBankAccounts } = useBusinessBankAccountStore();
   const [isDeletePopup, setIsDeletePopup] = useState(false);
   const [accountId, setAccountId] = useState("");
@@ -44,12 +46,14 @@ const SalesInvoiceFooterSection = ({
   }, []);
 
   const { isLoading, data: bankAccounts } = useQuery({
-    queryKey: ["businessBankAccounts"],
+    queryKey: ["businessBankAccounts", business?._id],
     queryFn: async () => {
+      if (!business?._id) return [];
       const res = await axiosInstance.get(`/bank-account/${business?._id}`);
       setBankAccounts(res.data);
       return res.data;
     },
+    enabled: !!business?._id,
   });
 
   // MUTATION TO DELETE THE BANK ACCOUNT
@@ -121,12 +125,53 @@ const SalesInvoiceFooterSection = ({
         </div>
 
         {/* add new account */}
-        {!bankAccounts?.length ? (
-          <BankAccountPopupForBusiness />
-        ) : title === "Purchase Invoice" ? (
-          <></>
+        {title === "Purchase Invoice" || title === "Purchase Return" ? (
+          <div className="p-2">
+            {partyBankAccount?.accountHoldersName && (
+              <div className="flex items-center justify-between ">
+                <h2 className="font-semibold text-zinc-800 text-sm">
+                  Account Holder's Name
+                </h2>
+                <p className="text-zinc-600 text-sm">
+                  {partyBankAccount.accountHoldersName}
+                </p>
+              </div>
+            )}
+            {partyBankAccount?.IFSCCode && (
+              <div className="flex items-center justify-between ">
+                <h2 className="font-semibold text-zinc-800 text-sm">
+                  IFSC Code
+                </h2>
+                <p className="text-zinc-600 text-sm">
+                  {partyBankAccount.IFSCCode}
+                </p>
+              </div>
+            )}
+            {partyBankAccount?.bankAccountNumber && (
+              <div className="flex items-center justify-between ">
+                <h2 className="font-semibold text-zinc-800 text-sm">
+                  Bank Account Number
+                </h2>
+                <p className="text-zinc-600 text-sm">
+                  {partyBankAccount.bankAccountNumber}
+                </p>
+              </div>
+            )}
+            {partyBankAccount?.bankAndBranchName && (
+              <div className="flex items-center justify-between ">
+                <h2 className="font-semibold text-zinc-800 text-sm">
+                  Bank and Branch Name
+                </h2>
+                <p className="text-zinc-600 text-sm">
+                  {partyBankAccount.bankAndBranchName}
+                </p>
+              </div>
+            )}
+          </div>
         ) : (
-          bankAccounts.map(
+          title === "Sales Invoice" &&
+          bankAccounts?.length > 0 &&
+          bankAccounts?.map(
             (bankAccount) =>
               bankAccount.isActive && (
                 <div key={bankAccount._id} className="bg-white p-4 ">

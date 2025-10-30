@@ -66,7 +66,6 @@ const DashboardMyBusinesses = () => {
           "deliveryChallans",
           "proformaInvoice",
           "items",
-          "parties",
           "purchaseInvoice",
           id,
         ],

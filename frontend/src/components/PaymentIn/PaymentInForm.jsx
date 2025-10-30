@@ -35,6 +35,8 @@ const PaymentInForm = () => {
     setData((prev) => ({ ...prev, paymentAmount: Number(value || 0) }));
   };
 
+  console.log(latestPaymentIn);
+
   // DATA TO SEND TO THE BACKEND
   const [data, setData] = useState({
     partyName: "",
@@ -355,6 +357,7 @@ const PaymentInForm = () => {
                     type="text"
                     className="input input-sm mt-1"
                     placeholder="1"
+                    readOnly={true}
                     name="paymentInNumber"
                     value={data?.paymentInNumber}
                     onChange={(e) =>

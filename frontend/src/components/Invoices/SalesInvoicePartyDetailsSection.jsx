@@ -14,6 +14,7 @@ import { useBusinessStore } from "../../store/businessStore";
 import toast from "react-hot-toast";
 import { queryClient } from "../../main";
 import { usePartyStore } from "../../store/partyStore";
+import { usePartyBankAccountStore } from "../../store/partyBankAccount";
 
 const SalesInvoicePartyDetailsSection = ({
   title,
@@ -36,6 +37,7 @@ const SalesInvoicePartyDetailsSection = ({
   const [selectedAddressId, setSelectedAddressId] = useState(null);
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [deleteShippingAddressId, setDeleteShippingAddressId] = useState(null);
+  const { setPartyBankAccount } = usePartyBankAccountStore();
 
   const [editShippingAddress, setEditShippingAddress] = useState(0);
   const [shippingData, setShippingData] = useState({
@@ -77,7 +79,7 @@ const SalesInvoicePartyDetailsSection = ({
     if (!parties?.length) return [];
 
     let partiesToFilter = [];
-    if (title === "Purchase Invoice") {
+    if (title === "Purchase Invoice" || title === "Purchase Return") {
       partiesToFilter = parties
         .filter((p) => p.businessId === business?._id)
         .filter((p) => p?.partyType === "Supplier");
@@ -183,6 +185,19 @@ const SalesInvoicePartyDetailsSection = ({
       await refetchParties();
       document.getElementById("my-drawer-5").checked = false;
     },
+  });
+
+  // get the party bank account details
+  const { data: partyBankAccount } = useQuery({
+    queryKey: ["partyBankAccount"],
+    queryFn: async () => {
+      const res = await axiosInstance.get(
+        `/bank-account/party/${data?.partyId}/?businessId=${business?._id}`
+      );
+      setPartyBankAccount(res.data[0]);
+      return res.data[0];
+    },
+    enabled: Boolean(data?.partyId),
   });
 
   return (

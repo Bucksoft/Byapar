@@ -1,6 +1,4 @@
 import { Routes, Route } from "react-router-dom";
-import { useQuery } from "@tanstack/react-query";
-import { axiosInstance } from "./config/axios";
 import { useAuthStore } from "./store/authStore";
 
 import LoginPage from "./pages/LoginPage";

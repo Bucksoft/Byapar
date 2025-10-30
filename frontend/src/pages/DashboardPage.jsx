@@ -3,7 +3,7 @@ import { container, dashboardLinksItems } from "../components/Sidebar";
 import { IoReceiptOutline } from "react-icons/io5";
 import DashboardCard from "../components/DashboardCard";
 import { dashboardCardDetails } from "../lib/dashboardCardDetails";
-import { motion } from "framer-motion";
+import { motion, recordStats } from "framer-motion";
 import { LiaRupeeSignSolid } from "react-icons/lia";
 import { Link } from "react-router-dom";
 import { useQuery } from "@tanstack/react-query";
@@ -15,12 +15,15 @@ import SalesChart from "../components/SalesChart";
 import { useState } from "react";
 import noPaymentInImage from "../assets/noPaymentIn.png";
 import inv from "../assets/inv.png";
+import { usePartyStore } from "../store/partyStore";
 
 const DashboardPage = () => {
   const { business } = useBusinessStore();
   const { setInvoices } = useInvoiceStore();
+  const { setParties } = usePartyStore();
   const [privacy, setPrivacy] = useState(true);
 
+  // SET INVOICES
   const { isLoading, data: invoices } = useQuery({
     queryKey: ["invoices", business?._id],
     queryFn: async () => {
@@ -31,6 +34,7 @@ const DashboardPage = () => {
     enabled: !!business?._id,
   });
 
+  // PAYMENT INS
   const { data: paymentIns } = useQuery({
     queryKey: ["paymentIns", business?._id],
     queryFn: async () => {
@@ -38,6 +42,20 @@ const DashboardPage = () => {
       return res?.data?.paymentIns;
     },
     enabled: !!business?._id,
+  });
+
+  // PARTIES
+  const { data: parties } = useQuery({
+    queryKey: ["parties", business?._id],
+    queryFn: async () => {
+      const res = await axiosInstance.get(
+        `/parties/all-parties/${business?._id}`
+      );
+      setParties(res.data?.data);
+      return res.data;
+    },
+    enabled: !!business?._id,
+    keepPreviousData: true,
   });
 
   return (

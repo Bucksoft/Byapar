@@ -4,6 +4,7 @@ import { FaIndianRupeeSign } from "react-icons/fa6";
 import {
   ArrowLeft,
   ArrowRight,
+  BanknoteArrowUp,
   EllipsisVertical,
   Plus,
   Search,
@@ -23,18 +24,20 @@ import { useMutation, useQuery } from "@tanstack/react-query";
 import { axiosInstance } from "../config/axios";
 import CustomLoader from "../components/Loader";
 import { LiaRupeeSignSolid } from "react-icons/lia";
-import { BsTrash3 } from "react-icons/bs";
+import { BsExclamationCircle, BsTrash3 } from "react-icons/bs";
 import { useInvoiceStore } from "../store/invoicesStore";
 import { useEffect, useMemo, useRef, useState } from "react";
 import toast from "react-hot-toast";
 import { useBusinessStore } from "../store/businessStore";
 import { uploadExcel } from "../../helpers/uploadExcel";
 import { useDebounce } from "../../helpers/useDebounce";
+import { usePaymentInStore } from "../store/paymentInStore";
 
 const DashboardSalesPage = () => {
   const { business } = useBusinessStore();
   const [searchQuery, setSearchQuery] = useState("");
   const [invoiceId, setInvoiceId] = useState();
+  const { paymentIns } = usePaymentInStore();
   const navigate = useNavigate();
   const [showDeletePopup, setShowDeletePopup] = useState(false);
   const { setInvoices, setTotalInvoices, setLatestInvoiceNumber } =
@@ -77,6 +80,23 @@ const DashboardSalesPage = () => {
       setLatestInvoiceNumber(0);
     }
   }, [isError, error]);
+
+  // CHECK IF PAYMENT HAS ALREADY BEEN MADE FOR THAT INVOICE, IF MADE, YOU CANNOT DELETE THAT INVOICE
+  useEffect(() => {
+    if (!invoiceId) return;
+
+    const isCreated = paymentIns?.some((paymentIn) =>
+      paymentIn?.settledInvoices?.some((invoiceObj) =>
+        Object.keys(invoiceObj || {}).includes(invoiceId)
+      )
+    );
+
+    if (isCreated) {
+      document.getElementById("warning_modal")?.showModal();
+    } else {
+      document.getElementById("my_modal_2")?.showModal();
+    }
+  }, [invoiceId]);
 
   // mutation to delete an invoice
   const mutation = useMutation({
@@ -388,11 +408,20 @@ const DashboardSalesPage = () => {
                                 </button>
                               </li>
                               <li>
+                                <button
+                                  onClick={() =>
+                                    navigate(
+                                      `/dashboard/parties/create-payment-in`
+                                    )
+                                  }
+                                  className="flex items-center gap-2"
+                                >
+                                  <BanknoteArrowUp size={14} /> Payment In
+                                </button>
+                              </li>
+                              <li>
                                 <a
                                   onClick={() => {
-                                    document
-                                      .getElementById("my_modal_2")
-                                      .showModal();
                                     setInvoiceId(invoice?._id);
                                   }}
                                   className="text-[var(--error-text-color)]"
@@ -530,30 +559,54 @@ const DashboardSalesPage = () => {
         </div>
       </div>
 
-      {!showDeletePopup && (
-        <>
-          <dialog id="my_modal_2" className="modal">
-            <div className="modal-box">
-              <h3 className="font-bold text-lg">Confirm Deletion</h3>
-              <p className="py-4 text-sm">
-                Are you sure you want to delete the selected invoice ? This
-                action cannot be undone.
-              </p>
-              <div className="flex w-full">
-                <button
-                  onClick={() => mutation.mutate()}
-                  className="btn btn-sm btn-ghost  ml-auto text-[var(--error-text-color)]"
-                >
-                  Delete
-                </button>
-              </div>
-            </div>
-            <form method="dialog" className="modal-backdrop">
-              <button>close</button>
+      {/* DELETE POPUP */}
+      <dialog className="modal" id="warning_modal">
+        <div className="modal-box">
+          <div className="flex items-center justify-center flex-col">
+            <BsExclamationCircle size={40} className="text-red-500" />
+            <h1 className="mt-4 font-bold">Invoice cannot be deleted</h1>
+            <p className="text-zinc-500">
+              You have already created a payment for this invoice.
+            </p>
+          </div>
+
+          <div className="modal-action">
+            <form method="dialog">
+              <button
+                onClick={() => {
+                  document.getElementById("warning_modal").close();
+                  setIsInvoiceCreated(false);
+                  setPartyIdToDelete(null);
+                }}
+                className="btn btn-sm rounded-xl bg-red-500 text-white hover:bg-red-500/90"
+              >
+                Close
+              </button>
             </form>
-          </dialog>
-        </>
-      )}
+          </div>
+        </div>
+      </dialog>
+
+      <dialog id="my_modal_2" className="modal">
+        <div className="modal-box">
+          <h3 className="font-bold text-lg">Confirm Deletion</h3>
+          <p className="py-4 text-sm">
+            Are you sure you want to delete the selected invoice ? This action
+            cannot be undone.
+          </p>
+          <div className="flex w-full">
+            <button
+              onClick={() => mutation.mutate()}
+              className="btn btn-sm btn-ghost  ml-auto text-[var(--error-text-color)]"
+            >
+              Delete
+            </button>
+          </div>
+        </div>
+        <form method="dialog" className="modal-backdrop">
+          <button>close</button>
+        </form>
+      </dialog>
     </main>
   );
 };
