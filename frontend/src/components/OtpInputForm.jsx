@@ -61,7 +61,7 @@ const OtpInputForm = ({ email }) => {
 
         <button
           onClick={() => mutation.mutate(otp)}
-          className="btn rounded-xl btn-sm rounded-full bg-success mt-5 py-5 w-full hover:bg-success/80 "
+          className="btn rounded-xl btn-sm bg-success mt-5 py-5 w-full hover:bg-success/80 "
         >
           {mutation.isPending ? (
             <>

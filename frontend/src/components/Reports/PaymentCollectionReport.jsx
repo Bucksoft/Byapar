@@ -48,6 +48,7 @@ const PaymentCollectionReport = () => {
 
   // SEARCH INVOICES
   const searchedInvoices = useMemo(() => {
+    if (invoices?.paymentIns?.length === 0) return [];
     const byDate = invoices?.paymentIns.filter((invoice) => {
       return (
         new Date(invoice?.paymentDate) >= dateRange.from &&

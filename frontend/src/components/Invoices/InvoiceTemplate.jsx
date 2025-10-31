@@ -31,9 +31,9 @@ const InvoiceTemplate = ({
     queryKey: ["bankAccounts", business?._id],
     queryFn: async () => {
       const res = await axiosInstance.get(
-        `/bank-account/party/${invoice?.partyId?._id}`
+        `/bank-account/party/${invoice?.partyId?._id}/?businessId=${business?._id}`
       );
-      return res.data;
+      return res.data[0];
     },
     enabled: type === "Purchase Invoice",
   });
@@ -631,7 +631,7 @@ const InvoiceTemplate = ({
 
             <tbody>
               {items.map((item, index) => (
-                <tr key={index}>
+                <tr key={item?._id}>
                   <td style={{ padding: "6px" }}>{index + 1}</td>
                   <td style={{ padding: "8px" }}>
                     <span>{item?.itemName ?? "-"}</span>
@@ -841,7 +841,6 @@ const InvoiceTemplate = ({
               {" "}
               {bankAccount && (
                 <div
-                  key={bankAccount?._id}
                   style={{
                     marginTop: "12px",
                   }}
@@ -952,9 +951,7 @@ const InvoiceTemplate = ({
                     <p style={{ whiteSpace: "pre-line" }}>
                       {bankAccount?.ifscCode}
                     </p>
-                    <p style={{ whiteSpace: "pre-line" }}>
-                      {bankAccount?.bankName}
-                    </p>
+                   
                   </div>
                 </div>
               )}

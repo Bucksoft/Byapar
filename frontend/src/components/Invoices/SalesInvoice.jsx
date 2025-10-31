@@ -1,4 +1,10 @@
-import { ArrowLeft, Download, EllipsisVertical, Printer } from "lucide-react";
+import {
+  ArrowLeft,
+  Download,
+  EllipsisVertical,
+  Printer,
+  Share2,
+} from "lucide-react";
 import { useNavigate, useParams } from "react-router-dom";
 import InvoiceTemplate from "./InvoiceTemplate";
 import { useMutation, useQuery } from "@tanstack/react-query";
@@ -9,6 +15,10 @@ import { queryClient } from "../../main";
 import CustomLoader from "../Loader";
 import { handlePrint } from "../../../helpers/print";
 import { downloadPDF } from "../../../helpers/downloadPdf";
+import { MdOutlineMailOutline, MdWhatsapp } from "react-icons/md";
+import InvoiceTemplate1 from "../InvoiceTemplate/InvoiceTemplate1";
+import InvoiceTemplate3 from "../InvoiceTemplate/InvoiceTemplate3";
+import InvoiceTemplate2 from "../InvoiceTemplate/InvoiceTemplate2";
 
 const SalesInvoice = () => {
   const { id } = useParams();
@@ -39,6 +49,17 @@ const SalesInvoice = () => {
       navigate("/dashboard/sales");
       queryClient.invalidateQueries({ queryKey: ["invoices"] });
       document.getElementById("my_modal_3").close();
+    },
+  });
+
+  const currentInvoiceTheme = JSON.parse(localStorage.getItem("invoiceTheme"));
+  const { data: currentTheme } = useQuery({
+    queryKey: ["themes"],
+    queryFn: async () => {
+      const res = await axiosInstance.get(
+        `/invoiceTheme/settings/${currentInvoiceTheme}`
+      );
+      return res.data;
     },
   });
 
@@ -83,7 +104,7 @@ const SalesInvoice = () => {
                   setIsDownloading
                 )
               }
-              className="btn btn-sm rounded-xl"
+              className="btn btn-sm rounded-xl btn-soft btn-info"
             >
               {isDownloading ? (
                 <div className="">
@@ -95,13 +116,42 @@ const SalesInvoice = () => {
                 </>
               )}
             </button>
+
+            {/* DROPDOWN TO SHARE IN WHATSAPP AND EMAIL */}
             <div className="dropdown dropdown-end">
-              <div tabIndex={0} role="button" className="btn btn-sm">
+              <div
+                tabIndex={0}
+                role="button"
+                className="btn btn-sm rounded-xl btn-info btn-soft"
+              >
+                <Share2 size={14} />
+              </div>
+              <ul
+                tabIndex={0}
+                className="dropdown-content menu bg-base-100 rounded-box z-1 w-38 text-xs p-1 shadow-sm"
+              >
+                <li>
+                  <button>
+                    <MdWhatsapp size={15} /> Whatsapp
+                  </button>
+                </li>
+
+                <li>
+                  <button>
+                    <MdOutlineMailOutline size={15} /> Email
+                  </button>
+                </li>
+              </ul>
+            </div>
+
+            {/* DROPDOWN FOR EDIT AND DELETE */}
+            <div className="dropdown dropdown-end">
+              <div tabIndex={0} role="button" className="btn btn-sm rounded-xl">
                 <EllipsisVertical size={14} />
               </div>
               <ul
                 tabIndex={0}
-                className="dropdown-content menu bg-base-100 rounded-box z-1 w-52 p-2 shadow-sm"
+                className="dropdown-content menu bg-base-100 rounded-box z-1 w-38 text-xs p-1 shadow-sm"
               >
                 <li>
                   <button
@@ -114,22 +164,14 @@ const SalesInvoice = () => {
                     Edit
                   </button>
                 </li>
-                {/* <li>
-                  <button>Edit History</button>
-                </li>
-                <li>
-                  <button>Duplicate</button>
-                </li>
-                <li>
-                  <button>Issue Credit Note</button>
-                </li> */}
+
                 <li className="text-[var(--error-text-color)]">
                   <button
                     onClick={() => {
                       document.getElementById("my_modal_3").showModal();
                       setInvoiceIdToDelete(invoice?._id);
                     }}
-                    className="text-error rounded-xl "
+                    className="text-error "
                   >
                     Delete
                   </button>
@@ -174,13 +216,56 @@ const SalesInvoice = () => {
         ) : (
           <section className="mt-3 bg-sky-50 flex justify-center py-1 flex-1">
             {/* Invoice template */}
-            <InvoiceTemplate
-              color={"#E56E2A"}
-              invoice={invoice}
-              type={"Sales Invoice"}
-              printRef={printRef}
-              setInvoiceIdToDownload={setInvoiceIdToDownload}
-            />
+            {currentTheme && currentTheme?.theme === "Luxury" ? (
+              <>
+                <InvoiceTemplate2
+                  color={
+                    currentTheme.selectedColor
+                      ? currentTheme.selectedColor
+                      : "#E56E2A"
+                  }
+                  invoice={invoice}
+                  type={"Sales Invoice"}
+                  printRef={printRef}
+                  checkBoxSetting={currentTheme?.options}
+                  setInvoiceIdToDownload={setInvoiceIdToDownload}
+                />
+              </>
+            ) : currentTheme && currentTheme?.theme === "Advanced" ? (
+              <>
+                <InvoiceTemplate3
+                  color={
+                    currentTheme.selectedColor
+                      ? currentTheme.selectedColor
+                      : "#E56E2A"
+                  }
+                  invoice={invoice}
+                  type={"Sales Invoice"}
+                  printRef={printRef}
+                  checkBoxSetting={currentTheme?.options}
+                  setInvoiceIdToDownload={setInvoiceIdToDownload}
+                />
+              </>
+            ) : currentTheme && currentTheme?.theme === "Stylish" ? (
+              <>
+                <InvoiceTemplate1
+                  color={currentTheme?.selectedColor || "#E56E2A"}
+                  checkBoxSetting={currentTheme?.options}
+                  invoice={invoice}
+                  type="Sales Invoice"
+                  printRef={printRef}
+                  setInvoiceIdToDownload={setInvoiceIdToDownload}
+                />
+              </>
+            ) : (
+              <InvoiceTemplate
+                color={"#E56E2A"}
+                invoice={invoice}
+                type={"Sales Invoice"}
+                printRef={printRef}
+                setInvoiceIdToDownload={setInvoiceIdToDownload}
+              />
+            )}
           </section>
         )}
       </div>

@@ -199,12 +199,12 @@ export const dashboardAccountingFields = [
 ];
 
 export const settingLinks = [
-  {
-    id: 1,
-    icon: <RiAccountCircleFill size={16} />,
-    label: "Account",
-    link: "account",
-  },
+  // {
+  //   id: 1,
+  //   icon: <RiAccountCircleFill size={16} />,
+  //   label: "Account",
+  //   link: "account",
+  // },
   // {
   //   id: 2,
   //   icon: <BiSolidBriefcaseAlt2 size={16} />,
@@ -217,48 +217,48 @@ export const settingLinks = [
     label: "Invoice Settings",
     link: "invoice",
   },
-  {
-    id: 4,
-    icon: <BiSolidPrinter size={16} />,
-    label: "Print Settings",
-    link: "print",
-  },
-  {
-    id: 5,
-    icon: <BsPersonFillGear size={16} />,
-    label: "Manage Users",
-    link: "users",
-  },
-  {
-    id: 6,
-    icon: <RiAlarmFill size={16} />,
-    label: "Reminders",
-    link: "reminders",
-  },
-  {
-    id: 7,
-    icon: <HiDocumentCurrencyRupee size={16} />,
-    label: "CA Reports Sharing",
-    link: "ca-reports",
-  },
-  {
-    id: 8,
-    icon: <HiCurrencyRupee size={16} />,
-    label: "Pricing",
-    link: "pricing",
-  },
-  {
-    id: 9,
-    icon: <IoIosGift size={16} />,
-    label: "Refer & Earn",
-    link: "refer-and-earn",
-  },
-  {
-    id: 10,
-    icon: <FaClipboardQuestion size={16} />,
-    label: "Help And Support",
-    link: "help-and-support",
-  },
+  // {
+  //   id: 4,
+  //   icon: <BiSolidPrinter size={16} />,
+  //   label: "Print Settings",
+  //   link: "print",
+  // },
+  // {
+  //   id: 5,
+  //   icon: <BsPersonFillGear size={16} />,
+  //   label: "Manage Users",
+  //   link: "users",
+  // },
+  // {
+  //   id: 6,
+  //   icon: <RiAlarmFill size={16} />,
+  //   label: "Reminders",
+  //   link: "reminders",
+  // },
+  // {
+  //   id: 7,
+  //   icon: <HiDocumentCurrencyRupee size={16} />,
+  //   label: "CA Reports Sharing",
+  //   link: "ca-reports",
+  // },
+  // {
+  //   id: 8,
+  //   icon: <HiCurrencyRupee size={16} />,
+  //   label: "Pricing",
+  //   link: "pricing",
+  // },
+  // {
+  //   id: 9,
+  //   icon: <IoIosGift size={16} />,
+  //   label: "Refer & Earn",
+  //   link: "refer-and-earn",
+  // },
+  // {
+  //   id: 10,
+  //   icon: <FaClipboardQuestion size={16} />,
+  //   label: "Help And Support",
+  //   link: "help-and-support",
+  // },
 ];
 
 export const businessTools = [
