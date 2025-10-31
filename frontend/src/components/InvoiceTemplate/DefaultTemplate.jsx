@@ -11,10 +11,9 @@ const DefaultTemplate = ({ color, textColor, checkBoxSetting }) => {
     <div
       style={{
         padding: "24px",
-        maxWidth: "800px",
+        maxWidth: "900px",
+        minHeight: "100vh",
         margin: "0 auto",
-        boxShadow: "0 0 10px rgba(0,0,0,0.1)",
-        borderRadius: "8px",
         fontFamily: "Arial, sans-serif",
         color: fontColor,
         backgroundColor: "#fff",

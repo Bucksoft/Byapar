@@ -3,7 +3,7 @@ import Button from "../../components/Button";
 import { CiLogin } from "react-icons/ci";
 import { Link } from "react-router-dom";
 
-const HomePageNavigation = () => {
+const HomePageNavigation = ({ user }) => {
   return (
     <div className="relative">
       <img src={wave} alt="wave.png" loading="lazy" />
@@ -26,9 +26,15 @@ const HomePageNavigation = () => {
           </ul>
 
           {/* Login Button */}
-          <Link to={"/login"}>
-            <Button text="Login" logo={<CiLogin />} />
-          </Link>
+          {user ? (
+            <Link to={"/dashboard"}>
+              <Button text="Dashboard" />
+            </Link>
+          ) : (
+            <Link to={"/login"}>
+              <Button text="Login" logo={<CiLogin />} />
+            </Link>
+          )}
         </nav>
       </header>
     </div>

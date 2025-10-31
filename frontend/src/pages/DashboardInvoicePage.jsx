@@ -133,7 +133,7 @@ const DashboardInvoicePage = () => {
       {/* Body (two scrollable divs side by side) */}
       <div className="flex overflow-hidden mt-2">
         {/* Left */}
-        <div className="overflow-y-auto w-7/10 px-5">
+        <div className="overflow-y-auto w-7/10 px-5 bg-sky-100 min-h-[100vh] flex items-center justify-center" >
           {currentTheme === "Default" ? (
             <DefaultTemplate
               color={currentColor}

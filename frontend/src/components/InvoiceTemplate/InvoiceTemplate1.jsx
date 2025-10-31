@@ -132,7 +132,7 @@ const InvoiceTemplate1 = ({
     <main
       style={{
         padding: "24px",
-        width: "800px",
+        width: "900px",
         minHeight: "100vh",
         backgroundColor: "#fff",
         color: fontColor,
@@ -821,7 +821,7 @@ const InvoiceTemplate1 = ({
         }}
       >
         <div style={{ width: "50%" }}>
-          {bankAccount ? (
+          {bankAccount && (
             <div key={bankAccount?._id} style={{ marginTop: "12px" }}>
               <div>
                 <h4 style={{ fontWeight: 600 }}>Bank Details</h4>
@@ -903,31 +903,6 @@ const InvoiceTemplate1 = ({
                   </p>
                 )}
               </div>
-            </div>
-          ) : (
-            <div style={{ marginTop: "30px" }}>
-              <h4 style={{ fontWeight: 600 }}>Bank Details</h4>
-              <p style={{ fontWeight: "550" }}>
-                Account Holder Name:{" "}
-                <span style={{ fontWeight: "400" }}>
-                  SHIVSHAKTI ENTERPRISES
-                </span>
-              </p>
-              <p style={{ fontWeight: "550" }}>
-                Bank Name: <span style={{ fontWeight: "400" }}>SBI</span>
-              </p>
-              <p style={{ fontWeight: "550" }}>
-                Account Number:{" "}
-                <span style={{ fontWeight: "400" }}>41452481808</span>
-              </p>
-              <p style={{ fontWeight: "550" }}>
-                Branch Name:{" "}
-                <span style={{ fontWeight: "400" }}>MOHRABADI</span>
-              </p>
-              <p style={{ fontWeight: "550" }}>
-                IFSC Code:{" "}
-                <span style={{ fontWeight: "400" }}>SBIN0016002</span>
-              </p>
             </div>
           )}
         </div>

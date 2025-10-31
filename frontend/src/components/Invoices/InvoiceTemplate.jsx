@@ -860,6 +860,24 @@ const InvoiceTemplate = ({
                           color: "#52525c",
                         }}
                       >
+                        Account name
+                      </h3>
+                      <p style={{ whiteSpace: "pre-line" }}>
+                        {bankAccount?.accountName}
+                      </p>
+                    </div>
+                    <div
+                      style={{
+                        display: "flex",
+                        justifyContent: "space-between",
+                        alignItems: "center",
+                      }}
+                    >
+                      <h3
+                        style={{
+                          color: "#52525c",
+                        }}
+                      >
                         Account holder's name
                       </h3>
                       <p style={{ whiteSpace: "pre-line" }}>
@@ -951,7 +969,6 @@ const InvoiceTemplate = ({
                     <p style={{ whiteSpace: "pre-line" }}>
                       {bankAccount?.ifscCode}
                     </p>
-                   
                   </div>
                 </div>
               )}
