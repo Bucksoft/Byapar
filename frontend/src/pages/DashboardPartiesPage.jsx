@@ -7,9 +7,7 @@ import {
   SquarePen,
   Trash2,
 } from "lucide-react";
-import upload from "../assets/upload.png";
 import not_found from "../assets/not-found.png";
-import { PiMicrosoftExcelLogoFill } from "react-icons/pi";
 import DashboardNavbar from "../components/DashboardNavbar";
 import { dashboardPartiesCardDetails } from "../lib/dashboardPartiesCards";
 import { motion } from "framer-motion";
@@ -26,10 +24,13 @@ import { useBusinessStore } from "../store/businessStore.js";
 import { uploadExcel } from "../../helpers/uploadExcel.js";
 import { IoMdArrowDown, IoMdArrowUp } from "react-icons/io";
 import no_party from "../assets/no_party.png";
+import { useInvoiceStore } from "../store/invoicesStore.js";
+import { BsExclamationCircle } from "react-icons/bs";
 
 const DashboardPartiesPage = () => {
   const [searchQuery, setSearchQuery] = useState("");
   const { business } = useBusinessStore();
+  const { invoices } = useInvoiceStore();
   const { setParties, setTotalParties, totalParties, parties } =
     usePartyStore();
   const [toCollect, setToCollect] = useState(0);
@@ -37,6 +38,7 @@ const DashboardPartiesPage = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 10;
   const [partyIdToDelete, setPartyIdToDelete] = useState(null);
+  const [isInvoiceCreated, setIsInvoiceCreated] = useState(false);
   const fileRef = useRef();
   const navigate = useNavigate();
 
@@ -77,6 +79,22 @@ const DashboardPartiesPage = () => {
       queryClient.invalidateQueries({ queryKey: ["parties"] });
     },
   });
+
+  // check if party has created an invoice or not, if it is created then party cannot be deleted.
+  useEffect(() => {
+    if (!partyIdToDelete) return;
+
+    const isCreated = invoices?.some(
+      (invoice) => invoice?.partyId?._id === partyIdToDelete
+    );
+    setIsInvoiceCreated(isCreated);
+
+    if (isCreated) {
+      document.getElementById("warning_modal").showModal();
+    } else {
+      document.getElementById("my_modal_3").showModal();
+    }
+  }, [partyIdToDelete]);
 
   // DELETE PARTY
   const mutation = useMutation({
@@ -204,7 +222,7 @@ const DashboardPartiesPage = () => {
             <div className="w-full sm:w-auto">
               <Link
                 to="/dashboard/add-party"
-                className="btn btn-sm bg-[var(--primary-btn)] w-full sm:w-auto flex items-center justify-center gap-2"
+                className="btn rounded-xl btn-sm bg-[var(--primary-btn)] w-full sm:w-auto flex items-center justify-center gap-2"
               >
                 <Plus size={14} /> Create Party
               </Link>
@@ -238,7 +256,7 @@ const DashboardPartiesPage = () => {
                 or clear your search.
               </p>
               <button
-                className="btn btn-outline btn-sm mt-3"
+                className="btn rounded-xl btn-outline btn-sm mt-3"
                 onClick={() => setSearchQuery("")}
               >
                 Clear search
@@ -258,50 +276,51 @@ const DashboardPartiesPage = () => {
                 </tr>
               </thead>
               <tbody className="text-center text-xs sm:text-sm">
-                {paginatedParties.map((party, index) => (
-                  <tr
-                    key={party._id}
-                    className="cursor-pointer hover:bg-zinc-50"
-                    onClick={() => navigate(party?._id)}
-                  >
-                    <td>{index + 1}</td>
-                    <td className="text-left">{party?.partyName || "-"}</td>
-                    <td>{party?.categoryName || "-"}</td>
-                    <td>{party?.mobileNumber || "-"}</td>
-                    <td>{party?.partyType || "-"}</td>
-                    <td>
-                      <div className="flex items-center justify-center gap-2">
-                        {party?.currentBalance > 0 ? (
-                          <IoMdArrowUp className="text-success" />
-                        ) : party?.currentBalance < 0 ? (
-                          <IoMdArrowDown className="text-error" />
-                        ) : (
-                          ""
-                        )}
-                        ₹ {Math.abs(party?.currentBalance) || 0}
-                      </div>
-                    </td>
-                    <td
-                      onClick={(e) => e.stopPropagation()}
-                      className="flex items-center gap-2 justify-end"
+                {paginatedParties
+                  .sort((a, b) => a.partyName.localeCompare(b.partyName))
+                  .map((party, index) => (
+                    <tr
+                      key={party._id}
+                      className="cursor-pointer hover:bg-zinc-50"
+                      onClick={() => navigate(party?._id)}
                     >
-                      <Link to={`/dashboard/edit-party/${party?._id}`}>
-                        <SquarePen size={14} className="cursor-pointer" />
-                      </Link>
-                      <button
-                        onClick={() => {
-                          setPartyIdToDelete(party?._id);
-                          document.getElementById("my_modal_3").showModal();
-                        }}
+                      <td>{index + 1}</td>
+                      <td className="text-left">{party?.partyName || "-"}</td>
+                      <td>{party?.categoryName || "-"}</td>
+                      <td>{party?.mobileNumber || "-"}</td>
+                      <td>{party?.partyType || "-"}</td>
+                      <td>
+                        <div className="flex items-center justify-center gap-2">
+                          {party?.currentBalance > 0 ? (
+                            <IoMdArrowUp className="text-success" />
+                          ) : party?.currentBalance < 0 ? (
+                            <IoMdArrowDown className="text-error" />
+                          ) : (
+                            ""
+                          )}
+                          ₹ {Math.abs(party?.currentBalance) || 0}
+                        </div>
+                      </td>
+                      <td
+                        onClick={(e) => e.stopPropagation()}
+                        className="flex items-center gap-2 justify-end"
                       >
-                        <Trash2
-                          size={14}
-                          className="text-[var(--error-text-color)] cursor-pointer"
-                        />
-                      </button>
-                    </td>
-                  </tr>
-                ))}
+                        <Link to={`/dashboard/edit-party/${party?._id}`}>
+                          <SquarePen size={14} className="cursor-pointer" />
+                        </Link>
+                        <button
+                          onClick={() => {
+                            setPartyIdToDelete(party?._id);
+                          }}
+                        >
+                          <Trash2
+                            size={14}
+                            className="rounded-xl text-[var(--error-text-color)] cursor-pointer"
+                          />
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
               </tbody>
             </table>
           ) : (
@@ -318,7 +337,7 @@ const DashboardPartiesPage = () => {
         <div className="w-full flex items-center justify-end p-3 sm:p-4">
           <div className="join join-sm flex items-center">
             <button
-              className="btn btn-sm btn-neutral"
+              className="btn rounded-xl btn-sm btn-neutral"
               disabled={currentPage === 1}
               onClick={() => setCurrentPage((p) => p - 1)}
             >
@@ -330,7 +349,7 @@ const DashboardPartiesPage = () => {
             </span>
 
             <button
-              className="btn btn-sm btn-neutral"
+              className="btn rounded-xl btn-sm btn-neutral"
               disabled={currentPage === totalPages}
               onClick={() => setCurrentPage((p) => p + 1)}
             >
@@ -357,7 +376,7 @@ const DashboardPartiesPage = () => {
             <button
               onClick={() => fileRef.current.click()}
               disabled={bulkMutation.isPending}
-              className="btn btn-success btn-sm flex items-center gap-2"
+              className="btn rounded-xl btn-success btn-sm flex items-center gap-2"
             >
               {bulkMutation.isPending ? (
                 <CustomLoader text="Adding parties..." />
@@ -388,7 +407,7 @@ const DashboardPartiesPage = () => {
 
             <button
               onClick={() => window.open("/sample-party.xlsx", "_blank")}
-              className="btn text-neutral btn-link btn-xs"
+              className="btn rounded-xl text-neutral btn-link btn-xs"
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -412,17 +431,51 @@ const DashboardPartiesPage = () => {
       </section>
 
       {/* Delete Modal */}
+
+      {/* Warning Modal */}
+      <dialog className="modal" id="warning_modal">
+        <div className="modal-box">
+          <div className="flex items-center justify-center flex-col">
+            <BsExclamationCircle size={40} className="text-red-500" />
+            <h1 className="mt-4 font-bold">Party cannot be deleted</h1>
+            <p className="text-zinc-500">
+              You have already created an invoice for this party.
+            </p>
+          </div>
+
+          <div className="modal-action">
+            <form method="dialog">
+              <button
+                onClick={() => {
+                  document.getElementById("warning_modal").close();
+                  setIsInvoiceCreated(false);
+                  setPartyIdToDelete(null);
+                }}
+                className="btn btn-sm rounded-xl bg-red-500 text-white hover:bg-red-500/90"
+              >
+                Close
+              </button>
+            </form>
+          </div>
+        </div>
+      </dialog>
+
+      {/* Delete Confirmation Modal */}
       <dialog id="my_modal_3" className="modal">
         <div className="modal-box max-w-sm sm:max-w-md md:max-w-lg">
           <h3 className="font-bold text-lg">Confirm Deletion</h3>
           <p className="py-4 text-sm">
-            Are you sure you want to delete the selected invoice? This action
+            Are you sure you want to delete the selected party? This action
             cannot be undone.
           </p>
           <div className="flex justify-end">
             <button
-              onClick={() => mutation.mutate()}
-              className="btn btn-sm btn-ghost text-[var(--error-text-color)]"
+              onClick={() => {
+                mutation.mutate();
+                document.getElementById("my_modal_3").close();
+                setPartyIdToDelete(null);
+              }}
+              className="btn rounded-xl btn-sm btn-ghost text-[var(--error-text-color)]"
             >
               Delete
             </button>

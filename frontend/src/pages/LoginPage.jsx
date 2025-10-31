@@ -114,15 +114,17 @@ const LoginPage = () => {
             <span className="text-md mt-2 text-zinc-500">
               Please enter your email
             </span>
-            <div className=" w-full ">
+            <form className="w-full">
               <input
                 type="text"
                 ref={inputRef}
+                name="email"
                 className={`input input-lg w-full mt-8 rounded-2xl  ${
                   mutation.isError && "input-error"
                 } x`}
                 placeholder="Email"
                 value={email}
+                autoComplete="email"
                 onChange={(e) => setEmail(e.target.value)}
                 onKeyDown={(e) => {
                   if (e.key === "Enter") {
@@ -136,11 +138,12 @@ const LoginPage = () => {
                   {mutation.error.response?.data?.err}
                 </p>
               )}
+
               {/* <Mail
                 className="absolute right-15 top-12 text-zinc-500"
                 size={15}
               /> */}
-            </div>
+            </form>
             {mutation.isError && (
               <p className="text-xs text-error mt-3">
                 {mutation.error.response?.data?.err}

@@ -102,7 +102,7 @@ const DashboardExpenses = () => {
                 <div className="h-full">
                   <button
                     onClick={() => setOpenCreateExpense(true)}
-                    className="btn bg-[var(--primary-btn)] btn-sm"
+                    className="btn rounded-xl bg-[var(--primary-btn)] btn-sm"
                   >
                     <Plus size={14} /> Create Expense
                   </button>

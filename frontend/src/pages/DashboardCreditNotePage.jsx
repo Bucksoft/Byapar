@@ -134,7 +134,7 @@ const DashboardCreditNotePage = () => {
                                         `/dashboard/update/${creditNote?._id}?type=credit note`
                                       )
                                     }
-                                    className="flex items-center gap-2"
+                                    className="flex rounded-xl items-center gap-2"
                                   >
                                     <FaRegEdit /> Edit
                                   </button>

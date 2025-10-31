@@ -22,7 +22,7 @@ const DashboardLowStockPage = () => {
                 <GiQueenCrown />
               </p>
             </div>
-            <button className=" flex items-center gap-2 text-sm bg-gray-100 p-1 px-2 rounded">
+            <button className="flex items-center gap-2 text-sm bg-gray-100 p-1 px-2 rounded">
               <FaRegStar className="text-gray-500" />
               Favourite
             </button>

@@ -52,7 +52,7 @@ const DashboardOnlineStorePage = () => {
               <span className="text-sm text-zinc-800">
                 Increase your sales, get Online Orders with a single click
               </span>
-              <button className="bg-[var(--primary-btn)] text-white rounded-sm text-xs w-40 h-8 mt-2">
+              <button className=" bg-[var(--primary-btn)] text-white rounded-sm text-xs w-40 h-8 mt-2">
                 Create Online Store
               </button>
             </div>

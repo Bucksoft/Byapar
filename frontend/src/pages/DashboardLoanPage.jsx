@@ -27,7 +27,7 @@ const DashboardLoanPage = () => {
                 className="border border-zinc-400 rounded-sm w-full h-10 mt-2"
               />
             </p>
-            <button className="border border-zinc-400 rounded-sm w-100 h-10 ml-5 bg-[var(--primary-btn)] text-white hover:text-white font-bold">
+            <button className="border  border-zinc-400 rounded-sm w-100 h-10 ml-5 bg-[var(--primary-btn)] text-white hover:text-white font-bold">
               Next
             </button>
           </div>

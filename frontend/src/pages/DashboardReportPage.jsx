@@ -9,6 +9,7 @@ import DashboardItemsSalesAndPurchaseSummary from "./DashboardItemsSalesAndPurch
 import DashboardRateListPage from "./DashboardRateListPage";
 import { useState } from "react";
 import InvoiceReport from "../components/Reports/InvoiceReport";
+import PaymentCollectionReport from "../components/Reports/PaymentCollectionReport";
 
 const DashboardReportPage = () => {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -77,6 +78,9 @@ const DashboardReportPage = () => {
 
             {/* INVOICE IS SELECTED */}
             {tab === "invoice" && <InvoiceReport />}
+
+            {/* PAYMENT COLLECTION */}
+            {tab === "payment collection" && <PaymentCollectionReport />}
 
             {/* 
             <motion.table

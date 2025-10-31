@@ -42,6 +42,9 @@ const DashboardMyBusinesses = () => {
     onSuccess: (data) => {
       toast.success(data?.msg);
       queryClient.invalidateQueries({ queryKey: ["business"] });
+      queryClient.invalidateQueries({
+        queryKey: ["invoices"],
+      });
     },
   });
 
@@ -63,7 +66,6 @@ const DashboardMyBusinesses = () => {
           "deliveryChallans",
           "proformaInvoice",
           "items",
-          "parties",
           "purchaseInvoice",
           id,
         ],
@@ -79,7 +81,7 @@ const DashboardMyBusinesses = () => {
           {businesses && businesses.length > 0 && (
             <button
               onClick={() => navigate("/dashboard/business")}
-              className="btn btn-sm bg-[var(--primary-btn)]"
+              className="btn rounded-xl btn-sm bg-[var(--primary-btn)]"
             >
               {" "}
               <Plus size={15} /> Create new business
@@ -265,7 +267,7 @@ const DashboardMyBusinesses = () => {
                               onClick={() =>
                                 deleteMutation.mutate(business?._id)
                               }
-                              className="btn btn-sm btn-ghost  ml-auto text-[var(--error-text-color)]"
+                              className="btn rounded-xl btn-sm btn-ghost  ml-auto text-[var(--error-text-color)]"
                             >
                               Delete
                             </button>
@@ -295,7 +297,7 @@ const DashboardMyBusinesses = () => {
               </h1>
               <button
                 onClick={() => navigate("/dashboard/business")}
-                className="btn btn-sm bg-[var(--primary-btn)] mt-5"
+                className="btn rounded-xl btn-sm bg-[var(--primary-btn)] mt-5"
               >
                 {" "}
                 <Plus size={15} /> Create new business

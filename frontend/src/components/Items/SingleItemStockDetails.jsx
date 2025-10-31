@@ -34,7 +34,7 @@ const SingleItemStockDetails = ({ item }) => {
               <option key={index}>{range}</option>
             ))}
         </select>
-        <button className="btn btn-sm flex items-center gap-2">
+        <button className="btn rounded-xl btn-sm flex items-center gap-2">
           <FaFilePdf size={15} />
           Download PDF
         </button>

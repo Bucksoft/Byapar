@@ -35,6 +35,8 @@ const PaymentInForm = () => {
     setData((prev) => ({ ...prev, paymentAmount: Number(value || 0) }));
   };
 
+  console.log(latestPaymentIn);
+
   // DATA TO SEND TO THE BACKEND
   const [data, setData] = useState({
     partyName: "",
@@ -253,12 +255,12 @@ const PaymentInForm = () => {
           <div className="flex items-center gap-2">
             <button
               onClick={() => navigate(-1)}
-              className="btn btn-soft btn-sm"
+              className="btn btn-soft btn-sm rounded-xl"
             >
               Cancel
             </button>
             <button
-              className={`btn btn-sm bg-[var(--primary-btn)]  ${
+              className={`btn btn-sm bg-[var(--primary-btn)]  rounded-xl ${
                 mutation?.isPending && "opacity-70 cursor-not-allowed"
               }`}
               disabled={mutation?.isPending}
@@ -355,6 +357,7 @@ const PaymentInForm = () => {
                     type="text"
                     className="input input-sm mt-1"
                     placeholder="1"
+                    readOnly={true}
                     name="paymentInNumber"
                     value={data?.paymentInNumber}
                     onChange={(e) =>

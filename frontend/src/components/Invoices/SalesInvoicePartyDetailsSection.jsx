@@ -14,6 +14,7 @@ import { useBusinessStore } from "../../store/businessStore";
 import toast from "react-hot-toast";
 import { queryClient } from "../../main";
 import { usePartyStore } from "../../store/partyStore";
+import { usePartyBankAccountStore } from "../../store/partyBankAccount";
 
 const SalesInvoicePartyDetailsSection = ({
   title,
@@ -36,6 +37,7 @@ const SalesInvoicePartyDetailsSection = ({
   const [selectedAddressId, setSelectedAddressId] = useState(null);
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [deleteShippingAddressId, setDeleteShippingAddressId] = useState(null);
+  const { setPartyBankAccount } = usePartyBankAccountStore();
 
   const [editShippingAddress, setEditShippingAddress] = useState(0);
   const [shippingData, setShippingData] = useState({
@@ -77,7 +79,7 @@ const SalesInvoicePartyDetailsSection = ({
     if (!parties?.length) return [];
 
     let partiesToFilter = [];
-    if (title === "Purchase Invoice") {
+    if (title === "Purchase Invoice" || title === "Purchase Return") {
       partiesToFilter = parties
         .filter((p) => p.businessId === business?._id)
         .filter((p) => p?.partyType === "Supplier");
@@ -185,6 +187,19 @@ const SalesInvoicePartyDetailsSection = ({
     },
   });
 
+  // get the party bank account details
+  const { data: partyBankAccount } = useQuery({
+    queryKey: ["partyBankAccount"],
+    queryFn: async () => {
+      const res = await axiosInstance.get(
+        `/bank-account/party/${data?.partyId}/?businessId=${business?._id}`
+      );
+      setPartyBankAccount(res.data[0]);
+      return res.data[0];
+    },
+    enabled: Boolean(data?.partyId),
+  });
+
   return (
     <>
       <section className="grid grid-cols-3 h-48">
@@ -204,7 +219,7 @@ const SalesInvoicePartyDetailsSection = ({
               {/* Select Button */}
               <button
                 onClick={() => setSelectOpen(!selectOpen)}
-                className="w-full truncate  flex justify-between items-center btn btn-xs btn-outline btn-neutral text-xs shadow"
+                className="w-full truncate rounded-xl flex justify-between items-center btn btn-xs btn-outline btn-neutral text-xs shadow"
               >
                 {party ? party?.partyName : "Select Party"}
                 <svg
@@ -367,7 +382,7 @@ const SalesInvoicePartyDetailsSection = ({
                                     <td>
                                       <div className="flex items-center">
                                         <button
-                                          className="btn btn-ghost btn-xs"
+                                          className="btn rounded-xl btn-ghost btn-xs"
                                           onClick={() => {
                                             setEditShippingAddress(address.id);
                                             setShippingData(address);
@@ -376,7 +391,7 @@ const SalesInvoicePartyDetailsSection = ({
                                           <FaPen size={12} />
                                         </button>
                                         <button
-                                          className="btn btn-ghost btn-xs"
+                                          className="btn rounded-xl btn-ghost btn-xs"
                                           onClick={() =>
                                             handleDeleteShippingAddress(
                                               address._id
@@ -479,7 +494,7 @@ const SalesInvoicePartyDetailsSection = ({
 
                         <div className="flex justify-between mt-4">
                           <button
-                            className="btn btn-xs btn-outline"
+                            className="btn btn-xs rounded-xl btn-outline"
                             onClick={() => {
                               setShippingData({});
                               setEditShippingAddress(null);
@@ -488,7 +503,7 @@ const SalesInvoicePartyDetailsSection = ({
                             Clear
                           </button>
                           <button
-                            className="btn btn-xs btn-info"
+                            className="btn btn-xs rounded-xl btn-info"
                             onClick={() => {
                               shippingMutation.mutate();
                             }}
@@ -585,7 +600,7 @@ const SalesInvoicePartyDetailsSection = ({
                   {/* Close Button */}
                   <button
                     onClick={() => setOpen(false)}
-                    className="absolute top-1 right-1 text-gray-500 hover:text-gray-700"
+                    className="absolute rounded-xl top-1 right-1 text-gray-500 hover:text-gray-700"
                   >
                     <IoCloseCircle size={22} />
                   </button>

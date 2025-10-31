@@ -72,7 +72,7 @@ const SalesChart = () => {
   });
 
   return (
-    <div className="bg-white p-4 rounded-lg shadow">
+    <div className="bg-gradient-to-b from-white to-zinc-200 p-4 rounded-xl shadow-lg border border-zinc-100">
       <div className="flex items-center justify-between">
         <h2 className="text-lg font-semibold mb-3">Sales (Last {days} Days)</h2>
         <div className="w-1/4">

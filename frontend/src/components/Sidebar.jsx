@@ -7,12 +7,11 @@ import {
 import { NavLink, useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { TbLogout2 } from "react-icons/tb";
-import { useAuthStore } from "../store/authStore";
 import { axiosInstance } from "../config/axios";
-import CustomLoader from "./Loader";
 import toast from "react-hot-toast";
 import { useState } from "react";
 import { IoMdArrowDropdown } from "react-icons/io";
+import { useAuthStore } from "../store/authStore";
 import { useBusinessStore } from "../store/businessStore";
 import { useInvoiceStore } from "../store/invoicesStore";
 import { useItemStore } from "../store/itemStore";
@@ -28,6 +27,7 @@ import { useChallanStore } from "../store/challanStore";
 import { BsExclamationCircle } from "react-icons/bs";
 import { useMutation } from "@tanstack/react-query";
 import { useDebitNoteStore } from "../store/debitNoteStore";
+import { LogOut } from "lucide-react";
 
 export const container = {
   hidden: { opacity: 0 },
@@ -51,6 +51,8 @@ export const dashboardLinksItems = {
 };
 
 const Sidebar = () => {
+  const { user } = useAuthStore();
+
   const navigate = useNavigate();
   // const [sidebarShrink, setSidebarShrink] = useState(false);
   const { business, setBusinesses, setBusiness } = useBusinessStore();
@@ -100,7 +102,7 @@ const Sidebar = () => {
 
   return (
     <>
-      <section className="h-screen bg-[var(--sidebar-background)] text-black/70 max-h-screen overflow-y-auto hide-scrollbar relative shadow-md rounded-tr-2xl rounded-br-2xl border-r-2 border-r-zinc-200 ">
+      <section className="h-screen relative bg-gradient-to-tr from-cyan-950 to-slate-950 text-white max-h-screen overflow-y-auto hide-scrollbar  shadow-md border-r border-r-zinc-200 ">
         {/* nav */}
         <motion.h1
           initial={{
@@ -111,7 +113,7 @@ const Sidebar = () => {
             translateX: 0,
             filter: "blur(0)",
           }}
-          className="sticky top-0 z-10 text-md text-black font-semibold flex items-center  gap-3 w-full px-5 py-3 backdrop-blur-md border-b border-b-zinc-200"
+          className="sticky top-0 z-10 text-md text-white font-semibold flex items-center  gap-3 w-full px-5 py-3 backdrop-blur-md border-b border-b-cyan-950"
         >
           {/* <img
             src={ByaparLogo}
@@ -123,8 +125,8 @@ const Sidebar = () => {
         </motion.h1>
 
         {/* business details */}
-        <div className="flex gap-3 px-5 py-3 items-center border-b border-b-zinc-200 ">
-          <div className="border-3 bg-white border-zinc-300 rounded-2xl p-1">
+        <div className="flex gap-3 px-5 py-3 items-center border-b border-b-cyan-950 ">
+          <div className="border-3 bg-white border-cyan-600 rounded-2xl p-1">
             <div className="w-12 h-12 rounded-xl hover:scale-120 transition-all ease-in-out duration-300 flex items-center justify-center bg-red-200 overflow-hidden">
               {business?.logo && business?.logo !== "null" ? (
                 <img
@@ -141,18 +143,18 @@ const Sidebar = () => {
           </div>
 
           <div className="flex-1 tracking-tight">
-            <p className="font-semibold text-sm break-words whitespace-normal">
+            <p className="font-bold text-sm break-words whitespace-normal">
               {business?.businessName ||
                 business?.companyEmail ||
                 "Business name"}
             </p>
-            <small className="text-xs text-neutral-500">
+            <small className="text-xs text-neutral-300">
               {business?.companyPhoneNo}
             </small>
           </div>
         </div>
 
-        <div className="py-2 border-b border-zinc-300">
+        <div className="py-2 border-b border-cyan-950 inset-shadow-[1px_1px_10px_rgba(0,0,0,0.5)] shadow-lg">
           <label className="font-semibold pl-4 text-xs text-[var(--primary-btn)]">
             GENERAL
           </label>
@@ -174,10 +176,10 @@ const Sidebar = () => {
                       to={`/dashboard/${field.label.toLowerCase()}`}
                       onClick={() => setCurrentLink(field?.label)}
                       className={({ isActive }) =>
-                        `flex items-center justify-between text-xs font-medium cursor-pointer py-2 pl-[13.5px] w-full transition-all duration-200 ease-in-out text-black/70
+                        `flex items-center justify-between text-xs font-medium cursor-pointer py-2 pl-[13.5px] w-full transition-all duration-200 ease-in-out text-white
                 ${
                   isActive
-                    ? "bg-[var(--primary-btn)]/10 text-[var(--primary-btn)] scale-105"
+                    ? "bg-[var(--primary-btn)]/10 text-[var(--primary-btn)] scale-105 border-l-4"
                     : "hover:text-[var(--primary-btn)]"
                 }`
                       }
@@ -195,17 +197,17 @@ const Sidebar = () => {
                     {currentLink === field.label && (
                       <div
                         name={field.label}
-                        className="bg-gradient-to-r from-transparent to-zinc-500/10 text-black overflow-hidden text-xs cursor-pointer outline-none w-[80%] my-2 ml-7 z-10 transition-all duration-200  ease-in-out border-l border-l-zinc-200 "
+                        className="bg-gradient-to-r from-transparent to-zinc-500/10 text-white overflow-hidden text-xs cursor-pointer outline-none w-[80%] my-2 ml-7 z-10 transition-all duration-200  ease-in-out border-l border-l-cyan-950 "
                       >
                         {field.subLinks?.map((sublink) => (
                           <NavLink
                             key={sublink.id}
                             to={sublink.link}
                             className={({ isActive }) =>
-                              `block p-2 rounded-md transition-all duration-200 ease-in-out 
+                              `block p-2  transition-all duration-200 ease-in-out 
                               ${
                                 isActive
-                                  ? " text-[var(--primary-btn)] font-semibold  "
+                                  ? " text-[var(--primary-btn)] font-semibold border-l-2 "
                                   : "hover:bg-white/20"
                               }`
                             }
@@ -232,7 +234,7 @@ const Sidebar = () => {
                       `group px-4 flex items-center gap-5 text-xs py-2 cursor-pointer transition-all ease-in-out duration-150 
                     ${
                       isActive
-                        ? "bg-[var(--primary-btn)]/10 text-[var(--primary-btn)] font-semibold"
+                        ? "bg-[var(--primary-btn)]/10 text-[var(--primary-btn)] border-l-4 font-semibold"
                         : "hover:text-[var(--primary-btn)] hover:scale-105 "
                     }`
                     }
@@ -248,7 +250,7 @@ const Sidebar = () => {
           </motion.div>
         </div>
 
-        <div className="hidden py-2 border-b border-zinc-300">
+        <div className="hidden py-2 border-b border-cyan-950">
           <label className="pl-4 font-semibold text-xs text-[var(--primary-btn)]">
             ACCOUNTING SOLUTIONS
           </label>
@@ -282,7 +284,7 @@ const Sidebar = () => {
           </motion.div>
         </div>
 
-        <div className="hidden py-2 border-b border-zinc-800">
+        <div className=" py-2 border-b border-cyan-950">
           <label className=" pl-4 font-semibold text-xs text-[var(--primary-btn)]">
             SETTINGS
           </label>
@@ -350,16 +352,19 @@ const Sidebar = () => {
           </motion.div>
         </div>
 
-        {/* LOGOUT BUTTON */}
-        <button
-          onClick={() => document.getElementById("my_modal_5").showModal()}
-          className="fixed bottom-0 w-1/6 flex items-center justify-center p-2"
-        >
-          <div className="flex items-center gap-3 justify-center bg-info px-5 py-2 rounded-md backdrop-blur-md w-[99%]">
-            <TbLogout2 className="group-hover:rotate-90 transition-all ease-in-out duration-200 group-hover:scale-120" />
-            Logout
-          </div>
-        </button>
+        <div className="fixed w-[200px]  bottom-0 left-5 rounded-tr-2xl rounded-tl-2xl flex items-center justify-between p-2 gap-2 bg-cyan-700 ">
+          <small>{user.email}</small>
+          {/* LOGOUT BUTTON */}
+          <button
+            onClick={() => document.getElementById("my_modal_5").showModal()}
+            className="w-full  p-1 shadow rounded-xl cursor-pointer bg-red-500 text-white hover:bg-rose-500/90 flex items-center justify-center gap-2 "
+          >
+            <LogOut
+              size={16}
+              className=" group-hover:rotate-90 transition-all ease-in-out duration-200 group-hover:scale-120"
+            />
+          </button>
+        </div>
 
         <dialog
           id="my_modal_5"
@@ -377,11 +382,11 @@ const Sidebar = () => {
             <div className="modal-action">
               <form method="dialog">
                 {/* if there is a button in form, it will close the modal */}
-                <button className="btn btn-sm">Cancel</button>
+                <button className="btn btn-sm rounded-xl">Cancel</button>
               </form>
               <button
                 onClick={() => mutation.mutate()}
-                className="btn btn-sm bg-red-500 text-white hover:bg-red-500/90"
+                className="btn btn-sm bg-red-500 rounded-xl text-white hover:bg-red-500/90"
               >
                 Logout
               </button>

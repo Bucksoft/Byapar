@@ -145,7 +145,7 @@ const DashboardQuotationPage = () => {
 
             <button
               onClick={() => navigate(`/dashboard/parties/create-quotation`)}
-              className="btn bg-[var(--primary-btn)] btn-sm text-zinc-700"
+              className="btn rounded-xl bg-[var(--primary-btn)] btn-sm text-zinc-700"
             >
               Create Quotation
             </button>

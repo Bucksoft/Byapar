@@ -4,10 +4,10 @@ import { GrDocumentExcel } from "react-icons/gr";
 const PartyItemWiseReport = () => {
   return (
     <section>
-      {/* <button className="btn btn-sm w-1/8">
+      {/* <button className="btn btn-sm w-1/8 rounded-xl">
         <Download size={14} /> Download
       </button>
-      <button className="btn btn-sm ml-2 w-1/8">
+      <button className="btn btn-sm ml-2 w-1/8 rounded-xl">
         <Printer size={14} /> Print
       </button> */}
       {/* <div className="overflow-x-auto mt-5 rounded-box border border-base-content/5 bg-base-100">

@@ -21,7 +21,7 @@ const DashboardGodownPage = () => {
               You can easily monitor and track your inventory across various
               Godowns and Store locations
             </p>
-            <button className="btn btn-sm p-2 rounded-sm mt-5 bg-[var(--primary-btn)] font-medium">
+            <button className="btn rounded-xl btn-sm p-2 rounded-sm mt-5 bg-[var(--primary-btn)] font-medium">
               Enable Godown
             </button>
           </div>

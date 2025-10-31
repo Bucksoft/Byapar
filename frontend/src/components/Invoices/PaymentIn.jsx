@@ -1,20 +1,71 @@
 import { FaIndianRupeeSign } from "react-icons/fa6";
 import converter from "number-to-words";
+import { useBusinessStore } from "../../store/businessStore";
+import { LuIndianRupee } from "react-icons/lu";
 
 const PaymentInTemplate = ({ data, id, printRef }) => {
   const total =
     data?.invoices &&
     data?.invoices.reduce((acc, invoice) => acc + invoice?.settledAmount, 0);
-    
+
+  const { business } = useBusinessStore();
+
   return (
     <main
       id={id}
-      style={{ width: "100%", fontFamily: "Arial, sans-serif" }}
+      style={{ width: "100%",  }}
       ref={printRef}
     >
       <div style={{ display: "flex", justifyContent: "space-between" }}>
-        <div>
-          <span style={{ fontWeight: 500 }}>Business Name</span>
+        <div
+          style={{
+            display: "flex",
+            flexDirection: "column",
+            marginBottom:"20px"
+          }}
+        >
+          <img
+            src={business?.logo || ""}
+            alt="logo"
+            style={{
+              width: "2.5rem",
+              height: "2.5rem",
+              backgroundSize: "cover",
+            }}
+          />
+          <h1 style={{ fontWeight: 700 }}>{business?.businessName}</h1>
+          <span
+            style={{
+              color: "#71717b",
+              fontSize:"14px"
+            }}
+          >
+            {business?.billingAddress}
+          </span>
+          <span
+            style={{
+              color: "#71717b",
+              fontSize:"14px"
+            }}
+          >
+            {business?.companyEmail}
+          </span>
+          <span
+            style={{
+              color: "#71717b",
+              fontSize:"14px"
+            }}
+          >
+            {business?.companyPhoneNo}
+          </span>
+          <span
+            style={{
+              color: "#71717b",
+              fontSize:"14px"
+            }}
+          >
+            {business?.gstNumber}
+          </span>
         </div>
         <div
           style={{
@@ -24,9 +75,17 @@ const PaymentInTemplate = ({ data, id, printRef }) => {
             gap: "8px",
           }}
         >
-          <span style={{ fontWeight: 500, padding: "8px 0" }}>
+          <span style={{ fontWeight: 600, padding: "8px 0" }}>
             Receipt Voucher
           </span>
+
+          <div
+            style={{
+              height: "0.1rem",
+              width: "100%",
+              backgroundColor: "#d4d4d8",
+            }}
+          />
           <p
             style={{
               fontSize: "14px",
@@ -104,11 +163,12 @@ const PaymentInTemplate = ({ data, id, printRef }) => {
             width: "100%",
             borderCollapse: "collapse",
             fontSize: "14px",
+            border: "1px solid #e4e4e7",
           }}
         >
           <thead>
             <tr style={{ backgroundColor: "#d4d4d8", fontSize: "12px" }}>
-              <th style={{ padding: "6px" }}>#</th>
+              <th style={{ padding: "6px" }}>NO.</th>
               <th style={{ padding: "6px" }}>INVOICE NUMBER</th>
               <th style={{ padding: "6px" }}>INVOICE DATE</th>
               <th style={{ padding: "6px" }}>INVOICE AMOUNT</th>
@@ -138,7 +198,9 @@ const PaymentInTemplate = ({ data, id, printRef }) => {
                         justifyContent: "center",
                       }}
                     >
-                      <FaIndianRupeeSign style={{ color: "#71717a" }} />
+                      <LuIndianRupee
+                        style={{ color: "black", fontSize: "12px" }}
+                      />
                       {invoice?.totalAmount}
                     </div>
                   </td>
@@ -150,7 +212,9 @@ const PaymentInTemplate = ({ data, id, printRef }) => {
                         justifyContent: "center",
                       }}
                     >
-                      <FaIndianRupeeSign style={{ color: "#71717a" }} />
+                      <LuIndianRupee
+                        style={{ color: "black", fontSize: "12px" }}
+                      />
                       {invoice?.settledAmount}
                     </div>
                   </td>
@@ -165,8 +229,10 @@ const PaymentInTemplate = ({ data, id, printRef }) => {
                         justifyContent: "center",
                       }}
                     >
-                      <FaIndianRupeeSign style={{ color: "#71717a" }} />
-                      {invoice?.pendingAmount}
+                      <LuIndianRupee
+                        style={{ color: "black", fontSize: "12px" }}
+                      />
+                      {invoice?.totalAmount - invoice?.settledAmount}
                     </div>
                   </td>
                 </tr>
@@ -193,7 +259,8 @@ const PaymentInTemplate = ({ data, id, printRef }) => {
                     justifyContent: "center",
                   }}
                 >
-                  <FaIndianRupeeSign style={{ color: "#71717a" }} /> {total}
+                  <LuIndianRupee style={{ color: "black", fontSize: "12px" }} />{" "}
+                  {total}
                 </div>
               </td>
               <td></td>
@@ -227,7 +294,7 @@ const PaymentInTemplate = ({ data, id, printRef }) => {
                   fontWeight: 600,
                 }}
               >
-                <FaIndianRupeeSign size={14} />
+                <LuIndianRupee size={14} />
                 {data?.invoices &&
                   data?.invoices.reduce(
                     (acc, invoice) => acc + invoice?.settledAmount,
@@ -249,14 +316,26 @@ const PaymentInTemplate = ({ data, id, printRef }) => {
             }}
           >
             <span>Authorized signature for </span>
-            <span>Business Name</span>
+            <span>{business?.businessName}</span>
             <div
               style={{
-                border: "1px solid #000",
+                border: "1px solid #d4d4d8",
                 width: "320px",
                 height: "100px",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
               }}
-            ></div>
+            >
+              <img
+                style={{
+                  height: "5rem",
+                  width: "15rem",
+                }}
+                src={business?.signature || ""}
+                alt="signature"
+              />
+            </div>
           </div>
         </div>
       </div>

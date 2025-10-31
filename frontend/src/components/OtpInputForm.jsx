@@ -5,18 +5,23 @@ import { useNavigate } from "react-router-dom";
 import CustomLoader from "./Loader";
 import toast from "react-hot-toast";
 import { BsFillShieldLockFill } from "react-icons/bs";
+import { useAuthStore } from "../store/authStore";
 
 const OtpInputForm = ({ email }) => {
   const navigate = useNavigate();
   const [otp, setOtp] = useState("");
+  const { setUser } = useAuthStore();
 
   const mutation = useMutation({
     mutationFn: async (otp) => {
       const res = await axiosInstance.post("/user/verify-otp", { otp, email });
-      return res;
+      return res.data;
     },
-    onSuccess: () => {
-      navigate("/dashboard");
+    onSuccess: (data) => {
+      if (data.status === "Success") {
+        navigate("/dashboard");
+      }
+      setUser(data.user);
       toast.success("logged In successfully");
     },
   });
@@ -56,7 +61,7 @@ const OtpInputForm = ({ email }) => {
 
         <button
           onClick={() => mutation.mutate(otp)}
-          className="btn btn-sm rounded-full bg-success mt-5 py-5 w-full hover:bg-success/80 "
+          className="btn rounded-xl btn-sm bg-success mt-5 py-5 w-full hover:bg-success/80 "
         >
           {mutation.isPending ? (
             <>

@@ -53,19 +53,19 @@ const DebitNote = () => {
             </div>
           </div>
           <div className="flex items-center gap-3">
-            {/* <button className="btn btn-sm">
+            {/* <button className="btn btn-sm rounded-xl">
               <GiProfit />
               Profit Details
             </button> */}
             <button
               onClick={() => handlePrint(printRef)}
-              className="btn btn-sm btn-dash"
+              className="btn btn-sm btn-dash rounded-xl"
             >
               <Printer size={15} /> Print PDF
             </button>
             <button
               onClick={() => downloadPDF(invoiceIdToDownload, "Debit Note")}
-              className="btn btn-sm"
+              className="btn btn-sm rounded-xl"
             >
               <Download size={15} /> Download PDF
             </button>
@@ -103,7 +103,7 @@ const DebitNote = () => {
                       document.getElementById("my_modal_3").showModal();
                       setInvoiceIdToDelete(invoice?._id);
                     }}
-                    className="text-error"
+                    className="text-error rounded-xl"
                   >
                     Delete
                   </button>
@@ -158,7 +158,7 @@ const DebitNote = () => {
       <dialog id="my_modal_3" className="modal">
         <div className="modal-box">
           <form method="dialog">
-            <button className="btn btn-sm btn-circle btn-ghost absolute right-2 top-2">
+            <button className="btn btn-sm rounded-xl btn-circle btn-ghost absolute right-2 top-2">
               ✕
             </button>
           </form>
@@ -170,7 +170,7 @@ const DebitNote = () => {
           <div className="w-full grid place-items-end">
             <button
               onClick={() => mutation.mutate()}
-              className="btn btn-sm bg-[var(--error-text-color)] text-[var(--primary-text-color)]"
+              className="btn rounded-xl btn-sm bg-[var(--error-text-color)] text-[var(--primary-text-color)]"
             >
               Delete
             </button>

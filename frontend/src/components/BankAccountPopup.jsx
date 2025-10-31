@@ -18,7 +18,6 @@ const BankAccountPopup = ({
 }) => {
   const { business } = useBusinessStore();
 
-
   const bankMutation = useMutation({
     mutationFn: async () => {
       if (data?.bankAccountNumber?.length === 0) {
@@ -47,7 +46,7 @@ const BankAccountPopup = ({
   return (
     <>
       <button
-        className="text-[var(--primary-btn)] text-xs flex items-center gap-2 p-2"
+        className="text-[var(--primary-btn)] rounded-xl text-xs  flex items-center gap-2 p-2"
         onClick={() => document.getElementById("bank-modal").showModal()}
       >
         <FaPlus />
@@ -58,7 +57,7 @@ const BankAccountPopup = ({
         <div className="modal-box">
           <form method="dialog">
             {/* if there is a button in form, it will close the modal */}
-            <button className="btn btn-sm btn-circle btn-ghost absolute right-2 top-4">
+            <button className="btn rounded-xl btn-sm btn-circle btn-ghost absolute right-2 top-4">
               ✕
             </button>
           </form>
@@ -166,7 +165,7 @@ const BankAccountPopup = ({
                 onClick={() => {
                   setIsAddedBankInfo(true);
                 }}
-                className="btn btn-sm bg-[var(--primary-btn)]"
+                className="btn rounded-xl btn-sm bg-[var(--primary-btn)]"
               >
                 Update
               </button>
@@ -179,7 +178,7 @@ const BankAccountPopup = ({
                     setIsAddedBankInfo(true);
                     setUpdateBankInfo(false);
                   }}
-                  className="btn btn-sm bg-[var(--primary-btn)]"
+                  className="btn rounded-xl btn-sm bg-[var(--primary-btn)]"
                 >
                   Update
                 </button>
@@ -188,7 +187,7 @@ const BankAccountPopup = ({
                   onClick={() => {
                     setIsAddedBankInfo(true);
                   }}
-                  className="btn btn-sm bg-[var(--primary-btn)]"
+                  className="btn rounded-xl btn-sm bg-[var(--primary-btn)]"
                 >
                   Add
                 </button>

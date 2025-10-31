@@ -22,8 +22,18 @@ const salesInvoiceSchema = new mongoose.Schema(
     discountPercent: { type: Number, default: 0 },
     taxableAmount: { type: Number },
     taxSubTotal: { type: Number },
-    sgst: String,
-    cgst: String,
+    sgst: {
+      type: String,
+      default: "0",
+    },
+    cgst: {
+      type: String,
+      default: "0",
+    },
+    igst: {
+      type: String,
+      default: "0",
+    },
     totalAmount: { type: Number, required: true },
     balanceAmount: { type: Number, required: true },
 

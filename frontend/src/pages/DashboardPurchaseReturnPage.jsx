@@ -267,7 +267,7 @@ const DashboardPurchaseReturnPage = () => {
             <div className="flex w-full">
               <button
                 onClick={() => mutation.mutate()}
-                className="btn btn-sm btn-ghost ml-auto text-[var(--error-text-color)]"
+                className="btn rounded-xl btn-sm btn-ghost ml-auto text-[var(--error-text-color)]"
               >
                 Delete
               </button>

@@ -157,6 +157,11 @@ export async function getAllPaymentInDetails(req, res) {
       clientId: req.user?.id,
     });
 
+    const totalPaymentAmount = paymentIns.reduce(
+      (acc, current) => acc + current.paymentAmount,
+      0
+    );
+
     if (!paymentIns) {
       return res
         .status(400)
@@ -165,8 +170,9 @@ export async function getAllPaymentInDetails(req, res) {
     return res.status(200).json({
       success: true,
       paymentIns,
-      latestPaymentIn: Number(latestPaymentIns?.paymentInNumber) || 0,
+      latestPaymentIn: Number(latestPaymentIns[0]?.paymentInNumber) || 0,
       totalPaymentIns: paymentIns.length,
+      totalPaymentAmount,
     });
   } catch (error) {
     console.error("ERROR IN GETTING PAYMENT IN DETAILS :", error);

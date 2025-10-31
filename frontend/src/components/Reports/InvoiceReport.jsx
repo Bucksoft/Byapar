@@ -122,7 +122,7 @@ const InvoiceReport = () => {
       <header className="w-full flex items-center relative">
         <span className="text-sm font-semibold">Filter by : </span>
         <button
-          className="btn btn-xs ml-2 relative btn-neutral"
+          className="btn btn-xs ml-2 relative btn-neutral rounded-xl"
           onClick={() => setOpenDatePicker(!openDatePicker)}
           id="datePickerButton"
         >
@@ -186,7 +186,7 @@ const InvoiceReport = () => {
               onClick={() =>
                 document.getElementById("report_popup").showModal()
               }
-              className="btn btn-sm "
+              className="btn btn-sm rounded-xl"
             >
               <Printer size={19} />
             </button>
@@ -432,7 +432,7 @@ const InvoiceReport = () => {
                               e.stopPropagation();
                               handlePrint("invoice");
                             }}
-                            className="btn btn-xs bg-white"
+                            className="btn btn-xs bg-white rounded-xl"
                           >
                             <Printer size={12} />
                           </button> */}
@@ -518,7 +518,7 @@ const InvoiceReport = () => {
               onClick={() =>
                 downloadPDF("sales_report", "sales_report", setIsDownloading)
               }
-              className="btn btn-sm bg-[var(--primary-btn)] shadow"
+              className="btn rounded-xl rounded-xl btn-sm bg-[var(--primary-btn)] shadow"
             >
               {isDownloading ? (
                 <div className="">
@@ -532,7 +532,7 @@ const InvoiceReport = () => {
             </button>
             <button
               onClick={() => handlePrint(printRef)}
-              className="btn btn-sm bg-[var(--primary-btn)] shadow"
+              className="btn rounded-xl btn-sm bg-[var(--primary-btn)] shadow"
             >
               Print
             </button>
@@ -873,7 +873,7 @@ const InvoiceReport = () => {
             {/* MODAL ACTIONS */}
             <div className="modal-action ">
               <form method="dialog">
-                <button className="btn btn-sm">Close</button>
+                <button className="btn btn-sm rounded-xl">Close</button>
               </form>
               <button
                 onClick={() =>

@@ -170,11 +170,11 @@ const PartyEditPage = () => {
           Edit Party
         </h1>
         <div className="space-x-3">
-          <button className="btn btn-sm">
+          <button className="btn btn-sm rounded-xl">
             Party Settings <Settings size="16" />{" "}
           </button>
           <button
-            className={`btn btn-sm bg-[var(--primary-btn)] ${
+            className={`btn btn-sm rounded-xl bg-[var(--primary-btn)] ${
               mutation.isPending && ""
             } `}
             disabled={mutation.isPending}
@@ -371,7 +371,7 @@ const PartyEditPage = () => {
               <ul className="menu dropdown-content bg-base-100 rounded-box  w-52 p-2 shadow-sm">
                 <button
                   onClick={() => setAddCategoryPopup(true)}
-                  className="btn btn-sm btn-dash btn-info mt-2"
+                  className="btn btn-sm rounded-xl btn-dash btn-info mt-2"
                 >
                   Add Category
                 </button>
@@ -708,13 +708,13 @@ const PartyEditPage = () => {
                         .getElementById(`delete-bank-modal-${account._id}`)
                         .showModal()
                     }
-                    className="btn btn-xs btn-error btn-soft"
+                    className="btn btn-xs rounded-xl btn-error btn-soft"
                   >
                     Delete
                   </button>
                   <button
                     onClick={() => saveBankAccount.mutate(account._id)}
-                    className="btn btn-xs btn-success ml-2"
+                    className="btn rounded-xl btn-xs btn-success ml-2"
                   >
                     Save
                   </button>
@@ -732,10 +732,12 @@ const PartyEditPage = () => {
                     </p>
                     <div className="modal-action">
                       <form method="dialog">
-                        <button className="btn btn-sm">Cancel</button>
+                        <button className="btn btn-sm rounded-xl">
+                          Cancel
+                        </button>
                       </form>
                       <button
-                        className="btn btn-sm btn-error"
+                        className="btn btn-sm btn-error rounded-xl"
                         onClick={() => deleteBankAccount.mutate(account._id)}
                       >
                         Delete
@@ -749,28 +751,28 @@ const PartyEditPage = () => {
         </>
       ) : (
         <>
-          {/* <div className="flex flex-col items-center justify-center gap-3 py-16 bg-white text-xs">
+          <div className="flex flex-col items-center justify-center gap-3 py-16 bg-white text-xs">
             <Landmark size={30} />
             <p>Add party bank information to manage transactions</p>
             <button
               onClick={() =>
                 document.getElementById("bankAccountModal").showModal()
               }
-              className="btn btn-sm btn-primary"
+              className="btn btn-sm btn-neutral btn-soft rounded-xl"
             >
               Add Bank Account
             </button>
-          </div> */}
-          <div className="flex items-center justify-center gap-4 pb-8 pt-1 px-5">
+          </div>
+          {/* <div className="flex items-center justify-center gap-4 pb-8 pt-1 px-5">
             <button
-              className="btn btn-sm btn-outline btn-neutral"
+              className="btn btn-sm btn-outline btn-neutral rounded-xl"
               onClick={() =>
                 document.getElementById("bankAccountModal").showModal()
               }
             >
               Manage Bank Accounts
             </button>
-          </div>
+          </div> */}
 
           <BankAccountsModal
             data={data}
@@ -797,7 +799,7 @@ const PartyEditPage = () => {
               />
               <div className="w-full flex items-center justify-end gap-3">
                 <button
-                  className="btn btn-sm mt-3"
+                  className="btn btn-sm mt-3 rounded-xl"
                   onClick={() => setAddCategoryPopup(false)}
                 >
                   Cancel
@@ -808,7 +810,7 @@ const PartyEditPage = () => {
                       setAddCategoryPopup(false);
                     }
                   }}
-                  className="btn btn-sm mt-3 bg-[var(--secondary-btn)]"
+                  className="btn btn-sm mt-3 bg-[var(--secondary-btn)] rounded-xl"
                 >
                   Add
                 </button>

@@ -73,7 +73,7 @@ const SingleItemPage = () => {
                 onClick={() =>
                   document.getElementById("my_modal_3").showModal()
                 }
-                className="btn btn-sm "
+                className="btn btn-sm rounded-xl"
               >
                 <FaPen size={12} /> Edit Item
               </button>
@@ -96,7 +96,7 @@ const SingleItemPage = () => {
 
             <button
               disabled={mutation.isPending}
-              className="btn btn-sm btn-outline text-[var(--error-text-color)] "
+              className="btn btn-sm btn-outline rounded-xl text-[var(--error-text-color)] "
               onClick={() => document.getElementById("my_modal_2").showModal()}
             >
               {mutation.isPending ? (
@@ -115,7 +115,7 @@ const SingleItemPage = () => {
                 <div className="flex w-full">
                   <button
                     onClick={() => mutation.mutate()}
-                    className="btn btn-sm btn-ghost  ml-auto text-[var(--error-text-color)]"
+                    className="btn rounded-xl btn-sm btn-ghost  ml-auto text-[var(--error-text-color)]"
                   >
                     Delete
                   </button>

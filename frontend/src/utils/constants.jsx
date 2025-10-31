@@ -17,6 +17,10 @@ import { MdMenuBook } from "react-icons/md";
 import { TbBuildingWarehouse, TbReportAnalytics } from "react-icons/tb";
 import { LuFileUser } from "react-icons/lu";
 import { CgDetailsMore } from "react-icons/cg";
+import Theme0 from "../assets/Theme0.png";
+import Theme1 from "../assets/Theme1.png";
+import Theme2 from "../assets/Theme2.png";
+import Theme3 from "../assets/Theme3.png";
 
 export const badges = [
   {
@@ -842,4 +846,27 @@ export const dateRanges = [
   "This Month",
   "Previous Month",
   "Last 365 Days",
+];
+
+export const templateThemes = [
+  {
+    id: 1,
+    title: "Default",
+    img: Theme0,
+  },
+  {
+    id: 2,
+    title: "Stylish",
+    img: Theme1,
+  },
+  {
+    id: 3,
+    title: "Luxury",
+    img: Theme2,
+  },
+  {
+    id: 4,
+    title: "Advanced",
+    img: Theme3,
+  },
 ];

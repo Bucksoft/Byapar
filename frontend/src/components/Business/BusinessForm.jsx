@@ -7,13 +7,15 @@ import { queryClient } from "../../main";
 import { axiosInstance } from "../../config/axios";
 import CustomLoader from "../Loader";
 import toast from "react-hot-toast";
-import { Trash } from "lucide-react";
+import { Plus, Trash } from "lucide-react";
 import { useRef } from "react";
 import { useBusinessStore } from "../../store/businessStore";
 import { useNavigate } from "react-router-dom";
 import { RxCross2 } from "react-icons/rx";
 import { FaPlus } from "react-icons/fa";
 import { useBusinessBankAccountStore } from "../../store/businessBankAccountStore";
+import ReactQuill from "react-quill-new";
+import "react-quill-new/dist/quill.snow.css";
 
 const BusinessForm = ({ businessToBeUpdated }) => {
   const [additionalInformation, setAdditionalInformation] = useState([]);
@@ -305,16 +307,13 @@ const BusinessForm = ({ businessToBeUpdated }) => {
               Edit your company settings and information
             </p>
           </div>
-          <button className="btn btn-sm bg-[var(--secondary-btn)]">
-            Create New Business
-          </button>
         </div>
 
         <div className="flex items-center justify-center mr-3 gap-4 ">
           {/* <p className="text-gray-500 cursor-pointer">
                     <MdKeyboard size={25} />
                   </p> */}
-          {/* <button className="btn btn-sm  ">
+          {/* <button className="btn rounded-xl rounded-xl btn-sm  ">
                     <RiChat1Line size={14} />
                     Chat Support
                   </button> */}
@@ -322,14 +321,17 @@ const BusinessForm = ({ businessToBeUpdated }) => {
             <MdOutlineCalendarToday size={14} />
             Close Financial Year
           </button> */}
-          <button className="btn btn-sm" onClick={() => navigate(-1)}>
+          <button
+            className="btn rounded-xl btn-sm"
+            onClick={() => navigate(-1)}
+          >
             Cancel
           </button>
           {businessToBeUpdated ? (
             <button
               onClick={handleSubmit}
               disabled={mutation.isPending}
-              className="btn btn-sm bg-[var(--primary-btn)]"
+              className="btn rounded-xl btn-sm bg-[var(--primary-btn)]"
             >
               {updateMutation.isPending ? (
                 <CustomLoader text={"Saving..."} />
@@ -341,7 +343,7 @@ const BusinessForm = ({ businessToBeUpdated }) => {
             <button
               onClick={handleSubmit}
               disabled={mutation.isPending}
-              className="btn btn-sm bg-[var(--primary-btn)]"
+              className="btn rounded-xl btn-sm bg-[var(--primary-btn)]"
             >
               {mutation.isPending ? (
                 <CustomLoader text={"Saving..."} />
@@ -959,7 +961,7 @@ const BusinessForm = ({ businessToBeUpdated }) => {
                   setAdditionalInfoKey("");
                   setAdditionalInfoValue("");
                 }}
-                className="btn btn-sm bg-[var(--primary-btn)] ml-3"
+                className="btn btn-sm rounded-xl bg-[var(--primary-btn)] ml-3"
               >
                 Add
               </div>
@@ -993,7 +995,37 @@ const BusinessForm = ({ businessToBeUpdated }) => {
               </div>
             ))}
           </div>
+
+          <h3 className="text-xs text-red-500 my-3 badge badge-error badge-soft">
+            Note: T&C for quotation is under development.
+          </h3>
+
+          {/* ADD TERMS AND CONDITION FOR QUOTATION */}
+          <div className="flex flex-col items-start gap-1 ">
+            <label htmlFor="Notes" className="text-xs text-gray-600">
+              Terms & Conditions for quotation
+            </label>
+            <textarea
+              className="textarea w-full text-xs bg-zinc-100"
+              placeholder="T&C"
+            ></textarea>
+          </div>
         </motion.div>
+
+        {/* COVER LETTER */}
+        <div className="p-4 flex flex-col">
+          <h3 className="text-xs text-red-500 my-3 badge badge-error badge-soft">
+            Note: Cover Letter for quotation is under development.
+          </h3>
+          <label className="text-gray-600 text-xs">Cover Letter</label>
+          <p className="text-xs text-zinc-800">
+            Add a cover letter for your quotation
+          </p>
+
+          <div className="mt-3">
+            <ReactQuill theme="snow" className="rounded-lg" />
+          </div>
+        </div>
       </form>
 
       <div className="divider divider-sm" />
@@ -1050,7 +1082,7 @@ const BusinessForm = ({ businessToBeUpdated }) => {
                   {!bank.isActive ? (
                     <button
                       onClick={() => markAsMutation.mutate(bank._id)}
-                      className="text-green-500  text-xs hover:underline"
+                      className="text-green-500 rounded-xl  text-xs hover:underline"
                     >
                       Mark as Active
                     </button>
@@ -1074,7 +1106,7 @@ const BusinessForm = ({ businessToBeUpdated }) => {
                         setEditIndex(index);
                         document.getElementById("bank-modal").showModal();
                       }}
-                      className="text-blue-500 text-xs hover:underline"
+                      className="text-blue-500 rounded-xl text-xs hover:underline"
                     >
                       Edit
                     </button>
@@ -1089,7 +1121,7 @@ const BusinessForm = ({ businessToBeUpdated }) => {
                         }));
                         deleteBank.mutate(bank._id);
                       }}
-                      className="text-red-500 text-xs hover:underline"
+                      className="text-red-500 rounded-xl text-xs hover:underline"
                     >
                       Delete
                     </button>
@@ -1104,7 +1136,7 @@ const BusinessForm = ({ businessToBeUpdated }) => {
       {/* BANK ACCOUNT ADDITION */}
       <div className="w-full flex items-center justify-center py-12">
         <button
-          className="text-[var(--primary-btn)] text-xs flex items-center gap-2 p-2 btn btn-dash"
+          className="text-[var(--primary-btn)] rounded-xl text-xs flex items-center gap-2 p-2 btn btn-dash"
           onClick={() => {
             resetBankForm();
             document.getElementById("bank-modal").showModal();
@@ -1119,7 +1151,7 @@ const BusinessForm = ({ businessToBeUpdated }) => {
         <div className="modal-box">
           <form method="dialog">
             {/* if there is a button in form, it will close the modal */}
-            <button className="btn btn-sm btn-circle btn-ghost absolute right-2 top-4">
+            <button className="btn rounded-xl rounded-xl btn-sm btn-circle btn-ghost absolute right-2 top-4">
               ✕
             </button>
           </form>
@@ -1297,7 +1329,7 @@ const BusinessForm = ({ businessToBeUpdated }) => {
 
                   document.getElementById("bank-modal").close();
                 }}
-                className="btn btn-sm bg-[var(--primary-btn)]"
+                className="btn rounded-xl btn-sm bg-[var(--primary-btn)]"
               >
                 Update
               </button>
@@ -1332,7 +1364,7 @@ const BusinessForm = ({ businessToBeUpdated }) => {
 
                   document.getElementById("bank-modal").close();
                 }}
-                className="btn btn-sm bg-[var(--primary-btn)]"
+                className="btn rounded-xl btn-sm bg-[var(--primary-btn)]"
               >
                 Add
               </button>

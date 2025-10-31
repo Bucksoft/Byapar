@@ -74,20 +74,22 @@ const DashboardAccountPage = () => {
             {/* navigation right side*/}
             <div className="flex items-center space-x-3 mr-5">
               <button
-                className="btn btn-soft bg-[var(--primary-btn)] btn-sm"
+                className="btn rounded-xl  btn-soft bg-[var(--primary-btn)] btn-sm"
                 onClick={() => setChatOpen(!chatOpen)}
               >
                 <MessageCircle size={16} />
                 Chat Support
               </button>
-              <button className="btn btn-soft btn-sm ">Cancel</button>
+              <button className="btn rounded-xl btn-soft btn-sm ">
+                Cancel
+              </button>
 
               <button
                 onClick={() => mutation.mutate(data)}
                 disabled={!data.name || !data.contact || !data.email}
                 className={` ${
                   (!data.name || !data.contact || !data.email) &&
-                  "bg-zinc-100 text-zinc-300 "
+                  "bg-zinc-100 text-zinc-300 rounded-xl "
                 }  btn bg-[var(--primary-btn)] btn-sm`}
               >
                 {mutation.isPending ? (
@@ -118,7 +120,7 @@ const DashboardAccountPage = () => {
             <span className="font-semibold pr-4 ">
               Help us make Byapar better
             </span>
-            <button className="btn bg-[var(--primary-btn)] btn-sm">
+            <button className="rounded-xl btn bg-[var(--primary-btn)] btn-sm">
               <img
                 src={suggestion}
                 alt=""
@@ -230,7 +232,7 @@ const DashboardAccountPage = () => {
               placeholder="Type here referral code"
               className="input w-fit input-sm"
             />
-            <button className="btn bg-[var(--primary-btn)] ml-5 px-15 btn-sm">
+            <button className="btn rounded-xl bg-[var(--primary-btn)] ml-5 px-15 btn-sm">
               Apply
             </button>
           </div>
@@ -272,7 +274,7 @@ const DashboardAccountPage = () => {
             <div className="pt-5 pl-3">
               <p className="text-xs">CURRENT PLAN</p>
               <p className="text-xl pt-2 font-medium">Free Trial Expired</p>
-              <button className="btn bg-[var(--primary-btn)] mt-15 btn-sm">
+              <button className="btn rounded-xl bg-[var(--primary-btn)] mt-15 btn-sm">
                 Buy Subscription Plan
               </button>
               {/* avatar */}

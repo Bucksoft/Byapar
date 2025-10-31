@@ -27,8 +27,10 @@ const DashboardCAReportsSharingPage = () => {
             </p>
           </div>
           <div className="flex items-center gap-4 mr-5">
-            <button className="btn btn-error btn-sm btn-outline">Cancel</button>
-            <button className="btn bg-[var(--primary-btn)]  btn-sm">
+            <button className="btn rounded-xl btn-error btn-sm btn-outline">
+              Cancel
+            </button>
+            <button className="btn rounded-xl bg-[var(--primary-btn)]  btn-sm">
               Save Changes
             </button>
           </div>

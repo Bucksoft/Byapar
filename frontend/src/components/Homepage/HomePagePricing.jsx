@@ -48,7 +48,7 @@ const HomePagePricing = () => {
                 <span className="text-gray-700">Email support</span>
               </li>
             </ul>
-            <button className="w-full bg-gray-100 text-gray-700 py-3 rounded-xl font-semibold hover:bg-gray-200 transition-colors">
+            <button className="w-full  bg-gray-100 text-gray-700 py-3 rounded-xl font-semibold hover:bg-gray-200 transition-colors">
               Start Free Trial
             </button>
           </div>

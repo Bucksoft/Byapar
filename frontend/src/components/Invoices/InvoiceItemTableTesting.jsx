@@ -16,6 +16,7 @@ const SalesInvoiceItemTableTesting = ({
   data,
   setData,
   invoiceTotals,
+  invoiceToUpdate,
 }) => {
   const { business } = useBusinessStore();
   const [searchItemQuery, setSearchItemQuery] = useState("");
@@ -241,7 +242,7 @@ const SalesInvoiceItemTableTesting = ({
         quantity,
         basePrice: Number(basePriceExclusive.toFixed(2)),
         discountAmount: finalDiscountAmount,
-        taxableAmount: Number(taxableAfterDiscount.toFixed(2)), // ✅ new field
+        taxableAmount: Number(taxableAfterDiscount.toFixed(2)),
         gstAmount,
         totalAmount: totalItemAmount,
         additionalDiscountAmount,
@@ -421,8 +422,8 @@ const SalesInvoiceItemTableTesting = ({
               value={
                 basePrices[item._id] !== undefined
                   ? basePrices[item._id]
-                  : item?.basePrice
-                  ? Number(item.basePrice).toFixed(2)
+                  : item?.taxableAmount
+                  ? Number(item.taxableAmount).toFixed(2)
                   : ""
               }
               className="input input-xs bg-zinc-100 text-right"
@@ -562,7 +563,7 @@ const SalesInvoiceItemTableTesting = ({
             onClick={() =>
               document.getElementById("add_items_modal").showModal()
             }
-            className="btn btn-info w-full hover:btn-dash"
+            className="btn btn-info w-full hover:btn-dash rounded-xl"
           >
             + Add Item
           </button>
@@ -595,7 +596,7 @@ const SalesInvoiceItemTableTesting = ({
                         document.getElementById("add_items_modal").close();
                         document.getElementById("my_modal_3").showModal();
                       }}
-                      className="btn btn-sm btn-outline btn-info"
+                      className="btn btn-sm btn-outline btn-info rounded-xl"
                     >
                       <Plus size={14} /> Create Item
                     </button>
@@ -666,7 +667,7 @@ const SalesInvoiceItemTableTesting = ({
                                           "decrement"
                                         )
                                       }
-                                      className="px-1 py-0 bg-[var(--primary-btn)] hover:bg-[var(--primary-btn)]/90 transition-colors text-white"
+                                      className="px-1 rounded-xl py-0 bg-[var(--primary-btn)] hover:bg-[var(--primary-btn)]/90 transition-colors text-white"
                                     >
                                       <HiMiniMinusSmall className="w-4 h-4" />
                                     </button>
@@ -695,7 +696,7 @@ const SalesInvoiceItemTableTesting = ({
                                           "increment"
                                         )
                                       }
-                                      className="px-1 py-0 bg-[var(--primary-btn)] hover:bg-[var(--primary-btn)]/90 transition-colors text-white"
+                                      className="px-1 rounded-xl py-0 bg-[var(--primary-btn)] hover:bg-[var(--primary-btn)]/90 transition-colors text-white"
                                     >
                                       <HiOutlinePlus className="w-4 h-4" />
                                     </button>
@@ -728,7 +729,7 @@ const SalesInvoiceItemTableTesting = ({
                                       [item._id]: prev[item._id] ?? 1,
                                     }));
                                   }}
-                                  className="btn btn-xs w-full btn-dash btn-neutral"
+                                  className="btn rounded-xl btn-xs w-full btn-dash btn-neutral"
                                 >
                                   Add
                                 </button>
@@ -753,7 +754,7 @@ const SalesInvoiceItemTableTesting = ({
                               </span>
                               <button
                                 onClick={() => setSearchItemQuery("")}
-                                className="btn btn-xs btn-neutral btn-outline"
+                                className="btn rounded-xl btn-xs btn-neutral btn-outline"
                               >
                                 Clear Search
                               </button>
@@ -769,10 +770,10 @@ const SalesInvoiceItemTableTesting = ({
               <div className="modal-action p-4 ">
                 <form method="dialog">
                   {/* if there is a button in form, it will close the modal */}
-                  <button className="btn btn-sm w-32">Cancel</button>
+                  <button className="btn rounded-xl btn-sm w-32">Cancel</button>
                 </form>
                 <button
-                  className="btn btn-sm w-32 bg-[var(--primary-btn)]"
+                  className="btn rounded-xl btn-sm w-32 bg-[var(--primary-btn)]"
                   onClick={handleDone}
                 >
                   Done
@@ -783,10 +784,10 @@ const SalesInvoiceItemTableTesting = ({
         </div>
         {/* ADD ITEMS DIALOG BOX ENDS HERE -------------------------------------------------------- */}
 
-        <div className="btn  w-3/10 ml-2 btn-soft btn-info">
+        {/* <div className="btn  w-3/10 ml-2 btn-soft btn-info">
           <FaBarcode />
           <span className="font-medium">Scan Barcode</span>
-        </div>
+        </div> */}
       </div>
 
       {/* SUBTOTAL SECTION ----------------------------------------------------------------------------------------------------------- */}

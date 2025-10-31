@@ -117,7 +117,7 @@ const DashboardPaymentOutPage = () => {
                             <div
                               tabIndex={0}
                               role="button"
-                              className="btn btn-xs m-1"
+                              className="btn btn-xs m-1 rounded-xl"
                             >
                               <EllipsisVertical size={15} />
                             </div>

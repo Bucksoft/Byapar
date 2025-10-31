@@ -84,8 +84,6 @@ const DashboardUpdateInvoicesPage = () => {
     );
   }
 
-  console.log(type);
-
   return (
     <main className="max-h-screen flex w-full overflow-auto">
       <section className="w-full h-screen p-2">
