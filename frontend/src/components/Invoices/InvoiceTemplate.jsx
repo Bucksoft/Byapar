@@ -873,7 +873,7 @@ const InvoiceTemplate = ({
                           color: "#52525c",
                         }}
                       >
-                        Account name
+                        Account type
                       </h4>
                       <p style={{ whiteSpace: "pre-line" }}>
                         {bankAccount?.accountName}
