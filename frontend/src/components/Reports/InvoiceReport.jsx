@@ -44,28 +44,32 @@ const InvoiceReport = () => {
 
   // SEARCH INVOICES
   const searchedInvoices = useMemo(() => {
-    const byDate = invoices?.invoices.filter((invoice) => {
-      return (
-        new Date(invoice?.salesInvoiceDate) >= dateRange.from &&
-        new Date(invoice?.salesInvoiceDate) <= dateRange.to
-      );
+    if (!invoices?.invoices || !dateRange || !dateRange.from || !dateRange.to) {
+      return [];
+    }
+
+    const fromDate = new Date(dateRange.from);
+    const toDate = new Date(dateRange.to);
+    toDate.setHours(23, 59, 59, 999);
+
+    const byDate = invoices.invoices.filter((invoice) => {
+      const invoiceDate = new Date(invoice?.salesInvoiceDate);
+      return invoiceDate >= fromDate && invoiceDate <= toDate;
     });
 
-    const filteredInvoices =
-      invoices?.invoices.length &&
-      invoices?.invoices?.filter((invoice) => {
-        return invoice?.salesInvoiceNumber
-          ?.toString()
-          .toLowerCase()
-          .includes(searchQuery.toLowerCase());
-      });
+    const filteredInvoices = invoices.invoices.filter((invoice) =>
+      invoice?.salesInvoiceNumber
+        ?.toString()
+        ?.toLowerCase()
+        .includes(searchQuery.toLowerCase())
+    );
 
-    if (byDate && byDate?.length > 0) {
+    if (byDate?.length > 0) {
       return byDate;
     }
 
     return filteredInvoices;
-  });
+  }, [invoices, dateRange, searchQuery]);
 
   // CANCEL INVOICE
   const cancelMutation = useMutation({

@@ -41,36 +41,38 @@ const PaymentCollectionReport = () => {
     queryKey: ["paymentIns", dateRange],
     queryFn: async () => {
       const res = await axiosInstance.get(`/payment-in/all/${business?._id}`);
-      console.log(res);
       return res.data;
     },
   });
 
   // SEARCH INVOICES
   const searchedInvoices = useMemo(() => {
-    if (invoices?.paymentIns?.length === 0) return [];
-    const byDate = invoices?.paymentIns.filter((invoice) => {
-      return (
-        new Date(invoice?.paymentDate) >= dateRange.from &&
-        new Date(invoice?.paymentDate) <= dateRange.to
-      );
-    });
+    if (!invoices?.paymentIns || !Array.isArray(invoices.paymentIns)) return [];
 
-    const filteredInvoices =
-      invoices?.paymentIns.length &&
-      invoices?.paymentIns?.filter((invoice) => {
-        return invoice?.paymentInNumber
-          .toString()
-          .toLowerCase()
-          .includes(searchQuery.toLowerCase());
-      });
+    const fromDate = dateRange?.from ? new Date(dateRange.from) : null;
+    const toDate = dateRange?.to ? new Date(dateRange.to) : null;
 
-    if (byDate && byDate?.length > 0) {
-      return byDate;
+    if (toDate) {
+      toDate.setHours(23, 59, 59, 999);
     }
 
-    return filteredInvoices;
-  });
+    const byDate =
+      fromDate && toDate
+        ? invoices.paymentIns.filter((invoice) => {
+            const invoiceDate = new Date(invoice?.paymentDate);
+            return invoiceDate >= fromDate && invoiceDate <= toDate;
+          })
+        : [];
+
+    const filteredInvoices = invoices.paymentIns.filter((invoice) =>
+      invoice?.paymentInNumber
+        ?.toString()
+        ?.toLowerCase()
+        .includes(searchQuery.toLowerCase())
+    );
+
+    return byDate.length > 0 ? byDate : filteredInvoices;
+  }, [invoices, dateRange, searchQuery]);
 
   // CANCEL INVOICE
   const cancelMutation = useMutation({

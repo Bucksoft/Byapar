@@ -72,22 +72,31 @@ const PaymentInForm = () => {
   });
 
   useEffect(() => {
-    if (!Array.isArray(invoices) || !data) return;
+    // 🛡️ If no party selected, clear invoices and total
+    if (!data?.partyName) {
+      setAllInvoices([]);
+      setTotalInvoiceAmount(0);
+      return;
+    }
+
+    // 🛡️ Ensure invoices is an array
+    if (!Array.isArray(invoices)) return;
 
     const allInvoices = invoices.filter(
       (invoice) =>
-        invoice.partyId?._id?.toString() === data?.partyId?.toString() ||
-        invoice.partyName === location.state?.partyName
+        invoice?.partyName?.toLowerCase() === data?.partyName?.toLowerCase()
     );
 
+    console.log("All invoices", allInvoices);
     setAllInvoices(allInvoices);
 
-    const totalAmount = invoices.reduce(
+    // ✅ Calculate subtotal only for selected party
+    const totalAmount = allInvoices.reduce(
       (acc, item) => acc + (item?.totalAmount || 0),
       0
     );
     setTotalInvoiceAmount(totalAmount);
-  }, [invoices, data, location.state?.partyName]);
+  }, [invoices, data]);
 
   useEffect(() => {
     if (!allInvoices?.length) return;
@@ -448,8 +457,8 @@ const PaymentInForm = () => {
                                 }
                               />
                             </td>
-                            <td>{invoice?.salesInvoiceDate.split("T")[0]}</td>
-                            <td>{invoice?.dueDate.split("T")[0]}</td>
+                            <td>{invoice?.salesInvoiceDate?.split("T")[0]}</td>
+                            <td>{invoice?.dueDate?.split("T")[0]}</td>
                             <td>{invoice?.salesInvoiceNumber}</td>
                             <td>
                               <span className="inline-flex items-center gap-1">

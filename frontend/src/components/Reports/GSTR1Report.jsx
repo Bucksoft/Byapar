@@ -35,26 +35,31 @@ const GSTR1Report = () => {
 
   // INVOICES
   const searchedInvoices = useMemo(() => {
-    const byDate = invoices?.invoices.filter((invoice) => {
-      {
-        return (
-          new Date(invoice?.salesInvoiceDate) >= dateRange.from &&
-          new Date(invoice?.salesInvoiceDate) <= dateRange.to
-        );
-      }
-    });
-    const filteredInvoices =
-      invoices?.invoices?.length &&
-      invoices?.invoices?.filter((invoice) => {
-        return invoice?.status !== "cancelled";
-      });
-
-    if (byDate && byDate?.length > 0) {
-      return byDate;
+    if (!invoices?.invoices || !Array.isArray(invoices.invoices)) {
+      return [];
     }
 
-    return filteredInvoices;
-  });
+    const fromDate = dateRange?.from ? new Date(dateRange.from) : null;
+    const toDate = dateRange?.to ? new Date(dateRange.to) : null;
+
+    if (toDate) {
+      toDate.setHours(23, 59, 59, 999);
+    }
+
+    const byDate =
+      fromDate && toDate
+        ? invoices.invoices.filter((invoice) => {
+            const invoiceDate = new Date(invoice?.salesInvoiceDate);
+            return invoiceDate >= fromDate && invoiceDate <= toDate;
+          })
+        : [];
+
+    const filteredInvoices = invoices.invoices.filter(
+      (invoice) => invoice?.status !== "cancelled"
+    );
+
+    return byDate.length > 0 ? byDate : filteredInvoices;
+  }, [invoices, dateRange]);
 
   // CANCEL INVOICE
   const cancelMutation = useMutation({

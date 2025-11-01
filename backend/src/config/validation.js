@@ -9,15 +9,7 @@ export const loginSchema = z.object({
 });
 
 export const partySchema = z.object({
-  partyName: z
-    .string()
-    .min(3, "Party name must be at least 3 characters long")
-    .max(50, "Party name must be at most 50 characters long")
-    .regex(
-      /^[a-zA-Z0-9\s\-.&]+$/,
-      "Party name can only contain letters, numbers, spaces, and . - &"
-    ),
-
+  partyName: z.string(),
   mobileNumber: z
     .string()
     .optional()
