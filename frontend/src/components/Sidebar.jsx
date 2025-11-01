@@ -28,6 +28,7 @@ import { BsExclamationCircle } from "react-icons/bs";
 import { useMutation } from "@tanstack/react-query";
 import { useDebitNoteStore } from "../store/debitNoteStore";
 import { LogOut } from "lucide-react";
+import { useBusinessBankAccountStore } from "../store/businessBankAccountStore";
 
 export const container = {
   hidden: { opacity: 0 },
@@ -68,6 +69,8 @@ const Sidebar = () => {
   const { setCategories } = useCategoryStore();
   const { setQuotations } = useQuotationStore();
   const { setDebitNotes } = useDebitNoteStore();
+  const { setActiveAccount, setBankAccounts, setBankAccount } =
+    useBusinessBankAccountStore();
 
   const { setSaleReturns } = useSalesReturnStore();
   const [currentLink, setCurrentLink] = useState("");
@@ -93,7 +96,9 @@ const Sidebar = () => {
       setDeliveryChallans(null);
       setQuotations(null);
       setSaleReturns(null);
-
+      setActiveAccount(null);
+      setBankAccounts(null);
+      setBankAccount(null);
       setCategories(null);
       navigate("/login");
       toast.success("Logged out");

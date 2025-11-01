@@ -29,7 +29,7 @@ const partySchema = new mongoose.Schema(
     },
     partyType: {
       type: String,
-      enum: ["Customer", "Supplier"],
+      enum: ["Customer", "Supplier", "Dealer"],
       default: "Customer",
     },
     currentBalance: {

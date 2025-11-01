@@ -32,7 +32,6 @@ const DashboardItemsBasicDetailPage = ({ data, setData, err }) => {
       return res.data;
     },
     onSuccess: (data) => {
-      console.log(data);
       setShowAddCategoryPopup(false);
       toast.success(data?.msg);
       setCategories([data?.newCategory, ...categories]);
@@ -108,7 +107,7 @@ const DashboardItemsBasicDetailPage = ({ data, setData, err }) => {
         </div>
 
         <div className=" flex flex-col mt-5">
-          <span className="text-xs text-gray-600">Sales Price</span>
+          <span className="text-xs text-gray-600">Sales Price (Customer)</span>
           <div className="flex items-center h-8 border border-[var(--primary-border)] rounded-xs w-full">
             <IndianRupee size={16} className="text-gray-600 w-10" />
             <input
@@ -119,6 +118,41 @@ const DashboardItemsBasicDetailPage = ({ data, setData, err }) => {
                 setData((prev) => ({
                   ...prev,
                   salesPrice: Number(e.target.value),
+                }))
+              }
+              placeholder="eg: 200"
+              className="w-60 text-xs text-gray-600 outline-none"
+            />
+            <select
+              name="salesPriceType"
+              value={data?.salesPriceType}
+              onChange={(e) =>
+                setData((prev) => ({
+                  ...prev,
+                  salesPriceType: e.target.value.toLowerCase(),
+                }))
+              }
+              className="select select-sm w-3/8 text-info select-ghost"
+            >
+              <option value={"with tax"}>With Tax</option>
+              <option value={"without tax"}>Without Tax</option>
+            </select>
+          </div>
+        </div>
+
+        {/* SALES PRICE FOR DEALER */}
+        <div className=" flex flex-col mt-5">
+          <span className="text-xs text-gray-600">Sales Price (Dealer)</span>
+          <div className="flex items-center h-8 border border-[var(--primary-border)] rounded-xs w-full">
+            <IndianRupee size={16} className="text-gray-600 w-10" />
+            <input
+              type="text"
+              value={data?.salesPriceForDealer}
+              name="salesPrice"
+              onChange={(e) =>
+                setData((prev) => ({
+                  ...prev,
+                  salesPriceForDealer: Number(e.target.value),
                 }))
               }
               placeholder="eg: 200"

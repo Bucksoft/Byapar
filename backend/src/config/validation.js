@@ -65,7 +65,7 @@ export const partySchema = z.object({
 
   partyType: z.preprocess(
     (val) => (val === "" ? undefined : val),
-    z.enum(["Customer", "Supplier"]).optional().default("Customer")
+    z.enum(["Customer", "Supplier", "Dealer"]).optional().default("Customer")
   ),
 
   categoryName: z
@@ -343,6 +343,13 @@ export const itemSchema = z.object({
     .optional(),
 
   salesPrice: z
+    .number({
+      invalid_type_error: "Sales price must be a number",
+    })
+    .nonnegative("Sales price cannot be negative")
+    .optional(),
+
+  salesPriceForDealer: z
     .number({
       invalid_type_error: "Sales price must be a number",
     })

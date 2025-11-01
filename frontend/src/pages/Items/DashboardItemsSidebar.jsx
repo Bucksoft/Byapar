@@ -37,6 +37,7 @@ const DashboardItemsSidebar = ({ modalId, itemIdToEdit, isOpen }) => {
     itemType: "product",
     itemName: "",
     salesPrice: 0,
+    salesPriceForDealer: 0,
     purchasePrice: 0,
     measuringUnit: "",
     category: "",

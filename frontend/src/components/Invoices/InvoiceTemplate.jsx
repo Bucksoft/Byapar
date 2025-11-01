@@ -6,6 +6,7 @@ import { toWords } from "../../../helpers/wordsToCurrency";
 import { useQuery } from "@tanstack/react-query";
 import { axiosInstance } from "../../config/axios";
 import { LuIndianRupee } from "react-icons/lu";
+import { Mail } from "lucide-react";
 
 const InvoiceTemplate = ({
   type,
@@ -110,6 +111,8 @@ const InvoiceTemplate = ({
 
     return acc + (isNaN(total) ? 0 : total);
   }, 0);
+
+  console.log(invoice);
 
   return (
     <main
@@ -252,6 +255,7 @@ const InvoiceTemplate = ({
                       color: "#52525b",
                     }}
                   >
+                    <Mail />
                     {invoice?.partyId?.email}
                   </p>
                 )
@@ -261,8 +265,11 @@ const InvoiceTemplate = ({
                       display: "flex",
                       fontSize: "0.875rem",
                       color: "#52525b",
+                      alignItems: "center",
+                      gap: "6px",
                     }}
                   >
+                    <Mail size={16} color={color} />
                     {business?.companyEmail}
                   </p>
                 )}
@@ -307,7 +314,7 @@ const InvoiceTemplate = ({
                 alignItems: "center",
               }}
             >
-              <p style={{ color: color, fontWeight: "600" }}>
+              <p style={{ color: "black", fontWeight: "600" }}>
                 {type === "Sales Return"
                   ? "Sales Return No."
                   : type === "Sales Invoice"
@@ -365,7 +372,7 @@ const InvoiceTemplate = ({
                 gap: "32px",
               }}
             >
-              <p style={{ color: color, fontWeight: "600" }}>
+              <p style={{ color: "black", fontWeight: "600" }}>
                 {type === "Sales Return"
                   ? "Sales Return Date"
                   : type === "Sales Invoice"
@@ -423,7 +430,7 @@ const InvoiceTemplate = ({
                 gap: "32px",
               }}
             >
-              <p style={{ color: color, fontWeight: "600" }}>
+              <p style={{ color: "black", fontWeight: "600" }}>
                 {type === "Quotation" ||
                 type === "Proforma Invoice" ||
                 type === "Purchase Order"
@@ -460,10 +467,10 @@ const InvoiceTemplate = ({
         {/* Phone */}
         <div
           style={{
-            marginTop: "16px",
+            marginTop: "2px",
             display: "flex",
             alignItems: "center",
-            gap: "8px",
+            gap: "3px",
             fontSize: "14px",
             color: "#3f3f46",
           }}
@@ -830,7 +837,7 @@ const InvoiceTemplate = ({
               alignItems: "start",
               justifyContent: "space-between",
               fontSize: "12px",
-              gap: "20px",
+              gap: "10px",
             }}
           >
             <div
@@ -845,8 +852,16 @@ const InvoiceTemplate = ({
                     marginTop: "12px",
                   }}
                 >
-                  <div>
-                    <h4 style={{ fontWeight: 600 }}>Bank Details</h4>
+                  <div
+                    style={{
+                      display: "flex",
+                      flexDirection: "column",
+                      gap: "1px",
+                    }}
+                  >
+                    <h4 style={{ fontWeight: 600, marginBottom: "8px" }}>
+                      Bank Details
+                    </h4>
 
                     <div
                       style={{
@@ -855,13 +870,13 @@ const InvoiceTemplate = ({
                         alignItems: "center",
                       }}
                     >
-                      <h3
+                      <h4
                         style={{
                           color: "#52525c",
                         }}
                       >
                         Account name
-                      </h3>
+                      </h4>
                       <p style={{ whiteSpace: "pre-line" }}>
                         {bankAccount?.accountName}
                       </p>
@@ -871,16 +886,18 @@ const InvoiceTemplate = ({
                         display: "flex",
                         justifyContent: "space-between",
                         alignItems: "center",
+                        whiteSpace: "nowrap",
                       }}
                     >
-                      <h3
+                      <h4
                         style={{
                           color: "#52525c",
+                          whiteSpace: "pre-line",
                         }}
                       >
                         Account holder's name
-                      </h3>
-                      <p style={{ whiteSpace: "pre-line" }}>
+                      </h4>
+                      <p style={{ whiteSpace: "nowrap", margin: 0 }}>
                         {bankAccount?.accountHoldersName}
                       </p>
                     </div>
@@ -892,13 +909,13 @@ const InvoiceTemplate = ({
                         alignItems: "center",
                       }}
                     >
-                      <h3
+                      <h4
                         style={{
                           color: "#52525c",
                         }}
                       >
                         Bank account number
-                      </h3>
+                      </h4>
                       <p style={{ whiteSpace: "pre-line" }}>
                         {bankAccount?.bankAccountNumber}
                       </p>
@@ -911,13 +928,13 @@ const InvoiceTemplate = ({
                         alignItems: "center",
                       }}
                     >
-                      <h3
+                      <h4
                         style={{
                           color: "#52525c",
                         }}
                       >
                         IFSC Code
-                      </h3>
+                      </h4>
                       <p style={{ whiteSpace: "pre-line" }}>
                         {bankAccount?.IFSCCode}
                       </p>
@@ -930,13 +947,13 @@ const InvoiceTemplate = ({
                         alignItems: "center",
                       }}
                     >
-                      <h3
+                      <h4
                         style={{
                           color: "#52525c",
                         }}
                       >
                         UPI Id
-                      </h3>
+                      </h4>
                       <p style={{ whiteSpace: "pre-line" }}>
                         {bankAccount?.upiId}
                       </p>
@@ -949,13 +966,13 @@ const InvoiceTemplate = ({
                         alignItems: "start",
                       }}
                     >
-                      <h3
+                      <h4
                         style={{
                           color: "#52525c",
                         }}
                       >
                         Bank and Branch
-                      </h3>
+                      </h4>
                       <p
                         style={{
                           whiteSpace: "pre-line",
@@ -1041,7 +1058,7 @@ const InvoiceTemplate = ({
               </div>
 
               {/* ADDITIONAL CHARGE AMOUNT EG. TRANSPORT ETC.... */}
-              {invoice?.additionalChargeAmount > 0 && (
+              {/* {invoice?.additionalChargeAmount > 0 && (
                 <div
                   style={{ display: "flex", justifyContent: "space-between" }}
                 >
@@ -1051,7 +1068,20 @@ const InvoiceTemplate = ({
                     {invoice?.additionalChargeAmount}
                   </span>
                 </div>
-              )}
+              )} */}
+
+              {invoice?.additionalCharges.length > 0 &&
+                invoice?.additionalCharges.map((charge) => (
+                  <div
+                    style={{ display: "flex", justifyContent: "space-between" }}
+                  >
+                    <p>{charge?.reason}</p>
+                    <span style={{ display: "flex", alignItems: "center" }}>
+                      <LiaRupeeSignSolid />
+                      {charge?.amount}
+                    </span>
+                  </div>
+                ))}
 
               {/* DISCOUNT PERCENTAGE */}
               {invoice?.additionalDiscountPercent > 0 && (

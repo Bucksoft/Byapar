@@ -41,6 +41,10 @@ const itemSchema = new mongoose.Schema(
       type: Number,
       min: [0, "Sales price cannot be negative"],
     },
+    salesPriceForDealer: {
+      type: Number,
+      min: [0, "Sales price cannot be negative"],
+    },
     purchasePrice: {
       type: Number,
       min: [0, "Sales price cannot be negative"],

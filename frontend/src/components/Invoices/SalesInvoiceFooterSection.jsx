@@ -9,6 +9,7 @@ import { useBusinessBankAccountStore } from "../../store/businessBankAccountStor
 import toast from "react-hot-toast";
 import { Landmark, Pen, Trash } from "lucide-react";
 import { usePartyBankAccountStore } from "../../store/partyBankAccount";
+import { gstRates } from "../../utils/constants";
 
 const SalesInvoiceFooterSection = ({
   data,
@@ -330,8 +331,8 @@ const SalesInvoiceFooterSection = ({
                 className="select select-xs text-xs bg-zinc-200 ml-2 w-1/3"
               >
                 <option value="">No Tax Applicable</option>
-                {data?.items?.map((item) => (
-                  <option key={item?._id}>{item?.gstTaxRate}</option>
+                {gstRates.map((item) => (
+                  <option key={item?._id}>{item?.label}</option>
                 ))}
               </select>
             </div>
@@ -470,6 +471,7 @@ const SalesInvoiceFooterSection = ({
             <div className="flex items-center justify-center py-2">
               <input
                 type="checkbox"
+                checked={selectCheckBox}
                 onChange={(e) => setSelectCheckBox(e.target.checked)}
                 className="checkbox checkbox-sm mr-2"
               />

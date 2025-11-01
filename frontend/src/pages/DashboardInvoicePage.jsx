@@ -97,7 +97,6 @@ const DashboardInvoicePage = () => {
     }));
   };
 
-
   // UPDATE THE CHECKBOX SETTINGS ON PAGE LOAD FROM THE BACKEND
   useEffect(() => {
     if (settings?.options?.length) {
@@ -125,6 +124,7 @@ const DashboardInvoicePage = () => {
       {/* Header (fixed) */}
       <div className="flex items-center justify-between p-1 py-3 sticky top-0 bg-white w-full shadow z-10 ">
         <p>Invoice Settings</p>
+        <span className="badge badge-error badge-soft animate-pulse">Note : This feature is under development</span>
         <button onClick={saveSettings} className="btn btn-info btn-sm">
           {loading ? <CustomLoader text={""} /> : "Save Changes"}
         </button>
@@ -133,7 +133,7 @@ const DashboardInvoicePage = () => {
       {/* Body (two scrollable divs side by side) */}
       <div className="flex overflow-hidden mt-2">
         {/* Left */}
-        <div className="overflow-y-auto w-7/10 px-5 bg-sky-100 min-h-[100vh] flex items-center justify-center" >
+        <div className="w-full flex justify-center items-start bg-sky-100  py-6 overflow-y-auto px-3">
           {currentTheme === "Default" ? (
             <DefaultTemplate
               color={currentColor}

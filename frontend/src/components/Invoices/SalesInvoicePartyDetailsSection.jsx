@@ -86,7 +86,7 @@ const SalesInvoicePartyDetailsSection = ({
     } else {
       partiesToFilter = parties
         .filter((p) => p.businessId === business?._id)
-        .filter((p) => p?.partyType === "Customer");
+        .filter((p) => p?.partyType === "Customer" || p.partyType === "Dealer");
     }
 
     return partiesToFilter

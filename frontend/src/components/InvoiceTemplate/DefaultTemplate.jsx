@@ -12,12 +12,14 @@ const DefaultTemplate = ({ color, textColor, checkBoxSetting }) => {
       style={{
         padding: "24px",
         maxWidth: "900px",
-        minHeight: "100vh",
+        minHeight: "100%",
         margin: "0 auto",
         fontFamily: "Arial, sans-serif",
         color: fontColor,
         backgroundColor: "#fff",
         fontSize: "14px",
+        position: "relative",
+        marginTop: "20px",
       }}
     >
       {/* Header */}

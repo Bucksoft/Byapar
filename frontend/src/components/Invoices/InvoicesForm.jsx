@@ -266,6 +266,8 @@ const InvoicesForm = ({
     // Run only when invoiceToUpdate changes from null → object
   }, [invoiceToUpdate, isEditing]);
 
+  console.log(data);
+
   const invoiceTotals = useMemo(() => {
     if (!data?.items?.length)
       return {
@@ -322,14 +324,14 @@ const InvoicesForm = ({
         totalAdditionalChargeGST += chargeGST;
       });
     }
-
     totalAmount += totalAdditionalCharge + totalAdditionalChargeGST;
+    console.log("TOTAL AMOUNT", totalAmount);
 
     return {
       totalDiscount: Number(totalDiscount.toFixed(2)),
       totalTaxableValue: Number(totalTaxableValue.toFixed(2)),
       totalTax: Number(totalTax.toFixed(2)),
-      totalAmount: Number(Math.round(totalAmount)),
+      totalAmount: Number(totalAmount.toFixed(2)),
       totalCGST: Number((totalTax / 2).toFixed(2)),
       totalSGST: Number((totalTax / 2).toFixed(2)),
       additionalCharge: Number(totalAdditionalCharge.toFixed(2)),
@@ -352,6 +354,7 @@ const InvoicesForm = ({
       cgst: invoiceTotals.totalCGST,
       sgst: invoiceTotals.totalSGST,
       balanceAmount: invoiceTotals.totalAmount,
+      totalAmount: invoiceTotals.totalAmount,
       additionalChargeAmount: invoiceTotals.additionalCharge,
       additionalChargeTax: data?.additionalChargeTax || "",
       additionalDiscountPercent: data?.additionalDiscountPercent || 0,

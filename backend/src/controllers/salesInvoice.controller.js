@@ -391,6 +391,9 @@ export async function bulkUploadSalesInvoices(req, res) {
         null,
         { session }
       );
+
+      console.log(invoice);
+
       const newInovice = {
         businessId,
         clientId: req.user?.id,

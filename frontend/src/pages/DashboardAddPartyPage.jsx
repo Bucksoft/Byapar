@@ -342,6 +342,7 @@ const DashboardAddPartyPage = () => {
               >
                 <option>Customer</option>
                 <option>Supplier</option>
+                <option>Dealer</option>
               </select>
             </div>
 

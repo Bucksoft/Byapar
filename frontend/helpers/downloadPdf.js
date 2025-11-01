@@ -15,7 +15,7 @@ export const downloadPDF = async (id, title = "invoice", setIsDownloading) => {
       <style>
         body {
           font-family: 'Inter', sans-serif;
-          font-size: 12px;
+          font-size: 10px;
           line-height: 1.3;
           margin: 0;
           padding: 0;
@@ -36,6 +36,11 @@ export const downloadPDF = async (id, title = "invoice", setIsDownloading) => {
           max-width: 100%;
           height: auto;
         }
+      .nowrap {
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
       </style>
     </head>
     <body>
