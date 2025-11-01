@@ -23,34 +23,38 @@ import Theme2 from "../assets/Theme2.png";
 import Theme3 from "../assets/Theme3.png";
 
 export const badges = [
-  {
-    id: 1,
-    label: "Party",
-  },
+  // {
+  //   id: 1,
+  //   label: "Party",
+  // },
   {
     id: 2,
     label: "Invoice",
   },
-  {
-    id: 3,
-    label: "Category",
-  },
+  // {
+  //   id: 3,
+  //   label: "Category",
+  // },
   {
     id: 4,
     label: "Payment Collection",
   },
-  {
-    id: 5,
-    label: "Item",
-  },
-  {
-    id: 6,
-    label: "Invoice Details",
-  },
+  // {
+  //   id: 5,
+  //   label: "Item",
+  // },
+  // {
+  //   id: 6,
+  //   label: "Invoice Details",
+  // },
   {
     id: 7,
-    label: "Summary",
+    label: "GSTR1 Report",
   },
+  // {
+  //   id: 8,
+  //   label: "Summary",
+  // },
 ];
 
 export const features = [

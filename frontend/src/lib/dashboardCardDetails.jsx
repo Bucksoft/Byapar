@@ -8,6 +8,7 @@ export const dashboardCardDetails = [
     content: "With 50+ settings, design a custom invoice theme",
     btnText: "Create Custom Theme",
     img: dummyInovice,
+    link:"/dashboard/invoice"
   },
   {
     id: 2,

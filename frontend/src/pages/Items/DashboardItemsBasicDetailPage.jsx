@@ -39,7 +39,6 @@ const DashboardItemsBasicDetailPage = ({ data, setData, err }) => {
       const res = await axiosInstance.post(`/category/${business?._id}`, {
         categoryName: data,
       });
-      console.log(res);
       return res.data?.newCategory;
     },
     onSuccess: (data) => {
@@ -55,8 +54,6 @@ const DashboardItemsBasicDetailPage = ({ data, setData, err }) => {
       toast.error(err.message);
     },
   });
-
-  console.log(categories);
 
   return (
     <main className="grid grid-cols-2 gap-15 h-full">

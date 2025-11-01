@@ -319,8 +319,6 @@ const SalesInvoiceItemTableTesting = ({
     JSON.stringify(data.items.map((i) => i.gstTaxRate)),
   ]);
 
-  console.log("DATA AFTER SELECTING PARTY ", data);
-
   return (
     <>
       <div className="w-full grid grid-cols-12 text-xs ">

@@ -1,3 +1,5 @@
+import { Link } from "react-router-dom";
+
 const DashboardCard = ({ details }) => {
   return (
     <div
@@ -23,7 +25,15 @@ const DashboardCard = ({ details }) => {
         >
           {details.content}
         </p>
-        <button className="btn btn-sm mt-8 rounded-xl">Coming Soon</button>
+        {details.id === 1 ? (
+          <Link to={details?.link} className="btn btn-sm mt-8 rounded-xl">
+            Custom Theme
+          </Link>
+        ) : details.id === 2 ? (
+          <Link className="btn btn-sm mt-8 rounded-xl">Coming Soon</Link>
+        ) : (
+          ""
+        )}
       </div>
     </div>
   );

@@ -18,9 +18,9 @@ const PaymentInForm = () => {
   const [checkedInvoices, setCheckedInvoices] = useState({});
   const navigate = useNavigate();
   const { setParty } = usePartyStore();
-  const { invoices } = useInvoiceStore();
+  // const { invoices } = useInvoiceStore();
   const { business } = useBusinessStore();
-  const { paymentIns, totalPaymentIns, latestPaymentIn } = usePaymentInStore();
+  const { totalPaymentIns, latestPaymentIn, paymentIns } = usePaymentInStore();
   const [selectedParty, setSelectedParty] = useState();
   const [paymentInToEdit, setPaymentInToEdit] = useState();
   const [totalInvoiceAmount, setTotalInvoiceAmount] = useState(0);
@@ -35,7 +35,18 @@ const PaymentInForm = () => {
     setData((prev) => ({ ...prev, paymentAmount: Number(value || 0) }));
   };
 
-  console.log(latestPaymentIn);
+  // FETCH ALL INVOICES
+  const { data: invoices } = useQuery({
+    queryKey: ["invoices", business?._id],
+    queryFn: async () => {
+      if (!business) return [];
+      const res = await axiosInstance.get(`/sales-invoice/${business._id}`);
+      return res.data?.invoices;
+    },
+    enabled: !!business,
+    keepPreviousData: true,
+    retry: 1,
+  });
 
   // DATA TO SEND TO THE BACKEND
   const [data, setData] = useState({
@@ -61,20 +72,22 @@ const PaymentInForm = () => {
   });
 
   useEffect(() => {
-    if (!allParties || !invoices) return;
-    const allInvoices = invoices?.filter(
+    if (!Array.isArray(invoices) || !data) return;
+
+    const allInvoices = invoices.filter(
       (invoice) =>
-        invoice.partyId?._id.toString() === data?.partyId.toString() ||
+        invoice.partyId?._id?.toString() === data?.partyId?.toString() ||
         invoice.partyName === location.state?.partyName
     );
 
     setAllInvoices(allInvoices);
-    const totalAmount = invoices?.reduce(
-      (acc, item) => item?.totalAmount + acc,
+
+    const totalAmount = invoices.reduce(
+      (acc, item) => acc + (item?.totalAmount || 0),
       0
     );
     setTotalInvoiceAmount(totalAmount);
-  }, [selectedParty]);
+  }, [invoices, data, location.state?.partyName]);
 
   useEffect(() => {
     if (!allInvoices?.length) return;
@@ -168,7 +181,7 @@ const PaymentInForm = () => {
       toast.success(data?.msg || "Payment In recorded successfully");
       setParty(data);
       navigate("/dashboard/payment-in");
-      queryClient.invalidateQueries({ queryKey: ["paymentIns", "invoices"] });
+      queryClient.invalidateQueries({ queryKey: ["invoices", business?._id] });
     },
     onError: (err) => {
       toast.error(err?.response?.data?.msg || err?.message);

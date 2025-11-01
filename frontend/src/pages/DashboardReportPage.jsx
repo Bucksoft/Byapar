@@ -10,10 +10,11 @@ import DashboardRateListPage from "./DashboardRateListPage";
 import { useState } from "react";
 import InvoiceReport from "../components/Reports/InvoiceReport";
 import PaymentCollectionReport from "../components/Reports/PaymentCollectionReport";
+import GSTR1Report from "../components/Reports/GSTR1Report";
 
 const DashboardReportPage = () => {
   const [searchParams, setSearchParams] = useSearchParams();
-  const [tab, setTab] = useState("party");
+  const [tab, setTab] = useState("invoice");
 
   const param = searchParams.get("type");
   return (
@@ -81,6 +82,9 @@ const DashboardReportPage = () => {
 
             {/* PAYMENT COLLECTION */}
             {tab === "payment collection" && <PaymentCollectionReport />}
+
+            {/* GSTR1 Report */}
+            {tab === "gstr1 report" && <GSTR1Report />}
 
             {/* 
             <motion.table

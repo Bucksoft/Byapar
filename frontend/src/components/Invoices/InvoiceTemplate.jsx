@@ -1070,8 +1070,8 @@ const InvoiceTemplate = ({
                 </div>
               )} */}
 
-              {invoice?.additionalCharges.length > 0 &&
-                invoice?.additionalCharges.map((charge) => (
+              {invoice?.additionalCharges?.length > 0 &&
+                invoice?.additionalCharges?.map((charge) => (
                   <div
                     style={{ display: "flex", justifyContent: "space-between" }}
                   >

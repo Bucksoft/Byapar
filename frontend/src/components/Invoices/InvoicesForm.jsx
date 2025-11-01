@@ -266,8 +266,6 @@ const InvoicesForm = ({
     // Run only when invoiceToUpdate changes from null → object
   }, [invoiceToUpdate, isEditing]);
 
-  console.log(data);
-
   const invoiceTotals = useMemo(() => {
     if (!data?.items?.length)
       return {
@@ -325,7 +323,6 @@ const InvoicesForm = ({
       });
     }
     totalAmount += totalAdditionalCharge + totalAdditionalChargeGST;
-    console.log("TOTAL AMOUNT", totalAmount);
 
     return {
       totalDiscount: Number(totalDiscount.toFixed(2)),
