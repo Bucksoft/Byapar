@@ -409,6 +409,7 @@ const InvoicesForm = ({
         data={data}
         setData={setData}
         isEditing={isEditing}
+        party={party}
         invoiceToUpdate={invoiceToUpdate}
         invoiceTotals={invoiceTotals}
       />

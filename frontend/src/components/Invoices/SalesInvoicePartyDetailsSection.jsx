@@ -258,7 +258,7 @@ const SalesInvoicePartyDetailsSection = ({
                       filteredParties.map((p) => (
                         <li
                           key={p._id}
-                          className="p-2 rounded-md hover:bg-gray-100 cursor-pointer text-sm truncate"
+                          className="p-2 rounded-md hover:bg-gray-100 flex items-center justify-between cursor-pointer text-sm truncate"
                           onClick={() => {
                             setParty(p);
                             setData((prev) => ({
@@ -271,6 +271,15 @@ const SalesInvoicePartyDetailsSection = ({
                           }}
                         >
                           {p?.partyName}
+                          <span
+                            className={` ${
+                              p?.partyType === "Dealer"
+                                ? "badge-secondary"
+                                : "badge-warning"
+                            }  text-xs badge badge-xs badge-accent badge-soft`}
+                          >
+                            {p?.partyType}
+                          </span>
                         </li>
                       ))
                     ) : (

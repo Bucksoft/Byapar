@@ -17,6 +17,7 @@ const SalesInvoiceItemTableTesting = ({
   setData,
   invoiceTotals,
   invoiceToUpdate,
+  party,
 }) => {
   const { business } = useBusinessStore();
   const [searchItemQuery, setSearchItemQuery] = useState("");
@@ -95,7 +96,11 @@ const SalesInvoiceItemTableTesting = ({
             priceType: isPurchaseType ? "purchase" : "sales",
             basePrice,
             purchasePrice: isPurchaseType ? item.purchasePrice : undefined,
-            salesPrice: !isPurchaseType ? item.salesPrice : undefined,
+            salesPrice: !isPurchaseType
+              ? party?.partyType === "Dealer"
+                ? item?.salesPriceForDealer
+                : item.salesPrice
+              : undefined,
             gstTaxRate,
             gstTaxRateType,
             discountPercent: 0,
@@ -313,6 +318,8 @@ const SalesInvoiceItemTableTesting = ({
     JSON.stringify(data.items.map((i) => i.gstTaxRateType)),
     JSON.stringify(data.items.map((i) => i.gstTaxRate)),
   ]);
+
+  console.log("DATA AFTER SELECTING PARTY ", data);
 
   return (
     <>
@@ -622,7 +629,8 @@ const SalesInvoiceItemTableTesting = ({
                       <tr className="text-xs bg-zinc-100 ">
                         <th>Item Name</th>
                         <th>Item Code</th>
-                        <th>Sales Price</th>
+                        <th>Sales Price (Customer)</th>
+                        <th>Sales Price (Dealer)</th>
                         <th>Purchase Price</th>
                         <th>Current Stock</th>
                         <th className="text-center">Quantity</th>
@@ -641,6 +649,14 @@ const SalesInvoiceItemTableTesting = ({
                                 {Number(item?.salesPrice ?? 0).toLocaleString(
                                   "en-IN"
                                 )}
+                              </div>
+                            </td>
+                            <td>
+                              <div className="flex items-center gap-0">
+                                <LiaRupeeSignSolid />
+                                {Number(
+                                  item?.salesPriceForDealer ?? 0
+                                ).toLocaleString("en-IN")}
                               </div>
                             </td>
                             <td>

@@ -4,7 +4,7 @@ import { useRef, useState } from "react";
 import { motion } from "framer-motion";
 import { useCategoryStore } from "../../store/categoryStore";
 import { useBusinessStore } from "../../store/businessStore";
-import { useMutation } from "@tanstack/react-query";
+import { useMutation, useQuery } from "@tanstack/react-query";
 import { axiosInstance } from "../../config/axios";
 import { queryClient } from "../../main";
 import toast from "react-hot-toast";
@@ -13,7 +13,7 @@ const DashboardItemsBasicDetailPage = ({ data, setData, err }) => {
   const [showAddCategoryPopup, setShowAddCategoryPopup] = useState(false);
   const { business } = useBusinessStore();
   const dropdownRef = useRef();
-  const { categories, setCategories } = useCategoryStore();
+  const { setCategories } = useCategoryStore();
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -23,18 +23,29 @@ const DashboardItemsBasicDetailPage = ({ data, setData, err }) => {
     }));
   };
 
+  // FETCH ALL CATEGORIES
+  const { data: categories } = useQuery({
+    queryKey: ["category"],
+    queryFn: async () => {
+      const res = await axiosInstance.get("/category");
+      setCategories(res.data);
+      return res.data;
+    },
+  });
+
   // ADD CATEGORY MUTATION
   const categoryMutation = useMutation({
     mutationFn: async (data) => {
       const res = await axiosInstance.post(`/category/${business?._id}`, {
         categoryName: data,
       });
-      return res.data;
+      console.log(res);
+      return res.data?.newCategory;
     },
     onSuccess: (data) => {
       setShowAddCategoryPopup(false);
-      toast.success(data?.msg);
-      setCategories([data?.newCategory, ...categories]);
+      toast.success("Category added");
+      setCategories([data?.categoryName, ...categories]);
       // if (dropdownRef.current) {
       //   dropdownRef.current.open = false;
       // }
@@ -44,6 +55,8 @@ const DashboardItemsBasicDetailPage = ({ data, setData, err }) => {
       toast.error(err.message);
     },
   });
+
+  console.log(categories);
 
   return (
     <main className="grid grid-cols-2 gap-15 h-full">
