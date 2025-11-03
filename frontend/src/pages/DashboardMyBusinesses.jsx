@@ -95,7 +95,7 @@ const DashboardMyBusinesses = () => {
             <CustomLoader text={"Loading..."} />
           </div>
         ) : (
-          <section className="grid grid-cols-3 gap-3 py-8">
+          <section className="grid grid-cols-3 2xl:grid-cols-5 gap-8 py-8">
             {businesses &&
               businesses.length > 0 &&
               businesses.map((business) => (

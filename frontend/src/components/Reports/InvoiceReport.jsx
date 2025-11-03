@@ -30,8 +30,8 @@ const InvoiceReport = () => {
   const { business } = useBusinessStore();
   const navigate = useNavigate();
   const [dateRange, setDateRange] = useState({
-    from: new Date(),
-    to: new Date(new Date().getTime() + 30 * 24 * 60 * 60 * 1000),
+    from: new Date(new Date().getTime() - 30 * 24 * 60 * 60 * 1000),
+    to: new Date(),
   });
   const [sortType, setSortType] = useState("");
   const { isLoading, data: invoices } = useQuery({
@@ -44,31 +44,31 @@ const InvoiceReport = () => {
 
   // SEARCH INVOICES
   const searchedInvoices = useMemo(() => {
-    if (!invoices?.invoices || !dateRange || !dateRange.from || !dateRange.to) {
-      return [];
+    if (!invoices?.invoices) return [];
+
+    let filtered = invoices.invoices;
+
+    if (dateRange?.from && dateRange?.to) {
+      const fromDate = new Date(dateRange.from);
+      const toDate = new Date(dateRange.to);
+      toDate.setHours(23, 59, 59, 999);
+
+      filtered = filtered.filter((invoice) => {
+        const invoiceDate = new Date(invoice?.salesInvoiceDate);
+        return invoiceDate >= fromDate && invoiceDate <= toDate;
+      });
     }
 
-    const fromDate = new Date(dateRange.from);
-    const toDate = new Date(dateRange.to);
-    toDate.setHours(23, 59, 59, 999);
-
-    const byDate = invoices.invoices.filter((invoice) => {
-      const invoiceDate = new Date(invoice?.salesInvoiceDate);
-      return invoiceDate >= fromDate && invoiceDate <= toDate;
-    });
-
-    const filteredInvoices = invoices.invoices.filter((invoice) =>
-      invoice?.salesInvoiceNumber
-        ?.toString()
-        ?.toLowerCase()
-        .includes(searchQuery.toLowerCase())
-    );
-
-    if (byDate?.length > 0) {
-      return byDate;
+    if (searchQuery) {
+      filtered = filtered.filter((invoice) =>
+        invoice?.salesInvoiceNumber
+          ?.toString()
+          ?.toLowerCase()
+          .includes(searchQuery.toLowerCase())
+      );
     }
 
-    return filteredInvoices;
+    return filtered;
   }, [invoices, dateRange, searchQuery]);
 
   // CANCEL INVOICE

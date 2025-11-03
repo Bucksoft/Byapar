@@ -9,7 +9,7 @@ export const loginSchema = z.object({
 });
 
 export const partySchema = z.object({
-  partyName: z.string(),
+  partyName: z.string().min(1, "Party name is required"),
   mobileNumber: z
     .string()
     .optional()
@@ -82,10 +82,7 @@ export const partySchema = z.object({
       message: "City name must be at least 2 characters and letters only",
     }),
 
-  billingAddress: z
-    .string()
-    .min(10, "Billing address must be at least 10 characters long")
-    .max(200, "Billing address must be at most 200 characters long"),
+  billingAddress: z.string().min(1, "Billing address is required"),
 
   shippingAddress: z
     .string()
@@ -94,24 +91,17 @@ export const partySchema = z.object({
       message: "Shipping address must be 10–200 characters long if provided",
     }),
 
-  creditPeriod: z.preprocess(
-    (val) => (val === "" ? undefined : Number(val)),
-    z
-      .number({ invalid_type_error: "Credit period must be a number" })
-      .int("Credit period must be an integer")
-      .min(0, "Credit period cannot be negative")
-      .max(365, "Credit period cannot exceed 365 days")
-      .optional()
-  ),
+  creditPeriod: z.preprocess((val) => {
+    if (val === "" || val === null || val === undefined) return undefined;
+    const num = Number(val);
+    return Number.isFinite(num) ? num : undefined;
+  }, z.number({ invalid_type_error: "Credit period must be a number" }).int("Credit period must be an integer").min(0, "Credit period cannot be negative").max(365, "Credit period cannot exceed 365 days").optional()),
 
-  creditLimit: z.preprocess(
-    (val) => (val === "" ? undefined : Number(val)),
-    z
-      .number({ invalid_type_error: "Credit limit must be a number" })
-      .min(0, "Credit limit cannot be negative")
-      .max(10000000, "Credit limit too high")
-      .optional()
-  ),
+  creditLimit: z.preprocess((val) => {
+    if (val === "" || val === null || val === undefined) return undefined;
+    const num = Number(val);
+    return Number.isFinite(num) ? num : undefined;
+  }, z.number({ invalid_type_error: "Credit limit must be a number" }).min(0, "Credit limit cannot be negative").max(10000000, "Credit limit too high").optional()),
 
   pincode: z
     .string()

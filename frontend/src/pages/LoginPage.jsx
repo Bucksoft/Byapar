@@ -205,23 +205,9 @@ const LoginPage = () => {
 
         {/* OTP INPUT FORM IS DISPLAYED HERE */}
         {otpInput && (
-          <motion.div
-            initial={{
-              translateY: -100,
-              opacity: 0,
-            }}
-            animate={{
-              translateY: 0,
-              opacity: 1,
-            }}
-            transition={{
-              ease: "easeInOut",
-              duration: 0.3,
-            }}
-            className="absolute h-screen w-full bg-black/70 backdrop-blur-md z-20 flex items-center justify-center"
-          >
-            <OtpInputForm email={email} />
-          </motion.div>
+          <div className="absolute h-screen w-full bg-black/80 backdrop-blur-md z-20 flex items-center justify-center">
+            <OtpInputForm email={email} setOtpInput={setOtpInput} />
+          </div>
         )}
       </main>
     </>

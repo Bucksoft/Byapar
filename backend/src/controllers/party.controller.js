@@ -11,6 +11,7 @@ export async function createParty(req, res) {
 
   try {
     const data = req.body;
+    console.log("DATA", data);
 
     if (!data || Object.keys(data).length === 0) {
       return res.status(400).json({
@@ -58,7 +59,7 @@ export async function createParty(req, res) {
     //  Create Party
     const partyDoc = {
       ...validationResult.data,
-      businessId: req.body?.businessId,
+      businessId: req.body?.businessId || req.query?.businessId,
       clientId: req.user?.id,
       currentBalance: validationResult.data.openingBalance || 0,
     };
@@ -301,6 +302,7 @@ export async function deleteParty(req, res) {
       .json({ success: true, msg: "Party deleted successfully" });
   } catch (error) {
     console.log("ERROR IN DELETING PARTY DETAILS");
+    console.log(error);
     return res.status(500).json({ err: "Internal server error", error });
   }
 }

@@ -4,6 +4,7 @@ import { BsBoxArrowInUpRight } from "react-icons/bs";
 import { useAuthStore } from "../store/authStore";
 import { useEffect } from "react";
 import { axiosInstance } from "../config/axios";
+import HomePageFeature from "../components/Homepage/HomePageFeature";
 
 const HomePage = () => {
   const { user, setUser } = useAuthStore();
@@ -31,7 +32,7 @@ const HomePage = () => {
 
   return (
     <main className="min-h-screen">
-      <HomePageNavigation user={user}/>
+      <HomePageNavigation user={user} />
       <div className=" -mt-10 flex items-center justify-center flex-col gap-4">
         <h1 className="text-6xl font-bold bg-gradient-to-r from-cyan-500 to-blue-500 bg-clip-text text-transparent">
           Byapar
@@ -48,6 +49,8 @@ const HomePage = () => {
           <Button text={"Get Started"} logo={<BsBoxArrowInUpRight />} />
         </div>
       </div>
+
+      {/* <HomePageFeature /> */}
     </main>
   );
 };

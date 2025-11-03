@@ -12,7 +12,7 @@ import { states } from "../../utils/constants";
 import { axiosInstance } from "../../config/axios";
 import { useBusinessStore } from "../../store/businessStore";
 import toast from "react-hot-toast";
-import { queryClient } from "../../main";
+import { queryClient } from "../../main.jsx";
 import { usePartyStore } from "../../store/partyStore";
 import { usePartyBankAccountStore } from "../../store/partyBankAccount";
 
@@ -38,6 +38,11 @@ const SalesInvoicePartyDetailsSection = ({
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [deleteShippingAddressId, setDeleteShippingAddressId] = useState(null);
   const { setPartyBankAccount } = usePartyBankAccountStore();
+
+  // state for adding a new party
+  const [partyName, setPartyName] = useState("");
+  const [billingAddress, setBillingAddress] = useState("");
+  const [partyType, setPartyType] = useState("Customer");
 
   const [editShippingAddress, setEditShippingAddress] = useState(0);
   const [shippingData, setShippingData] = useState({
@@ -81,11 +86,11 @@ const SalesInvoicePartyDetailsSection = ({
     let partiesToFilter = [];
     if (title === "Purchase Invoice" || title === "Purchase Return") {
       partiesToFilter = parties
-        .filter((p) => p.businessId === business?._id)
+        .filter((p) => p?.businessId === business?._id)
         .filter((p) => p?.partyType === "Supplier");
     } else {
       partiesToFilter = parties
-        .filter((p) => p.businessId === business?._id)
+        .filter((p) => p?.businessId === business?._id)
         .filter((p) => p?.partyType === "Customer" || p.partyType === "Dealer");
     }
 
@@ -200,6 +205,23 @@ const SalesInvoicePartyDetailsSection = ({
     enabled: Boolean(data?.partyId),
   });
 
+  // create a new party mutation at sales invoice page.
+  const createPartyMutation = useMutation({
+    mutationFn: async () => {
+      const res = await axiosInstance.post(
+        `/parties/?businessId=${business?._id}`,
+        { partyName, billingAddress, partyType }
+      );
+      return res.data;
+    },
+    onSuccess: (data) => {
+      toast.success(data?.msg);
+      console.log(data);
+      setParties([...parties, data?.data?.party]);
+      document.getElementById("create_party_modal").close();
+    },
+  });
+
   return (
     <>
       <section className="grid grid-cols-3 h-48">
@@ -290,17 +312,99 @@ const SalesInvoicePartyDetailsSection = ({
                   </ul>
 
                   <div className="border-t border-zinc-100 mt-2 pt-2 flex justify-center">
-                    <Link
-                      to="/dashboard/add-party"
+                    <button
                       className="btn btn-sm btn-info text-xs w-full"
-                      onClick={() => setSelectOpen(false)}
+                      onClick={(e) => {
+                        e.preventDefault();
+                        setSelectOpen(false);
+                        document
+                          .getElementById("create_party_modal")
+                          .showModal();
+                      }}
                     >
                       Create Party
-                    </Link>
+                    </button>
                   </div>
                 </div>
               )}
             </div>
+
+            {/* CREATE PARTY MODAL */}
+            <dialog id="create_party_modal" className="modal">
+              <div className="modal-box">
+                <h3 className="font-bold text-lg">Create party</h3>
+                <p className="pb-3">Enter details to create a new party</p>
+                <label htmlFor="party_name" className="text-xs text-zinc-600 ">
+                  Party Name
+                </label>
+                <input
+                  type="text"
+                  value={partyName}
+                  onChange={(e) => setPartyName(e.target.value)}
+                  id="party_name"
+                  placeholder="Party Name"
+                  className="input input-sm my-1 w-full"
+                />
+                <small className="text-xs text-red-500">
+                  {
+                    createPartyMutation.error?.response?.data?.validationError
+                      ?.partyName?._errors[0]
+                  }
+                </small>
+                <br />
+
+                <label
+                  htmlFor="billing_address"
+                  className="text-xs text-zinc-600"
+                >
+                  Billing Address
+                </label>
+                <textarea
+                  value={billingAddress}
+                  onChange={(e) => setBillingAddress(e.target.value)}
+                  name="billing_address"
+                  id="billing_address"
+                  placeholder="Billing Address"
+                  className="textarea textarea-sm w-full"
+                />
+
+                <small className="text-xs text-red-500">
+                  {
+                    createPartyMutation.error?.response?.data?.validationError
+                      ?.billingAddress?._errors[0]
+                  }
+                </small>
+                <br />
+                <label
+                  htmlFor="Party_type"
+                  className="text-xs text-zinc-600 mt-2"
+                >
+                  Party type
+                </label>
+                <select
+                  className="select select-sm w-full"
+                  value={partyType}
+                  onChange={(e) => setPartyType(e.target.value)}
+                >
+                  <option value="Customer">Customer</option>
+                  <option value="Dealer">Dealer</option>
+                  <option value="Supplier">Supplier</option>
+                </select>
+
+                <div className="modal-action">
+                  <form method="dialog">
+                    {/* if there is a button in form, it will close the modal */}
+                    <button className="btn btn-sm">Close</button>
+                  </form>
+                  <button
+                    onClick={() => createPartyMutation.mutate()}
+                    className="btn bg-[var(--primary-btn)] btn-sm"
+                  >
+                    Save
+                  </button>
+                </div>
+              </div>
+            </dialog>
 
             {/* Change and add new party dropdown ends  ----------------------------------------------*/}
           </div>

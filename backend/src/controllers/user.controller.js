@@ -42,7 +42,7 @@ export async function login(req, res) {
     });
 
     // send OTP via email
-    // await sendOTPviaMail(email, otp);
+    await sendOTPviaMail(email, otp);
 
     console.log("Generated OTP:", otp);
 
@@ -342,6 +342,28 @@ export async function masterLogin(req, res) {
     }
     return res.status(200).json({ msg: "Master login successful", user });
   } catch (error) {
+    return res.status(500).json({ msg: "Error in logging to master" });
+  }
+}
+
+export async function resendOTP(req, res) {
+  try {
+    const { email } = req.body;
+    console.log(req.body);
+    // generate 6-digit OTP
+    const otp = crypto.randomInt(100000, 1000000).toString();
+
+    await OTP.create({
+      email,
+      otp,
+      expiresIn: Date.now() + 60 * 1000, // 1 min validity
+    });
+    await sendOTPviaMail(email, otp);
+    console.log(otp);
+
+    return res.status(200).json({ msg: "OTP sent successfully" });
+  } catch (error) {
+    console.log(error);
     return res.status(500).json({ msg: "Error in logging to master" });
   }
 }

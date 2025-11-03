@@ -449,7 +449,6 @@ const DashboardPartiesPage = () => {
                 onClick={() => {
                   document.getElementById("warning_modal").close();
                   setIsInvoiceCreated(false);
-                  setPartyIdToDelete(null);
                 }}
                 className="btn btn-sm rounded-xl bg-red-500 text-white hover:bg-red-500/90"
               >
@@ -473,7 +472,6 @@ const DashboardPartiesPage = () => {
               onClick={() => {
                 mutation.mutate();
                 document.getElementById("my_modal_3").close();
-                setPartyIdToDelete(null);
               }}
               className="btn rounded-xl btn-sm btn-ghost text-[var(--error-text-color)]"
             >
