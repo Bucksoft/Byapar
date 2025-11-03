@@ -1,7 +1,7 @@
 import { ArrowLeft } from "lucide-react";
 import { useLocation, useNavigate } from "react-router-dom";
 import { usePartyStore } from "../../store/partyStore";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useInvoiceStore } from "../../store/invoicesStore";
 import { LiaRupeeSignSolid } from "react-icons/lia";
 import { useMutation, useQuery } from "@tanstack/react-query";
@@ -16,6 +16,7 @@ import { usePaymentInStore } from "../../store/paymentInStore";
 const PaymentInForm = () => {
   const [settledInvoices, setSettledInvoices] = useState({});
   const [checkedInvoices, setCheckedInvoices] = useState({});
+  const [searchPartyQuery, setSearchPartyQuery] = useState("");
   const navigate = useNavigate();
   const { setParty } = usePartyStore();
   // const { invoices } = useInvoiceStore();
@@ -27,6 +28,7 @@ const PaymentInForm = () => {
   const [allInvoices, setAllInvoices] = useState([]);
   const paymentAmountRef = useRef();
   const allocationTriggerRef = useRef(false);
+  const [selectOpen, setSelectOpen] = useState(false);
 
   const location = useLocation();
 
@@ -72,14 +74,12 @@ const PaymentInForm = () => {
   });
 
   useEffect(() => {
-    // 🛡️ If no party selected, clear invoices and total
     if (!data?.partyName) {
       setAllInvoices([]);
       setTotalInvoiceAmount(0);
       return;
     }
 
-    // 🛡️ Ensure invoices is an array
     if (!Array.isArray(invoices)) return;
 
     const allInvoices = invoices.filter(
@@ -87,10 +87,8 @@ const PaymentInForm = () => {
         invoice?.partyName?.toLowerCase() === data?.partyName?.toLowerCase()
     );
 
-    console.log("All invoices", allInvoices);
     setAllInvoices(allInvoices);
 
-    // ✅ Calculate subtotal only for selected party
     const totalAmount = allInvoices.reduce(
       (acc, item) => acc + (item?.totalAmount || 0),
       0
@@ -262,6 +260,18 @@ const PaymentInForm = () => {
     });
   };
 
+  const filteredParties = useMemo(() => {
+    const nonSupplierParties = allParties?.filter(
+      (p) => p?.partyType?.toLowerCase() !== "supplier"
+    );
+
+    if (!searchPartyQuery) return nonSupplierParties;
+
+    return nonSupplierParties?.filter((p) =>
+      p?.partyName?.toLowerCase()?.includes(searchPartyQuery?.toLowerCase())
+    );
+  }, [searchPartyQuery, allParties]);
+
   return (
     <main className="h-screen w-full p-2">
       <div className="h-full w-full bg-white rounded-lg flex flex-col">
@@ -301,7 +311,7 @@ const PaymentInForm = () => {
             <div className="p-4 space-y-3 text-sm border border-[var(--primary-background)] rounded-lg">
               <div>
                 <label className="text-zinc-500">Party Name</label>
-                <select
+                {/* <select
                   className="select select-sm w-full mt-1"
                   value={selectedParty}
                   onChange={(e) => {
@@ -321,7 +331,83 @@ const PaymentInForm = () => {
                       {party.partyName}
                     </option>
                   ))}
-                </select>
+                </select> */}
+
+                <button
+                  onClick={() => setSelectOpen(!selectOpen)}
+                  className="w-full truncate flex items-center justify-between my-2 border border-zinc-300 rounded p-[5.25px]"
+                >
+                  {selectedParty ? selectedParty : "Select Party"}
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    className={`h-4 w-4 transition-transform ${
+                      selectOpen ? "rotate-180" : "rotate-0"
+                    }`}
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M19 9l-7 7-7-7"
+                    />
+                  </svg>
+                </button>
+
+                {/* Dropdown Content */}
+                {selectOpen && (
+                  <div className="absolute z-10 mt-2 w-1/3 bg-base-100 border border-gray-200 rounded-lg shadow-lg p-2">
+                    {/* Search Input */}
+                    <input
+                      type="text"
+                      className="input input-sm w-full mb-2"
+                      placeholder="Search parties..."
+                      value={searchPartyQuery}
+                      onChange={(e) => setSearchPartyQuery(e.target.value)}
+                    />
+
+                    {/* Party List */}
+                    <ul className="max-h-60 overflow-y-auto">
+                      {filteredParties?.length > 0 ? (
+                        filteredParties?.map((p) => (
+                          <li
+                            key={p._id}
+                            className="p-2 rounded-md hover:bg-gray-100 flex items-center justify-between cursor-pointer text-sm truncate"
+                            onClick={() => {
+                              setSelectedParty(p.partyName);
+                              setData((prev) => ({
+                                ...prev,
+                                partyName: p.partyName,
+                                partyId: p._id,
+                              }));
+                              setSelectOpen(false);
+                              setSearchPartyQuery("");
+                            }}
+                          >
+                            {p?.partyName}
+                            <span
+                              className={` ${
+                                p?.partyType === "Dealer"
+                                  ? "badge-secondary"
+                                  : p?.partyType === "Customer"
+                                  ? "badge-accent"
+                                  : "badge-warning"
+                              }  text-xs badge badge-xs badge-accent badge-soft`}
+                            >
+                              {p?.partyType}
+                            </span>
+                          </li>
+                        ))
+                      ) : (
+                        <li className="p-2 text-sm text-gray-500">
+                          No parties found
+                        </li>
+                      )}
+                    </ul>
+                  </div>
+                )}
               </div>
 
               <div>

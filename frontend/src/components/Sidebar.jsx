@@ -107,7 +107,7 @@ const Sidebar = () => {
 
   return (
     <>
-      <section className="h-screen relative bg-gradient-to-tr from-cyan-950 to-slate-950 text-white max-h-screen overflow-y-auto hide-scrollbar  shadow-md border-r border-r-zinc-200 ">
+      <section className="h-screen flex flex-col bg-gradient-to-tr from-cyan-950 to-slate-950 text-white shadow-md border-r border-r-zinc-200 overflow-hidden">
         {/* nav */}
         <motion.h1
           initial={{
@@ -118,130 +118,160 @@ const Sidebar = () => {
             translateX: 0,
             filter: "blur(0)",
           }}
-          className="sticky top-0 z-10 text-md text-white font-semibold flex items-center  gap-3 w-full px-5 py-3 backdrop-blur-md border-b border-b-cyan-950"
+          className="sticky top-0 z-10 text-md text-white font-semibold flex items-center gap-3 w-full px-5 py-3 backdrop-blur-md border-b border-b-cyan-950"
         >
-          {/* <img
-            src={ByaparLogo}
-            alt="Byapar_logo"
-            className=" w-8 h-8 "
-            loading="lazy"
-          /> */}
           ByaparSetu
         </motion.h1>
 
-        {/* business details */}
-        <div className="flex gap-3 px-5 py-3 items-center border-b border-b-cyan-950 ">
-          <div className="border-3 bg-white border-cyan-600 rounded-2xl p-1">
-            <div className="w-12 h-12 rounded-xl hover:scale-120 transition-all ease-in-out duration-300 flex items-center justify-center bg-red-200 overflow-hidden">
-              {business?.logo && business?.logo !== "null" ? (
-                <img
-                  src={business.logo}
-                  alt="Logo"
-                  className="w-full h-full object-cover "
-                />
-              ) : (
-                <span className="text-sm font-semibold text-white tracking-tight">
-                  {business?.businessName?.[0]?.toUpperCase() || "?"}
-                </span>
-              )}
+        <div className="flex-1 overflow-y-auto hide-scrollbar">
+          {/* business details */}
+          <div className="flex gap-3 px-5 py-3 items-center border-b border-b-cyan-950 ">
+            <div className="border-3 bg-white border-cyan-600 rounded-2xl p-1">
+              <div className="w-12 h-12 rounded-xl hover:scale-120 transition-all ease-in-out duration-300 flex items-center justify-center bg-red-200 overflow-hidden">
+                {business?.logo && business?.logo !== "null" ? (
+                  <img
+                    src={business.logo}
+                    alt="Logo"
+                    className="w-full h-full object-cover "
+                  />
+                ) : (
+                  <span className="text-sm font-semibold text-white tracking-tight">
+                    {business?.businessName?.[0]?.toUpperCase() || "?"}
+                  </span>
+                )}
+              </div>
+            </div>
+
+            <div className="flex-1 tracking-tight">
+              <p className="font-bold text-sm break-words whitespace-normal">
+                {business?.businessName ||
+                  business?.companyEmail ||
+                  "Business name"}
+              </p>
+              <small className="text-xs text-neutral-300">
+                {business?.companyPhoneNo}
+              </small>
             </div>
           </div>
 
-          <div className="flex-1 tracking-tight">
-            <p className="font-bold text-sm break-words whitespace-normal">
-              {business?.businessName ||
-                business?.companyEmail ||
-                "Business name"}
-            </p>
-            <small className="text-xs text-neutral-300">
-              {business?.companyPhoneNo}
-            </small>
-          </div>
-        </div>
-
-        <div className="py-2 border-b border-cyan-950 inset-shadow-[1px_1px_10px_rgba(0,0,0,0.5)] shadow-lg">
-          <label className="font-semibold pl-4 text-xs text-[var(--primary-btn)]">
-            GENERAL
-          </label>
-          <motion.div
-            variants={container}
-            initial="hidden"
-            animate="show"
-            className="mt-3"
-          >
-            {dashboardFields?.map((field, index) => (
-              <motion.div key={index} variants={dashboardLinksItems}>
-                {/* Fields that have sublinks */}
-                {field.label === "Items" ||
-                field.label === "Sales" ||
-                field.label === "Purchases" ? (
-                  <div className="group  flex flex-col items-start transition-all duration-200 ease-in-out">
-                    {/* Parent link */}
-                    <NavLink
-                      to={`/dashboard/${field.label.toLowerCase()}`}
-                      onClick={() => setCurrentLink(field?.label)}
-                      className={({ isActive }) =>
-                        `flex items-center justify-between text-xs font-medium cursor-pointer py-2 pl-[13.5px] w-full transition-all duration-200 ease-in-out text-white
+          <div className="py-2 border-b border-cyan-950 inset-shadow-[1px_1px_10px_rgba(0,0,0,0.5)] shadow-lg">
+            <label className="font-semibold pl-4 text-xs text-[var(--primary-btn)]">
+              GENERAL
+            </label>
+            <motion.div
+              variants={container}
+              initial="hidden"
+              animate="show"
+              className="mt-3"
+            >
+              {dashboardFields?.map((field, index) => (
+                <motion.div key={index} variants={dashboardLinksItems}>
+                  {/* Fields that have sublinks */}
+                  {field.label === "Items" ||
+                  field.label === "Sales" ||
+                  field.label === "Purchases" ? (
+                    <div className="group  flex flex-col items-start transition-all duration-200 ease-in-out">
+                      {/* Parent link */}
+                      <NavLink
+                        to={`/dashboard/${field.label.toLowerCase()}`}
+                        onClick={() => setCurrentLink(field?.label)}
+                        className={({ isActive }) =>
+                          `flex items-center justify-between text-xs font-medium cursor-pointer py-2 pl-[13.5px] w-full transition-all duration-200 ease-in-out text-white
                 ${
                   isActive
                     ? "bg-[var(--primary-btn)]/10 text-[var(--primary-btn)] scale-105 border-l-4"
                     : "hover:text-[var(--primary-btn)]"
                 }`
-                      }
-                    >
-                      <div className="flex items-center gap-6 ">
-                        <span className="transition-all duration-200 group-hover:-translate-x-2">
-                          {field.icon}
-                        </span>
-                        <span>{field.label}</span>
-                      </div>
-                      <IoMdArrowDropdown className="mr-4" />
-                    </NavLink>
-
-                    {/* Sublinks */}
-                    {currentLink === field.label && (
-                      <div
-                        name={field.label}
-                        className="bg-gradient-to-r from-transparent to-zinc-500/10 text-white overflow-hidden text-xs cursor-pointer outline-none w-[80%] my-2 ml-7 z-10 transition-all duration-200  ease-in-out border-l border-l-cyan-950 "
+                        }
                       >
-                        {field.subLinks?.map((sublink) => (
-                          <NavLink
-                            key={sublink.id}
-                            to={sublink.link}
-                            className={({ isActive }) =>
-                              `block p-2  transition-all duration-200 ease-in-out 
+                        <div className="flex items-center gap-6 ">
+                          <span className="transition-all duration-200 group-hover:-translate-x-2">
+                            {field.icon}
+                          </span>
+                          <span>{field.label}</span>
+                        </div>
+                        <IoMdArrowDropdown className="mr-4" />
+                      </NavLink>
+
+                      {/* Sublinks */}
+                      {currentLink === field.label && (
+                        <div
+                          name={field.label}
+                          className="bg-gradient-to-r from-transparent to-zinc-500/10 text-white overflow-hidden text-xs cursor-pointer outline-none w-[80%] my-2 ml-7 z-10 transition-all duration-200  ease-in-out border-l border-l-cyan-950 "
+                        >
+                          {field.subLinks?.map((sublink) => (
+                            <NavLink
+                              key={sublink.id}
+                              to={sublink.link}
+                              className={({ isActive }) =>
+                                `block p-2  transition-all duration-200 ease-in-out 
                               ${
                                 isActive
                                   ? " text-[var(--primary-btn)] font-semibold border-l-2 "
                                   : "hover:bg-white/20"
                               }`
-                            }
-                          >
-                            {sublink.label}
-                          </NavLink>
-                        ))}
-                      </div>
-                    )}
-                  </div>
-                ) : (
-                  // Normal fields without sublinks
-                  <NavLink
-                    onClick={() => setCurrentLink("")}
-                    end
-                    to={
-                      field.label.toLowerCase() === "dashboard"
-                        ? "/dashboard"
-                        : `/dashboard/${field.label
-                            .toLowerCase()
-                            .replace(/\s+/g, "-")}`
-                    }
-                    className={({ isActive }) =>
-                      `group px-4 flex items-center gap-5 text-xs py-2 cursor-pointer transition-all ease-in-out duration-150 
+                              }
+                            >
+                              {sublink.label}
+                            </NavLink>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  ) : (
+                    // Normal fields without sublinks
+                    <NavLink
+                      onClick={() => setCurrentLink("")}
+                      end
+                      to={
+                        field.label.toLowerCase() === "dashboard"
+                          ? "/dashboard"
+                          : `/dashboard/${field.label
+                              .toLowerCase()
+                              .replace(/\s+/g, "-")}`
+                      }
+                      className={({ isActive }) =>
+                        `group px-4 flex items-center gap-5 text-xs py-2 cursor-pointer transition-all ease-in-out duration-150 
                     ${
                       isActive
                         ? "bg-[var(--primary-btn)]/10 text-[var(--primary-btn)] border-l-4 font-semibold"
                         : "hover:text-[var(--primary-btn)] hover:scale-105 "
                     }`
+                      }
+                    >
+                      {field?.icon}
+                      <span className="group-hover:translate-x-2 transition-all ease-in-out duration-200">
+                        {field.label}
+                      </span>
+                    </NavLink>
+                  )}
+                </motion.div>
+              ))}
+            </motion.div>
+          </div>
+
+          <div className="hidden py-2 border-b border-cyan-950">
+            <label className="pl-4 font-semibold text-xs text-[var(--primary-btn)]">
+              ACCOUNTING SOLUTIONS
+            </label>
+            <motion.div
+              className="mt-3"
+              variants={container}
+              initial="hidden"
+              animate="show"
+            >
+              {dashboardAccountingFields?.map((field) => (
+                <div key={field.id} variants={dashboardLinksItems}>
+                  <NavLink
+                    end
+                    to={field.link}
+                    className={({ isActive }) =>
+                      `group px-4 my-1 flex items-center gap-5 text-xs py-2 cursor-pointer transition-all ease-in-out duration-150 
+                  ${
+                    isActive
+                      ? "bg-[var(--primary-btn)]/10 text-[var(--primary-btn)] scale-105 border-l-2"
+                      : "hover:bg-[var(--primary-btn)]/0 hover:text-[var(--primary-btn)] hover:scale-105"
+                  }`
                     }
                   >
                     {field?.icon}
@@ -249,125 +279,98 @@ const Sidebar = () => {
                       {field.label}
                     </span>
                   </NavLink>
-                )}
-              </motion.div>
-            ))}
-          </motion.div>
-        </div>
+                </div>
+              ))}
+            </motion.div>
+          </div>
 
-        <div className="hidden py-2 border-b border-cyan-950">
-          <label className="pl-4 font-semibold text-xs text-[var(--primary-btn)]">
-            ACCOUNTING SOLUTIONS
-          </label>
-          <motion.div
-            className="mt-3"
-            variants={container}
-            initial="hidden"
-            animate="show"
-          >
-            {dashboardAccountingFields?.map((field) => (
-              <div key={field.id} variants={dashboardLinksItems}>
-                <NavLink
-                  end
-                  to={field.link}
-                  className={({ isActive }) =>
-                    `group px-4 my-1 flex items-center gap-5 text-xs py-2 cursor-pointer transition-all ease-in-out duration-150 
+          <div className=" py-2 border-b border-cyan-950">
+            <label className=" pl-4 font-semibold text-xs text-[var(--primary-btn)]">
+              SETTINGS
+            </label>
+            <motion.div
+              className="mt-3"
+              variants={container}
+              initial="hidden"
+              animate="show"
+            >
+              {settingLinks?.map((field) => (
+                <div key={field.id} variants={dashboardLinksItems}>
+                  <NavLink
+                    end
+                    to={field.link}
+                    className={({ isActive }) =>
+                      `group px-4 my-1 flex items-center gap-5 text-xs py-2 cursor-pointer transition-all ease-in-out duration-150 
                   ${
                     isActive
                       ? "bg-[var(--primary-btn)]/10 text-[var(--primary-btn)] scale-105 border-l-2"
                       : "hover:bg-[var(--primary-btn)]/0 hover:text-[var(--primary-btn)] hover:scale-105"
                   }`
-                  }
-                >
-                  {field?.icon}
-                  <span className="group-hover:translate-x-2 transition-all ease-in-out duration-200">
-                    {field.label}
-                  </span>
-                </NavLink>
-              </div>
-            ))}
-          </motion.div>
-        </div>
+                    }
+                  >
+                    {field?.icon}
+                    <span className="group-hover:translate-x-2 text-nowrap transition-all ease-in-out duration-200">
+                      {field.label}
+                    </span>
+                  </NavLink>
+                </div>
+              ))}
+            </motion.div>
+          </div>
 
-        <div className=" py-2 border-b border-cyan-950">
-          <label className=" pl-4 font-semibold text-xs text-[var(--primary-btn)]">
-            SETTINGS
-          </label>
-          <motion.div
-            className="mt-3"
-            variants={container}
-            initial="hidden"
-            animate="show"
-          >
-            {settingLinks?.map((field) => (
-              <div key={field.id} variants={dashboardLinksItems}>
-                <NavLink
-                  end
-                  to={field.link}
-                  className={({ isActive }) =>
-                    `group px-4 my-1 flex items-center gap-5 text-xs py-2 cursor-pointer transition-all ease-in-out duration-150 
+          <div className="hidden  py-2 pb-8 border-b border-zinc-800">
+            <label className=" pl-4 font-semibold text-xs text-[var(--primary-btn)]">
+              BUSINESS TOOLS
+            </label>
+            <motion.div
+              className="mt-3 mb-12"
+              variants={container}
+              initial="hidden"
+              animate="show"
+            >
+              {businessTools?.map((field) => (
+                <div key={field.id} variants={dashboardLinksItems}>
+                  <NavLink
+                    end
+                    to={field.link}
+                    className={({ isActive }) =>
+                      `group px-4 my-1 flex items-center gap-5 text-xs text-nowrap py-2 cursor-pointer transition-all ease-in-out duration-150 
                   ${
                     isActive
                       ? "bg-[var(--primary-btn)]/10 text-[var(--primary-btn)] scale-105 border-l-2"
                       : "hover:bg-[var(--primary-btn)]/0 hover:text-[var(--primary-btn)] hover:scale-105"
                   }`
-                  }
-                >
-                  {field?.icon}
-                  <span className="group-hover:translate-x-2 text-nowrap transition-all ease-in-out duration-200">
-                    {field.label}
-                  </span>
-                </NavLink>
-              </div>
-            ))}
-          </motion.div>
+                    }
+                  >
+                    {field?.icon}
+                    <span className="group-hover:translate-x-2 transition-all ease-in-out duration-200">
+                      {field.label}
+                    </span>
+                  </NavLink>
+                </div>
+              ))}
+            </motion.div>
+          </div>
         </div>
 
-        <div className="hidden  py-2 pb-8 border-b border-zinc-800">
-          <label className=" pl-4 font-semibold text-xs text-[var(--primary-btn)]">
-            BUSINESS TOOLS
-          </label>
-          <motion.div
-            className="mt-3 mb-12"
-            variants={container}
-            initial="hidden"
-            animate="show"
-          >
-            {businessTools?.map((field) => (
-              <div key={field.id} variants={dashboardLinksItems}>
-                <NavLink
-                  end
-                  to={field.link}
-                  className={({ isActive }) =>
-                    `group px-4 my-1 flex items-center gap-5 text-xs text-nowrap py-2 cursor-pointer transition-all ease-in-out duration-150 
-                  ${
-                    isActive
-                      ? "bg-[var(--primary-btn)]/10 text-[var(--primary-btn)] scale-105 border-l-2"
-                      : "hover:bg-[var(--primary-btn)]/0 hover:text-[var(--primary-btn)] hover:scale-105"
-                  }`
-                  }
-                >
-                  {field?.icon}
-                  <span className="group-hover:translate-x-2 transition-all ease-in-out duration-200">
-                    {field.label}
-                  </span>
-                </NavLink>
-              </div>
-            ))}
-          </motion.div>
-        </div>
+        {/* BOTTOM PART - USER EMAIL AND LOGOUT BUTTON */}
+        <div className="bg-cyan-700 w-full rounded-t-2xl flex items-center justify-between p-2 gap-2 border-t border-cyan-800">
+          <small className="truncate text-white/90 text-xs">{user.email}</small>
 
-        <div className="fixed w-[200px]  bottom-0 left-5 rounded-tr-2xl rounded-tl-2xl flex items-center justify-between p-2 gap-2 bg-cyan-700 ">
-          <small>{user.email}</small>
-          {/* LOGOUT BUTTON */}
           <button
             onClick={() => document.getElementById("my_modal_5").showModal()}
-            className="w-full  p-1 shadow rounded-xl cursor-pointer bg-red-500 text-white hover:bg-rose-500/90 flex items-center justify-center gap-2 "
+            className="group relative py-1.5 px-3 rounded-xl flex items-center justify-center gap-2 
+               bg-white/10 border border-white/20 backdrop-blur-md text-white/90 
+               hover:bg-white/20 hover:scale-105 hover:shadow-lg hover:text-white
+               transition-all duration-300 ease-in-out"
           >
             <LogOut
               size={16}
-              className=" group-hover:rotate-90 transition-all ease-in-out duration-200 group-hover:scale-120"
+              className="transition-transform duration-300 group-hover:rotate-90"
             />
+            <span className="text-xs font-semibold tracking-wide hidden sm:inline">
+              Logout
+            </span>
           </button>
         </div>
 

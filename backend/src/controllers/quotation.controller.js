@@ -110,7 +110,7 @@ export async function getAllQuotations(req, res) {
     return res.status(200).json({
       success: true,
       quotations,
-      totalQuotations: latestQuotation.quotationNumber,
+      totalQuotations: latestQuotation?.quotationNumber || 0,
     });
   } catch (error) {
     console.log("Error in getting  quotations", error);

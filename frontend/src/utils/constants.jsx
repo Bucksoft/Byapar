@@ -51,6 +51,10 @@ export const badges = [
     id: 7,
     label: "GSTR1 Report",
   },
+  {
+    id: 7,
+    label: "GSTR3 Report",
+  },
   // {
   //   id: 8,
   //   label: "Summary",

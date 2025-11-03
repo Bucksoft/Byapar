@@ -1,6 +1,6 @@
 import { ChevronDown, IndianRupee, Search } from "lucide-react";
 import { gstRates, uomList } from "../../utils/constants";
-import { useRef, useState } from "react";
+import { useMemo, useRef, useState } from "react";
 import { motion } from "framer-motion";
 import { useCategoryStore } from "../../store/categoryStore";
 import { useBusinessStore } from "../../store/businessStore";
@@ -12,6 +12,8 @@ import toast from "react-hot-toast";
 const DashboardItemsBasicDetailPage = ({ data, setData, err }) => {
   const [showAddCategoryPopup, setShowAddCategoryPopup] = useState(false);
   const { business } = useBusinessStore();
+  const [searchUnitQuery, setSearchUnitQuery] = useState("");
+  const [selectOpen, setSelectOpen] = useState(false);
   const dropdownRef = useRef();
   const { setCategories } = useCategoryStore();
 
@@ -21,7 +23,10 @@ const DashboardItemsBasicDetailPage = ({ data, setData, err }) => {
       ...prev,
       [name]: value,
     }));
+    setSelectOpen(false);
   };
+
+  console.log(data);
 
   // FETCH ALL CATEGORIES
   const { data: categories } = useQuery({
@@ -55,10 +60,27 @@ const DashboardItemsBasicDetailPage = ({ data, setData, err }) => {
     },
   });
 
+  const handleUnitSelection = (e, unit) => {
+    console.log(unit);
+    setData((prev) => ({
+      ...prev,
+      measuringUnit: unit?.label,
+    }));
+    setSelectOpen(false);
+  };
+
+  const filteredUnits = useMemo(() => {
+    if (!searchUnitQuery) return uomList;
+    return uomList.filter((unit) =>
+      unit.label.toLowerCase().includes(searchUnitQuery.toLowerCase())
+    );
+  });
+
   return (
     <main className="grid grid-cols-2 gap-15 h-full">
       {/* left container */}
       <div className="">
+        {/* PRODUCT TYPE */}
         <div className=" flex flex-col">
           <p className="text-xs text-gray-600">Item Type </p>
           <div className="h-full flex gap-2">
@@ -181,28 +203,6 @@ const DashboardItemsBasicDetailPage = ({ data, setData, err }) => {
             >
               <option value={"with tax"}>With Tax</option>
               <option value={"without tax"}>Without Tax</option>
-            </select>
-          </div>
-        </div>
-
-        <div className="flex flex-col mt-5">
-          <span className="text-xs text-gray-600">Measuring Unit</span>
-
-          <div className="">
-            <select
-              name="measuringUnit"
-              className="select select-sm w-full"
-              value={data?.measuringUnit}
-              onChange={handleInputChange}
-            >
-              {uomList.map((unit, index) => (
-                <option
-                  key={index}
-                  className="w-full text-left text-xs px-2 py-1 hover:bg-gray-100 rounded"
-                >
-                  {unit?.label} ({unit?.code})
-                </option>
-              ))}
             </select>
           </div>
         </div>
@@ -347,7 +347,89 @@ const DashboardItemsBasicDetailPage = ({ data, setData, err }) => {
             </div>
           </div>
         )}
+
+        <div className="flex flex-col mt-[20.9px] relative">
+          <span className="text-xs text-gray-600">Measuring Unit</span>
+
+          <div>
+            <button
+              onClick={() => setSelectOpen(!selectOpen)}
+              className="w-full text-xs
+               truncate flex items-center justify-between  border border-zinc-300 rounded p-[7.25px]"
+            >
+              {data?.measuringUnit?.length > 0
+                ? data?.measuringUnit
+                : "Select Unit"}
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                className={`h-4 w-4 transition-transform ${
+                  selectOpen ? "rotate-180" : "rotate-0"
+                }`}
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M19 9l-7 7-7-7"
+                />
+              </svg>
+            </button>
+
+            {selectOpen && (
+              <div className="absolute z-15 w-full bg-base-100 border border-gray-200 rounded-lg shadow-lg p-2">
+                {/* Search Input */}
+                <input
+                  type="text"
+                  className="input input-xs w-full mb-2"
+                  placeholder="Search parties..."
+                  value={searchUnitQuery}
+                  onChange={(e) => setSearchUnitQuery(e.target.value)}
+                />
+
+                {/* Unit List */}
+                <ul className="max-h-30 overflow-y-auto">
+                  {filteredUnits?.length > 0 ? (
+                    filteredUnits?.map((unit, index) => (
+                      <li
+                        key={index}
+                        name="measuringUnit"
+                        className="p-1 text-xs rounded-md hover:bg-gray-100 flex items-center justify-between cursor-pointer truncate"
+                        onClick={(e) => handleUnitSelection(e, unit)}
+                      >
+                        {unit?.label} ({unit?.code})
+                      </li>
+                    ))
+                  ) : (
+                    <li className="p-2 text-sm text-gray-500">
+                      No units found
+                    </li>
+                  )}
+                </ul>
+              </div>
+            )}
+
+            {/* <select
+              name="measuringUnit"
+              className="select select-sm w-full"
+              value={data?.measuringUnit}
+              onChange={handleInputChange}
+            >
+              {uomList.map((unit, index) => (
+                <option
+                  key={index}
+                  className="w-full text-left text-xs px-2 py-1 hover:bg-gray-100 rounded"
+                >
+                  {unit?.label} ({unit?.code})
+                </option>
+              ))}
+            </select> */}
+          </div>
+        </div>
       </div>
+
       {showAddCategoryPopup && (
         <div className="fixed inset-0 z-200 flex items-center justify-center bg-black/40 backdrop-blur-sm">
           {/* Modal Box with Animation */}

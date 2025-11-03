@@ -11,6 +11,7 @@ import { useState } from "react";
 import InvoiceReport from "../components/Reports/InvoiceReport";
 import PaymentCollectionReport from "../components/Reports/PaymentCollectionReport";
 import GSTR1Report from "../components/Reports/GSTR1Report";
+import GSTR3Report from "../components/Reports/GSTR3Report";
 
 const DashboardReportPage = () => {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -85,6 +86,9 @@ const DashboardReportPage = () => {
 
             {/* GSTR1 Report */}
             {tab === "gstr1 report" && <GSTR1Report />}
+
+            {/* GSTR3 Report */}
+            {tab === "gstr3 report" && <GSTR3Report />}
 
             {/* 
             <motion.table
