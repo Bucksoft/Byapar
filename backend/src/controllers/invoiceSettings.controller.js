@@ -48,13 +48,11 @@ export const saveInvoiceSettings = async (req, res) => {
       await settings.save();
     }
 
-    res
-      .status(200)
-      .json({
-        success: true,
-        message: "Invoice settings saved successfully",
-        settings,
-      });
+    res.status(200).json({
+      success: true,
+      message: "Invoice settings saved successfully",
+      settings,
+    });
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: "Server error", error });
@@ -74,7 +72,6 @@ export const getInvoiceSettings = async (req, res) => {
     const id = new mongoose.Types.ObjectId(userId);
 
     const themes = await InvoiceSettings.findOne({ userId: id, theme });
-    console.log(themes);
     if (!themes) {
       return res.status(404).json({ message: "Invoice theme not found" });
     }

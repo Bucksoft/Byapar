@@ -1051,7 +1051,7 @@ const BusinessForm = ({ businessToBeUpdated }) => {
               >
                 <div className="text-xs text-gray-700 w-full">
                   <p>
-                    <span className="font-semibold">Account Name:</span>{" "}
+                    <span className="font-semibold">Account Type:</span>{" "}
                     {bank.accountName || "-"}
                   </p>
                   <p>
@@ -1161,7 +1161,7 @@ const BusinessForm = ({ businessToBeUpdated }) => {
             <div className="flex justify-between gap-2">
               <div className="flex flex-col  w-full gap-1">
                 <p className="text-gray-600 text-xs">
-                  Account Name
+                  Account Type
                   <span className="text-red-500"> *</span>
                 </p>
                 <input

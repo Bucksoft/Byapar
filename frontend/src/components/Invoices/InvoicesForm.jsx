@@ -99,7 +99,9 @@ const InvoicesForm = ({
         tax: "",
       },
     ],
-
+    amountSubTotal: 0,
+    taxSubTotal: 0,
+    additionalDiscountAmount: 0,
     additionalDiscountType: "after tax",
     additionalDiscountPercent: 0,
   };
@@ -178,6 +180,7 @@ const InvoicesForm = ({
       }
       return res.data;
     },
+
     onSuccess: (data) => {
       toast.success(data?.msg);
       queryClient.invalidateQueries({ queryKey: ["invoices"] });
@@ -218,17 +221,19 @@ const InvoicesForm = ({
     },
   });
 
+  console.log("INVOICE TO UPDATE -> ", invoiceToUpdate);
+
   // THIS USE EFFECT IS FOR SETTING THE INVOICE WHICH NEEDS TO BE UPDATED
   useEffect(() => {
     if (isEditing && invoiceToUpdate) {
       const normalizedItems = (invoiceToUpdate.items || []).map((it, idx) => {
-        const id = it?._id || it?.itemId || `item-${idx}`;
+        const id = it?._id || `item-${idx}`;
         const qty = Number(it?.quantity ?? it?.qty ?? 1);
         return {
           ...it,
           _id: id,
           quantity: qty,
-          salesPrice: Number(it.salesPrice ?? it.rate ?? 0),
+          salesPrice: Number(it.basePrice ?? it.rate ?? 0),
           gstTaxRate: it.gstTaxRate ?? it.gstRate ?? "0%",
           gstTaxRateType: it.gstTaxRateType ?? "with tax",
           discountPercent: it.discountPercent ?? 0,
@@ -265,6 +270,8 @@ const InvoicesForm = ({
     }
     // Run only when invoiceToUpdate changes from null → object
   }, [invoiceToUpdate, isEditing]);
+
+  console.log("INVOICE TO UPDATE", invoiceToUpdate);
 
   const invoiceTotals = useMemo(() => {
     if (!data?.items?.length)
@@ -353,7 +360,7 @@ const InvoicesForm = ({
       balanceAmount: invoiceTotals.totalAmount,
       totalAmount: invoiceTotals.totalAmount,
       additionalChargeAmount: invoiceTotals.additionalCharge,
-      additionalChargeTax: data?.additionalChargeTax || "",
+      additionalChargeTax: data?.additionalChargeGST || "",
       additionalDiscountPercent: data?.additionalDiscountPercent || 0,
       additionalDiscountType: data?.additionalDiscountType || "after tax",
     }));

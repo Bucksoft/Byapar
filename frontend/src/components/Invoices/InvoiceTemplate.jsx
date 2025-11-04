@@ -1075,8 +1075,12 @@ const InvoiceTemplate = ({
                   >
                     <p>{charge?.reason}</p>
                     <span style={{ display: "flex", alignItems: "center" }}>
-                      <LiaRupeeSignSolid />
-                      {charge?.amount}
+                      {charge?.amount > 0 && (
+                        <>
+                          <LiaRupeeSignSolid />
+                          {charge?.amount}
+                        </>
+                      )}
                     </span>
                   </div>
                 ))}

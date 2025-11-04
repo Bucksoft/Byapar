@@ -77,7 +77,7 @@ const DashboardItemsBasicDetailPage = ({ data, setData, err }) => {
   });
 
   return (
-    <main className="grid grid-cols-2 gap-15 h-full">
+    <main className="grid grid-cols-2 gap-15 h-full ">
       {/* left container */}
       <div className="">
         {/* PRODUCT TYPE */}
@@ -379,7 +379,7 @@ const DashboardItemsBasicDetailPage = ({ data, setData, err }) => {
             </button>
 
             {selectOpen && (
-              <div className="absolute z-15 w-full bg-base-100 border border-gray-200 rounded-lg shadow-lg p-2">
+              <div className="absolute z-20 w-full bg-base-100 border border-gray-200 rounded-lg shadow-lg p-2">
                 {/* Search Input */}
                 <input
                   type="text"
@@ -410,22 +410,6 @@ const DashboardItemsBasicDetailPage = ({ data, setData, err }) => {
                 </ul>
               </div>
             )}
-
-            {/* <select
-              name="measuringUnit"
-              className="select select-sm w-full"
-              value={data?.measuringUnit}
-              onChange={handleInputChange}
-            >
-              {uomList.map((unit, index) => (
-                <option
-                  key={index}
-                  className="w-full text-left text-xs px-2 py-1 hover:bg-gray-100 rounded"
-                >
-                  {unit?.label} ({unit?.code})
-                </option>
-              ))}
-            </select> */}
           </div>
         </div>
       </div>
@@ -477,6 +461,37 @@ const DashboardItemsBasicDetailPage = ({ data, setData, err }) => {
               </button>
             </div>
           </motion.div>
+          
+          {selectOpen && (
+            <div className="absolute z-15 w-full bg-base-100 border border-gray-200 rounded-lg shadow-lg p-2">
+              {/* Search Input */}
+              <input
+                type="text"
+                className="input input-xs w-full mb-2"
+                placeholder="Search parties..."
+                value={searchUnitQuery}
+                onChange={(e) => setSearchUnitQuery(e.target.value)}
+              />
+
+              {/* Unit List */}
+              <ul className="max-h-30 overflow-y-auto">
+                {filteredUnits?.length > 0 ? (
+                  filteredUnits?.map((unit, index) => (
+                    <li
+                      key={index}
+                      name="measuringUnit"
+                      className="p-1 text-xs rounded-md hover:bg-gray-100 flex items-center justify-between cursor-pointer truncate"
+                      onClick={(e) => handleUnitSelection(e, unit)}
+                    >
+                      {unit?.label} ({unit?.code})
+                    </li>
+                  ))
+                ) : (
+                  <li className="p-2 text-sm text-gray-500">No units found</li>
+                )}
+              </ul>
+            </div>
+          )}
         </div>
       )}
     </main>

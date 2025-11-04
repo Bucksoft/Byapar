@@ -13,7 +13,7 @@ const DashboardItemsPricingDetailsPage = ({ data, setData }) => {
     <main className="grid grid-cols-2 gap-15 h-full">
       {/* left container */}
       <div>
-        <div className=" flex flex-col">
+        {/* <div className=" flex flex-col">
           <span className="text-xs text-gray-600">Sales Price</span>
           <div className=" flex items-center h-8 border border-[var(--primary-border)] rounded-xs w-full ">
             <IndianRupee size={16} className="w-10 text-gray-600" />
@@ -49,9 +49,9 @@ const DashboardItemsPricingDetailsPage = ({ data, setData }) => {
               <option value={"without tax"}>Without tax</option>
             </select>
           </div>
-        </div>
+        </div> */}
 
-        <div className="flex flex-col mt-5">
+        <div className="flex flex-col ">
           <span className="text-xs text-gray-600">GST Tax Rate (%)</span>
           {/* <Search size={16} className="w-10 text-gray-600" />
             <input

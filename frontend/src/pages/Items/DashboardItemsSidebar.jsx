@@ -123,141 +123,85 @@ const DashboardItemsSidebar = ({ modalId, itemIdToEdit, isOpen }) => {
 
   return (
     <>
-      <main className="h-full">
-        <div className="w-full flex flex-col text-sm flex-1 ">
+      <main className="h-full flex flex-col overflow-hidden rounded-md">
+        <div className="w-full flex flex-col text-sm flex-1 overflow-hidden">
+          {/* Title */}
           <p className="font-medium text-lg flex items-center my-3">
             <span className="mx-6">
               {state ? "Edit Item" : "Create New Item"}
             </span>
           </p>
 
-          <div className="flex h-full flex-1 p-2 ">
+          {/* Body (Sidebar + Main Content) */}
+          <div className="flex flex-1  p-2 overflow-hidden">
             {/* Sidebar */}
             <motion.div
-              initial={{
-                translateX: -70,
-                opacity: 0,
-              }}
-              animate={{
-                translateX: 0,
-                opacity: 1,
-              }}
-              transition={{
-                ease: "easeInOut",
-                duration: 0.3,
-              }}
-              className="w-3/10 rounded-md"
+              initial={{ translateX: -70, opacity: 0 }}
+              animate={{ translateX: 0, opacity: 1 }}
+              transition={{ ease: "easeInOut", duration: 0.3 }}
+              className="w-3/10 rounded-md bg-white h-full flex flex-col overflow-auto"
             >
-              {data?.itemType === "product" ? (
+              {(data?.itemType === "product"
+                ? newItemsSidebarDetails
+                : newServiceSidebarDetails
+              )?.map((item) => (
                 <div
-                  // style={{
-                  //   boxShadow:
-                  //     "rgba(0, 0, 0, 0.16) 0px 3px 6px, rgba(0, 0, 0, 0.23) 0px 3px 6px",
-                  // }}
-                  className="flex items-center h-full rounded-md flex-col p-3 bg-white"
+                  onClick={() => handleSidebar(item?.title)}
+                  key={item.id}
+                  className={`my-1 cursor-pointer rounded-md w-full transition-all ease-in duration-150 h-10 flex items-center font-normal text-gray-600 hover:bg-info/10 ${
+                    item.title === currentField && "text-info bg-info/10"
+                  }`}
                 >
-                  {newItemsSidebarDetails?.map((item) => (
-                    <div
-                      onClick={() => handleSidebar(item?.title)}
-                      key={item.id}
-                      className={`my-1 cursor-pointer rounded-md w-full transition-all ease-in duration-150 h-10  flex items-center font-normal text-gray-600 hover:bg-info/10 ${
-                        item.title === currentField && "text-info bg-info/10"
-                      }`}
-                    >
-                      {data.itemType === "product" && (
-                        <button
-                          className={` ${
-                            item.title === currentField && "text-info"
-                          } flex gap-2 ml-5`}
-                        >
-                          {item?.icon}
-                          {item.title}
-                        </button>
-                      )}
-                    </div>
-                  ))}
+                  <button
+                    className={`${
+                      item.title === currentField && "text-info"
+                    } flex gap-2 ml-5`}
+                  >
+                    {item?.icon}
+                    {item.title}
+                  </button>
                 </div>
-              ) : (
-                <div className="flex items-center flex-col p-3 h-full bg-white">
-                  {newServiceSidebarDetails?.map((item) => (
-                    <div
-                      onClick={() => handleSidebar(item?.title)}
-                      key={item.id}
-                      className={`my-2 cursor-pointer rounded-md w-full transition-all ease-in duration-150 h-10 flex items-center font-normal text-gray-600 hover:bg-info/10 ${
-                        item.title === currentField && "text-info bg-info/10"
-                      }`}
-                    >
-                      {
-                        <button
-                          className={` ${
-                            item.title === currentField && "text-info"
-                          } flex gap-2 ml-5`}
-                        >
-                          {item?.icon}
-                          {item.title}
-                        </button>
-                      }
-                    </div>
-                  ))}
-                </div>
-              )}
+              ))}
             </motion.div>
 
-            {/* Main Component */}
+            {/* Main Section */}
             <motion.div
-              initial={{
-                opacity: 0,
-                scale: 0,
-              }}
-              animate={{
-                scale: 1,
-                opacity: 1,
-              }}
-              transition={{
-                ease: "easeInOut",
-                duration: 0.3,
-              }}
-              // style={{
-              //   boxShadow:
-              //     "rgba(0, 0, 0, 0.16) 0px 3px 6px, rgba(0, 0, 0, 0.23) 0px 3px 6px",
-              // }}
-              className=" rounded-md w-full bg-white p-5 flex flex-col ml-2"
+              initial={{ opacity: 0, scale: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              transition={{ ease: "easeInOut", duration: 0.3 }}
+              className="rounded-md w-full bg-white p-1 flex flex-col ml-2 h-full overflow-hidden"
             >
-              {/* Scrollable fixed-height content */}
-              <div className="flex-1 overflow-auto">
-                <div className="">
-                  {currentField === "Basic Details" ? (
-                    <DashboardItemsBasicDetailPage
-                      data={data}
-                      setData={setData}
-                      err={
-                        itemMutation.isError &&
-                        itemMutation.error?.response?.data
-                      }
-                    />
-                  ) : currentField === "Stock Details" ? (
-                    <DashboardItemsStockDetailsPage
-                      data={data}
-                      setData={setData}
-                    />
-                  ) : currentField === "Pricing Details" ? (
-                    <DashboardItemsPricingDetailsPage
-                      data={data}
-                      setData={setData}
-                    />
-                  ) : currentField === "Party Wise Prices" ? (
-                    <DashboardItemsPartyWisePricesPage />
-                  ) : currentField === "Other Details" ? (
-                    <DashboardItemsSACCodePage data={data} setData={setData} />
-                  ) : (
-                    ""
-                  )}
-                </div>
+              {/* Scrollable area */}
+              <div className="flex-1 overflow-auto pr-1">
+                {currentField === "Basic Details" ? (
+                  <DashboardItemsBasicDetailPage
+                    data={data}
+                    setData={setData}
+                    err={
+                      itemMutation.isError && itemMutation.error?.response?.data
+                    }
+                  />
+                ) : currentField === "Stock Details" ? (
+                  <DashboardItemsStockDetailsPage
+                    data={data}
+                    setData={setData}
+                  />
+                ) : currentField === "Pricing Details" ? (
+                  <DashboardItemsPricingDetailsPage
+                    data={data}
+                    setData={setData}
+                  />
+                ) : currentField === "Party Wise Prices" ? (
+                  <DashboardItemsPartyWisePricesPage />
+                ) : currentField === "Other Details" ? (
+                  <DashboardItemsSACCodePage data={data} setData={setData} />
+                ) : (
+                  ""
+                )}
               </div>
 
-              {/* Fixed button at bottom */}
-              {/* <div className="divider"></div> */}
-              <div className="w-full flex justify-end gap-3 mt-4 ">
+              {/* Fixed bottom buttons */}
+              <div className="w-full flex justify-end gap-3 mt-4">
                 <button
                   onClick={() => {
                     document.getElementById(modalId).close();
@@ -268,31 +212,20 @@ const DashboardItemsSidebar = ({ modalId, itemIdToEdit, isOpen }) => {
                 >
                   Cancel
                 </button>
-                {state ? (
-                  <button
-                    disabled={itemMutation.isPending}
-                    onClick={() => itemMutation.mutate(data)}
-                    className="btn btn-sm bg-[var(--primary-btn)] w-1/7"
-                  >
-                    {itemMutation.isPending ? (
-                      <CustomLoader text={"Updating..."} />
-                    ) : (
-                      "Save Changes"
-                    )}
-                  </button>
-                ) : (
-                  <button
-                    disabled={itemMutation.isPending}
-                    onClick={() => itemMutation.mutate(data)}
-                    className="btn btn-sm bg-[var(--primary-btn)] w-1/7"
-                  >
-                    {itemMutation.isPending ? (
-                      <CustomLoader text={"Loading..."} />
-                    ) : (
-                      "Save"
-                    )}
-                  </button>
-                )}
+
+                <button
+                  disabled={itemMutation.isPending}
+                  onClick={() => itemMutation.mutate(data)}
+                  className="btn btn-sm bg-[var(--primary-btn)] w-1/7"
+                >
+                  {itemMutation.isPending ? (
+                    <CustomLoader text={state ? "Updating..." : "Loading..."} />
+                  ) : state ? (
+                    "Save Changes"
+                  ) : (
+                    "Save"
+                  )}
+                </button>
               </div>
             </motion.div>
           </div>
