@@ -43,3 +43,55 @@ export async function sendOTPviaMail(to, otp) {
     }
   );
 }
+
+export async function sendInvoiceByEmail(email, html, pdfBuffer) {
+  const base64Pdf = pdfBuffer.toString("base64");
+
+  await axios.post(
+    "https://api.zeptomail.in/v1.1/email",
+    {
+      bounce_address: process.env.ZOHO_BOUNCE_ADDRESS,
+      from: {
+        address: process.env.ZOHO_MAIL_FROM,
+        name: "Byapar",
+      },
+      to: [{ email_address: { address: email } }],
+      subject: "Your Invoice from Byapar",
+      // htmlbody: html,
+      htmlbody: `
+      <div style="font-family: Arial, sans-serif; color: #333; padding: 16px;">
+      <p style="font-size: 15px; line-height: 1.6;">
+        Dear Customer,<br /><br />
+        Please find attached your invoice for the recent transaction with <strong>ByaparSetu</strong>.
+      </p>
+      <p style="font-size: 15px; line-height: 1.6;">
+        You can view your invoice in the attachment below.
+      </p>
+      <hr style="margin: 20px 0; border: none; border-top: 1px solid #ddd;" />
+     
+      <br />
+      <p style="margin-top: 24px; font-size: 14px; color: #555;">
+        If you have any questions regarding this invoice, feel free to reach out to our support team.
+        <br />
+        <strong>Best regards,</strong><br />
+        Team Byapar<br />
+        <a href="https://byaparsetu.com" style="color: #0ea5e9; text-decoration: none;">www.byaparsetu.com</a>
+      </p>
+    </div>
+      `,
+      attachments: [
+        {
+          name: "invoice.pdf",
+          mime_type: "application/pdf",
+          content: base64Pdf,
+        },
+      ],
+    },
+    {
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Zoho-enczapikey ${process.env.ZOHO_API_KEY}`,
+      },
+    }
+  );
+}

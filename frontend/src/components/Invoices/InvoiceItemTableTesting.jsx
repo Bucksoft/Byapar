@@ -180,6 +180,7 @@ const SalesInvoiceItemTableTesting = ({
       "Purchase Return",
       "Purchase Order",
     ].includes(title);
+
     const addDiscPercent = Number(data?.additionalDiscountPercent ?? 0);
     const addDiscType = data?.additionalDiscountType ?? "after tax";
 
@@ -319,6 +320,8 @@ const SalesInvoiceItemTableTesting = ({
     JSON.stringify(data.items.map((i) => i.gstTaxRate)),
   ]);
 
+  console.log(data?.items);
+
   return (
     <>
       <div className="w-full grid grid-cols-12 text-xs ">
@@ -393,9 +396,9 @@ const SalesInvoiceItemTableTesting = ({
           {/* Quantity */}
           <span className="border-t border-l p-2 border-[var(--primary-border)]">
             <input
-              type="number"
-              min={1} // HTML validation (won't allow arrow-down below 1)
-              value={quantities[item._id] || item?.quantity || 1} // default to 1
+              type="text"
+              min={1}
+              value={quantities[item._id] || item?.quantity || 1}
               onChange={(e) => {
                 let newQty = Number(e.target.value);
 
@@ -466,9 +469,15 @@ const SalesInvoiceItemTableTesting = ({
                   ? String(item.discountPercent)
                   : ""
               }
-              onChange={(e) =>
-                handleDiscountChange(index, e.target.value, "percent")
-              }
+              onChange={(e) => {
+                let value = parseFloat(e.target.value);
+                if (isNaN(value)) value = 0;
+
+                if (value > 100) value = 100;
+                if (value < 0) value = 0;
+
+                handleDiscountChange(index, value, "percent");
+              }}
               className="input input-xs bg-zinc-100 text-right"
             />
 
@@ -523,10 +532,15 @@ const SalesInvoiceItemTableTesting = ({
           {/* Amount */}
           <span className="relative border-l border-t p-2 border-[var(--primary-border)]">
             <input
-              value={Number(item?.totalAmount).toLocaleString("en-IN") ?? 0}
+              value={
+                item?.totalAmount !== undefined && item?.totalAmount !== null
+                  ? Math.round(Number(item.totalAmount)).toLocaleString("en-IN")
+                  : 0
+              }
               className="input input-xs bg-zinc-100 text-right"
               readOnly
             />
+
             <LiaRupeeSignSolid className="absolute top-[14.3px] left-3 z-10" />
           </span>
 

@@ -36,7 +36,7 @@ export async function createItem(req, res) {
       ...itemData,
       businessId: req.params?.id,
       clientId: req.user?.id,
-      currentStock: itemData.openingStock || 0,
+      currentStock: itemData.openingStock < 0 ? 0 : itemData.openingStock,
     });
 
     return res.status(201).json({

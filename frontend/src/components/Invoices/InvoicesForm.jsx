@@ -221,7 +221,7 @@ const InvoicesForm = ({
     },
   });
 
-  console.log("INVOICE TO UPDATE -> ", invoiceToUpdate);
+  console.log("INVOICE TO UPDATE", invoiceToUpdate);
 
   // THIS USE EFFECT IS FOR SETTING THE INVOICE WHICH NEEDS TO BE UPDATED
   useEffect(() => {
@@ -233,7 +233,10 @@ const InvoicesForm = ({
           ...it,
           _id: id,
           quantity: qty,
-          salesPrice: Number(it.basePrice ?? it.rate ?? 0),
+          salesPrice:
+            it.gstTaxRateType === "with tax"
+              ? Number(it.totalAmount)
+              : Number(it.basePrice ?? 0),
           gstTaxRate: it.gstTaxRate ?? it.gstRate ?? "0%",
           gstTaxRateType: it.gstTaxRateType ?? "with tax",
           discountPercent: it.discountPercent ?? 0,
@@ -270,8 +273,6 @@ const InvoicesForm = ({
     }
     // Run only when invoiceToUpdate changes from null → object
   }, [invoiceToUpdate, isEditing]);
-
-  console.log("INVOICE TO UPDATE", invoiceToUpdate);
 
   const invoiceTotals = useMemo(() => {
     if (!data?.items?.length)

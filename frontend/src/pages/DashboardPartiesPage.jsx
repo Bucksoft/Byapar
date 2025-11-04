@@ -170,12 +170,23 @@ const DashboardPartiesPage = () => {
               className={`border-l-4 
               rounded-md p-3 sm:p-4 shadow-md shadow-zinc-300 hover:-translate-y-1 hover:bg-emerald-100/10 transition-all duration-200 cursor-pointer`}
             >
-              <p
-                style={{ color: `${details.color}` }}
-                className="flex items-center gap-2 sm:gap-3 text-base"
-              >
-                {details?.icon} {details?.label}
-              </p>
+              <div className="w-full flex  items-center justify-between">
+                <p
+                  style={{ color: `${details.color}` }}
+                  className="flex items-center gap-2 sm:gap-3 text-base"
+                >
+                  {details?.icon} {details?.label}
+                </p>
+                <span>
+                  {details?.label === "To Collect" ? (
+                    <IoMdArrowDown className="text-success" />
+                  ) : (
+                    details?.label === "To Pay" && (
+                      <IoMdArrowUp className="text-error" />
+                    )
+                  )}
+                </span>
+              </div>
               <span className="font-medium text-xl sm:text-2xl flex items-center gap-2 mt-1">
                 {details?.label === "To Collect" && (
                   <>
@@ -271,7 +282,7 @@ const DashboardPartiesPage = () => {
                   <th className="text-center">Category</th>
                   <th className="text-center">Mobile Number</th>
                   <th className="text-center">Party type</th>
-                  <th className="text-center">Balance</th>
+                  <th className="text-center">Current Balance</th>
                   <th className="text-right">Action</th>
                 </tr>
               </thead>
@@ -292,9 +303,9 @@ const DashboardPartiesPage = () => {
                       <td>
                         <div className="flex items-center justify-center gap-2">
                           {party?.currentBalance > 0 ? (
-                            <IoMdArrowUp className="text-success" />
+                            <IoMdArrowDown className="text-success" />
                           ) : party?.currentBalance < 0 ? (
-                            <IoMdArrowDown className="text-error" />
+                            <IoMdArrowUp className="text-error" />
                           ) : (
                             ""
                           )}

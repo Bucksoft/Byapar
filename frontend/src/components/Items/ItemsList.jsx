@@ -177,7 +177,7 @@ const ItemsList = ({ showLowStock, items }) => {
                     <td>
                       {item.itemType === "product" ? (
                         <>
-                          {item?.currentStock || "-"} {item?.measuringUnit}
+                          {item?.currentStock || 0} {item?.measuringUnit}
                         </>
                       ) : (
                         <>-</>

@@ -5,6 +5,8 @@ import { Item } from "../models/item.schema.js";
 import mongoose from "mongoose";
 import { parseDate } from "../../src/utils/date.js";
 import { getFinancialYearRange } from "../utils/financialYear.js";
+import { sendInvoiceByEmail } from "../utils/mail.js";
+import pdf from "html-pdf-node";
 
 // CONTROLLER TO CREATE A SALES INVOICE
 export async function createSalesInvoice(req, res) {
@@ -481,6 +483,58 @@ export async function getSalesDataForChart(req, res) {
 
     return res.status(200).json({ success: true, salesData });
   } catch (error) {
+    return res
+      .status(500)
+      .json({ success: false, msg: "Internal Server Error" });
+  }
+}
+
+// SEND INVOICE VIA EMAIL
+export async function sendInvoiceViaEmail(req, res) {
+  try {
+    const { html, email } = req.body;
+
+    if (!email) {
+      return res
+        .status(400)
+        .json({ success: false, msg: "Please provide an email" });
+    }
+
+    const finalHtml = `
+      <!DOCTYPE html>
+      <html>
+        <head>
+          <meta charset="utf-8" />
+          <title>Invoice</title>
+          <style>
+            @page { size: A4; margin: 10mm; }
+            body { font-family: Arial, sans-serif; margin: 0; padding: 0; }
+            .invoice-container { width: 100%; max-width: 900px; margin: auto; }
+          </style>
+        </head>
+        <body>
+          <div class="invoice-container">
+            ${html}
+          </div>
+        </body>
+      </html>
+    `;
+
+    const file = { content: finalHtml };
+
+    const pdfBuffer = await pdf.generatePdf(file, {
+      format: "A4",
+      printBackground: true,
+      preferCSSPageSize: true,
+    });
+
+    await sendInvoiceByEmail(email, finalHtml, pdfBuffer);
+
+    return res
+      .status(200)
+      .json({ success: true, msg: "Invoice sent successfully" });
+  } catch (error) {
+    console.error("Error in sending email:", error.message);
     return res
       .status(500)
       .json({ success: false, msg: "Internal Server Error" });

@@ -25,19 +25,16 @@ export async function createQuotation(req, res) {
 
     const existingQuotation = await Quotation.findOne({
       quotationNumber: data?.salesInvoiceNumber,
+      businessId: req.params.id,
     });
 
-    if (existingQuotation) {
-      return res.status(400).json({
-        success: false,
-        msg: "Invoice already exists with this invoice number",
-      });
-    }
     const { salesInvoiceNumber, salesInvoiceDate, ...cleanData } = data;
     const quotation = await Quotation.create({
       partyId: party?._id,
       ...cleanData,
-      quotationNumber: data?.salesInvoiceNumber,
+      quotationNumber: existingQuotation
+        ? existingQuotation?.quotationNumber + 1
+        : data?.salesInvoiceNumber,
       quotationDate: data?.salesInvoiceDate,
       businessId: req.params?.id,
       clientId: req.user?.id,

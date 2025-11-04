@@ -32,6 +32,7 @@ export async function createPaymentIn(req, res) {
 
     const existingPaymentIn = await PaymentIn.findOne({
       paymentInNumber,
+      businessId: req.params?.id,
     }).session(session);
 
     const invoiceIds = Object.keys(settledInvoices || {});

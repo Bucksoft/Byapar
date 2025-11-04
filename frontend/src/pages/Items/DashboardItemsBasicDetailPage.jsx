@@ -26,8 +26,6 @@ const DashboardItemsBasicDetailPage = ({ data, setData, err }) => {
     setSelectOpen(false);
   };
 
-  console.log(data);
-
   // FETCH ALL CATEGORIES
   const { data: categories } = useQuery({
     queryKey: ["category"],
@@ -321,7 +319,7 @@ const DashboardItemsBasicDetailPage = ({ data, setData, err }) => {
                     openingStock: Number(e.target.value),
                   }))
                 }
-                type="number"
+                type="text"
                 placeholder="eg: 150 PCS"
                 className="px-2 w-full border border-[var(--primary-border)] rounded-xs h-8 text-xs text-gray-600"
               />
@@ -461,7 +459,7 @@ const DashboardItemsBasicDetailPage = ({ data, setData, err }) => {
               </button>
             </div>
           </motion.div>
-          
+
           {selectOpen && (
             <div className="absolute z-15 w-full bg-base-100 border border-gray-200 rounded-lg shadow-lg p-2">
               {/* Search Input */}

@@ -3,13 +3,14 @@ import {
   Download,
   EllipsisVertical,
   Printer,
+  Send,
   Share2,
 } from "lucide-react";
 import { useNavigate, useParams } from "react-router-dom";
 import InvoiceTemplate from "./InvoiceTemplate";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { axiosInstance } from "../../config/axios";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import toast from "react-hot-toast";
 import { queryClient } from "../../main";
 import CustomLoader from "../Loader";
@@ -19,6 +20,7 @@ import { MdOutlineMailOutline, MdWhatsapp } from "react-icons/md";
 import InvoiceTemplate1 from "../InvoiceTemplate/InvoiceTemplate1";
 import InvoiceTemplate3 from "../InvoiceTemplate/InvoiceTemplate3";
 import InvoiceTemplate2 from "../InvoiceTemplate/InvoiceTemplate2";
+import { sendEmail } from "../../../helpers/sendEmail";
 
 const SalesInvoice = () => {
   const { id } = useParams();
@@ -27,6 +29,8 @@ const SalesInvoice = () => {
   const [isDownloading, setIsDownloading] = useState(false);
   const [invoiceIdToDownload, setInvoiceIdToDownload] = useState();
   const [invoiceIdToDelete, setInvoiceIdToDelete] = useState();
+  const [email, setEmail] = useState("");
+  const [isSending, setIsSending] = useState(false);
 
   // THIS IS THE QUERY TO GET THE INVOICE BASED ON ID
   const { isLoading, data: invoice } = useQuery({
@@ -62,6 +66,12 @@ const SalesInvoice = () => {
       return res.data;
     },
   });
+
+  useEffect(() => {
+    if (invoice?.partyId?.email?.length > 0) {
+      setEmail(invoice?.partyId?.email);
+    }
+  }, [invoice]);
 
   return (
     <main className="p-2 h-screen">
@@ -137,12 +147,73 @@ const SalesInvoice = () => {
                 </li>
 
                 <li>
-                  <button>
+                  <button
+                    onClick={(e) => {
+                      e.preventDefault();
+                      document.getElementById("mail_dialog").showModal();
+                    }}
+                  >
                     <MdOutlineMailOutline size={15} /> Email
                   </button>
                 </li>
               </ul>
             </div>
+
+            {/* Modal to send email to customer */}
+            <dialog id="mail_dialog" className="modal">
+              <div className="modal-box rounded-2xl">
+                <h3 className="font-bold text-xl text-center mb-4">
+                  Enter Receipient Email
+                </h3>
+
+                <form method="dialog" className="flex flex-col gap-2">
+                  <label className="form-control w-full">
+                    <div className="label">
+                      <span className="label-text font-semibold">
+                        Email Address
+                      </span>
+                    </div>
+                    <input
+                      type="email"
+                      placeholder="Enter receipient email"
+                      className="input input-sm w-full"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      required
+                    />
+                  </label>
+
+                  <div className="modal-action flex justify-end">
+                    <div>
+                      <button
+                        onClick={() =>
+                          document.getElementById("mail_dialog").close()
+                        }
+                        className="btn btn-sm btn-ghost rounded-xl mr-2"
+                      >
+                        Close
+                      </button>
+
+                      <button
+                        type="submit"
+                        className="btn btn-sm bg-[var(--primary-btn)] rounded-xl"
+                        onClick={() =>
+                          sendEmail(invoiceIdToDownload, email, setIsSending)
+                        }
+                      >
+                        {isSending ? (
+                          <CustomLoader text={""} />
+                        ) : (
+                          <>
+                            <Send size={15} /> Send
+                          </>
+                        )}
+                      </button>
+                    </div>
+                  </div>
+                </form>
+              </div>
+            </dialog>
 
             {/* DROPDOWN FOR EDIT AND DELETE */}
             <div className="dropdown dropdown-end">
