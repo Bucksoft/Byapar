@@ -29,6 +29,7 @@ import { useMutation } from "@tanstack/react-query";
 import { useDebitNoteStore } from "../store/debitNoteStore";
 import { LogOut } from "lucide-react";
 import { useBusinessBankAccountStore } from "../store/businessBankAccountStore";
+import ByaparSetu from "../assets/ByaparSetu.png";
 
 export const container = {
   hidden: { opacity: 0 },
@@ -120,7 +121,11 @@ const Sidebar = () => {
           }}
           className="sticky top-0 z-10 text-md text-white font-semibold flex items-center gap-3 w-full px-5 py-3 backdrop-blur-md border-b border-b-cyan-950"
         >
-          ByaparSetu
+          {/* <div className="avatar">
+            <div className="w-8 rounded-full bg-white"></div>
+          </div> */}
+          
+          <img src={ByaparSetu} width={"32px"} />
         </motion.h1>
 
         <div className="flex-1 overflow-y-auto hide-scrollbar">
@@ -132,7 +137,7 @@ const Sidebar = () => {
                   <img
                     src={business.logo}
                     alt="Logo"
-                    className="w-full h-full object-cover "
+                    className="w-full h-full object-cover " 
                   />
                 ) : (
                   <span className="text-sm font-semibold text-white tracking-tight">

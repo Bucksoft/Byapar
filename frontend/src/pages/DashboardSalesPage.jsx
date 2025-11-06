@@ -158,7 +158,6 @@ const DashboardSalesPage = () => {
   // MUTATION TO UPLOAD ITEMS IN BULK
   const bulkMutation = useMutation({
     mutationFn: async (data) => {
-      console.log("BULK INVOICE DATA TO SEND ", data);
       const res = await axiosInstance.post(
         `/sales-invoice/bulk/${business?._id}`,
         data
@@ -411,7 +410,15 @@ const DashboardSalesPage = () => {
                                 <button
                                   onClick={() =>
                                     navigate(
-                                      `/dashboard/parties/create-payment-in`
+                                      `/dashboard/parties/create-payment-in`,
+                                      {
+                                        state: {
+                                          partyId: invoice?.partyId?._id,
+                                          invoiceId: invoice?._id,
+                                          partyName:
+                                            invoice?.partyId?.partyName,
+                                        },
+                                      }
                                     )
                                   }
                                   className="flex items-center gap-2"

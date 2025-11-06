@@ -9,7 +9,12 @@ import { axiosInstance } from "../../config/axios";
 import { queryClient } from "../../main";
 import toast from "react-hot-toast";
 
-const DashboardItemsBasicDetailPage = ({ data, setData, err }) => {
+const DashboardItemsBasicDetailPage = ({
+  data,
+  setData,
+  err,
+  itemNameError,
+}) => {
   const [showAddCategoryPopup, setShowAddCategoryPopup] = useState(false);
   const { business } = useBusinessStore();
   const [searchUnitQuery, setSearchUnitQuery] = useState("");
@@ -121,6 +126,7 @@ const DashboardItemsBasicDetailPage = ({ data, setData, err }) => {
               </>
             )}
           </p>
+
           <div>
             <input
               type="text"
@@ -133,6 +139,7 @@ const DashboardItemsBasicDetailPage = ({ data, setData, err }) => {
             <span className="text-xs text-red-500">
               {err?.validationError?.itemName?._errors[0]}
             </span>
+            <span className="text-xs text-red-500">{itemNameError}</span>
           </div>
         </div>
 

@@ -1,0 +1,61 @@
+2025/11/06-12:19:55.760 8e0 Reusing MANIFEST C:\Users\USER\Desktop\BYAPAR\backend\.wwebjs_auth\session\Default\IndexedDB\https_web.whatsapp.com_0.indexeddb.leveldb/MANIFEST-000001
+2025/11/06-12:19:55.761 8e0 Recovering log #638
+2025/11/06-12:19:55.803 8e0 Reusing old log C:\Users\USER\Desktop\BYAPAR\backend\.wwebjs_auth\session\Default\IndexedDB\https_web.whatsapp.com_0.indexeddb.leveldb/000638.log 
+2025/11/06-12:19:59.002 1974 Level-0 table #655: started
+2025/11/06-12:19:59.023 1974 Level-0 table #655: 223242 bytes OK
+2025/11/06-12:19:59.024 1974 Delete type=0 #638
+2025/11/06-12:19:59.025 1974 Manual compaction at level-0 from '\x009\x00\x00\x00' @ 72057594037927935 : 1 .. '\x00:\x00\x00\x00' @ 0 : 0; will stop at '\x009\x00\x00\x05' @ 2823272 : 1
+2025/11/06-12:19:59.025 1974 Compacting 1@0 + 1@1 files
+2025/11/06-12:19:59.049 1974 Generated table #656@0: 8417 keys, 133467 bytes
+2025/11/06-12:19:59.069 1974 Generated table #657@0: 7451 keys, 165585 bytes
+2025/11/06-12:19:59.069 1974 Compacted 1@0 + 1@1 files => 299052 bytes
+2025/11/06-12:19:59.070 1974 compacted to: files[ 0 2 13 0 0 0 0 ]
+2025/11/06-12:19:59.070 1974 Delete type=2 #655
+2025/11/06-12:19:59.070 1974 Manual compaction at level-0 from '\x009\x00\x00\x05' @ 2823272 : 1 .. '\x00:\x00\x00\x00' @ 0 : 0; will stop at (end)
+2025/11/06-12:20:01.770 1d14 Compacting 1@1 + 5@2 files
+2025/11/06-12:20:01.918 1d14 Generated table #658@1: 50031 keys, 2211652 bytes
+2025/11/06-12:20:02.075 1d14 Generated table #659@1: 57995 keys, 2223597 bytes
+2025/11/06-12:20:02.135 1d14 Generated table #660@1: 11588 keys, 2158967 bytes
+2025/11/06-12:20:02.306 1d14 Generated table #661@1: 19776 keys, 2198456 bytes
+2025/11/06-12:20:02.384 1d14 Generated table #662@1: 15731 keys, 2059700 bytes
+2025/11/06-12:20:02.384 1d14 Compacted 1@1 + 5@2 files => 10852372 bytes
+2025/11/06-12:20:02.385 1d14 compacted to: files[ 0 1 13 0 0 0 0 ]
+2025/11/06-12:20:02.385 1d14 Delete type=2 #641
+2025/11/06-12:20:02.385 1d14 Delete type=2 #642
+2025/11/06-12:20:02.385 1d14 Delete type=2 #643
+2025/11/06-12:20:02.385 1d14 Delete type=2 #644
+2025/11/06-12:20:02.385 1d14 Delete type=2 #645
+2025/11/06-12:20:02.385 1d14 Delete type=2 #646
+2025/11/06-12:20:02.385 1d14 Delete type=2 #656
+2025/11/06-13:11:05.546 1974 Level-0 table #664: started
+2025/11/06-13:11:05.614 1974 Level-0 table #664: 1082015 bytes OK
+2025/11/06-13:11:05.615 1974 Delete type=0 #654
+2025/11/06-13:23:16.297 7b0 Compacting 1@0 + 1@1 files
+2025/11/06-13:23:16.343 7b0 Generated table #665@0: 12847 keys, 342384 bytes
+2025/11/06-13:23:16.357 7b0 Generated table #666@0: 7459 keys, 165818 bytes
+2025/11/06-13:23:16.357 7b0 Compacted 1@0 + 1@1 files => 508202 bytes
+2025/11/06-13:23:16.358 7b0 compacted to: files[ 0 2 13 0 0 0 0 ]
+2025/11/06-13:23:16.358 7b0 Delete type=2 #657
+2025/11/06-13:23:16.358 7b0 Delete type=2 #664
+2025/11/06-13:24:19.896 7b0 Compacting 1@1 + 9@2 files
+2025/11/06-13:24:19.992 7b0 Generated table #667@1: 50604 keys, 2213435 bytes
+2025/11/06-13:24:20.159 7b0 Generated table #668@1: 57598 keys, 2221877 bytes
+2025/11/06-13:24:20.201 7b0 Generated table #669@1: 12297 keys, 2159776 bytes
+2025/11/06-13:24:20.271 7b0 Generated table #670@1: 19437 keys, 2197731 bytes
+2025/11/06-13:24:20.327 7b0 Generated table #671@1: 16144 keys, 2154308 bytes
+2025/11/06-13:24:20.351 7b0 Generated table #672@1: 250 keys, 2115048 bytes
+2025/11/06-13:24:20.454 7b0 Generated table #673@1: 66518 keys, 2203644 bytes
+2025/11/06-13:24:20.607 7b0 Generated table #674@1: 101179 keys, 2254414 bytes
+2025/11/06-13:24:20.750 7b0 Generated table #675@1: 99021 keys, 2203658 bytes
+2025/11/06-13:24:20.750 7b0 Compacted 1@1 + 9@2 files => 19723891 bytes
+2025/11/06-13:24:20.751 7b0 compacted to: files[ 0 1 13 0 0 0 0 ]
+2025/11/06-13:24:20.751 7b0 Delete type=2 #647
+2025/11/06-13:24:20.751 7b0 Delete type=2 #648
+2025/11/06-13:24:20.752 7b0 Delete type=2 #649
+2025/11/06-13:24:20.752 7b0 Delete type=2 #650
+2025/11/06-13:24:20.752 7b0 Delete type=2 #658
+2025/11/06-13:24:20.752 7b0 Delete type=2 #659
+2025/11/06-13:24:20.752 7b0 Delete type=2 #660
+2025/11/06-13:24:20.752 7b0 Delete type=2 #661
+2025/11/06-13:24:20.752 7b0 Delete type=2 #662
+2025/11/06-13:24:20.752 7b0 Delete type=2 #665

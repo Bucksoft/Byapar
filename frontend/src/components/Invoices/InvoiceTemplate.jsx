@@ -121,7 +121,7 @@ const InvoiceTemplate = ({
         justifyContent: "center",
         alignItems: "start",
         minHeight: "100vh",
-        padding: "1rem 0",
+        padding: "2rem 0",
         overflowX: "hidden",
         // overflowY: "auto",
       }}
@@ -861,6 +861,7 @@ const InvoiceTemplate = ({
                       Bank Details
                     </h4>
 
+                    {/* ACCOUNT TYPE */}
                     <div
                       style={{
                         display: "flex",
@@ -879,6 +880,9 @@ const InvoiceTemplate = ({
                         {bankAccount?.accountName}
                       </p>
                     </div>
+
+
+                    {/* ACCOUNT HOLDER'S NAME */}
                     <div
                       style={{
                         display: "flex",
@@ -899,7 +903,8 @@ const InvoiceTemplate = ({
                         {bankAccount?.accountHoldersName}
                       </p>
                     </div>
-
+                    
+                    {/* BANK ACCOUNT NUMBER */}
                     <div
                       style={{
                         display: "flex",
@@ -919,6 +924,8 @@ const InvoiceTemplate = ({
                       </p>
                     </div>
 
+
+                    {/* IFSC CODE */}
                     <div
                       style={{
                         display: "flex",
@@ -938,25 +945,30 @@ const InvoiceTemplate = ({
                       </p>
                     </div>
 
-                    <div
-                      style={{
-                        display: "flex",
-                        justifyContent: "space-between",
-                        alignItems: "center",
-                      }}
-                    >
-                      <h4
+
+                  {/* UPI ID */}
+                    {bankAccount?.upiId && (
+                      <div
                         style={{
-                          color: "#52525c",
+                          display: "flex",
+                          justifyContent: "space-between",
+                          alignItems: "center",
                         }}
                       >
-                        UPI Id
-                      </h4>
-                      <p style={{ whiteSpace: "pre-line" }}>
-                        {bankAccount?.upiId}
-                      </p>
-                    </div>
+                        <h4
+                          style={{
+                            color: "#52525c",
+                          }}
+                        >
+                          UPI Id
+                        </h4>
+                        <p style={{ whiteSpace: "pre-line" }}>
+                          {bankAccount?.upiId}
+                        </p>
+                      </div>
+                    )}
 
+                    {/* BANK AND BRANCH NAME */}
                     <div
                       style={{
                         display: "flex",

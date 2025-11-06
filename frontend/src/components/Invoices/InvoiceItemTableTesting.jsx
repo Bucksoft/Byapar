@@ -320,7 +320,6 @@ const SalesInvoiceItemTableTesting = ({
     JSON.stringify(data.items.map((i) => i.gstTaxRate)),
   ]);
 
-  console.log(data?.items);
 
   return (
     <>

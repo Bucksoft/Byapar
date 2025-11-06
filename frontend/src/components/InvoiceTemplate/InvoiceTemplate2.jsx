@@ -362,7 +362,7 @@ const InvoiceTemplate2 = ({
               fontSize: "14px",
             }}
           >
-            {checkBoxSetting && checkBoxSetting?.billTo && (
+            {
               <div style={{ padding: "12px" }}>
                 <h2 style={{ fontWeight: "600", margin: "0 0 4px 0" }}>
                   {type === "Credit Note"
@@ -444,15 +444,15 @@ const InvoiceTemplate2 = ({
                   </p>
                 )}
               </div>
-            )}
-            {checkBoxSetting?.shipTo && (
+            }
+            {
               <div style={{ padding: "8px" }}>
                 <h3 style={{ fontWeight: "600", marginBottom: "4px" }}>
                   Ship To
                 </h3>
                 <p>{invoice?.partyId?.shippingAddress || "shipping address"}</p>
               </div>
-            )}
+            }
           </div>
         }
 
@@ -541,13 +541,14 @@ const InvoiceTemplate2 = ({
                   Discount
                 </th>
               ) : (
-                <th></th>
+                <></>
               )}
               <th
                 style={{
                   border: `1px solid ${themeColor}`,
                   padding: "8px",
                   fontWeight: "600",
+                  textAlign: "right",
                 }}
               >
                 Total
@@ -604,6 +605,7 @@ const InvoiceTemplate2 = ({
                     style={{
                       display: "flex",
                       alignItems: "center",
+                      justifyContent: "center",
                     }}
                   >
                     <LuIndianRupee />
@@ -623,7 +625,7 @@ const InvoiceTemplate2 = ({
                   <div
                     style={{
                       display: "flex",
-                      alignItems: "start",
+                      alignItems: "center",
                       flexDirection: "column",
                       justifyContent: "start",
                     }}
@@ -715,7 +717,13 @@ const InvoiceTemplate2 = ({
 
               {/* Taxable */}
               <td style={{ padding: "6px" }}>
-                <div style={{ display: "flex", alignItems: "center" }}>
+                <div
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                  }}
+                >
                   <LiaRupeeSignSolid />
                   {subtotalTaxable.toLocaleString("en-IN", {
                     minimumFractionDigits: 2,
@@ -726,7 +734,13 @@ const InvoiceTemplate2 = ({
 
               {/* Tax */}
               <td style={{ padding: "6px" }}>
-                <div style={{ display: "flex", alignItems: "center" }}>
+                <div
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                  }}
+                >
                   <LiaRupeeSignSolid />
                   {subtotalTax.toLocaleString("en-IN", {
                     minimumFractionDigits: 2,
@@ -734,7 +748,7 @@ const InvoiceTemplate2 = ({
                   })}
                 </div>
               </td>
-              <td></td>
+              {/* <td></td> */}
               <td style={{ padding: "8px" }}>
                 {" "}
                 <div
@@ -765,6 +779,7 @@ const InvoiceTemplate2 = ({
             fontSize: "14px",
           }}
         >
+          {/* bank details */}
           <div
             style={{
               width: "100%",

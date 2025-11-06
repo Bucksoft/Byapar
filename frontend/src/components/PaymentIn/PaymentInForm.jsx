@@ -38,7 +38,7 @@ const PaymentInForm = () => {
   };
 
   // FETCH ALL INVOICES
-  const { data: invoices } = useQuery({
+  const { data: invoices = [] } = useQuery({
     queryKey: ["invoices", business?._id],
     queryFn: async () => {
       if (!business) return [];
@@ -74,17 +74,20 @@ const PaymentInForm = () => {
   });
 
   useEffect(() => {
-    if (!data?.partyName) {
+    if (!data?.partyName && !location?.state?.partyName) {
       setAllInvoices([]);
       setTotalInvoiceAmount(0);
       return;
     }
 
+    const currentPartyName =
+      data?.partyName || location?.state?.partyName || "";
+
     if (!Array.isArray(invoices)) return;
 
     const allInvoices = invoices.filter(
       (invoice) =>
-        invoice?.partyName?.toLowerCase() === data?.partyName?.toLowerCase()
+        invoice?.partyName?.toLowerCase() === currentPartyName.toLowerCase()
     );
 
     setAllInvoices(allInvoices);
@@ -94,7 +97,7 @@ const PaymentInForm = () => {
       0
     );
     setTotalInvoiceAmount(totalAmount);
-  }, [invoices, data]);
+  }, [invoices, data, location?.state?.partyName]);
 
   useEffect(() => {
     if (!allInvoices?.length) return;
@@ -222,10 +225,27 @@ const PaymentInForm = () => {
   };
 
   useEffect(() => {
-    if (location?.state?.invoiceId && location?.state?.partyName) {
+    if (!Array.isArray(invoices) || invoices.length === 0) return;
+
+    if (location?.state?.partyId && location?.state?.partyName) {
       setSelectedParty(location?.state?.partyName);
     }
-  }, [location?.state?.invoiceId, location?.state?.partyName]);
+
+    if (location?.state?.invoiceId && location?.state?.partyName) {
+      handleInvoiceCheckbox(location?.state?.invoiceId, true);
+    }
+
+    setAllInvoices(
+      invoices.filter(
+        (invoice) => invoice?.partyName === location?.state?.partyName
+      )
+    );
+  }, [
+    invoices,
+    location?.state?.invoiceId,
+    location?.state?.partyName,
+    location?.state?.partyId,
+  ]);
 
   const handleInvoiceCheckbox = (invoiceId, pending) => {
     // prevent auto-allocation from running in effect

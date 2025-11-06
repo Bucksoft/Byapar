@@ -5,6 +5,8 @@ import {
   Printer,
   Send,
   Share2,
+  User,
+  X,
 } from "lucide-react";
 import { useNavigate, useParams } from "react-router-dom";
 import InvoiceTemplate from "./InvoiceTemplate";
@@ -21,16 +23,24 @@ import InvoiceTemplate1 from "../InvoiceTemplate/InvoiceTemplate1";
 import InvoiceTemplate3 from "../InvoiceTemplate/InvoiceTemplate3";
 import InvoiceTemplate2 from "../InvoiceTemplate/InvoiceTemplate2";
 import { sendEmail } from "../../../helpers/sendEmail";
+import { sendWhatsapp } from "../../../helpers/sendWhatsapp";
+import Indian_flag from "../../assets/Indian_flag.png";
+import { useBusinessStore } from "../../store/businessStore";
 
 const SalesInvoice = () => {
+  const [number, setNumber] = useState("");
   const { id } = useParams();
   const navigate = useNavigate();
+  const { business } = useBusinessStore();
+  const [connectionStatus, setConnectionStatus] = useState("");
   const printRef = useRef();
+  const [phoneNumbers, setPhoneNumbers] = useState([]);
   const [isDownloading, setIsDownloading] = useState(false);
   const [invoiceIdToDownload, setInvoiceIdToDownload] = useState();
   const [invoiceIdToDelete, setInvoiceIdToDelete] = useState();
   const [email, setEmail] = useState("");
   const [isSending, setIsSending] = useState(false);
+  const [checkingConn, setCheckingConn] = useState(true);
 
   // THIS IS THE QUERY TO GET THE INVOICE BASED ON ID
   const { isLoading, data: invoice } = useQuery({
@@ -70,6 +80,47 @@ const SalesInvoice = () => {
   useEffect(() => {
     if (invoice?.partyId?.email?.length > 0) {
       setEmail(invoice?.partyId?.email);
+    }
+  }, [invoice]);
+
+  // generate qr code mutation
+  const qrMutation = useMutation({
+    mutationFn: async () => {
+      const res = await axiosInstance.post(`/sales-invoice/qr`);
+      return res.data;
+    },
+  });
+
+  //   use Effect to check if logged in or not
+  useEffect(() => {
+    const interval = setInterval(async () => {
+      try {
+        const res = await axiosInstance.get("/sales-invoice/whatsapp-status");
+
+        if (res.data?.status === "qr") {
+          setQrCode(res?.data.qr);
+          setConnectionStatus("qr");
+        } else if (res.data?.status === "connected") {
+          clearInterval(interval);
+          setConnectionStatus("connected");
+        } else {
+          setConnectionStatus("waiting");
+        }
+
+        setCheckingConn(false);
+      } catch (error) {
+        console.error("Error fetching WhatsApp status:", error);
+        setCheckingConn(false);
+      }
+    }, 5000);
+
+    return () => clearInterval(interval);
+  }, []);
+
+  // set the number by default if party's number is available
+  useEffect(() => {
+    if (invoice?.partyId?.mobileNumber?.length > 0) {
+      setNumber(invoice?.partyId?.mobileNumber);
     }
   }, [invoice]);
 
@@ -141,7 +192,12 @@ const SalesInvoice = () => {
                 className="dropdown-content menu bg-base-100 rounded-box z-1 w-38 text-xs p-1 shadow-sm"
               >
                 <li>
-                  <button>
+                  <button
+                    onClick={(e) => {
+                      e.preventDefault();
+                      document.getElementById("whatsapp_dialog").showModal();
+                    }}
+                  >
                     <MdWhatsapp size={15} /> Whatsapp
                   </button>
                 </li>
@@ -158,6 +214,160 @@ const SalesInvoice = () => {
                 </li>
               </ul>
             </div>
+
+            {/* Modal to send whatsapp to customer */}
+            <dialog id="whatsapp_dialog" className="modal">
+              {checkingConn ? (
+                <div className="modal-box rounded-2xl flex items-center justify-center ">
+                  <CustomLoader text={"Checking connection..."} />
+                </div>
+              ) : connectionStatus === "connected" ? (
+                <div>
+                  <div className="modal-box rounded-2xl">
+                    <h3 className="font-bold text-xl text-center mb-3 text-green-600">
+                      Send Invoice on WhatsApp
+                    </h3>
+
+                    <p className="text-center text-sm text-gray-600 mb-4">
+                      Click the button below to send the invoice on WhatsApp.
+                    </p>
+
+                    <label className="text-xs text-zinc-500">Phone no.</label>
+                    <div className="flex items-center gap-1 mb-2">
+                      <button className="btn btn-sm">
+                        <img src={Indian_flag} alt="flag" width={"10px"} />
+                        +91
+                      </button>
+                      <input
+                        type="number"
+                        value={number}
+                        onChange={(e) => setNumber(e.target.value)}
+                        placeholder="Enter Phone Number"
+                        className="input w-full input-sm"
+                      />
+                      <button
+                        onClick={() => {
+                          if (!number) return;
+                          const cleaned = number
+                            .toString()
+                            .replace(/^\+?91/, "")
+                            .trim();
+                          const fullNumber = `+91${cleaned}`;
+                          setPhoneNumbers([...phoneNumbers, fullNumber]);
+                          setNumber("");
+                        }}
+                        className="btn btn-sm rounded-xl"
+                      >
+                        Add
+                      </button>
+                    </div>
+
+                    {phoneNumbers?.map((no, index) => (
+                      <div key={index} className="mb-4">
+                        <div className="flex items-center justify-between text-xs p-2 bg-zinc-100 shadow-md rounded-xl">
+                          <div className="flex items-center gap-1">
+                            <div className="w-6 h-6 rounded-full flex items-center justify-center bg-zinc-300">
+                              <User size={15} />
+                            </div>
+
+                            <span>{no}</span>
+                          </div>
+                          <button
+                            onClick={() =>
+                              setPhoneNumbers(
+                                phoneNumbers.filter((n) => n !== no)
+                              )
+                            }
+                            className="btn btn-sm btn-circle"
+                          >
+                            <X size={15} />
+                          </button>
+                        </div>
+                      </div>
+                    ))}
+
+                    <div className="flex flex-col items-center gap-2">
+                      <button
+                        className="btn bg-green-500 hover:bg-green-600 text-white w-full rounded-xl"
+                        onClick={() =>
+                          sendWhatsapp(
+                            invoiceIdToDownload,
+                            phoneNumbers,
+                            setIsSending,
+                            business?.businessName,
+                            invoice?.partyId?.partyName,
+                            invoice?.totalAmount,
+                            "whatsapp_dialog"
+                          )
+                        }
+                      >
+                        {isSending ? (
+                          <CustomLoader text={"Sending..."} />
+                        ) : (
+                          "Send"
+                        )}
+                      </button>
+                      <button
+                        className="btn btn-sm btn-ghost rounded-xl"
+                        onClick={() =>
+                          document.getElementById("whatsapp_dialog").close()
+                        }
+                      >
+                        Close
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              ) : (
+                <div className="modal-box rounded-2xl">
+                  <h3 className="font-bold text-xl text-center mb-3 text-green-600">
+                    Link Your WhatsApp
+                  </h3>
+
+                  <p className="text-center text-sm text-gray-600 mb-4">
+                    To send invoices directly on WhatsApp, please connect your
+                    WhatsApp account. A QR code will appear after clicking the
+                    button below.
+                  </p>
+
+                  <div className="flex flex-col items-center gap-4">
+                    {qrMutation.isSuccess ? (
+                      <img src={qrMutation.data?.qr} alt="qr" />
+                    ) : (
+                      <button
+                        className="btn bg-green-500 hover:bg-green-600 text-white w-full rounded-xl"
+                        onClick={() => qrMutation.mutate()}
+                      >
+                        {qrMutation.isPending ? (
+                          <CustomLoader text={"Generating QR..."} />
+                        ) : (
+                          <>
+                            <MdWhatsapp size={15} />
+                            Link WhatsApp
+                          </>
+                        )}
+                      </button>
+                    )}
+
+                    <p className="text-xs text-gray-500 text-center px-4">
+                      Make sure your WhatsApp Web session is active on your
+                      phone to complete the connection.
+                    </p>
+                  </div>
+
+                  <div className="modal-action mt-4 justify-center">
+                    <button
+                      className="btn btn-sm btn-ghost rounded-xl"
+                      onClick={() =>
+                        document.getElementById("whatsapp_dialog").close()
+                      }
+                    >
+                      Close
+                    </button>
+                  </div>
+                </div>
+              )}
+            </dialog>
 
             {/* Modal to send email to customer */}
             <dialog id="mail_dialog" className="modal">
@@ -330,7 +540,7 @@ const SalesInvoice = () => {
               </>
             ) : (
               <InvoiceTemplate
-                color={"#E56E2A"}
+                color={currentTheme?.selectedColor || "#E56E2A"}
                 invoice={invoice}
                 type={"Sales Invoice"}
                 printRef={printRef}

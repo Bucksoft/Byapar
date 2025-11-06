@@ -309,7 +309,7 @@ const DashboardPartiesPage = () => {
                           ) : (
                             ""
                           )}
-                          ₹ {Math.abs(party?.currentBalance) || 0}
+                          ₹ {Math.abs(party?.currentBalance || 0)?.toFixed(2)}
                         </div>
                       </td>
                       <td

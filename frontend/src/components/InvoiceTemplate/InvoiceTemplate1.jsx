@@ -756,7 +756,7 @@ const InvoiceTemplate1 = ({
                     </div>
                   </td>
                 ) : (
-                  <td></td>
+                  <></>
                 )}
 
                 {/* Total */}

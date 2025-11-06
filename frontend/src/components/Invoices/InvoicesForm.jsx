@@ -116,6 +116,20 @@ const InvoicesForm = ({
           "You don't have any active business yet, create one first"
         );
       }
+
+      // check for stock
+      const productItems = formData?.items?.filter(
+        (item) => item?.itemType === "product"
+      );
+      const itemWithZeroStock =
+        productItems?.length > 0
+          ? productItems?.find((item) => item?.currentStock <= 0)
+          : [];
+
+      if (itemWithZeroStock && itemWithZeroStock?.length > 0) {
+        throw new Error(`${itemWithZeroStock?.itemName} is out of stock`);
+      }
+
       if (!party) {
         throw new Error("Please select a party");
       }
@@ -220,8 +234,6 @@ const InvoicesForm = ({
       }
     },
   });
-
-  console.log("INVOICE TO UPDATE", invoiceToUpdate);
 
   // THIS USE EFFECT IS FOR SETTING THE INVOICE WHICH NEEDS TO BE UPDATED
   useEffect(() => {

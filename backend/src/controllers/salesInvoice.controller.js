@@ -7,6 +7,68 @@ import { parseDate } from "../../src/utils/date.js";
 import { getFinancialYearRange } from "../utils/financialYear.js";
 import { sendInvoiceByEmail } from "../utils/mail.js";
 import pdf from "html-pdf-node";
+import pkg from "whatsapp-web.js";
+import qrcode from "qrcode";
+import path from "path";
+import { fileURLToPath } from "url";
+import fs from "fs";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+
+const { Client, LocalAuth } = pkg;
+
+let qrCodeString = null;
+let isReady = false;
+let qrPromiseResolve = null;
+
+const client = new Client({
+  authStrategy: new LocalAuth({
+    dataPath: "./.wwebjs_auth",
+  }),
+  puppeteer: {
+    headless: true,
+    // executablePath:
+    //   process.platform === "win32"
+    //     ? "C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe"
+    //     : undefined,
+    args: [
+      "--no-sandbox",
+      "--disable-setuid-sandbox",
+      "--disable-dev-shm-usage",
+      "--disable-gpu",
+      "--no-zygote",
+      "--disable-extensions",
+      "--disable-infobars",
+      "--window-size=1280,800",
+    ],
+  },
+});
+
+client.on("qr", (qr) => {
+  console.log("📲 QR Code received from WhatsApp");
+  qrCodeString = qr;
+  isReady = false;
+
+  if (qrPromiseResolve) {
+    qrPromiseResolve(qr);
+    qrPromiseResolve = null;
+  }
+});
+
+client.on("ready", () => {
+  console.log(" WhatsApp client is ready!");
+  isReady = true;
+  qrCodeString = null;
+});
+
+client.on("auth_failure", (msg) => {
+  console.error(" Authentication failed:", msg);
+  isReady = false;
+  qrCodeString = null;
+});
+
+client.initialize();
 
 // CONTROLLER TO CREATE A SALES INVOICE
 export async function createSalesInvoice(req, res) {
@@ -538,5 +600,143 @@ export async function sendInvoiceViaEmail(req, res) {
     return res
       .status(500)
       .json({ success: false, msg: "Internal Server Error" });
+  }
+}
+
+// WAIT FOR QR CODE
+const waitForQrCode = () => {
+  if (qrCodeString) return Promise.resolve(qrCodeString);
+
+  return new Promise((resolve, reject) => {
+    qrPromiseResolve = resolve;
+    setTimeout(() => {
+      reject(new Error("QR not generated in time"));
+    }, 20000);
+  });
+};
+
+// GENERATE QR CODE
+export async function generateQrCode(req, res) {
+  try {
+    if (isReady) {
+      return res.status(200).json({
+        status: "connected",
+        message: "WhatsApp is already connected",
+      });
+    }
+
+    // Wait for QR code to be generated
+    const qrData = await waitForQrCode();
+    const qrBase64 = await qrcode.toDataURL(qrData);
+
+    return res.status(200).json({
+      status: "qr",
+      qr: qrBase64,
+    });
+  } catch (error) {
+    console.error("⚠️ Error generating QR:", error.message);
+    return res.status(202).json({
+      status: "waiting",
+      message: "⌛ QR not yet ready. Please retry in a few seconds.",
+    });
+  }
+}
+
+// SEND INVOICE VIA WHATSAPP
+export async function sendInvoiceViaWhatsapp(req, res) {
+  try {
+    const { phoneNumbers, html, businessName, partyName, invoiceAmount } =
+      req.body;
+
+    if (!isReady) {
+      return res.status(400).json({ error: "WhatsApp not connected yet." });
+    }
+
+    if (!phoneNumbers || phoneNumbers.length === 0 || !html) {
+      return res
+        .status(400)
+        .json({ error: "Missing phone numbers or invoice." });
+    }
+
+    const finalHtml = `
+      <!DOCTYPE html>
+      <html>
+        <head>
+          <meta charset="utf-8" />
+          <title>Invoice</title>
+          <style>
+            @page { size: A4; margin: 10mm; }
+            body { font-family: Arial, sans-serif; margin: 0; padding: 0; }
+            .invoice-container { width: 100%; max-width: 900px; margin: auto; }
+          </style>
+        </head>
+        <body>
+          <div class="invoice-container">
+            ${html}
+          </div>
+        </body>
+      </html>
+    `;
+
+    const file = { content: finalHtml };
+
+    const pdfBuffer = await pdf.generatePdf(file, {
+      format: "A4",
+      printBackground: true,
+      preferCSSPageSize: true,
+    });
+
+    const pdfBase64 = pdfBuffer.toString("base64");
+    const media = new pkg.MessageMedia(
+      "application/pdf",
+      pdfBase64,
+      "Invoice.pdf"
+    );
+
+    // sending invoice to all the phone numbers
+    for (const number of phoneNumbers) {
+      const formattedNumber = number.toString().replace(/\D/g, "");
+      const chatId = `${formattedNumber}@c.us`;
+
+      await client.sendMessage(
+        chatId,
+        `Hi *${partyName?.trim()},*
+
+Here are the details of your _Sale Invoice_ from *${businessName?.trim()}*:
+
+*Invoice Amount:* ₹${invoiceAmount}
+
+Thank you for doing business with us.  
+Please find your invoice attached below.`
+      );
+      await client.sendMessage(chatId, media);
+    }
+
+    res
+      .status(200)
+      .json({ success: true, message: "Invoice sent successfully!" });
+  } catch (error) {
+    console.error("Error sending WhatsApp message:", error);
+    res.status(500).json({ error: "Failed to send message." });
+  }
+}
+
+// get whatsapp status
+export async function getWhatsappStatus(req, res) {
+  try {
+    if (isReady) {
+      return res.json({
+        status: "connected",
+        message: " WhatsApp is connected and ready.",
+      });
+    } else {
+      return res.json({
+        status: "waiting",
+        message: "⌛ Initializing WhatsApp client. Please wait...",
+      });
+    }
+  } catch (err) {
+    console.error("Error getting WhatsApp status:", err);
+    res.status(500).json({ error: "Internal Server Error" });
   }
 }

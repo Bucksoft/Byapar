@@ -18,11 +18,13 @@ import { useItemStore } from "../../store/itemStore";
 import CustomLoader from "../../components/Loader";
 import { useBusinessStore } from "../../store/businessStore";
 import DashboardItemsSACCodePage from "./DashboardItemsSACCodePage";
+import { useRef } from "react";
 
 const DashboardItemsSidebar = ({ modalId, itemIdToEdit, isOpen }) => {
   const navigate = useNavigate();
   const [itemToBeEdited, setItemToBeEdited] = useState();
   const { state } = useLocation();
+  const [itemNameError, setItemNameError] = useState("");
   const { business } = useBusinessStore();
   const { setItem, items } = useItemStore();
   const [currentField, setCurrentField] = useState("Basic Details");
@@ -79,24 +81,33 @@ const DashboardItemsSidebar = ({ modalId, itemIdToEdit, isOpen }) => {
         );
       }
 
-      if (itemIdToEdit) {
-        const res = await axiosInstance.patch(`/item/${itemIdToEdit}`, {
-          data,
-        });
-        return res.data;
-      } else {
-        const res = await axiosInstance.post(`/item/${business?._id}`, {
-          data,
-        });
-        return res.data;
+      // check for valid name of the item
+      const isValidName = /^[a-zA-Z0-9\s\-_.&/()]+$/.test(data?.itemName);
+
+      if (!isValidName) {
+        setItemNameError(
+          `Use only letters, numbers, and basic symbols (- _ . / ()).`
+        );
       }
+
+      // if (itemIdToEdit) {
+      //   const res = await axiosInstance.patch(`/item/${itemIdToEdit}`, {
+      //     data,
+      //   });
+      //   return res.data;
+      // } else {
+      //   const res = await axiosInstance.post(`/item/${business?._id}`, {
+      //     data,
+      //   });
+      //   return res.data;
+      // }
     },
 
     onSuccess: (data) => {
       toast.success(data.msg);
       setItem(data);
       setData(initialFormState);
-
+      setItemNameError("");
       if (!itemIdToEdit) {
         document.getElementById(modalId)?.close();
       }
@@ -110,7 +121,6 @@ const DashboardItemsSidebar = ({ modalId, itemIdToEdit, isOpen }) => {
     },
 
     onError: (err) => {
-      console.log(err);
       toast.error(
         err?.response?.data?.validationError?.itemName?._errors?.[0] ||
           err?.response?.data?.msg ||
@@ -177,6 +187,7 @@ const DashboardItemsSidebar = ({ modalId, itemIdToEdit, isOpen }) => {
                   <DashboardItemsBasicDetailPage
                     data={data}
                     setData={setData}
+                    itemNameError={itemNameError}
                     err={
                       itemMutation.isError && itemMutation.error?.response?.data
                     }
@@ -207,6 +218,7 @@ const DashboardItemsSidebar = ({ modalId, itemIdToEdit, isOpen }) => {
                     document.getElementById(modalId).close();
                     setCurrentField("Basic Details");
                     setData(initialFormState);
+                    setItemNameError("");
                   }}
                   className="btn btn-sm w-1/7"
                 >
