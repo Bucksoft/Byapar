@@ -3,17 +3,64 @@ import { Calendar, ChevronDown, Plus, Search } from "lucide-react";
 import { FaFileInvoice } from "react-icons/fa";
 import DashboardNavbar from "../components/DashboardNavbar";
 import { motion } from "framer-motion";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import CreateExpenseForm from "../components/CreateExpenseForm";
+import { useQuery } from "@tanstack/react-query";
+import { axiosInstance } from "../config/axios";
+import { useBusinessStore } from "../store/businessStore";
+import { LuIndianRupee } from "react-icons/lu";
+import CustomLoader from "../components/Loader";
 
 const DashboardExpenses = () => {
   const [openCreateExpense, setOpenCreateExpense] = useState(false);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [searchCategoryQuery, setSearchCategoryQuery] = useState("");
+  const { business } = useBusinessStore();
+
+  // fetch all expenses
+  const { isLoading, data } = useQuery({
+    queryKey: ["expenses"],
+    queryFn: async () => {
+      const res = await axiosInstance.get(
+        `/expense/?businessId=${business?._id}`
+      );
+      return res.data;
+    },
+  });
+
+  // fetch all expense categories
+  const { data: expenseCategories = [] } = useQuery({
+    queryKey: ["expenseCategory"],
+    queryFn: async () => {
+      const res = await axiosInstance.get(
+        `/expense/category/?businessId=${business?._id}`
+      );
+      return res.data?.expenseCategories;
+    },
+  });
+
+  const filteredExpenses = useMemo(() => {
+    if (!data?.expenses) return [];
+    if (searchQuery) {
+      return data?.expenses?.filter((expense) => {
+        return expense?.expenseCategory?.categoryName
+          ?.toLowerCase()
+          .includes(searchQuery);
+      });
+    } else {
+      return data?.expenses;
+    }
+  });
+
   return (
     <main className="h-screen w-full flex">
       {openCreateExpense ? (
-        <CreateExpenseForm setOpenCreateExpense={setOpenCreateExpense} />
+        <CreateExpenseForm
+          setOpenCreateExpense={setOpenCreateExpense}
+          latestExpenseNumber={data?.latestExpenseNumber || 0}
+        />
       ) : (
-        <section className="w-full p-3 bg-zinc-100">
+        <section className="w-full p-3 ">
           <div className="h-full rounded-md  bg-white p-2 flex flex-col">
             <DashboardNavbar title={"Expenses"} />
 
@@ -37,7 +84,13 @@ const DashboardExpenses = () => {
                 <div className="">
                   <label className="input input-sm">
                     <Search size={16} className="text-zinc-400" />
-                    <input type="search" required placeholder="Search" />
+                    <input
+                      value={searchQuery}
+                      onChange={(e) => setSearchQuery(e.target.value)}
+                      type="search"
+                      required
+                      placeholder="Search by Category"
+                    />
                   </label>
                 </div>
                 {/* calender */}
@@ -55,7 +108,7 @@ const DashboardExpenses = () => {
                   </div>
                   <ul
                     tabIndex={0}
-                    className="dropdown-content menu bg-base-100 rounded-box z-1 w-52 p-2 shadow-sm"
+                    className="dropdown-content menu bg-base-100 rounded-box z-1 w-52 p-2 shadow-sm text-xs"
                   >
                     <li>
                       <a>Today</a>
@@ -72,28 +125,43 @@ const DashboardExpenses = () => {
                   </ul>
                 </div>
                 {/* all expense */}
-                <div className="dropdown dropdown-center w-60">
+                <div className="dropdown dropdown-center ">
                   <div
                     tabIndex={0}
                     role="button"
-                    className="btn btn-wide btn-sm w-full  text-xs font-medium flex items-center justify-between"
+                    className="btn btn-wide btn-sm w-full text-xs font-medium flex items-center justify-between"
                   >
                     All Expenses Categories
                     <ChevronDown size={16} />
                   </div>
                   <ul
                     tabIndex={0}
-                    className="dropdown-content menu bg-base-100 rounded-box z-1 w-52 p-2 shadow-sm"
+                    className="dropdown-content menu bg-base-100 rounded-box z-1 w-52 p-2 shadow-sm text-xs"
                   >
-                    <li>
-                      <a>All Expenses Categories</a>
-                    </li>
-                    <li>
-                      <a>Bank Fee & Charges</a>
-                    </li>
-                    <li>
-                      <a>Raw Material</a>
-                    </li>
+                    <input
+                      type="text"
+                      placeholder="Search"
+                      value={searchCategoryQuery}
+                      onChange={(e) => setSearchCategoryQuery(e.target.value)}
+                      className="input input-xs mb-1"
+                    />
+                    {searchCategoryQuery
+                      ? expenseCategories
+                          ?.filter((category) =>
+                            category?.categoryName
+                              ?.toLowerCase()
+                              ?.includes(searchCategoryQuery)
+                          )
+                          .map((category) => (
+                            <li key={category?._id}>
+                              <a>{category?.categoryName}</a>
+                            </li>
+                          ))
+                      : expenseCategories?.map((category) => (
+                          <li key={category?._id}>
+                            <a>{category?.categoryName}</a>
+                          </li>
+                        ))}
                   </ul>
                 </div>
               </div>
@@ -126,7 +194,7 @@ const DashboardExpenses = () => {
                 ease: "easeInOut",
                 duration: 0.2,
               }}
-              className="overflow-x-auto border border-zinc-200 rounded-lg  mt-10 h-80 w-full"
+              className="overflow-x-auto border border-zinc-200 rounded-lg  mt-10 max-h-full w-full overflow-y-auto"
             >
               <table className="table table-zebra">
                 {/* head */}
@@ -134,16 +202,51 @@ const DashboardExpenses = () => {
                   <tr className="bg-zinc-200">
                     <th>Date</th>
                     <th>Expense Number</th>
-                    <th>Party Name</th>
                     <th>Category</th>
                     <th>Amount</th>
+                    <th>Payment Mode</th>
                   </tr>
                 </thead>
+                <tbody>
+                  {isLoading ? (
+                    <tr>
+                      <td colSpan={5}>
+                        <div className="flex items-center justify-center py-20">
+                          <CustomLoader text={"Loading..."} />
+                        </div>
+                      </td>
+                    </tr>
+                  ) : filteredExpenses?.length > 0 ? (
+                    filteredExpenses?.map((expense) => (
+                      <tr key={expense?._id}>
+                        <td>{expense?.expenseDate}</td>
+                        <td>{expense?.expenseNumber}</td>
+                        <td>{expense?.expenseCategory?.categoryName}</td>
+                        <td>
+                          <div className="flex items-center">
+                            <LuIndianRupee />
+                            {Number(expense?.totalAmount).toLocaleString(
+                              "en-IN"
+                            )}
+                          </div>
+                        </td>
+                        <td>{expense?.paymentMode}</td>
+                      </tr>
+                    ))
+                  ) : (
+                    <tr>
+                      <td colSpan={5} className=" text-center text-zinc-400">
+                        <div className="flex flex-col py-20 items-center justify-center gap-3">
+                          <FaFileInvoice size={40} />
+                          <span>
+                            No transactions matching the current filter
+                          </span>
+                        </div>
+                      </td>
+                    </tr>
+                  )}
+                </tbody>
               </table>
-              <div className="w-full flex items-center justify-center py-20 flex-col gap-3 text-zinc-400">
-                <FaFileInvoice size={40} />
-                No transactions matching the current filter
-              </div>
             </motion.div>
           </div>
         </section>

@@ -166,36 +166,36 @@ export const dashboardFields = [
 ];
 
 export const dashboardAccountingFields = [
-  {
-    id: 1,
-    icon: <BsBank2 size={16} />,
-    label: "Cash & Bank",
-    link: "cashandbank",
-  },
-  {
-    id: 2,
-    icon: <FaFileInvoice size={16} />,
-    label: "E-Invoicing",
-    link: "invoicing",
-  },
-  {
-    id: 3,
-    icon: <FaMoneyBills size={16} />,
-    label: "Automated Bills",
-    link: "bills",
-  },
+  // {
+  //   id: 1,
+  //   icon: <BsBank2 size={16} />,
+  //   label: "Cash & Bank",
+  //   link: "cashandbank",
+  // },
+  // {
+  //   id: 2,
+  //   icon: <FaFileInvoice size={16} />,
+  //   label: "E-Invoicing",
+  //   link: "invoicing",
+  // },
+  // {
+  //   id: 3,
+  //   icon: <FaMoneyBills size={16} />,
+  //   label: "Automated Bills",
+  //   link: "bills",
+  // },
   {
     id: 4,
     icon: <FaWallet size={16} />,
     label: "Expenses",
     link: "expenses",
   },
-  {
-    id: 5,
-    icon: <BsFillLaptopFill />,
-    label: "POS Billing",
-    link: "pos",
-  },
+  // {
+  //   id: 5,
+  //   icon: <BsFillLaptopFill />,
+  //   label: "POS Billing",
+  //   link: "pos",
+  // },
 ];
 
 export const settingLinks = [

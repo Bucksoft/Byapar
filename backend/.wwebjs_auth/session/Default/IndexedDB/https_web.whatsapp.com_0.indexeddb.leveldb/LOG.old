@@ -1,4 +1,3 @@
-2025/11/06-12:19:47.165 3a5c Reusing MANIFEST C:\Users\USER\Desktop\BYAPAR\backend\.wwebjs_auth\session\Default\IndexedDB\https_web.whatsapp.com_0.indexeddb.leveldb/MANIFEST-000001
-2025/11/06-12:19:47.165 3a5c Recovering log #638
-2025/11/06-12:19:47.257 3a5c Reusing old log C:\Users\USER\Desktop\BYAPAR\backend\.wwebjs_auth\session\Default\IndexedDB\https_web.whatsapp.com_0.indexeddb.leveldb/000638.log 
-2025/11/06-12:19:50.117 2698 Manual compaction at level-0 from '\x008\x00\x00\x00' @ 72057594037927935 : 1 .. '\x009\x00\x00\x00' @ 0 : 0; will stop at (end)
+2025/11/07-15:25:32.745 13e0 Reusing MANIFEST C:\Users\USER\Desktop\BYAPAR\backend\.wwebjs_auth\session\Default\IndexedDB\https_web.whatsapp.com_0.indexeddb.leveldb/MANIFEST-000001
+2025/11/07-15:25:32.746 13e0 Recovering log #1849
+2025/11/07-15:25:32.752 13e0 Reusing old log C:\Users\USER\Desktop\BYAPAR\backend\.wwebjs_auth\session\Default\IndexedDB\https_web.whatsapp.com_0.indexeddb.leveldb/001849.log 

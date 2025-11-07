@@ -22,6 +22,7 @@ import categoryRoutes from "./routes/category.routes.js";
 import debitNoteRoutes from "./routes/debitNote.route.js";
 import bankAccountRoutes from "./routes/bankAccount.js";
 import invoiceSettingsRoutes from "./routes/invoiceSettings.js";
+import expenseRoutes from "./routes/expenseItem.routes.js";
 import { loginViaGoogleCallback } from "./controllers/user.controller.js";
 import cookieParser from "cookie-parser";
 import path from "path";
@@ -83,6 +84,7 @@ app.use("/api/v1/purchase-order", purchaseOrderRoutes);
 app.use("/api/v1/debit-note", debitNoteRoutes);
 app.use("/api/v1/bank-account", bankAccountRoutes);
 app.use("/api/v1/invoiceTheme", invoiceSettingsRoutes);
+app.use("/api/v1/expense", expenseRoutes);
 
 // const __dirname = path.resolve();
 // app.use(express.static(path.join(__dirname, "../frontend/dist")));

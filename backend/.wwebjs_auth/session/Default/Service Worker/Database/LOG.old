@@ -1,3 +1,4 @@
-2025/11/06-12:19:46.542 3a5c Reusing MANIFEST C:\Users\USER\Desktop\BYAPAR\backend\.wwebjs_auth\session\Default\Service Worker\Database/MANIFEST-000001
-2025/11/06-12:19:46.543 3a5c Recovering log #3
-2025/11/06-12:19:46.544 3a5c Reusing old log C:\Users\USER\Desktop\BYAPAR\backend\.wwebjs_auth\session\Default\Service Worker\Database/000003.log 
+2025/11/07-15:25:32.029 2c9c Reusing MANIFEST C:\Users\USER\Desktop\BYAPAR\backend\.wwebjs_auth\session\Default\Service Worker\Database/MANIFEST-000001
+2025/11/07-15:25:32.029 2c9c Recovering log #3
+2025/11/07-15:25:32.030 2c9c (ignoring error) C:\Users\USER\Desktop\BYAPAR\backend\.wwebjs_auth\session\Default\Service Worker\Database/000003.log: dropping 45 bytes; Corruption: missing start of fragmented record(2)
+2025/11/07-15:25:32.030 2c9c Reusing old log C:\Users\USER\Desktop\BYAPAR\backend\.wwebjs_auth\session\Default\Service Worker\Database/000003.log 
