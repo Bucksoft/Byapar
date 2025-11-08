@@ -54,7 +54,7 @@ const DashboardExpenses = () => {
 
   return (
     <main className="h-screen w-full flex">
-      {openCreateExpense ? (
+      {!openCreateExpense ? (
         <CreateExpenseForm
           setOpenCreateExpense={setOpenCreateExpense}
           latestExpenseNumber={data?.latestExpenseNumber || 0}

@@ -40,6 +40,20 @@ const CreateExpenseForm = ({ setOpenCreateExpense, latestExpenseNumber }) => {
     totalAmount: 0,
     totalTax: 0,
     totalQuantity: 0,
+    additionalCharges: [
+      {
+        reason: "",
+        amount: 0,
+        gstRate: "",
+        gstAmount: 0,
+      },
+    ],
+    additionalDiscountType: "after_tax",
+    additionalDicountPercent: 0,
+    additionalDiscountAmount: 0,
+    totalAdditionalChargeAmount: 0,
+    totalAdditionalChargeGST: 0,
+    totalAmountAfterCharges: 0,
   });
 
   const { isPending, data: items = [] } = useQuery({
@@ -333,18 +347,6 @@ const CreateExpenseForm = ({ setOpenCreateExpense, latestExpenseNumber }) => {
               </div>
             </motion.div>
           </div>
-
-          {/* DISPLAYING LIST OF ADDED ITEMS IN A TABULAR FORMAT FOR CALCULATION */}
-          <div>
-            <ExpenseItemsTable
-              addedItems={addedItems}
-              checked={checked}
-              setAddedItems={setAddedItems}
-              setData={setData}
-            />
-          </div>
-
-          {/* bottom section */}
           {checked !== undefined && (
             <div className="border-b border-[var(--primary-border)] p-2">
               <button
@@ -358,6 +360,18 @@ const CreateExpenseForm = ({ setOpenCreateExpense, latestExpenseNumber }) => {
               </button>
             </div>
           )}
+          {/* DISPLAYING LIST OF ADDED ITEMS IN A TABULAR FORMAT FOR CALCULATION */}
+          <div>
+            <ExpenseItemsTable
+              addedItems={addedItems}
+              checked={checked}
+              setAddedItems={setAddedItems}
+              setData={setData}
+              data={data}
+            />
+          </div>
+
+          {/* bottom section */}
         </div>
       </section>
 

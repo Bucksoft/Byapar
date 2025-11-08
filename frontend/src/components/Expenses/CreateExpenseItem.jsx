@@ -26,6 +26,7 @@ const CreateExpenseItem = () => {
         `/expense/item/?businessId=${business?._id}`,
         data
       );
+      console.log(res);
       return res.data;
     },
     onSuccess: (data) => {
@@ -42,6 +43,10 @@ const CreateExpenseItem = () => {
       });
       document.getElementById("create_item_modal").close();
       queryClient.invalidateQueries({ queryKey: ["expenseItems"] });
+    },
+    onError: (err) => {
+      toast.error(err?.response?.data?.msg);
+      document.getElementById("create_item_modal").close();
     },
   });
 
@@ -140,7 +145,6 @@ const CreateExpenseItem = () => {
 
             {/* RIGHT SECTION */}
             <div className="space-y-4">
-              
               {/* ITEM TYPE */}
               <div className="mt-5">
                 <label className="text-xs text-zinc-600">Item Type</label>

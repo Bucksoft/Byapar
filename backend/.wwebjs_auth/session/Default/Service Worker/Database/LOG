@@ -1,4 +1,0 @@
-2025/11/08-10:19:58.403 2610 Reusing MANIFEST C:\Users\USER\Desktop\BYAPAR\backend\.wwebjs_auth\session\Default\Service Worker\Database/MANIFEST-000001
-2025/11/08-10:19:58.415 2610 Recovering log #3
-2025/11/08-10:19:58.416 2610 (ignoring error) C:\Users\USER\Desktop\BYAPAR\backend\.wwebjs_auth\session\Default\Service Worker\Database/000003.log: dropping 45 bytes; Corruption: missing start of fragmented record(2)
-2025/11/08-10:19:58.416 2610 Reusing old log C:\Users\USER\Desktop\BYAPAR\backend\.wwebjs_auth\session\Default\Service Worker\Database/000003.log 

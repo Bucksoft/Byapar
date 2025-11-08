@@ -90,17 +90,17 @@ const DashboardItemsSidebar = ({ modalId, itemIdToEdit, isOpen }) => {
         );
       }
 
-      // if (itemIdToEdit) {
-      //   const res = await axiosInstance.patch(`/item/${itemIdToEdit}`, {
-      //     data,
-      //   });
-      //   return res.data;
-      // } else {
-      //   const res = await axiosInstance.post(`/item/${business?._id}`, {
-      //     data,
-      //   });
-      //   return res.data;
-      // }
+      if (itemIdToEdit) {
+        const res = await axiosInstance.patch(`/item/${itemIdToEdit}`, {
+          data,
+        });
+        return res.data;
+      } else {
+        const res = await axiosInstance.post(`/item/${business?._id}`, {
+          data,
+        });
+        return res.data;
+      }
     },
 
     onSuccess: (data) => {

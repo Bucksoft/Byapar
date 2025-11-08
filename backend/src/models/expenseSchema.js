@@ -41,6 +41,31 @@ const expenseSchema = new mongoose.Schema({
     type: Number,
     default: 0,
   },
+  additionalCharges: [
+    {
+      reason: String,
+      amount: Number,
+      gstRate: String,
+      gstAmount: Number,
+    },
+  ],
+  additionalDiscountPercent: {
+    type: Number,
+    default: 0,
+  },
+  additionalDiscountType: {
+    type: String,
+    enum: ["after_tax", "before_tax"],
+    default: "after_tax",
+  },
+  additionalDiscountAmount: {
+    type: Number,
+    default: 0,
+  },
+  totalAmountAfterCharges: {
+    type: Number,
+    default: 0,
+  },
   businessId: {
     type: mongoose.Schema.Types.ObjectId,
     ref: "Business",
