@@ -126,42 +126,47 @@ const DashboardPaymentInPage = () => {
                   </tr>
                 </thead>
                 <tbody>
-                  {filteredPaymentIns?.map((paymentIn) => (
-                    <tr
-                      key={paymentIn?._id}
-                      onClick={() =>
-                        navigate(`/dashboard/payment-in/${paymentIn?._id}`)
-                      }
-                      className="cursor-pointer hover:bg-zinc-50"
-                    >
-                      <td>{paymentIn?.paymentDate.split("T")[0]}</td>
-                      <td className="text-center">
-                        {paymentIn?.paymentInNumber || "-"}
-                      </td>
-                      <td className="text-center">
-                        {paymentIn?.partyName || "-"}
-                      </td>
-                      <td>
-                        <div className="flex items-center justify-center">
-                          <LiaRupeeSignSolid />
-                          {Number(paymentIn?.paymentAmount).toLocaleString(
-                            "en-IN"
-                          ) || "-"}
-                        </div>
-                      </td>
-                      <td className="text-right">
-                        <div
-                          className={`badge badge-soft ${
-                            paymentIn?.status === "cancelled"
-                              ? "badge-error"
-                              : "badge-warning"
-                          }  `}
-                        >
-                          {paymentIn?.status}
-                        </div>
-                      </td>
-                    </tr>
-                  ))}
+                  {filteredPaymentIns
+                    ?.sort(
+                      (a, b) =>
+                        new Date(b.paymentDate) - new Date(a.paymentDate)
+                    )
+                    .map((paymentIn) => (
+                      <tr
+                        key={paymentIn?._id}
+                        onClick={() =>
+                          navigate(`/dashboard/payment-in/${paymentIn?._id}`)
+                        }
+                        className="cursor-pointer hover:bg-zinc-50"
+                      >
+                        <td>{paymentIn?.paymentDate.split("T")[0]}</td>
+                        <td className="text-center">
+                          {paymentIn?.paymentInNumber || "-"}
+                        </td>
+                        <td className="text-center">
+                          {paymentIn?.partyName || "-"}
+                        </td>
+                        <td>
+                          <div className="flex items-center justify-center">
+                            <LiaRupeeSignSolid />
+                            {Number(paymentIn?.paymentAmount).toLocaleString(
+                              "en-IN"
+                            ) || "-"}
+                          </div>
+                        </td>
+                        <td className="text-right">
+                          <div
+                            className={`badge badge-soft ${
+                              paymentIn?.status === "cancelled"
+                                ? "badge-error"
+                                : "badge-warning"
+                            }  `}
+                          >
+                            {paymentIn?.status}
+                          </div>
+                        </td>
+                      </tr>
+                    ))}
                 </tbody>
               </table>
             ) : (

@@ -140,6 +140,7 @@ const CreateExpenseItem = () => {
 
             {/* RIGHT SECTION */}
             <div className="space-y-4">
+              
               {/* ITEM TYPE */}
               <div className="mt-5">
                 <label className="text-xs text-zinc-600">Item Type</label>

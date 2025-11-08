@@ -277,9 +277,15 @@ const ExpenseItemsTable = ({ addedItems, checked, setAddedItems, setData }) => {
             </tr>
           </tfoot>
         </table>
+      
+
       </div>
     </>
   );
 };
 
 export default ExpenseItemsTable;
+
+
+
+// sales invoice mein qty ke basis pr price/item change ho rha hai, jo ki nhi hona chahiye.

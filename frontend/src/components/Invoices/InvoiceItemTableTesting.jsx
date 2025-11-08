@@ -215,7 +215,7 @@ const SalesInvoiceItemTableTesting = ({
         ? (basePriceExclusive * quantity * discountPercent) / 100
         : discountAmount;
 
-      const grossValue = basePriceExclusive * quantity;
+      const grossValue = basePriceExclusive;
       let taxableAfterDiscount = grossValue - finalDiscountAmount;
 
       let additionalDiscountAmount = 0;
@@ -225,9 +225,12 @@ const SalesInvoiceItemTableTesting = ({
         taxableAfterDiscount -= additionalDiscountAmount;
       }
 
-      const gstAmount = Math.max((taxableAfterDiscount * gstRate) / 100, 0);
+      const gstAmount = Math.max(
+        ((taxableAfterDiscount * gstRate) / 100) * quantity,
+        0
+      );
 
-      let totalItemAmount = taxableAfterDiscount + gstAmount;
+      let totalItemAmount = (taxableAfterDiscount * quantity) + gstAmount ;
 
       if (addDiscPercent > 0 && addDiscType === "after tax") {
         const afterTaxDisc = (totalItemAmount * addDiscPercent) / 100;
@@ -319,7 +322,6 @@ const SalesInvoiceItemTableTesting = ({
     JSON.stringify(data.items.map((i) => i.gstTaxRateType)),
     JSON.stringify(data.items.map((i) => i.gstTaxRate)),
   ]);
-
 
   return (
     <>
