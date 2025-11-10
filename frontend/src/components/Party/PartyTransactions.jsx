@@ -2,6 +2,7 @@ import { GrDocumentExcel } from "react-icons/gr";
 import { LiaRupeeSignSolid } from "react-icons/lia";
 import { useEffect } from "react";
 import { useState } from "react";
+import { toTitleCase } from "../../../helpers/titleCaseString";
 
 const PartyTransactions = ({
   party,
@@ -125,7 +126,7 @@ const PartyTransactions = ({
                       transaction?.purchaseInvoiceDate?.split("T")[0] ||
                       "-"}
                   </td>
-                  <td>{transaction?.type || "-"}</td>
+                  <td>{toTitleCase(transaction?.type || "-")}</td>
                   <td>
                     {transaction?.salesInvoiceNumber ||
                       transaction?.quotationNumber ||
@@ -159,7 +160,7 @@ const PartyTransactions = ({
                           : "badge-success"
                       }`}
                     >
-                      {transaction?.status && transaction?.status}
+                      {toTitleCase(transaction?.status && transaction?.status)}
                     </div>
                   </td>
                 </tr>

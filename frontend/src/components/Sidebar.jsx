@@ -172,84 +172,85 @@ const Sidebar = () => {
               {dashboardFields?.map((field, index) => (
                 <motion.div key={index} variants={dashboardLinksItems}>
                   {/* Fields that have sublinks */}
-                  {field.label === "Items" ||
-                  field.label === "Sales" ||
-                  field.label === "Purchases" ? (
-                    <div className="group  flex flex-col items-start transition-all duration-200 ease-in-out">
-                      {/* Parent link */}
-                      <NavLink
-                        to={`/dashboard/${field.label.toLowerCase()}`}
-                        onClick={() => setCurrentLink(field?.label)}
-                        className={({ isActive }) =>
-                          `flex items-center justify-between text-xs font-medium cursor-pointer py-2 pl-[13.5px] w-full transition-all duration-200 ease-in-out text-white
+                  {
+                    // ITEMS WILL ALSO WILL LISTED HERE AS IT CONTAINS SUBLINKS.
+                    field.label === "Sales" || field.label === "Purchases" ? (
+                      <div className="group flex flex-col items-start transition-all duration-200 ease-in-out">
+                        {/* Parent link */}
+                        <NavLink
+                          to={`/dashboard/${field.label.toLowerCase()}`}
+                          onClick={() => setCurrentLink(field?.label)}
+                          className={({ isActive }) =>
+                            `flex items-center justify-between text-xs font-medium cursor-pointer py-2 pl-[13.5px] w-full transition-all duration-200 ease-in-out text-white
                 ${
                   isActive
                     ? "bg-[var(--primary-btn)]/10 text-[var(--primary-btn)] scale-105 border-l-4"
                     : "hover:text-[var(--primary-btn)]"
                 }`
-                        }
-                      >
-                        <div className="flex items-center gap-6 ">
-                          <span className="transition-all duration-200 group-hover:-translate-x-2">
-                            {field.icon}
-                          </span>
-                          <span>{field.label}</span>
-                        </div>
-                        <IoMdArrowDropdown className="mr-4" />
-                      </NavLink>
-
-                      {/* Sublinks */}
-                      {currentLink === field.label && (
-                        <div
-                          name={field.label}
-                          className="bg-gradient-to-r from-transparent to-zinc-500/10 text-white overflow-hidden text-xs cursor-pointer outline-none w-[80%] my-2 ml-7 z-10 transition-all duration-200  ease-in-out border-l border-l-cyan-950 "
+                          }
                         >
-                          {field.subLinks?.map((sublink) => (
-                            <NavLink
-                              key={sublink.id}
-                              to={sublink.link}
-                              className={({ isActive }) =>
-                                `block p-2  transition-all duration-200 ease-in-out 
+                          <div className="flex items-center gap-6 ">
+                            <span className="transition-all duration-200 group-hover:-translate-x-2">
+                              {field.icon}
+                            </span>
+                            <span>{field.label}</span>
+                          </div>
+                          <IoMdArrowDropdown className="mr-4" />
+                        </NavLink>
+
+                        {/* Sublinks */}
+                        {currentLink === field.label && (
+                          <div
+                            name={field.label}
+                            className="bg-gradient-to-r from-transparent to-zinc-500/10 text-white overflow-hidden text-xs cursor-pointer outline-none w-[80%] my-2 ml-7 z-10 transition-all duration-200  ease-in-out border-l border-l-cyan-950 "
+                          >
+                            {field.subLinks?.map((sublink) => (
+                              <NavLink
+                                key={sublink.id}
+                                to={sublink.link}
+                                className={({ isActive }) =>
+                                  `block p-2  transition-all duration-200 ease-in-out 
                               ${
                                 isActive
                                   ? " text-[var(--primary-btn)] font-semibold border-l-2 "
                                   : "hover:bg-white/20"
                               }`
-                              }
-                            >
-                              {sublink.label}
-                            </NavLink>
-                          ))}
-                        </div>
-                      )}
-                    </div>
-                  ) : (
-                    // Normal fields without sublinks
-                    <NavLink
-                      onClick={() => setCurrentLink("")}
-                      end
-                      to={
-                        field.label.toLowerCase() === "dashboard"
-                          ? "/dashboard"
-                          : `/dashboard/${field.label
-                              .toLowerCase()
-                              .replace(/\s+/g, "-")}`
-                      }
-                      className={({ isActive }) =>
-                        `group px-4 flex items-center gap-5 text-xs py-2 cursor-pointer transition-all ease-in-out duration-150 
+                                }
+                              >
+                                {sublink.label}
+                              </NavLink>
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                    ) : (
+                      // Normal fields without sublinks
+                      <NavLink
+                        onClick={() => setCurrentLink("")}
+                        end
+                        to={
+                          field.label.toLowerCase() === "dashboard"
+                            ? "/dashboard"
+                            : `/dashboard/${field.label
+                                .toLowerCase()
+                                .replace(/\s+/g, "-")}`
+                        }
+                        className={({ isActive }) =>
+                          `group px-4 flex items-center gap-5 text-xs py-2 cursor-pointer transition-all ease-in-out duration-150 
                     ${
                       isActive
                         ? "bg-[var(--primary-btn)]/10 text-[var(--primary-btn)] border-l-4 font-semibold"
                         : "hover:text-[var(--primary-btn)] hover:scale-105 "
                     }`
-                      }
-                    >
-                      {field?.icon}
-                      <span className="group-hover:translate-x-2 transition-all ease-in-out duration-200">
-                        {field.label}
-                      </span>
-                    </NavLink>
-                  )}
+                        }
+                      >
+                        {field?.icon}
+                        <span className="group-hover:translate-x-2 transition-all ease-in-out duration-200">
+                          {field.label}
+                        </span>
+                      </NavLink>
+                    )
+                  }
                 </motion.div>
               ))}
             </motion.div>

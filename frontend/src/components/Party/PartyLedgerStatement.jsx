@@ -8,6 +8,7 @@ import { downloadPDF } from "../../../helpers/downloadPdf";
 import CustomLoader from "../Loader";
 import { handlePrint } from "../../../helpers/print";
 import { useRef } from "react";
+import { toTitleCase } from "../../../helpers/titleCaseString";
 
 const PartyLedgerStatement = ({
   party,
@@ -25,7 +26,10 @@ const PartyLedgerStatement = ({
     from: new Date(new Date().setDate(new Date().getDate() - 1)),
     to: new Date(),
   });
+
   const printRef = useRef();
+
+  // ALL THE LEDGER ENTRIES
   const ledgerEntries = useMemo(() => {
     if (!party) return [];
 
@@ -49,6 +53,7 @@ const PartyLedgerStatement = ({
           debit: Number(invoice?.totalAmount) || 0,
           tdsDeductedByParty: Number(invoice?.tdsDeductedByParty) || 0,
           tdsDeductedBySelf: Number(invoice?.tdsDeductedBySelf) || 0,
+          status: invoice?.status,
         });
       });
 
@@ -70,6 +75,7 @@ const PartyLedgerStatement = ({
           debit: 0,
           tdsDeductedByParty: Number(invoice?.tdsDeductedByParty) || 0,
           tdsDeductedBySelf: Number(invoice?.tdsDeductedBySelf) || 0,
+          status: invoice?.status,
         });
       });
 
@@ -86,6 +92,7 @@ const PartyLedgerStatement = ({
           debit: 0,
           tdsDeductedByParty: Number(paymentIn?.tdsDeductedByParty) || 0,
           tdsDeductedBySelf: Number(paymentIn?.tdsDeductedBySelf) || 0,
+          status: paymentIn?.status,
         });
       });
 
@@ -106,6 +113,7 @@ const PartyLedgerStatement = ({
           credit: Number(sr?.totalAmount) || 0,
           tdsDeductedByParty: Number(sr?.tdsDeductedByParty) || 0,
           tdsDeductedBySelf: Number(sr?.tdsDeductedBySelf) || 0,
+          status: sr?.status,
         });
       });
 
@@ -126,6 +134,7 @@ const PartyLedgerStatement = ({
           credit: Number(sr?.totalAmount) || 0,
           tdsDeductedByParty: Number(sr?.tdsDeductedByParty) || 0,
           tdsDeductedBySelf: Number(sr?.tdsDeductedBySelf) || 0,
+          status: sr?.status,
         });
       });
 
@@ -146,6 +155,7 @@ const PartyLedgerStatement = ({
           credit: Number(cn?.totalAmount) || 0,
           tdsDeductedByParty: Number(cn?.tdsDeductedByParty) || 0,
           tdsDeductedBySelf: Number(cn?.tdsDeductedBySelf) || 0,
+          status: cn?.status,
         });
       });
 
@@ -156,27 +166,28 @@ const PartyLedgerStatement = ({
   const ledgerWithBalance = useMemo(() => {
     let runningBalance =
       party.openingBalanceStatus === "To Collect"
-        ? party?.openingBalance
-        : -party?.openingBalance;
+        ? Number(party?.openingBalance) || 0
+        : -Number(party?.openingBalance) || 0;
+
     return ledgerEntries.map((entry) => {
-      runningBalance += entry.debit - entry.credit;
-      return { ...entry, balance: runningBalance };
+      const effectiveBalance =
+        entry.status === "cancelled"
+          ? 0
+          : runningBalance + (entry.debit - entry.credit);
+
+      // Update running balance only if not cancelled
+      if (entry.status !== "cancelled") {
+        runningBalance = effectiveBalance;
+      }
+
+      return {
+        ...entry,
+        balance: effectiveBalance,
+      };
     });
-  }, [ledgerEntries]);
+  }, [ledgerEntries, party]);
 
-  const totalBalance = useMemo(() => {
-    if (!ledgerWithBalance.length) return party?.openingBalance || 0;
-
-    const lastEntryBalance =
-      ledgerWithBalance[ledgerWithBalance.length - 1].balance;
-
-    return (
-      (party?.openingBalanceStatus === "To Collect" ? 1 : -1) *
-        (party?.openingBalance || 0) +
-      lastEntryBalance
-    );
-  }, [ledgerWithBalance, party]);
-
+  // FILTER BY DATE
   const filteredEntries = useMemo(() => {
     if (!dateRange) return ledgerWithBalance;
 
@@ -191,6 +202,30 @@ const PartyLedgerStatement = ({
       return entryDate >= from && entryDate <= to;
     });
   }, [dateRange, ledgerWithBalance]);
+
+  // total balance
+  const totalBalance = useMemo(() => {
+    if (filteredEntries.length === 0) {
+      return party.openingBalanceStatus === "To Collect"
+        ? Number(party?.openingBalance) || 0
+        : -Number(party?.openingBalance) || 0;
+    }
+
+    // find last non-cancelled entry
+    const lastValidEntry = [...filteredEntries]
+      .reverse()
+      .find((entry) => entry.status !== "cancelled");
+
+    // if all are cancelled → show opening balance
+    if (!lastValidEntry) {
+      return party.openingBalanceStatus === "To Collect"
+        ? Number(party?.openingBalance) || 0
+        : -Number(party?.openingBalance) || 0;
+    }
+
+    // otherwise return last valid balance
+    return lastValidEntry.balance;
+  }, [filteredEntries, party]);
 
   return (
     <section className="relative mt-5">
@@ -431,24 +466,13 @@ const PartyLedgerStatement = ({
             }}
           >
             <thead>
-              <tr
-                style={{
-                  backgroundColor: "#e4e4e7",
-                }}
-              >
-                <th
-                  style={{
-                    padding: "5px",
-                    textAlign: "left",
-                  }}
-                >
-                  Date
-                </th>
+              <tr style={{ backgroundColor: "#e4e4e7" }}>
+                <th style={{ padding: "5px", textAlign: "left" }}>Date</th>
                 <th
                   style={{
                     padding: "8px",
                     textAlign: "left",
-                    textWrap: "nowrap",
+                    whiteSpace: "nowrap",
                   }}
                 >
                   Voucher
@@ -457,16 +481,16 @@ const PartyLedgerStatement = ({
                   style={{
                     padding: "8px",
                     textAlign: "left",
-                    textWrap: "nowrap",
+                    whiteSpace: "nowrap",
                   }}
                 >
-                  Sr No
+                  Txn No
                 </th>
                 <th
                   style={{
                     padding: "8px",
                     textAlign: "left",
-                    textWrap: "nowrap",
+                    whiteSpace: "nowrap",
                   }}
                 >
                   Credit
@@ -475,213 +499,270 @@ const PartyLedgerStatement = ({
                   style={{
                     padding: "8px",
                     textAlign: "left",
-                    textWrap: "nowrap",
+                    whiteSpace: "nowrap",
                   }}
                 >
                   Debit
                 </th>
-                <th
-                  style={{
-                    padding: "8px",
-                    textAlign: "left",
-                    textWrap: "nowrap",
-                  }}
-                >
-                  TDS deducted by party
-                </th>
-                <th style={{ padding: "8px", textAlign: "left" }}>
-                  TDS deducted by self
-                </th>
+
+                {/* 👇 Check if any TDS-related value exists */}
+                {filteredEntries?.some(
+                  (entry) =>
+                    (entry?.tdsDeductedByParty &&
+                      entry.tdsDeductedByParty > 0) ||
+                    (entry?.tdsDeductedBySelf && entry.tdsDeductedBySelf > 0)
+                ) ? (
+                  <>
+                    <th
+                      style={{
+                        padding: "8px",
+                        textAlign: "left",
+                        whiteSpace: "nowrap",
+                      }}
+                    >
+                      TDS (By Party)
+                    </th>
+                    <th
+                      style={{
+                        padding: "8px",
+                        textAlign: "left",
+                        whiteSpace: "nowrap",
+                      }}
+                    >
+                      TDS (By Self)
+                    </th>
+                  </>
+                ) : (
+                  <>
+                    {/* Empty columns for alignment */}
+                    <th colSpan={2}></th>
+                  </>
+                )}
+
                 <th style={{ padding: "8px", textAlign: "right" }}>Balance</th>
               </tr>
             </thead>
+
             <tbody>
-              {/* THIS FIRST ROW IS FOR OPENING BALANCE */}
-              <tr>
-                <td style={{ padding: "6px" }}></td>
-                <td style={{ padding: "6px", textWrap: "nowrap" }}>
-                  Opening Balance
-                </td>
-                <td style={{ padding: "6px" }}>-</td>
-                <td style={{ padding: "6px" }}>
-                  {party?.openingBalanceStatus === "To Pay" ? (
-                    <div
-                      style={{
-                        display: "flex",
-                        alignItems: "center",
-                      }}
-                    >
-                      <LuIndianRupee />
-                      {Number(party?.openingBalance).toLocaleString("en-IN")}
-                    </div>
-                  ) : (
-                    "-"
-                  )}
-                </td>
-                <td style={{ padding: "6px" }}>
-                  {party?.openingBalanceStatus === "To Collect" ? (
-                    <div
-                      style={{
-                        display: "flex",
-                        alignItems: "center",
-                      }}
-                    >
-                      <LuIndianRupee />
-                      {Number(party?.openingBalance).toLocaleString("en-IN")}
-                    </div>
-                  ) : (
-                    "-"
-                  )}
-                </td>
-                <td style={{ padding: "6px" }}>-</td>
-                <td style={{ padding: "6px" }}>-</td>
-                <td style={{ padding: "6px" }}>
-                  <div
-                    style={{
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "flex-end",
-                    }}
-                  >
-                    <LuIndianRupee />
-                    {Number(party?.openingBalance).toLocaleString("en-IN") ||
-                      0.0}
-                  </div>
-                </td>
-              </tr>
+              {/* Compute the same condition as header for consistency */}
+              {(() => {
+                const showTDSColumns = filteredEntries?.some(
+                  (entry) =>
+                    (entry?.tdsDeductedByParty &&
+                      entry.tdsDeductedByParty > 0) ||
+                    (entry?.tdsDeductedBySelf && entry.tdsDeductedBySelf > 0)
+                );
 
-              {/* THIS IS FOR LEDGER */}
-              {ledgerWithBalance &&
-                ledgerWithBalance.length > 0 &&
-                filteredEntries.map((entry, idx) => (
-                  <tr key={idx}>
-                    <td
-                      style={{
-                        padding: "6px",
-                        textAlign: "left",
-                        width: "100px",
-                      }}
-                    >
-                      {entry?.date?.split("T")[0]}
-                    </td>
-                    <td style={{ padding: "6px" }}>{entry?.voucher}</td>
-                    <td style={{ padding: "6px" }}>{entry?.srNo}</td>
-                    <td style={{ padding: "6px" }}>
-                      <div
-                        style={{
-                          display: "flex",
-                          alignItems: "center",
-                        }}
-                      >
-                        <LuIndianRupee />
-                        {Number(entry?.credit).toLocaleString("en-IN")}
-                      </div>
-                    </td>
-                    <td style={{ padding: "6px" }}>
-                      <div
-                        style={{
-                          display: "flex",
-                          alignItems: "center",
-                        }}
-                      >
-                        <LuIndianRupee />
-                        {Number(entry?.debit).toLocaleString("en-IN")}
-                      </div>
-                    </td>
-                    <td style={{ padding: "6px" }}>
-                      <div
-                        style={{
-                          display: "flex",
-                          alignItems: "center",
-                        }}
-                      >
-                        <LuIndianRupee />
-                        {Number(entry?.tdsDeductedByParty).toLocaleString(
-                          "en-IN"
-                        ) || 0}
-                      </div>
-                    </td>
-                    <td style={{ padding: "6px" }}>
-                      <div
-                        style={{
-                          display: "flex",
-                          alignItems: "center",
-                        }}
-                      >
-                        <LuIndianRupee />
-                        {Number(entry?.tdsDeductedBySelf).toLocaleString(
-                          "en-IN"
-                        ) || 0}
-                      </div>
-                    </td>
-                    <td style={{ padding: "6px" }}>
-                      <div
-                        style={{
-                          display: "flex",
-                          alignItems: "center",
-                          justifyContent: "flex-end",
-                        }}
-                      >
-                        <LuIndianRupee />
-                        {Number(entry?.balance).toLocaleString("en-IN")}
-                      </div>
-                    </td>
-                  </tr>
-                ))}
+                return (
+                  <>
+                    {/* OPENING BALANCE ROW */}
+                    <tr>
+                      <td style={{ padding: "6px" }}></td>
+                      <td style={{ padding: "6px", whiteSpace: "nowrap" }}>
+                        Opening Balance
+                      </td>
+                      <td style={{ padding: "6px" }}>-</td>
+                      <td style={{ padding: "6px" }}>
+                        {party?.openingBalanceStatus === "To Pay" ? (
+                          <div
+                            style={{ display: "flex", alignItems: "center" }}
+                          >
+                            <LuIndianRupee />
+                            {Number(party?.openingBalance).toLocaleString(
+                              "en-IN"
+                            )}
+                          </div>
+                        ) : (
+                          "-"
+                        )}
+                      </td>
+                      <td style={{ padding: "6px" }}>
+                        {party?.openingBalanceStatus === "To Collect" ? (
+                          <div
+                            style={{ display: "flex", alignItems: "center" }}
+                          >
+                            <LuIndianRupee />
+                            {Number(party?.openingBalance).toLocaleString(
+                              "en-IN"
+                            )}
+                          </div>
+                        ) : (
+                          "-"
+                        )}
+                      </td>
 
-              {/* THIS IS FOR CLOSING BALANCE */}
-              <tr>
-                <td style={{ padding: "6px" }}></td>
-                <td style={{ padding: "6px" }}>Closing Balance</td>
-                <td style={{ padding: "6px" }}>-</td>
-                <td style={{ padding: "6px" }}>
-                  {totalBalance < 0 ? (
-                    <div
-                      style={{
-                        display: "flex",
-                        alignItems: "center",
-                      }}
-                    >
-                      <LuIndianRupee />
-                      {Math.abs(totalBalance).toLocaleString("en-IN")}
-                    </div>
-                  ) : (
-                    "-"
-                  )}
-                </td>
-                <td style={{ padding: "6px" }}>
-                  {totalBalance > 0 ? (
-                    <div
-                      style={{
-                        display: "flex",
-                        alignItems: "center",
-                      }}
-                    >
-                      <LuIndianRupee />
-                      {Math.abs(totalBalance).toLocaleString("en-IN")}
-                    </div>
-                  ) : (
-                    "-"
-                  )}
-                </td>
-                <td style={{ padding: "6px" }}>-</td>
-                <td style={{ padding: "6px" }}>-</td>
-                <td style={{ padding: "6px" }}>
-                  <div
-                    style={{
-                      display: "flex",
-                      alignItems: "center",
-                      // gap: "4px",
-                      justifyContent: "flex-end",
-                    }}
-                  >
-                    <LuIndianRupee />
-                    {Number(Math.abs(totalBalance || 0)).toLocaleString(
-                      "en-IN"
-                    )}
-                  </div>
-                </td>
-              </tr>
+                      {/* TDS columns - maintain alignment */}
+                      {showTDSColumns ? (
+                        <>
+                          <td style={{ padding: "6px" }}>-</td>
+                          <td style={{ padding: "6px" }}>-</td>
+                        </>
+                      ) : (
+                        <td colSpan={2}></td>
+                      )}
+
+                      <td style={{ padding: "6px" }}>
+                        <div
+                          style={{
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "flex-end",
+                          }}
+                        >
+                          <LuIndianRupee />
+                          {Number(party?.openingBalance).toLocaleString(
+                            "en-IN"
+                          ) || 0.0}
+                        </div>
+                      </td>
+                    </tr>
+
+                    {/* LEDGER ROWS */}
+                    {ledgerWithBalance &&
+                      ledgerWithBalance.length > 0 &&
+                      filteredEntries.map((entry, idx) => (
+                        <tr key={idx}>
+                          <td
+                            style={{
+                              padding: "6px",
+                              textAlign: "left",
+                              width: "100px",
+                            }}
+                          >
+                            {entry?.date?.split("T")[0]}
+                          </td>
+                          <td style={{ padding: "6px" }}>
+                            {toTitleCase(entry?.voucher)}{" "}
+                            {entry?.status === "cancelled" && (
+                              <small className="text-red-500  ml-1">
+                                (Cancelled)
+                              </small>
+                            )}
+                          </td>
+                          <td style={{ padding: "6px" }}>{entry?.srNo}</td>
+                          <td style={{ padding: "6px" }}>
+                            <div
+                              style={{ display: "flex", alignItems: "center" }}
+                            >
+                              <LuIndianRupee />
+                              {Number(entry?.credit).toLocaleString("en-IN")}
+                            </div>
+                          </td>
+                          <td style={{ padding: "6px" }}>
+                            <div
+                              style={{ display: "flex", alignItems: "center" }}
+                            >
+                              <LuIndianRupee />
+                              {Number(entry?.debit).toLocaleString("en-IN")}
+                            </div>
+                          </td>
+
+                          {showTDSColumns ? (
+                            <>
+                              <td style={{ padding: "6px" }}>
+                                <div
+                                  style={{
+                                    display: "flex",
+                                    alignItems: "center",
+                                  }}
+                                >
+                                  <LuIndianRupee />
+                                  {Number(
+                                    entry?.tdsDeductedByParty || 0
+                                  ).toLocaleString("en-IN")}
+                                </div>
+                              </td>
+                              <td style={{ padding: "6px" }}>
+                                <div
+                                  style={{
+                                    display: "flex",
+                                    alignItems: "center",
+                                  }}
+                                >
+                                  <LuIndianRupee />
+                                  {Number(
+                                    entry?.tdsDeductedBySelf || 0
+                                  ).toLocaleString("en-IN")}
+                                </div>
+                              </td>
+                            </>
+                          ) : (
+                            <td colSpan={2}></td>
+                          )}
+
+                          <td style={{ padding: "6px" }}>
+                            <div
+                              style={{
+                                display: "flex",
+                                alignItems: "center",
+                                justifyContent: "flex-end",
+                              }}
+                            >
+                              <LuIndianRupee />
+                              {Number(entry?.balance).toLocaleString("en-IN")}
+                            </div>
+                          </td>
+                        </tr>
+                      ))}
+
+                    {/* CLOSING BALANCE ROW */}
+                    <tr>
+                      <td style={{ padding: "6px" }}></td>
+                      <td style={{ padding: "6px" }}>Closing Balance</td>
+                      <td style={{ padding: "6px" }}>-</td>
+                      <td style={{ padding: "6px" }}>
+                        {totalBalance < 0 ? (
+                          <div
+                            style={{ display: "flex", alignItems: "center" }}
+                          >
+                            <LuIndianRupee />
+                            {Math.abs(totalBalance).toLocaleString("en-IN")}
+                          </div>
+                        ) : (
+                          "-"
+                        )}
+                      </td>
+                      <td style={{ padding: "6px" }}>
+                        {totalBalance > 0 ? (
+                          <div
+                            style={{ display: "flex", alignItems: "center" }}
+                          >
+                            <LuIndianRupee />
+                            {Math.abs(totalBalance).toLocaleString("en-IN")}
+                          </div>
+                        ) : (
+                          "-"
+                        )}
+                      </td>
+
+                      {/* Keep columns consistent */}
+                      {showTDSColumns ? (
+                        <>
+                          <td style={{ padding: "6px" }}>-</td>
+                          <td style={{ padding: "6px" }}>-</td>
+                        </>
+                      ) : (
+                        <td colSpan={2}></td>
+                      )}
+
+                      <td style={{ padding: "6px" }}>
+                        <div
+                          style={{
+                            display: "flex",
+                            alignItems: "center",
+                            justifyContent: "flex-end",
+                          }}
+                        >
+                          <LuIndianRupee />
+                          {Number(Math.abs(totalBalance || 0)).toLocaleString(
+                            "en-IN"
+                          )}
+                        </div>
+                      </td>
+                    </tr>
+                  </>
+                );
+              })()}
             </tbody>
           </table>
         </div>

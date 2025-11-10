@@ -49,7 +49,7 @@ const CreateExpenseForm = ({ setOpenCreateExpense, latestExpenseNumber }) => {
       },
     ],
     additionalDiscountType: "after_tax",
-    additionalDicountPercent: 0,
+    additionalDiscountPercent: 0,
     additionalDiscountAmount: 0,
     totalAdditionalChargeAmount: 0,
     totalAdditionalChargeGST: 0,

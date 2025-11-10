@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
 
-import { partySchema, bankAccountSchema } from "../config/validation.js";
+import { partySchema } from "../config/validation.js";
 import Category from "../models/category.schema.js";
 import Party from "../models/party.schema.js";
 import BankAccount from "../models/bankAccount.schema.js";
@@ -155,6 +155,16 @@ export async function getAllParties(req, res) {
       clientId: req.user?.id,
     });
 
+    console.log(allFilteredParties);
+
+    allFilteredParties.forEach((party) => {
+      const balance = party?.openingBalance || 0;
+      if (party.openingBalanceStatus === "To Collect")
+        toCollect += Math.abs(balance);
+      else if (party.openingBalanceStatus === "To Pay")
+        toPay += Math.abs(balance);
+    });
+
     allFilteredParties.forEach((party) => {
       const balance = party?.currentBalance || 0;
       if (balance > 0) toCollect += balance;
@@ -286,6 +296,7 @@ export async function deleteParty(req, res) {
   try {
     // get the id of the party
     const { id } = req.params;
+
     if (!id) {
       return res
         .status(400)
@@ -478,10 +489,20 @@ export async function allParties(req, res) {
     const totalParties = await Party.countDocuments({ businessId: businessId });
     let toCollect = 0;
     let toPay = 0;
+
     const parties = await Party.find({
       businessId: businessId,
       clientId: req.user.id,
     });
+
+    parties.forEach((party) => {
+      if (party.openingBalanceStatus === "To Collect") {
+        toCollect += party.openingBalance || 0;
+      } else if (party.openingBalanceStatus === "To Pay") {
+        toPay += party.openingBalance || 0;
+      }
+    });
+
     parties.forEach((party) => {
       const balance = party?.currentBalance || 0;
       if (balance > 0) toCollect += balance;

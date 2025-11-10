@@ -19,10 +19,12 @@ import toast from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
 import { downloadPDF } from "../../../helpers/downloadPdf";
 import InvoiceTemplate from "../Invoices/InvoiceTemplate";
+import { useEffect } from "react";
 
 const InvoiceReport = () => {
   const [openDatePicker, setOpenDatePicker] = useState(false);
   const [isDownloading, setIsDownloading] = useState(false);
+  const [totalSales, setTotalSales] = useState(0);
   const [searchQuery, setSearchQuery] = useState("");
   const [invoiceToDownload, setInvoiceToDownload] = useState(null);
   const [invoiceIdToDownload, setInvoiceIdToDownload] = useState(null);
@@ -70,6 +72,15 @@ const InvoiceReport = () => {
 
     return filtered;
   }, [invoices, dateRange, searchQuery]);
+
+  //  use effect to calculate the total Sales based on searched invoices
+  useEffect(() => {
+    let totalSales = 0;
+    searchedInvoices?.forEach((invoice) => {
+      if (invoice.status !== "cancelled") totalSales += invoice?.totalAmount;
+    });
+    setTotalSales(totalSales);
+  }, [searchedInvoices]);
 
   // CANCEL INVOICE
   const cancelMutation = useMutation({
@@ -166,7 +177,7 @@ const InvoiceReport = () => {
           <span className="text-sm text-zinc-500">Total Sales</span>
           <p className="flex items-center gap-1">
             <LuIndianRupee size={12} />
-            {invoices?.totalSales}
+            {Number(totalSales).toLocaleString("en-IN")}
           </p>
         </div>
       </div>

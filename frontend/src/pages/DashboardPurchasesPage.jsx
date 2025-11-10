@@ -135,6 +135,7 @@ const DashboardPurchasesPage = () => {
               {purchaseInvoices
                 ? Number(
                     purchaseInvoices
+                      .filter((inv) => inv.status !== "cancelled")
                       .reduce(
                         (acc, invoice) =>
                           acc + Number(invoice?.totalAmount || 0),
@@ -158,10 +159,12 @@ const DashboardPurchasesPage = () => {
               <FaIndianRupeeSign size={15} />
               {purchaseInvoices
                 ? Number(
-                    purchaseInvoices.reduce(
-                      (sum, invoice) => sum + (invoice.settledAmount || 0),
-                      0
-                    )
+                    purchaseInvoices
+                      .filter((inv) => inv.status !== "cancelled")
+                      .reduce(
+                        (sum, invoice) => sum + (invoice.settledAmount || 0),
+                        0
+                      )
                   ).toLocaleString("en-IN")
                 : 0}
             </span>
@@ -179,13 +182,15 @@ const DashboardPurchasesPage = () => {
               <FaIndianRupeeSign size={15} />
               {purchaseInvoices
                 ? Number(
-                    purchaseInvoices.reduce(
-                      (sum, invoice) =>
-                        sum +
-                        (invoice.pendingAmount ??
-                          invoice.totalAmount - (invoice.settledAmount || 0)),
-                      0
-                    )
+                    purchaseInvoices
+                      .filter((inv) => inv.status !== "cancelled")
+                      .reduce(
+                        (sum, invoice) =>
+                          sum +
+                          (invoice.pendingAmount ??
+                            invoice.totalAmount - (invoice.settledAmount || 0)),
+                        0
+                      )
                   ).toLocaleString("en-IN")
                 : 0}
             </span>

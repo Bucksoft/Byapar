@@ -85,10 +85,11 @@ const DashboardSalesPage = () => {
   useEffect(() => {
     if (!invoiceId) return;
 
-    const isCreated = paymentIns?.some((paymentIn) =>
-      paymentIn?.settledInvoices?.some((invoiceObj) =>
-        Object.keys(invoiceObj || {}).includes(invoiceId)
-      )
+    const isCreated = paymentIns?.some(
+      (paymentIn) =>
+        paymentIn?.settledInvoices?.some((invoiceObj) =>
+          Object.keys(invoiceObj || {}).includes(invoiceId)
+        ) && paymentIn?.status !== "cancelled"
     );
 
     if (isCreated) {

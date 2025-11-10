@@ -1,6 +1,6 @@
 import { LuIndianRupee } from "react-icons/lu";
 import { getTotalTaxRate } from "../../../helpers/getGSTTaxRate";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useMemo } from "react";
 import { LucideAlertTriangle, X } from "lucide-react";
 import { gstRates } from "../../utils/constants";
@@ -44,6 +44,8 @@ const ExpenseItemsTable = ({
   setData,
   data,
 }) => {
+  const [showAdditionalCharges, setShowAdditionalCharges] = useState(false);
+
   // IT HANDLES THE INPUT CHANGE
   const handleItemChange = (id, field, value) => {
     setAddedItems((prev) =>
@@ -88,7 +90,16 @@ const ExpenseItemsTable = ({
       0
     );
 
-    const totalAmountAfterCharges = totalAmount + totalAdditionalChargeAmount;
+    let totalAmountAfterCharges =
+      totalAmount + totalAdditionalChargeAmount + totalAdditionalChargeGST;
+
+    let totalAdditionalDiscountAmount = 0;
+    totalAdditionalDiscountAmount = data.additionalDiscountPercent
+      ? (totalAmountAfterCharges * data.additionalDiscountPercent) / 100
+      : 0;
+
+    totalAmountAfterCharges =
+      totalAmountAfterCharges - totalAdditionalDiscountAmount;
 
     setData((prev) => ({
       ...prev,
@@ -98,6 +109,7 @@ const ExpenseItemsTable = ({
       totalAdditionalChargeAmount,
       totalAdditionalChargeGST,
       totalAmountAfterCharges,
+      additionalDiscountAmount: totalAdditionalDiscountAmount,
     }));
 
     return {
@@ -105,7 +117,12 @@ const ExpenseItemsTable = ({
       totalQuantity,
       totalTax,
     };
-  }, [addedItems, checked, data.additionalCharges]);
+  }, [
+    addedItems,
+    checked,
+    data.additionalCharges,
+    data.additionalDiscountPercent,
+  ]);
 
   const handleChargeChange = (index, field, value) => {
     setData((prev) => {
@@ -121,8 +138,6 @@ const ExpenseItemsTable = ({
       return { ...prev, additionalCharges: updated };
     });
   };
-
-  console.log(data);
 
   return (
     <>
@@ -318,126 +333,144 @@ const ExpenseItemsTable = ({
         </table>
       </div>
 
-      {/* ADDITIONAL CHARGES & ADDITIONAL DISCOUNT  */}
-      <div className="w-full flex items-center ">
-        <div className="ml-auto w-1/3 p-2 border border-zinc-200 rounded-xl">
-          {/* charges */}
-          <div className="flex flex-col items-start">
-            <button
-              onClick={() => {
-                setData((prev) => ({
-                  ...prev,
-                  additionalCharges: [
-                    ...prev.additionalCharges,
-                    {
-                      reason: "",
-                      amount: 0,
-                      gstRate: "",
-                      gstAmount: 0,
-                    },
-                  ],
-                }));
-              }}
-              className="text-xs text-info"
-            >
-              + Additional Charges
-            </button>
-            {data?.additionalCharges?.map((charge, index) => (
-              <div className="flex items-center my-2">
-                <input
-                  type="text"
-                  className="input input-xs"
-                  placeholder="Reason"
-                  value={charge.reason}
-                  onChange={(e) =>
-                    handleChargeChange(index, "reason", e.target.value)
-                  }
-                />
-                <input
-                  type="number"
-                  className="input input-xs"
-                  placeholder="Amount"
-                  value={charge.amount}
-                  onChange={(e) =>
-                    handleChargeChange(
-                      index,
-                      "amount",
-                      parseFloat(e.target.value)
-                    )
-                  }
-                />
-                <select
-                  value={charge.gstRate}
-                  onChange={(e) =>
-                    handleChargeChange(index, "gstRate", e.target.value)
-                  }
-                  className="select select-xs bg-zinc-100"
-                >
-                  {gstRates.map((rate) => (
-                    <option value={rate.label}>{rate.label}</option>
-                  ))}
-                </select>
+      <div className="w-fit ml-auto p-2">
+        <input
+          type="checkbox"
+          checked={showAdditionalCharges}
+          onChange={() => setShowAdditionalCharges(!showAdditionalCharges)}
+          id="check"
+          className="checkbox checkbox-info checkbox-sm mr-1"
+        />
+        <label htmlFor="check" className="text-zinc-600">
+          Additional Charges
+        </label>
+      </div>
 
+      {showAdditionalCharges && (
+        <>
+          {/* ADDITIONAL CHARGES & ADDITIONAL DISCOUNT  */}
+          <div className="w-full flex items-center ">
+            <div className="ml-auto w-1/3 p-2 border border-zinc-200 rounded-xl">
+              {/* charges */}
+              <div className="flex flex-col items-start">
                 <button
-                  onClick={() =>
+                  onClick={() => {
                     setData((prev) => ({
                       ...prev,
-                      additionalCharges: prev.additionalCharges.filter(
-                        (_, i) => i != index
-                      ),
-                    }))
-                  }
-                  className="text-zinc-700 border rounded-full p-1 ml-1"
+                      additionalCharges: [
+                        ...prev.additionalCharges,
+                        {
+                          reason: "",
+                          amount: 0,
+                          gstRate: "",
+                          gstAmount: 0,
+                        },
+                      ],
+                    }));
+                  }}
+                  className="text-xs text-info"
                 >
-                  <X size={12} />
+                  + Additional Charges
                 </button>
-              </div>
-            ))}
-          </div>
+                {data?.additionalCharges?.map((charge, index) => (
+                  <div className="flex items-center my-2">
+                    <input
+                      type="text"
+                      className="input input-xs"
+                      placeholder="Reason"
+                      value={charge.reason}
+                      onChange={(e) =>
+                        handleChargeChange(index, "reason", e.target.value)
+                      }
+                    />
+                    <input
+                      type="number"
+                      className="input input-xs"
+                      placeholder="Amount"
+                      min={0}
+                      value={charge.amount}
+                      onChange={(e) =>
+                        handleChargeChange(
+                          index,
+                          "amount",
+                          parseFloat(e.target.value)
+                        )
+                      }
+                    />
+                    <select
+                      value={charge.gstRate}
+                      onChange={(e) =>
+                        handleChargeChange(index, "gstRate", e.target.value)
+                      }
+                      className="select select-xs bg-zinc-100"
+                    >
+                      {gstRates.map((rate) => (
+                        <option value={rate.label}>{rate.label}</option>
+                      ))}
+                    </select>
 
-          {/* discount */}
-          <div className="flex flex-col items-start">
-            <span className="text-xs text-info">Additional Discount</span>
-            <div className="flex w-full my-1">
-              <select
+                    <button
+                      onClick={() =>
+                        setData((prev) => ({
+                          ...prev,
+                          additionalCharges: prev.additionalCharges.filter(
+                            (_, i) => i != index
+                          ),
+                        }))
+                      }
+                      className="text-zinc-700 border rounded-full p-1 ml-1"
+                    >
+                      <X size={12} />
+                    </button>
+                  </div>
+                ))}
+              </div>
+
+              {/* discount */}
+              <div className="flex flex-col items-start">
+                <span className="text-xs text-info">Additional Discount</span>
+                <div className="flex w-full my-1">
+                  {/* <select
                 value={data.additionalDicountType}
                 onChange={(e) =>
                   setData((prev) => ({
                     ...prev,
-                    additionalDicountType: e.target.value,
+                    additionalDiscountType: e.target.value,
                   }))
                 }
                 className="select select-xs bg-zinc-100"
               >
                 <option value="after_tax">After tax</option>
                 <option value="before_tax">Before tax</option>
-              </select>
+              </select> */}
 
-              <input
-                type="number"
-                value={data.additionalDicountPercent}
-                onChange={(e) =>
-                  setData((prev) => ({
-                    ...prev,
-                    additionalDicountPercent: parseFloat(e.target.value),
-                  }))
-                }
-                className="input input-xs"
-                placeholder="Percentage"
-              />
+                  <input
+                    type="number"
+                    value={data.additionalDicountPercent}
+                    onChange={(e) =>
+                      setData((prev) => ({
+                        ...prev,
+                        additionalDiscountPercent: parseFloat(e.target.value),
+                      }))
+                    }
+                    className="input input-xs w-1/2"
+                    placeholder="Discount percent"
+                  />
+                </div>
+              </div>
             </div>
           </div>
-        </div>
-      </div>
 
-      {/* TOTAL AFTER DISCSOUNT AND ADDITIONAL CHARGES */}
-      <div className="ml-auto w-1/3 py-10 px-2 border rounded-xl border-zinc-200 flex items-center justify-between text-zinc-600 font-bold">
-        <span>TOTAL AMOUNT</span>
-        <p className="flex items-center ">
-          <LuIndianRupee size={15} />
-          100
-        </p>
-      </div>
+          {/* TOTAL AFTER DISCOUNT AND ADDITIONAL CHARGES */}
+          <div className="ml-auto w-1/3 py-10 px-2 border rounded-xl border-zinc-200 flex items-center justify-between text-zinc-600 font-bold">
+            <span>TOTAL AMOUNT</span>
+            <p className="flex items-center ">
+              <LuIndianRupee size={15} />
+              {data?.totalAmountAfterCharges.toFixed(2)}
+            </p>
+          </div>
+        </>
+      )}
     </>
   );
 };

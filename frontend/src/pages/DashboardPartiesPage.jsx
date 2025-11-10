@@ -26,6 +26,7 @@ import { IoMdArrowDown, IoMdArrowUp } from "react-icons/io";
 import no_party from "../assets/no_party.png";
 import { useInvoiceStore } from "../store/invoicesStore.js";
 import { BsExclamationCircle } from "react-icons/bs";
+import { toTitleCase } from "../../helpers/titleCaseString.js";
 
 const DashboardPartiesPage = () => {
   const [searchQuery, setSearchQuery] = useState("");
@@ -299,16 +300,16 @@ const DashboardPartiesPage = () => {
                       <td className="text-left">{party?.partyName || "-"}</td>
                       <td>{party?.categoryName || "-"}</td>
                       <td>{party?.mobileNumber || "-"}</td>
-                      <td>{party?.partyType || "-"}</td>
+                      <td>{toTitleCase(party?.partyType || "-")}</td>
                       <td>
                         <div className="flex items-center justify-center gap-2">
-                          {party?.currentBalance > 0 ? (
+                          {/* {party?.currentBalance > 0 ? (
                             <IoMdArrowDown className="text-success" />
                           ) : party?.currentBalance < 0 ? (
                             <IoMdArrowUp className="text-error" />
                           ) : (
                             ""
-                          )}
+                          )} */}
                           ₹ {Math.abs(party?.currentBalance || 0)?.toFixed(2)}
                         </div>
                       </td>

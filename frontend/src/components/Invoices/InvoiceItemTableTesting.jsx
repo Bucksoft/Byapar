@@ -197,27 +197,20 @@ const SalesInvoiceItemTableTesting = ({
 
       const manualRaw = manualBasePriceRaw[item._id] ?? 0;
 
-      // --- calculate basePriceExclusive ---
-      // Prefer manual base price if provided, otherwise use raw price
-      let basePriceExclusive = 0;
-
       const effectivePrice = manualRaw > 0 ? manualRaw : rawPrice;
+      const basePriceExclusive =
+        gstType === "with tax"
+          ? effectivePrice / (1 + gstRate / 100)
+          : effectivePrice;
 
-      if (effectivePrice > 0) {
-        basePriceExclusive =
-          gstType === "with tax"
-            ? effectivePrice / (1 + gstRate / 100)
-            : effectivePrice;
-      }
-
-      // --- discount ---
       const finalDiscountAmount = discountPercent
         ? (basePriceExclusive * quantity * discountPercent) / 100
         : discountAmount;
 
       const grossValue = basePriceExclusive;
-      let taxableAfterDiscount = grossValue - finalDiscountAmount;
+      let taxableAfterDiscount = grossValue - finalDiscountAmount / quantity;
 
+      // add additional charge as well as discount
       let additionalDiscountAmount = 0;
       if (addDiscPercent > 0 && addDiscType === "before tax") {
         additionalDiscountAmount =
@@ -230,7 +223,7 @@ const SalesInvoiceItemTableTesting = ({
         0
       );
 
-      let totalItemAmount = (taxableAfterDiscount * quantity) + gstAmount ;
+      let totalItemAmount = taxableAfterDiscount * quantity + gstAmount;
 
       if (addDiscPercent > 0 && addDiscType === "after tax") {
         const afterTaxDisc = (totalItemAmount * addDiscPercent) / 100;
@@ -238,12 +231,11 @@ const SalesInvoiceItemTableTesting = ({
         totalItemAmount -= afterTaxDisc;
       }
 
-      // accumulate totals
       totalDiscount += finalDiscountAmount;
-      totalTaxableValue += taxableAfterDiscount;
+      totalTaxableValue += taxableAfterDiscount * quantity;
       totalTax += gstAmount;
       totalAdditionalDiscount += additionalDiscountAmount;
-      subtotalAmount += grossValue;
+      subtotalAmount += basePriceExclusive * quantity;
       totalAmount += totalItemAmount;
 
       return {
@@ -251,7 +243,7 @@ const SalesInvoiceItemTableTesting = ({
         quantity,
         basePrice: Number(basePriceExclusive.toFixed(2)),
         discountAmount: finalDiscountAmount,
-        taxableAmount: Number(taxableAfterDiscount.toFixed(2)),
+        taxableAmount: Number((taxableAfterDiscount * quantity).toFixed(2)),
         gstAmount,
         totalAmount: totalItemAmount,
         additionalDiscountAmount,
@@ -276,7 +268,8 @@ const SalesInvoiceItemTableTesting = ({
       });
     }
 
-    totalAmount += totalAdditionalCharges + totalAdditionalChargeGST;
+    totalAmount += totalAdditionalCharges + totalAdditionalChargeGST ;
+
     setData((prev) => {
       let changed = false;
       const newItems = prev.items.map((item, idx) => {
@@ -431,8 +424,8 @@ const SalesInvoiceItemTableTesting = ({
               value={
                 basePrices[item._id] !== undefined
                   ? basePrices[item._id]
-                  : item?.taxableAmount
-                  ? Number(item.taxableAmount).toFixed(2)
+                  : item?.basePrice
+                  ? Number(item.basePrice).toFixed(2)
                   : ""
               }
               className="input input-xs bg-zinc-100 text-right"
@@ -579,11 +572,17 @@ const SalesInvoiceItemTableTesting = ({
       >
         {/* ADD ITEMS DIALOG BOX -------------------------------------------------------- */}
         <div className="w-7/10 ">
+          {/* ADD ITEMS BUTTON SHOULD NOT BE VISIBLE FOR SALES RETURN AND PURCHASE RETURN */}
+
           <button
             onClick={() =>
               document.getElementById("add_items_modal").showModal()
             }
-            className="btn btn-info w-full hover:btn-dash rounded-xl"
+            className={`${
+              title === "Sales Return" || title === "Purchase Return"
+                ? "hidden"
+                : "btn btn-info w-full hover:btn-dash rounded-xl"
+            }`}
           >
             + Add Item
           </button>

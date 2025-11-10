@@ -159,7 +159,7 @@ const DashboardPage = () => {
                             <tr>
                               <th className="font-medium">DATE</th>
                               <th className="font-medium">TYPE</th>
-                              <th className="font-medium">TXN NO</th>
+                              <th className="font-medium">INV NO</th>
                               <th className="font-medium">PARTY NAME</th>
                               <th className="font-medium">AMOUNT</th>
                             </tr>

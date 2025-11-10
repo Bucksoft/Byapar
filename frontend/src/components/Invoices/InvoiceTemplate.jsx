@@ -881,7 +881,6 @@ const InvoiceTemplate = ({
                       </p>
                     </div>
 
-
                     {/* ACCOUNT HOLDER'S NAME */}
                     <div
                       style={{
@@ -903,7 +902,7 @@ const InvoiceTemplate = ({
                         {bankAccount?.accountHoldersName}
                       </p>
                     </div>
-                    
+
                     {/* BANK ACCOUNT NUMBER */}
                     <div
                       style={{
@@ -923,7 +922,6 @@ const InvoiceTemplate = ({
                         {bankAccount?.bankAccountNumber}
                       </p>
                     </div>
-
 
                     {/* IFSC CODE */}
                     <div
@@ -945,8 +943,7 @@ const InvoiceTemplate = ({
                       </p>
                     </div>
 
-
-                  {/* UPI ID */}
+                    {/* UPI ID */}
                     {bankAccount?.upiId && (
                       <div
                         style={{
@@ -1208,8 +1205,9 @@ const InvoiceTemplate = ({
           >
             {/* TERMS AND CONDITION BLOCK */}
             <div style={{ marginTop: "12px" }}>
-              {invoice?.termsAndCondition ||
-                (business?.termsAndCondition && (
+              {type === "Sales Invoice" &&
+                invoice?.termsAndCondition &&
+                business?.termsAndCondition && (
                   <div>
                     <h4 style={{ fontWeight: 600 }}>Terms & Condition</h4>
                     <p
@@ -1223,9 +1221,9 @@ const InvoiceTemplate = ({
                         business?.termsAndCondition}
                     </p>
                   </div>
-                ))}
+                )}
 
-              {business?.notes && (
+              {type === "Sales Invoice" && business?.notes && (
                 <div style={{ marginTop: "16px" }}>
                   <h4 style={{ fontWeight: 600 }}>Notes</h4>
                   <p

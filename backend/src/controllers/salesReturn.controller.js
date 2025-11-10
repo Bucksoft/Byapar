@@ -43,9 +43,10 @@ export async function createSalesReturn(req, res) {
       req.body.invoiceId.trim() !== "" &&
       mongoose.isValidObjectId(req.body.invoiceId);
 
+    let originalInvoice = null;
     if (hasInvoiceId) {
       const invoiceId = new mongoose.Types.ObjectId(req.body.invoiceId);
-      const originalInvoice = await SalesInvoice.findById(invoiceId);
+      originalInvoice = await SalesInvoice.findById(invoiceId);
 
       if (!originalInvoice) {
         return res
@@ -181,22 +182,27 @@ export async function deleteSaleReturn(req, res) {
         .status(400)
         .json({ success: false, msg: "Please provide sales return id" });
     }
-    const deletedSalesReturn = await SalesReturn.findById(id);
-    if (!deletedSalesReturn) {
+
+    const salesReturn = await SalesReturn.findById(id);
+    if (!salesReturn) {
       return res
-        .status(400)
-        .json({ status: false, msg: "Failed to delete sales return" });
+        .status(404)
+        .json({ success: false, msg: "Sales return not found" });
     }
-    if (deletedSalesReturn.status === "cancelled") {
+
+    if (salesReturn.status === "cancelled") {
       return res.status(400).json({
         success: false,
         msg: "Sales return already cancelled",
       });
     }
-    if (Array.isArray(deletedSalesReturn?.items)) {
-      for (const item of deletedSalesReturn.items) {
+
+    // Revert stock
+    if (Array.isArray(salesReturn?.items)) {
+      for (const item of salesReturn.items) {
         const dbItem = await Item.findById(item?._id);
         if (dbItem) {
+          // Decrease stock since returned goods are now being "unreturned"
           dbItem.currentStock =
             (dbItem.currentStock || 0) - Number(item.quantity || 0);
           await dbItem.save();
@@ -204,20 +210,28 @@ export async function deleteSaleReturn(req, res) {
       }
     }
 
-    const party = await Party.findById(deletedSalesReturn?.partyId?._id);
+    // Reverse party balance adjustments
+    const party = await Party.findById(salesReturn?.partyId?._id);
     if (party) {
-      party.currentBalance =
-        (party.currentBalance || 0) +
-        Number(deletedSalesReturn.totalAmount || 0);
+      const reversalAmount = Number(salesReturn.balanceAmount || 0);
+      party.currentBalance = (party.currentBalance || 0) + reversalAmount;
+      party.totalDebits = (party.totalDebits || 0) + reversalAmount;
+      party.totalInvoices = (party.totalInvoices || 0) + reversalAmount;
+      party.totalCredits = (party.totalCredits || 0) - reversalAmount;
+
       await party.save();
     }
 
-    deletedSalesReturn.status = "cancelled";
-    await deletedSalesReturn.save();
+    // Mark sales return as cancelled
+    salesReturn.status = "cancelled";
+    await salesReturn.save();
 
-    return res.status(200).json({ success: true, msg: "Deleted Sales Return" });
+    return res.status(200).json({
+      success: true,
+      msg: "Sales return cancelled successfully",
+    });
   } catch (error) {
-    console.log("ERROR IN DELETING SALES RETURN");
+    console.log("ERROR IN DELETING SALES RETURN", error);
     return res.status(500).json({ err: "Internal server error", error });
   }
 }

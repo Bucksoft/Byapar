@@ -103,6 +103,7 @@ const DashboardItemsPage = () => {
   // SEARCH ITEMS
   const searchedItems = useMemo(() => {
     if (!items?.length) return [];
+
     return items.filter((item) =>
       item?.itemName.toLowerCase().includes(searchQuery?.toLowerCase())
     );
@@ -116,7 +117,7 @@ const DashboardItemsPage = () => {
 
   useEffect(() => {
     setCurrentPage(1);
-  }, [searchQuery]);
+  }, [searchQuery, showLowStock, items]);
 
   return (
     <main className="h-screen overflow-y-scroll p-2">

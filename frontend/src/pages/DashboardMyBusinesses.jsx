@@ -67,9 +67,11 @@ const DashboardMyBusinesses = () => {
           "proformaInvoice",
           "items",
           "purchaseInvoice",
+          "debitNotes",
           id,
         ],
       });
+      localStorage.clear();
     },
   });
 

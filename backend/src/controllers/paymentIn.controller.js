@@ -18,7 +18,7 @@ export async function createPaymentIn(req, res) {
       paymentInNumber,
       settledInvoices,
     } = req.body;
-
+    console.log(partyId);
     const party = await Party.findOne({
       _id: new mongoose.Types.ObjectId(partyId),
       businessId: req.params?.id,
@@ -228,37 +228,56 @@ export async function deletePaymentIn(req, res) {
 
     const paymentIn = await PaymentIn.findById(id).populate("partyId");
     if (!paymentIn) {
-      return res.status(400).json({ success: false, msg: "Payment not found" });
+      return res.status(404).json({ success: false, msg: "Payment not found" });
+    }
+
+    if (paymentIn.status === "cancelled") {
+      return res
+        .status(400)
+        .json({ success: false, msg: "Payment already cancelled" });
     }
 
     const session = await mongoose.startSession();
     session.startTransaction();
 
     try {
-      // PARTY's BALANCE GETS ADJUSTED AGAIN (PREVIOUS BALANCE + PAYMENT AMOUNT)
-      if (paymentIn.paymentAmount > 0 && paymentIn.partyId) {
-        paymentIn.partyId.currentBalance += paymentIn.paymentAmount;
-        await paymentIn.partyId.save({ session });
+      const party = paymentIn.partyId;
+
+      if (party) {
+        party.currentBalance += Number(paymentIn.paymentAmount || 0);
+        party.totalCredits -= Number(paymentIn.paymentAmount || 0);
+        if (party.totalCredits < 0) party.totalCredits = 0;
+        await party.save({ session });
       }
 
-      // SETTLING THE INVOICE AMOUNT AND MARKING IT AS UNPAID
-      for (const settled of paymentIn.settledInvoices) {
-        const [[invoiceId, amountSettled]] = Object.entries(settled);
-        const id = new mongoose.Types.ObjectId(invoiceId);
-        const invoice = await SalesInvoice.findById(id).session(session);
-        console.log(invoice);
-        if (invoice) {
-          invoice.settledAmount -= Number(amountSettled);
-          invoice.pendingAmount += Number(amountSettled);
-          if (invoice.settledAmount < 0) invoice.settledAmount = 0;
-          invoice.status = "unpaid";
+      if (Array.isArray(paymentIn.settledInvoices)) {
+        for (const settled of paymentIn.settledInvoices) {
+          const [[invoiceId, amountSettled]] = Object.entries(settled);
+
+          const invoice = await SalesInvoice.findById(invoiceId).session(
+            session
+          );
+          if (!invoice) continue;
+
+          invoice.settledAmount = Math.max(
+            0,
+            (invoice.settledAmount || 0) - Number(amountSettled || 0)
+          );
+
+          invoice.pendingAmount = Math.min(
+            invoice.totalAmount,
+            (invoice.pendingAmount || 0) + Number(amountSettled || 0)
+          );
+          if (invoice.pendingAmount <= 0) invoice.status = "paid";
+          else if (invoice.settledAmount > 0) invoice.status = "partially paid";
+          else invoice.status = "unpaid";
+
           await invoice.save({ session });
         }
       }
-
-      // NO UPDATE IN THE ITEMS
       paymentIn.status = "cancelled";
-      await paymentIn.save();
+      await paymentIn.save({ session });
+
       await session.commitTransaction();
       session.endSession();
 
@@ -271,7 +290,7 @@ export async function deletePaymentIn(req, res) {
       throw err;
     }
   } catch (error) {
-    console.error("ERROR IN DELETING PAYMENT IN DETAILS :", error);
+    console.error("ERROR IN DELETING PAYMENT IN DETAILS:", error);
     return res
       .status(500)
       .json({ success: false, msg: "Internal Server Error" });

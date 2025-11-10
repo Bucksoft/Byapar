@@ -10,8 +10,10 @@ import { PackagePlus, Plus } from "lucide-react";
 import { GrFormSubtract } from "react-icons/gr";
 import { FiPackage } from "react-icons/fi";
 import { AiOutlineProduct } from "react-icons/ai";
+import { toTitleCase } from "../../../helpers/titleCaseString";
 
 const ItemsList = ({ showLowStock, items }) => {
+  
   const [selectedItems, setSelectedItems] = useState([]);
   const [choice, setChoice] = useState("add");
   const [stockUpdationDate, setStockUpdationDate] = useState(
@@ -147,7 +149,7 @@ const ItemsList = ({ showLowStock, items }) => {
                     // Only show low-stock products
                     return (
                       item.itemType === "product" &&
-                      item.currentStock <= (item.lowStockLevel || 0)
+                      item.currentStock <= (item.lowStockQuantity || 10)
                     );
                   }
                   return true; // Show all if not filtering
@@ -172,7 +174,7 @@ const ItemsList = ({ showLowStock, items }) => {
                         {item?.itemName}
                       </div>
                     </td>
-                    <td>{item?.itemType}</td>
+                    <td>{toTitleCase(item?.itemType)}</td>
                     <td>{item?.itemCode || item?.serviceCode || "-"}</td>
                     <td>
                       {item.itemType === "product" ? (

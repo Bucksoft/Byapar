@@ -50,18 +50,18 @@ export const dashboardFields = [
       </>
     ),
     label: "Items",
-    subLinks: [
-      {
-        id: 1,
-        label: "Inventory",
-        link: "items",
-      },
-      // {
-      //   id: 2,
-      //   label: "Godown (Warehouse)",
-      //   link: "godown",
-      // },
-    ],
+    // subLinks: [
+    //   {
+    //     id: 1,
+    //     label: "Inventory",
+    //     link: "items",
+    //   },
+    //   // {
+    //   //   id: 2,
+    //   //   label: "Godown (Warehouse)",
+    //   //   link: "godown",
+    //   // },
+    // ],
   },
   {
     id: 4,
