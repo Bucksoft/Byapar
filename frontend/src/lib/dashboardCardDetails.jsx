@@ -6,7 +6,7 @@ export const dashboardCardDetails = [
     id: 1,
     title: "",
     content: "Customer Support",
-    btnText: "+91 7280003245",
+    btnText: "+91 7280003246",
     img: support,
     link: "https://anydesk.com/en/downloads/thank-you?dv=win_exe",
   },
