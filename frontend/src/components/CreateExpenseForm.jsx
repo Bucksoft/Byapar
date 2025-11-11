@@ -2,10 +2,12 @@ import {
   ArrowLeft,
   Check,
   ChevronDown,
+  Delete,
   IndianRupee,
   Plus,
   PlusCircle,
   Settings,
+  Trash,
   X,
 } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
@@ -25,6 +27,7 @@ import CustomLoader from "./Loader";
 
 const CreateExpenseForm = ({ setOpenCreateExpense, latestExpenseNumber }) => {
   const [checked, setChecked] = useState(false);
+  const [open, setOpen] = useState(false);
   const { business } = useBusinessStore();
   const [searchQuery, setSearchQuery] = useState("");
   const [addedItems, setAddedItems] = useState([]);
@@ -84,8 +87,6 @@ const CreateExpenseForm = ({ setOpenCreateExpense, latestExpenseNumber }) => {
     },
   });
 
-  console.log(data);
-
   // CREATE EXPENSE
   const mutation = useMutation({
     mutationFn: async () => {
@@ -120,6 +121,21 @@ const CreateExpenseForm = ({ setOpenCreateExpense, latestExpenseNumber }) => {
       items: addedItems,
     }));
   }, [addedItems]);
+
+  const deleteMutation = useMutation({
+    mutationFn: async (id) => {
+      const res = await axiosInstance.delete(
+        `/expense/item/${id}/?businessId=${business?._id}`
+      );
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["expenseItems"] });
+    },
+  });
+
+  const handleDelete = (id) => {
+    deleteMutation.mutate(id);
+  };
 
   return (
     <main className="h-screen w-full flex">
@@ -206,12 +222,16 @@ const CreateExpenseForm = ({ setOpenCreateExpense, latestExpenseNumber }) => {
                   className="toggle text-zinc-800 toggle-sm"
                 />
               </div>
-              {/* second field */}
+
+              {/* second field - CATEGORY */}
               <div className=" w-full px-2 pt-4 rounded-md border-zinc-300 flex flex-col">
                 <p className="text-xs text-zinc-800">
                   Expense Category <span className="text-red-500">*</span>
                 </p>
-                <div className="dropdown dropdown-center w-full ">
+                <div
+                  onClick={() => setOpen((prev) => !prev)}
+                  className="dropdown dropdown-center w-full "
+                >
                   <div
                     tabIndex={0}
                     role="button"
@@ -227,40 +247,44 @@ const CreateExpenseForm = ({ setOpenCreateExpense, latestExpenseNumber }) => {
                     </span>
                     <ChevronDown size={16} />
                   </div>
-                  <ul
-                    tabIndex={0}
-                    className="dropdown-content menu bg-base-100  rounded-bl-box rounded-br-box border-zinc-200 z-1 w-full p-2 shadow-md text-xs  text-zinc-600"
-                  >
-                    {expenseCategories.length > 0 &&
-                      expenseCategories?.map((category) => (
-                        <li
-                          onClick={(e) =>
-                            setData((prev) => ({
-                              ...prev,
-                              expenseCategory: category?._id,
-                            }))
-                          }
-                          key={category?._id}
-                        >
-                          <a>{category?.categoryName}</a>
-                        </li>
-                      ))}
 
-                    <div>
-                      <>
-                        <button
-                          onClick={() =>
-                            document
-                              .getElementById("expense_category_modal")
-                              .showModal()
-                          }
-                          className="btn mt-1 btn-xs rounded-xl btn-dash btn-info w-full"
-                        >
-                          Add Category
-                        </button>
-                      </>
-                    </div>
-                  </ul>
+                  {open && (
+                    <ul
+                      role="menu"
+                      tabIndex={0}
+                      className="dropdown-content menu bg-base-100  rounded-bl-box rounded-br-box border-zinc-200 z-1 w-full p-2 shadow-md text-xs  text-zinc-600"
+                    >
+                      {expenseCategories.length > 0 &&
+                        expenseCategories?.map((category) => (
+                          <li
+                            onClick={(e) => {
+                              setData((prev) => ({
+                                ...prev,
+                                expenseCategory: category?._id,
+                              }));
+                            }}
+                            key={category?._id}
+                          >
+                            <a>{category?.categoryName}</a>
+                          </li>
+                        ))}
+
+                      <div>
+                        <>
+                          <button
+                            onClick={() =>
+                              document
+                                .getElementById("expense_category_modal")
+                                .showModal()
+                            }
+                            className="btn mt-1 btn-xs rounded-xl btn-dash btn-info w-full"
+                          >
+                            Add Category
+                          </button>
+                        </>
+                      </div>
+                    </ul>
+                  )}
                 </div>
               </div>
               {/* third field */}
@@ -411,19 +435,21 @@ const CreateExpenseForm = ({ setOpenCreateExpense, latestExpenseNumber }) => {
                       <th>HSN/SAC</th>
                       <th>Purchase Price</th>
                       <th>Action</th>
+                      <th></th>
                     </tr>
                   </thead>
                   <tbody>
                     {filteredItems?.length > 0 ? (
                       filteredItems?.map((item, index) => (
                         <tr key={index}>
-                          <th>{index + 1}</th>
+                          <td>{index + 1}</td>
                           <td>{item?.itemName}</td>
-                          <td>{item?.hsnSac}</td>
+                          <td>{item?.hsnSac || "-"}</td>
                           <td>
                             <div className="flex items-center">
                               <LuIndianRupee size={12} />
-                              {item?.purchasePrice?.toLocaleString("en-IN")}
+                              {item?.purchasePrice?.toLocaleString("en-IN") ||
+                                "-"}
                             </div>
                           </td>
                           <td>
@@ -458,6 +484,13 @@ const CreateExpenseForm = ({ setOpenCreateExpense, latestExpenseNumber }) => {
                                 <>Add</>
                               )}
                             </button>
+                          </td>
+                          <td>
+                            <Trash
+                              onClick={() => handleDelete(item?._id)}
+                              size={15}
+                              className="text-error"
+                            />
                           </td>
                         </tr>
                       ))

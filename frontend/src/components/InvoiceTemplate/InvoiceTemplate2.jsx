@@ -301,26 +301,27 @@ const InvoiceTemplate2 = ({
           }}
         >
           <p style={{}}>
-            {type === "Sales Return"
-              ? "Sales Return No. : "
-              : type === "Sales Invoice"
-              ? "Sales Invoice No. : "
-              : type === "Quotation"
-              ? "Quotation No. : "
-              : type === "Delivery Challan"
-              ? "Delivery Challan No. : "
-              : type === "Proforma Invoice"
-              ? "Proforma Invoice No. : "
-              : type === "Purchase Invoice"
-              ? "Purchase Invoice No. : "
-              : type === "Credit Note"
-              ? "Credit Note No. : "
-              : type === "Purchase Order"
-              ? "Purchase Order No. : "
-              : type === "Debit Note"
-              ? "Debit Note No. : "
-              : "Invoice No. : "}
-
+            <b>
+              {type === "Sales Return"
+                ? "Sales Return No. : "
+                : type === "Sales Invoice"
+                ? "Sales Invoice No. : "
+                : type === "Quotation"
+                ? "Quotation No. : "
+                : type === "Delivery Challan"
+                ? "Delivery Challan No. : "
+                : type === "Proforma Invoice"
+                ? "Proforma Invoice No. : "
+                : type === "Purchase Invoice"
+                ? "Purchase Invoice No. : "
+                : type === "Credit Note"
+                ? "Credit Note No. : "
+                : type === "Purchase Order"
+                ? "Purchase Order No. : "
+                : type === "Debit Note"
+                ? "Debit Note No. : "
+                : "Invoice No. : "}
+            </b>
             <span>
               {type === "Sales Return"
                 ? invoice?.salesReturnNumber

@@ -1,5 +1,5 @@
 import { PackageOpen } from "lucide-react";
-import { BsPeopleFill, BsPersonFillGear } from "react-icons/bs";
+import { BsPeopleFill, BsPersonFillGear, BsWhatsapp } from "react-icons/bs";
 import { IoColorPaletteSharp, IoPricetagsSharp } from "react-icons/io5";
 import { TbDeviceMobileMessage, TbLayoutDashboardFilled } from "react-icons/tb";
 import { GiShoppingBag } from "react-icons/gi";
@@ -259,6 +259,12 @@ export const settingLinks = [
   //   label: "Help And Support",
   //   link: "help-and-support",
   // },
+  {
+    id: 11,
+    icon: <BsWhatsapp size={16} />,
+    label: "Connect Whatsapp",
+    link: "whatsapp",
+  },
 ];
 
 export const businessTools = [

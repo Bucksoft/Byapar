@@ -132,7 +132,7 @@ const Sidebar = () => {
           {/* business details */}
           <div className="flex gap-3 px-5 py-3 items-center border-b border-b-cyan-950 ">
             <div className="border-3 bg-white border-cyan-600 rounded-2xl p-1">
-              <div className="w-12 h-12 rounded-xl hover:scale-120 transition-all ease-in-out duration-300 flex items-center justify-center bg-red-200 overflow-hidden">
+              <div className="w-12 h-12 rounded-xl hover:scale-120 transition-all ease-in-out duration-300 flex items-center justify-center overflow-hidden">
                 {business?.logo && business?.logo !== "null" ? (
                   <img
                     src={business.logo}

@@ -15,6 +15,7 @@ const DashboardExpenses = () => {
   const [openCreateExpense, setOpenCreateExpense] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [searchCategoryQuery, setSearchCategoryQuery] = useState("");
+  const [selectedCategory, setSelectedCategory] = useState("");
   const { business } = useBusinessStore();
 
   // fetch all expenses
@@ -39,22 +40,25 @@ const DashboardExpenses = () => {
     },
   });
 
+  // TO BE FIXED
   const filteredExpenses = useMemo(() => {
     if (!data?.expenses) return [];
-    if (searchQuery) {
-      return data?.expenses?.filter((expense) => {
-        return expense?.expenseCategory?.categoryName
-          ?.toLowerCase()
-          .includes(searchQuery);
-      });
-    } else {
-      return data?.expenses;
-    }
-  });
+
+    const query = searchQuery?.toLowerCase()?.trim();
+    const category = selectedCategory?.toLowerCase()?.trim();
+
+    return data.expenses.filter((expense) => {
+      const categoryName =
+        expense?.expenseCategory?.categoryName?.toLowerCase() ?? "";
+      const categoryMatch = category ? categoryName.includes(category) : true;
+      const searchMatch = query ? categoryName.includes(query) : true;
+      return categoryMatch && searchMatch;
+    });
+  }, [data?.expenses, searchQuery, selectedCategory]);
 
   return (
     <main className="h-screen w-full flex">
-      {!openCreateExpense ? (
+      {openCreateExpense ? (
         <CreateExpenseForm
           setOpenCreateExpense={setOpenCreateExpense}
           latestExpenseNumber={data?.latestExpenseNumber || 0}
@@ -94,7 +98,7 @@ const DashboardExpenses = () => {
                   </label>
                 </div>
                 {/* calender */}
-                <div className="dropdown dropdown-center w-50">
+                {/* <div className="dropdown dropdown-center w-50">
                   <div
                     tabIndex={0}
                     role="button"
@@ -123,7 +127,8 @@ const DashboardExpenses = () => {
                       <a>Last week</a>
                     </li>
                   </ul>
-                </div>
+                </div> */}
+
                 {/* all expense */}
                 <div className="dropdown dropdown-center ">
                   <div
@@ -153,12 +158,26 @@ const DashboardExpenses = () => {
                               ?.includes(searchCategoryQuery)
                           )
                           .map((category) => (
-                            <li key={category?._id}>
+                            <li
+                              onClick={() =>
+                                setSelectedCategory(
+                                  category?.categoryName?.toLowerCase()
+                                )
+                              }
+                              key={category?._id}
+                            >
                               <a>{category?.categoryName}</a>
                             </li>
                           ))
                       : expenseCategories?.map((category) => (
-                          <li key={category?._id}>
+                          <li
+                            onClick={() =>
+                              setSelectedCategory(
+                                category?.categoryName?.toLowerCase()
+                              )
+                            }
+                            key={category?._id}
+                          >
                             <a>{category?.categoryName}</a>
                           </li>
                         ))}

@@ -1,5 +1,5 @@
 import { useMutation } from "@tanstack/react-query";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { axiosInstance } from "../../config/axios";
 import { useBusinessStore } from "../../store/businessStore";
 import { queryClient } from "../../main";
@@ -12,10 +12,15 @@ const CreateExpenseCategory = () => {
 
   const mutation = useMutation({
     mutationFn: async () => {
+      // if (!categoryName) {
+      //   throw new Error("Please provide the category name");
+      // }
+
       const res = await axiosInstance.post(
         `/expense/category/?businessId=${business?._id}`,
         { categoryName, expenseType }
       );
+
       return res.data?.expenseCategory;
     },
     onSuccess: (data) => {
@@ -46,6 +51,9 @@ const CreateExpenseCategory = () => {
               placeholder="Enter Category Name"
               className="input input-sm w-full"
             />
+            <small className="text-red-500 mt-1">
+              {mutation.isError && mutation.error?.response?.data?.msg}
+            </small>
           </div>
 
           <div className="mt-2">

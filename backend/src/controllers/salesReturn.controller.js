@@ -64,6 +64,7 @@ export async function createSalesReturn(req, res) {
       }
       itemsToProcess = data.items;
     }
+    
     // updating stock
     for (const returnedItem of itemsToProcess) {
       const item = await Item.findById(returnedItem?._id);

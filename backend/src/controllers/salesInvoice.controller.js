@@ -738,3 +738,63 @@ export async function getWhatsappStatus(req, res) {
     res.status(500).json({ error: "Internal Server Error" });
   }
 }
+
+// get whatsapp profile
+export async function getWhatsappProfile(req, res) {
+  try {
+    const me = client.info;
+    const jid = `${me.wid.user}@c.us`;
+
+    let profilePic = null;
+    try {
+      profilePic = await client.getProfilePicUrl(jid);
+    } catch (e) {
+      profilePic = null;
+    }
+
+    let about = null;
+
+    if (typeof client.getStatus === "function") {
+      try {
+        const st = await client.getStatus(jid);
+        about = st?.status || st || null;
+      } catch (e) {
+        about = null;
+      }
+    }
+
+    if (!about && typeof client.getContactById === "function") {
+      try {
+        const contact = await client.getContactById(jid);
+        about =
+          contact?.bio ||
+          contact?.about ||
+          (contact?.profile && contact.profile.about) ||
+          null;
+      } catch (e) {
+        about = null;
+      }
+    }
+
+    if (!about) {
+      if (typeof client.getAbout === "function") {
+        try {
+          about = await client.getAbout(jid);
+        } catch (e) {
+          about = null;
+        }
+      }
+    }
+
+    return res.json({
+      number: me.wid.user,
+      name: me.pushname || null,
+      about,
+      profilePic,
+      rawClientInfo: me,
+    });
+  } catch (error) {
+    console.error("Error /api/my-profile:", error);
+    return res.status(500).json({ error: "Failed to get profile info" });
+  }
+}

@@ -244,7 +244,7 @@ const InvoiceTemplate3 = ({
                       style={{
                         display: "flex",
                         fontSize: "0.875rem",
-                        color: "#52525b",
+                        // color: "#52525b",
                       }}
                     >
                       <span
@@ -263,7 +263,7 @@ const InvoiceTemplate3 = ({
                       style={{
                         display: "flex",
                         fontSize: "0.875rem",
-                        color: "#52525b",
+                        // color: "#52525b",
                       }}
                     >
                       <span

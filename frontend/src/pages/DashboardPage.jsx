@@ -237,7 +237,7 @@ const DashboardPage = () => {
 
                   <div className={`${privacy ? "blur-xs" : ""}`}>
                     {paymentIns?.length > 0 ? (
-                      <table className="table table-zebra text-sm">
+                      <table className="table table-zebra text-xs table-sm">
                         <thead className="bg-zinc-300">
                           <tr>
                             <th className="font-medium">DATE</th>
@@ -249,12 +249,12 @@ const DashboardPage = () => {
                           {paymentIns &&
                             paymentIns?.slice(0, 5).map((paymentIn) => (
                               <tr key={paymentIn?._id} className="bg-white">
-                                <td>
+                                <td className="text-nowrap">
                                   {(paymentIn?.paymentDate &&
                                     paymentIn?.paymentDate.split("T")[0]) ||
                                     "-"}
                                 </td>
-                                <td>{paymentIn?.partyName || "-"}</td>
+                                <td className="text-nowrap">{paymentIn?.partyName || "-"}</td>
                                 <td className="flex items-center">
                                   <LiaRupeeSignSolid />
                                   {Number(

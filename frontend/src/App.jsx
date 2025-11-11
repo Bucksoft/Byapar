@@ -77,6 +77,7 @@ import DebitNote from "./components/Invoices/DebitNote";
 import PurchaseReturn from "./components/Invoices/PurchaseReturn";
 import MasterLogin from "./pages/MasterLogin";
 import ProtectedRoute from "./components/ProtectedRoute";
+import DashboardWhatsappPage from "./pages/DashboardWhatsappPage";
 
 function App() {
   const { user } = useAuthStore();
@@ -102,6 +103,11 @@ function App() {
             <Route
               path="/dashboard/my-businesses"
               element={<DashboardMyBusinesses />}
+            />
+
+            <Route
+              path="/dashboard/whatsapp"
+              element={<DashboardWhatsappPage />}
             />
 
             <Route

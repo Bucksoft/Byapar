@@ -96,7 +96,6 @@ const SalesInvoice = () => {
     const interval = setInterval(async () => {
       try {
         const res = await axiosInstance.get("/sales-invoice/whatsapp-status");
-
         if (res.data?.status === "qr") {
           setQrCode(res?.data.qr);
           setConnectionStatus("qr");
@@ -106,7 +105,6 @@ const SalesInvoice = () => {
         } else {
           setConnectionStatus("waiting");
         }
-
         setCheckingConn(false);
       } catch (error) {
         console.error("Error fetching WhatsApp status:", error);
@@ -115,7 +113,9 @@ const SalesInvoice = () => {
     }, 5000);
 
     return () => clearInterval(interval);
-  }, []);
+  }, []); 
+
+  
 
   // set the number by default if party's number is available
   useEffect(() => {
@@ -153,6 +153,7 @@ const SalesInvoice = () => {
             >
               <Printer size={15} /> Print PDF
             </button>
+
             <button
               disabled={mutation.isPending}
               onClick={() =>

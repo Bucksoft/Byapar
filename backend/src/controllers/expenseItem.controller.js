@@ -25,6 +25,7 @@ export async function createExpenseItem(req, res) {
 
     const existingItem = await ExpenseItem.findOne({
       itemName: { $regex: `^${itemName}$`, $options: "i" },
+      businessId,
     });
 
     if (existingItem) {
@@ -88,6 +89,7 @@ export async function createExpenseCategory(req, res) {
 
     const existingCategory = await ExpenseCategory.findOne({
       categoryName: { $regex: `^${categoryName}$`, $options: "i" },
+      businessId: new mongoose.Types.ObjectId(req.query.businessId),
     });
 
     if (existingCategory) {
@@ -175,6 +177,7 @@ export async function getAllExpenses(req, res) {
     const expenses = await Expense.find({
       $and: [{ businessId: businessId, clientId: req?.user?.id }],
     }).populate("items expenseCategory");
+
     return res.status(200).json({
       success: true,
       expenses,
@@ -183,6 +186,32 @@ export async function getAllExpenses(req, res) {
     });
   } catch (error) {
     console.log("Error in getting all expenses", error);
+    return res.status(500).json({ msg: "Internal Server Error" });
+  }
+}
+
+export async function deleteExpenseItem(req, res) {
+  try {
+    const { id } = req.params;
+    const businessId = req.query?.businessId;
+
+    // delete item which matches id and business id both
+    const expenseItem = await ExpenseItem.deleteOne({
+      _id: id,
+      businessId,
+    });
+
+    if (!expenseItem) {
+      return res
+        .status(400)
+        .json({ success: false, msg: "Expense item could not be deleted" });
+    }
+
+    return res
+      .status(200)
+      .json({ success: true, msg: "Expense item deleted successfully" });
+  } catch (error) {
+    console.log("Error in deleting all expenses", error);
     return res.status(500).json({ msg: "Internal Server Error" });
   }
 }
