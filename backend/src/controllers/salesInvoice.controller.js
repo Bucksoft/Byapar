@@ -28,8 +28,7 @@ const client = new Client({
   }),
   puppeteer: {
     headless: true,
-    executablePath:
-      "C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe",
+    executablePath: process.env.CHROM_PATH,
     args: [
       "--no-sandbox",
       "--disable-setuid-sandbox",
@@ -796,5 +795,24 @@ export async function getWhatsappProfile(req, res) {
   } catch (error) {
     console.error("Error /api/my-profile:", error);
     return res.status(500).json({ error: "Failed to get profile info" });
+  }
+}
+
+// remove connection
+export async function removeConnection(req, res) {
+  const SESSION_PATH = path.join(process.cwd(), ".wwebjs_auth");
+  await client.logout();
+  if (fs.existsSync(SESSION_PATH)) {
+    fs.rmSync(SESSION_PATH, { recursive: true, force: true });
+    console.log("🗑️ Deleted session folder:", SESSION_PATH);
+  }
+  client.initialize();
+  res.json({
+    success: true,
+    message: "WhatsApp connection removed successfully.",
+  });
+  try {
+  } catch (error) {
+    return res.status(500).json({ error: "Internal Server Error" });
   }
 }

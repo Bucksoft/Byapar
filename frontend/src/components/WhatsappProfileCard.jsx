@@ -1,9 +1,21 @@
+import { useMutation } from "@tanstack/react-query";
 import React from "react";
 import { FaWhatsapp } from "react-icons/fa";
 import { MdPhoneIphone } from "react-icons/md";
+import { axiosInstance } from "../config/axios";
 
 const WhatsappProfileCard = ({ profile }) => {
   if (!profile) return null;
+
+  const removeConnection = useMutation({
+    mutationFn: async () => {
+      const res = await axiosInstance.post(`/sales-invoice/remove-connection`);
+    },
+    onSuccess: () => {
+      window.location.reload();
+    },
+  });
+
   return (
     <div className="flex justify-center my-4">
       <div className="card w-80 bg-base-100 shadow-xl hover:shadow-2xl transition-all duration-300 rounded-3xl border border-green-200">
@@ -34,10 +46,13 @@ const WhatsappProfileCard = ({ profile }) => {
             <span>{profile.number}</span>
           </div>
 
-          {/* Platform */}
-          <div className="badge badge-outline badge-success px-3 py-3 mt-2">
-            {profile.rawClientInfo?.platform || "Unknown Platform"}
-          </div>
+          {/* Disconnect */}
+          <button
+            onClick={() => removeConnection.mutate()}
+            className="btn btn-sm rounded-full text-green-500 border border-green-500 bg-white hover:bg-green-500 hover:text-white"
+          >
+            Disconnect
+          </button>
         </div>
       </div>
     </div>

@@ -281,6 +281,7 @@ const PartyLedgerStatement = ({
 
         {openDatePicker && (
           <div
+            // onBlur={()=>}
             className="absolute top-12 left-0 z-[9999] bg-white shadow-lg rounded-md "
             style={{
               position: "absolute",

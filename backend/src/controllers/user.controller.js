@@ -186,7 +186,6 @@ export async function loginViaGoogleCallback(req, res) {
         headers: { "Content-Type": "application/x-www-form-urlencoded" },
       }
     );
-
     const token = tokenRes.data.access_token;
     const userRes = await axios.get(
       "https://www.googleapis.com/oauth2/v2/userinfo",
@@ -194,7 +193,7 @@ export async function loginViaGoogleCallback(req, res) {
         headers: { Authorization: `Bearer ${token}` },
       }
     );
-
+    console.log("USER RESPONSE", userRes);
     // save user in DB
     let user = await UserCredential.findOne({ email: userRes.data.email });
     if (!user) {

@@ -13,6 +13,7 @@ import {
   generateQrCode,
   getWhatsappStatus,
   getWhatsappProfile,
+  removeConnection,
 } from "../controllers/salesInvoice.controller.js";
 import { isAuth } from "../middleware/auth.middleware.js";
 const router = express.Router();
@@ -22,6 +23,7 @@ router.route("/chart/:id").get(isAuth, getSalesDataForChart);
 router.route("/bulk/:businessId").post(isAuth, bulkUploadSalesInvoices);
 router.route("/:businessId/:id").patch(isAuth, updatedSalesInvoice);
 router.route("/qr").post(isAuth, generateQrCode);
+router.route("/remove-connection").post(isAuth, removeConnection);
 router.route("/send-email").post(isAuth, sendInvoiceViaEmail);
 router.route("/send-whatsapp").post(isAuth, sendInvoiceViaWhatsapp);
 router.route("/whatsapp-status").get(isAuth, getWhatsappStatus);

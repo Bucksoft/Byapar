@@ -67,6 +67,7 @@ const DashboardWhatsappPage = () => {
         console.log("error in fetching whatsapp profile", error);
       } finally {
         setLoading(false);
+        document.getElementById("whatsapp_dialog").close();
       }
     }
     getWhatsappProfile();
