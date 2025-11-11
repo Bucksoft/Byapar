@@ -17,6 +17,7 @@ import toast from "react-hot-toast";
 import { queryClient } from "../main";
 import { useNavigate } from "react-router-dom";
 import dayjs from "dayjs";
+import { toTitleCase } from "../../helpers/titleCaseString";
 
 const DashboardSalesReturnPage = () => {
   const { business } = useBusinessStore();
@@ -164,7 +165,7 @@ const DashboardSalesReturnPage = () => {
                     </td>
                     <td>
                       <div className="badge badge-sm badge-secondary badge-soft">
-                        {saleReturn?.status}
+                        {toTitleCase(saleReturn?.status)}
                       </div>
                     </td>
                     <td onClick={(e) => e.stopPropagation()}>

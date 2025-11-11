@@ -28,7 +28,7 @@ const LoginPage = () => {
   });
 
   const handleGoogleLogin = () => {
-    window.location.href = "http://localhost:8000/api/v1/user";
+    window.location.href = "https://backend.byaparsetu.com/api/v1/user";
   };
 
   return (

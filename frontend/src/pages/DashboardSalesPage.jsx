@@ -32,6 +32,7 @@ import { useBusinessStore } from "../store/businessStore";
 import { uploadExcel } from "../../helpers/uploadExcel";
 import { useDebounce } from "../../helpers/useDebounce";
 import { usePaymentInStore } from "../store/paymentInStore";
+import { toTitleCase } from "../../helpers/titleCaseString";
 
 const DashboardSalesPage = () => {
   const { business } = useBusinessStore();
@@ -375,7 +376,7 @@ const DashboardSalesPage = () => {
                               : "badge-success"
                           }`}
                         >
-                          {invoice?.status}
+                          {toTitleCase(invoice?.status)}
                         </p>
                       </td>
 

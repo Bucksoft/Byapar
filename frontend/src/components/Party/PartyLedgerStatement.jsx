@@ -274,22 +274,16 @@ const PartyLedgerStatement = ({
         {/* CUSTOM DAY PICKER */}
         <button
           className="btn btn-sm ml-2 rounded-xl"
-          onClick={() => setOpenDatePicker(!openDatePicker)}
+          onClick={() => {
+            setOpenDatePicker(!openDatePicker);
+            document.getElementById("day_picker").showModal();
+          }}
         >
           Select Custom Date
         </button>
 
-        {openDatePicker && (
-          <div
-            // onBlur={()=>}
-            className="absolute top-12 left-0 z-[9999] bg-white shadow-lg rounded-md "
-            style={{
-              position: "absolute",
-              top: "60px",
-              left: "50%",
-              transform: "translateX(-50%)",
-            }}
-          >
+        <dialog id="day_picker" className="modal">
+          <div className="modal-box w-fit absolute top-50 right-125 p-0 bg-none">
             <DayPicker
               selected={dateRange}
               onSelect={setDateRange}
@@ -297,7 +291,10 @@ const PartyLedgerStatement = ({
               mode="range"
             />
           </div>
-        )}
+          <form method="dialog" className="modal-backdrop">
+            <button>close</button>
+          </form>
+        </dialog>
 
         <ul
           className="dropdown menu w-52 rounded-box bg-base-100 shadow-sm"

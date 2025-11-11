@@ -12,6 +12,7 @@ import dayjs from "dayjs";
 import isoWeek from "dayjs/plugin/isoWeek";
 import isBetween from "dayjs/plugin/isBetween";
 import { ChevronDown, Search } from "lucide-react";
+import { toTitleCase } from "../../helpers/titleCaseString";
 
 dayjs.extend(isoWeek);
 dayjs.extend(isBetween);
@@ -198,7 +199,7 @@ const DashboardQuotationPage = () => {
                               : "badge-accent"
                           } badge-soft`}
                         >
-                          {quotation?.status}
+                          {toTitleCase(quotation?.status)}
                         </div>
                       </td>
                     </tr>

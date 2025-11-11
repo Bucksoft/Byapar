@@ -11,6 +11,7 @@ import toast from "react-hot-toast";
 import { queryClient } from "../../main";
 import CustomLoader from "../Loader";
 import { handlePrint } from "../../../helpers/print";
+import { toTitleCase } from "../../../helpers/titleCaseString";
 
 const PurchaseReturn = () => {
   const { id } = useParams();
@@ -49,7 +50,7 @@ const PurchaseReturn = () => {
             <ArrowLeft onClick={() => navigate(-1)} />
             <h1 className="font-medium">Purchase Return</h1>
             <div className="badge badge-success badge-soft">
-              {invoice?.status}
+              {toTitleCase(invoice?.status)}
             </div>
           </div>
           <div className="flex items-center gap-3">

@@ -59,13 +59,11 @@ const GSTR3Report = () => {
       return (acc += invoice?.totalAmount);
     }, 0);
 
-
   const totalCGST = searchedInvoices
     ?.filter((invoice) => invoice.status !== "cancelled")
     ?.reduce((acc, invoice) => {
       return (acc += Number(invoice?.cgst));
     }, 0);
-
 
   const totalSGST = searchedInvoices
     ?.filter((invoice) => invoice.status !== "cancelled")
@@ -413,11 +411,9 @@ const GSTR3Report = () => {
               style={{
                 fontWeight: "bold",
                 fontSize: "20px",
-                marginBottom: "8px",
                 display: "flex",
                 justifyContent: "center",
                 alignItems: "center",
-                fontWeight: "bold",
                 marginBottom: "10px",
               }}
             >

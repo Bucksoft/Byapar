@@ -14,6 +14,7 @@ import dayjs from "dayjs";
 import isSameOrAfter from "dayjs/plugin/isSameOrAfter";
 import isSameOrBefore from "dayjs/plugin/isSameOrBefore";
 import isoWeek from "dayjs/plugin/isoWeek";
+import { toTitleCase } from "../../helpers/titleCaseString";
 
 dayjs.extend(isSameOrAfter);
 dayjs.extend(isSameOrBefore);
@@ -162,7 +163,7 @@ const DashboardPaymentInPage = () => {
                                 : "badge-warning"
                             }  `}
                           >
-                            {paymentIn?.status}
+                            {toTitleCase(paymentIn?.status)}
                           </div>
                         </td>
                       </tr>

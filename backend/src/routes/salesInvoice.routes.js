@@ -22,6 +22,8 @@ router.route("/invoice/:id").get(isAuth, getInvoiceById);
 router.route("/chart/:id").get(isAuth, getSalesDataForChart);
 router.route("/bulk/:businessId").post(isAuth, bulkUploadSalesInvoices);
 router.route("/:businessId/:id").patch(isAuth, updatedSalesInvoice);
+
+
 router.route("/qr").post(isAuth, generateQrCode);
 router.route("/remove-connection").post(isAuth, removeConnection);
 router.route("/send-email").post(isAuth, sendInvoiceViaEmail);

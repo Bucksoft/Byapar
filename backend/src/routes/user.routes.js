@@ -9,6 +9,7 @@ import {
   verifyOTP,
   masterLogin,
   resendOTP,
+  loginViaGoogleCallback,
 } from "../controllers/user.controller.js";
 import dotenv from "dotenv";
 import { isAuth } from "../middleware/auth.middleware.js";
@@ -20,8 +21,11 @@ router.route("/login").post(login);
 router.route("/resend-otp").post(resendOTP);
 router.route("/master-login").post(masterLogin);
 router.route("/verify-otp").post(verifyOTP);
+
 router.route("/").get(googleOAuthRedirection);
 router.route("/me").get(isAuth, getUserCredential);
+router.route("/callback").get(loginViaGoogleCallback);
+
 router.route("/logout").post(isAuth, logoutUser);
 router.route("/").patch(isAuth, updateUserAccount);
 router.route("/refresh").get(refreshToken);

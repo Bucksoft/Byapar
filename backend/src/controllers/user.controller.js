@@ -193,7 +193,7 @@ export async function loginViaGoogleCallback(req, res) {
         headers: { Authorization: `Bearer ${token}` },
       }
     );
-    console.log("USER RESPONSE", userRes);
+    
     // save user in DB
     let user = await UserCredential.findOne({ email: userRes.data.email });
     if (!user) {

@@ -13,7 +13,6 @@ import { AiOutlineProduct } from "react-icons/ai";
 import { toTitleCase } from "../../../helpers/titleCaseString";
 
 const ItemsList = ({ showLowStock, items }) => {
-  
   const [selectedItems, setSelectedItems] = useState([]);
   const [choice, setChoice] = useState("add");
   const [stockUpdationDate, setStockUpdationDate] = useState(
@@ -419,11 +418,11 @@ const ItemsList = ({ showLowStock, items }) => {
           </tbody>
         </table>
         {showLowStock &&
-          items.filter(
+          !items.filter(
             (item) =>
               item.itemType === "product" &&
-              item.currentStock <= (item.lowStockLevel || 0)
-          ).length === 0 && (
+              item.currentStock <= (item.lowStockLevel || 10)
+          ) && (
             <div className="mt-16">
               <p className="flex flex-col items-center gap-2 text-center text-gray-400 mt-4">
                 <FiPackage size={30} />

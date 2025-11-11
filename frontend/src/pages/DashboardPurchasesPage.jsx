@@ -26,6 +26,7 @@ import { MdOutlineHistory } from "react-icons/md";
 import { FaRegEdit } from "react-icons/fa";
 import { useMemo } from "react";
 import not_found from "../assets/not-found.png";
+import { toTitleCase } from "../../helpers/titleCaseString";
 
 const DashboardPurchasesPage = () => {
   const { business } = useBusinessStore();
@@ -323,7 +324,7 @@ const DashboardPurchasesPage = () => {
                               : "badge-success"
                           }`}
                         >
-                          {invoice?.status}
+                          {toTitleCase(invoice?.status)}
                         </p>
                       </td>
 
