@@ -68,6 +68,14 @@ const salesReturnSchema = new mongoose.Schema(
       type: String,
       default: "sales return",
     },
+    fullyPaid: {
+      type: Boolean,
+      default: false,
+    },
+    roundedOff: {
+      type: Boolean,
+      default: false,
+    },
   },
   {
     strict: false,

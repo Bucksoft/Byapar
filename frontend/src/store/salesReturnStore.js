@@ -10,6 +10,9 @@ export const useSalesReturnStore = create(
       setSaleReturn: (data) => set({ saleReturn: data }),
       totalSalesReturn: 0,
       setTotalSalesReturn: (data) => set({ totalSalesReturn: data }),
+      latestSalesReturnNumber: 0,
+      setLatestSalesReturnNumber: (data) =>
+        set({ latestSalesReturnNumber: data }),
     }),
     {
       name: "salesReturn",

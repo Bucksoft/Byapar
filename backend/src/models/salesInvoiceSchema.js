@@ -87,6 +87,18 @@ const salesInvoiceSchema = new mongoose.Schema(
       type: mongoose.Schema.Types.ObjectId,
       ref: "UserCredential",
     },
+    fullyPaid: {
+      type: Boolean,
+      default: false,
+    },
+    roundedOff: {
+      type: Boolean,
+      default: false,
+    },
+    receivedAmount: {
+      type: Number,
+      default: 0,
+    },
   },
   {
     strict: false,

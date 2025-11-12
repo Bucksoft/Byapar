@@ -256,7 +256,7 @@ const Sidebar = () => {
             </motion.div>
           </div>
 
-          <div className=" py-2 border-b border-cyan-950">
+          <div className="hidden py-2 border-b border-cyan-950">
             <label className="pl-4 font-semibold text-xs text-[var(--primary-btn)]">
               ACCOUNTING SOLUTIONS
             </label>
@@ -272,7 +272,7 @@ const Sidebar = () => {
                     end
                     to={field.link}
                     className={({ isActive }) =>
-                      `group px-4 my-1 flex items-center gap-5 text-xs py-2 cursor-pointer transition-all ease-in-out duration-150 
+                      ` group px-4 my-1 flex items-center gap-5 text-xs py-2 cursor-pointer transition-all ease-in-out duration-150 
                   ${
                     isActive
                       ? "bg-[var(--primary-btn)]/10 text-[var(--primary-btn)] scale-105 border-l-2"

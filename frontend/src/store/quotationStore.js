@@ -10,6 +10,8 @@ export const useQuotationStore = create(
       setQuotation: (data) => set({ quotation: data }),
       totalQuotations: 0,
       setTotalQuotations: (data) => set({ totalQuotations: data }),
+      latestQuotationNumber: 0,
+      setLatestQuotationNumber: (data) => set({ latestQuotationNumber: data }),
     }),
     {
       name: "quotations",

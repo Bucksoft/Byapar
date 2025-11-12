@@ -38,11 +38,11 @@ export async function login(req, res) {
     await OTP.create({
       email,
       otp,
-      expiresIn: Date.now() + 60 * 1000, // 1 min validity
+      expiresIn: Date.now() + 10 * 60 * 1000, // 10 min validity
     });
 
     // send OTP via email
-    await sendOTPviaMail(email, otp);
+    // await sendOTPviaMail(email, otp);
 
     console.log("Generated OTP:", otp);
 
@@ -154,7 +154,7 @@ export async function googleOAuthRedirection(req, res) {
       "https://accounts.google.com/o/oauth2/v2/auth?" +
       new URLSearchParams({
         client_id: process.env.GOOGLE_CLIENT_ID,
-        redirect_uri: `${process.env.BACKEND_URI}/auth/google/callback`,
+        redirect_uri: `https://backend.byaparsetu.com/auth/google/callback`,
         response_type: "code",
         scope: "profile email",
         access_type: "offline",
@@ -180,7 +180,7 @@ export async function loginViaGoogleCallback(req, res) {
           code,
           client_id: process.env.GOOGLE_CLIENT_ID,
           client_secret: process.env.GOOGLE_CLIENT_SECRET,
-          redirect_uri: `${process.env.BACKEND_URI}/auth/google/callback`,
+          redirect_uri: `https://backend.byaparsetu.com/auth/google/callback`,
           grant_type: "authorization_code",
         },
         headers: { "Content-Type": "application/x-www-form-urlencoded" },
@@ -193,7 +193,7 @@ export async function loginViaGoogleCallback(req, res) {
         headers: { Authorization: `Bearer ${token}` },
       }
     );
-    
+
     // save user in DB
     let user = await UserCredential.findOne({ email: userRes.data.email });
     if (!user) {

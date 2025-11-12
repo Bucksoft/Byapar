@@ -1,6 +1,4 @@
 import { Routes, Route } from "react-router-dom";
-import { useAuthStore } from "./store/authStore";
-
 import LoginPage from "./pages/LoginPage";
 import DashboardPage from "./pages/DashboardPage";
 import DashboardPartiesPage from "./pages/DashboardPartiesPage";
@@ -62,8 +60,6 @@ import DashboardPaymentInDetails from "./pages/DashboardPaymentInDetails";
 import DashboardCreateCreditNoteInvoicePage from "./pages/DashboardCreateCreditNoteInvoicePage";
 import DashboardMyBusinesses from "./pages/DashboardMyBusinesses";
 import SalesReturn from "./components/Invoices/SalesReturn";
-import { useBusinessStore } from "./store/businessStore";
-import { useEffect } from "react";
 import DashboardCreateChallanPage from "./pages/DashboardCreateChallanPage";
 import DeliveryChallan from "./components/Invoices/DeliveryChallan";
 import ProformaInvoice from "./components/Invoices/ProformaInvoice";
@@ -80,14 +76,13 @@ import ProtectedRoute from "./components/ProtectedRoute";
 import DashboardWhatsappPage from "./pages/DashboardWhatsappPage";
 
 function App() {
-  const { user } = useAuthStore();
-
   return (
     <>
       <Routes>
+
         {/* PUBLIC ROUTES */}
         <Route path="/" element={<HomePage />} />
-        <Route path="/login" element={<LoginPage />} />
+        <Route path="/login" element={<LoginP age />} />
         <Route path="/masterloginforbyapar" element={<MasterLogin />} />
         <Route path="/preview-excel/:id" element={<PreviewExcel />} />
 

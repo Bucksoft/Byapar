@@ -10,6 +10,7 @@ import not_found from "../../assets/not-found.png";
 import { useBusinessStore } from "../../store/businessStore";
 import { FaBarcode } from "react-icons/fa6";
 import { getTotalTaxRate } from "../../../helpers/getGSTTaxRate";
+import { gstRates } from "../../utils/constants";
 
 const SalesInvoiceItemTableTesting = ({
   title,
@@ -268,7 +269,7 @@ const SalesInvoiceItemTableTesting = ({
       });
     }
 
-    totalAmount += totalAdditionalCharges + totalAdditionalChargeGST ;
+    totalAmount += totalAdditionalCharges + totalAdditionalChargeGST;
 
     setData((prev) => {
       let changed = false;
@@ -503,9 +504,28 @@ const SalesInvoiceItemTableTesting = ({
               className="input input-xs bg-zinc-100 text-right"
               readOnly
             />
-            <small className="text-zinc-500 mt-1 text-xs text-nowrap">
+            {/* <small className="text-zinc-500 mt-1 text-xs text-nowrap">
               {item?.gstTaxRate && <span>({item?.gstTaxRate})</span>}
-            </small>
+            </small> */}
+
+            <select
+              value={item?.gstTaxRate || "0"}
+              onChange={(e) => {
+                const newRate = e.target.value;
+                setData((prev) => ({
+                  ...prev,
+                  items: prev.items.map((i) =>
+                    i._id === item._id ? { ...i, gstTaxRate: newRate } : i
+                  ),
+                }));
+              }}
+              className="select select-xs bg-zinc-100 text-left mt-1"
+            >
+              {gstRates.map((rate) => (
+                <option value={rate.label}>{rate.label}</option>
+              ))}
+            </select>
+
             <select
               value={item?.gstTaxRateType || "with tax"}
               onChange={(e) => {

@@ -49,6 +49,14 @@ const quotationSchema = new mongoose.Schema(
       type: String,
       default: "quotation",
     },
+    fullyPaid: {
+      type: Boolean,
+      default: false,
+    },
+    roundedOff: {
+      type: Boolean,
+      default: false,
+    },
   },
   {
     strict: false,

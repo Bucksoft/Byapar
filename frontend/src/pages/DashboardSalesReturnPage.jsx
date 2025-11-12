@@ -21,7 +21,8 @@ import { toTitleCase } from "../../helpers/titleCaseString";
 
 const DashboardSalesReturnPage = () => {
   const { business } = useBusinessStore();
-  const { setSaleReturns, setTotalSalesReturn } = useSalesReturnStore();
+  const { setSaleReturns, setTotalSalesReturn, setLatestSalesReturnNumber } =
+    useSalesReturnStore();
   const [searchedQuery, setSearchedQuery] = useState("");
   const [saleReturnId, setSaleReturnId] = useState();
   const [filterDate, setFilterDate] = useState("");
@@ -51,6 +52,7 @@ const DashboardSalesReturnPage = () => {
       const res = await axiosInstance.get(`/sales-return/${business?._id}`);
       setTotalSalesReturn(res.data?.totalSalesReturn);
       setSaleReturns(res.data?.salesReturn);
+      setLatestSalesReturnNumber(res.data?.latestSalesReturnNumber);
       return res.data?.salesReturn;
     },
   });

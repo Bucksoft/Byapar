@@ -99,6 +99,7 @@ const PaymentInForm = () => {
     setTotalInvoiceAmount(totalAmount);
   }, [invoices, data, location?.state?.partyName]);
 
+  // HANDLES INVOICE CALCULATION
   useEffect(() => {
     if (!allInvoices?.length) return;
 
@@ -120,6 +121,12 @@ const PaymentInForm = () => {
     sorted.forEach((invoice) => {
       const alreadySettled = invoice?.settledAmount || 0;
       const pending = Math.max(invoice.totalAmount - alreadySettled, 0);
+
+      if (pending <= 0) {
+        newSettled[invoice._id] = totalAmount;
+        newChecked[invoice._id] = true;
+        return; 
+      }
 
       if (remainingPayment > 0 && pending > 0) {
         const settleAmount = Math.min(pending, remainingPayment);

@@ -63,6 +63,14 @@ const proformaInvoiceSchema = new mongoose.Schema(
       ],
       default: "open",
     },
+    fullyPaid: {
+      type: Boolean,
+      default: false,
+    },
+    roundedOff: {
+      type: Boolean,
+      default: false,
+    },
   },
   {
     strict: false,

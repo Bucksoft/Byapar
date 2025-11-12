@@ -19,7 +19,8 @@ dayjs.extend(isBetween);
 
 const DashboardQuotationPage = () => {
   const { business } = useBusinessStore();
-  const { setQuotations, setTotalQuotations } = useQuotationStore();
+  const { setQuotations, setTotalQuotations, setLatestQuotationNumber } =
+    useQuotationStore();
   const [searchedQuery, setSearchedQuery] = useState("");
   const [filterDate, setFilterDate] = useState("");
   const [quotationType, setQuotationType] = useState("");
@@ -33,6 +34,7 @@ const DashboardQuotationPage = () => {
       const res = await axiosInstance.get(`/quotation/all/${business?._id}`);
       setTotalQuotations(res.data?.totalQuotations);
       setQuotations(res.data.quotations);
+      setLatestQuotationNumber(res.data?.latestQuotationNumber);
       return Array.isArray(res.data.quotations) ? res.data.quotations : [];
     },
     enabled: !!business?._id,

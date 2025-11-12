@@ -14,7 +14,13 @@ const OtpInputForm = ({ email, setOtpInput }) => {
   const inputsRef = useRef([]);
 
   const { setUser } = useAuthStore();
-  const [timerLeft, setTimerLeft] = useState(60);
+  const [timerLeft, setTimerLeft] = useState(600);
+
+  const formatTime = (seconds) => {
+    const minutes = Math.floor(seconds / 60);
+    const remainingSeconds = seconds % 60;
+    return `${minutes}:${remainingSeconds.toString().padStart(2, "0")}`;
+  };
 
   const handleChange = (value, index) => {
     if (!/^[0-9]?$/.test(value)) return;
@@ -122,15 +128,12 @@ const OtpInputForm = ({ email, setOtpInput }) => {
           </p>
         )}
 
-        <div className="my-2 text-xs">
+        <div className="my-2 text-xs text-gray-600">
           <p>
-            Resend OTP in{" "}
-            <span className="countdown">
-              <span style={{ "--value": timerLeft }} aria-live="polite">
-                {timerLeft}
-              </span>
-            </span>{" "}
-            sec
+            OTP will expire in{" "}
+            <span className="font-semibold ">
+              {formatTime(timerLeft)}
+            </span>
           </p>
         </div>
 

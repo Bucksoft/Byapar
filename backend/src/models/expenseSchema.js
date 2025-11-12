@@ -74,6 +74,14 @@ const expenseSchema = new mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: "UserCredential",
   },
+  fullyPaid: {
+    type: Boolean,
+    default: false,
+  },
+  roundedOff: {
+    type: Boolean,
+    default: false,
+  },
 });
 
 const Expense = mongoose.model("Expense", expenseSchema);

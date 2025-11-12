@@ -122,8 +122,16 @@ export async function createSalesInvoice(req, res) {
       partyId: party?._id,
       businessId: req.params?.id,
       clientId: req.user?.id,
+      status:
+        data?.receivedAmount > 0
+          ? "partially paid"
+          : data?.receivedAmount === data?.totalAmount
+          ? "paid"
+          : "unpaid",
       type: "sales invoice",
-      pendingAmount: data?.totalAmount,
+      pendingAmount: data?.totalAmount - data?.receivedAmount,
+      settledAmount: data?.receivedAmount,
+      balanceAmount: data?.totalAmount - data?.receivedAmount,
       salesInvoiceNumber: existingInvoice
         ? existingInvoice.salesInvoiceNumber + 1
         : data?.salesInvoiceNumber,

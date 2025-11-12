@@ -29,12 +29,7 @@ export async function createSalesReturn(req, res) {
       salesReturnNumber: validatedResult.data?.salesInvoiceNumber,
       businessId: req?.params?.id,
     });
-    if (existingSalesReturn) {
-      return res.status(400).json({
-        success: false,
-        msg: "Sales Return already exists with this invoice number",
-      });
-    }
+    
 
     let itemsToProcess = [];
 
@@ -64,7 +59,7 @@ export async function createSalesReturn(req, res) {
       }
       itemsToProcess = data.items;
     }
-    
+
     // updating stock
     for (const returnedItem of itemsToProcess) {
       const item = await Item.findById(returnedItem?._id);
@@ -106,7 +101,9 @@ export async function createSalesReturn(req, res) {
 
     const salesReturnPayload = {
       partyId: party._id,
-      salesReturnNumber: validatedResult.data?.salesInvoiceNumber,
+      salesReturnNumber:
+        (existingSalesReturn && existingSalesReturn?.salesInvoiceNumber + 1) ||
+        validatedResult.data?.salesInvoiceNumber,
       businessId: req.params?.id,
       clientId: req.user?.id,
       ...cleanData,

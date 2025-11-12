@@ -472,7 +472,13 @@ const SalesInvoiceFooterSection = ({
               <input
                 type="checkbox"
                 checked={selectCheckBox}
-                onChange={(e) => setSelectCheckBox(e.target.checked)}
+                onChange={(e) => {
+                  setSelectCheckBox(e.target.checked);
+                  setData((prev) => ({
+                    ...prev,
+                    roundedOff: e.target.checked,
+                  }));
+                }}
                 className="checkbox checkbox-sm mr-2"
               />
               <span className="text-xs">Auto Round Off</span>
@@ -496,6 +502,7 @@ const SalesInvoiceFooterSection = ({
               </div>
             )} */}
           </div>
+
           <div className="p-2 flex justify-between">
             <span className="text-sm font-semibold">Total Amount</span>
             {data?.items?.length > 0 && (
@@ -509,19 +516,44 @@ const SalesInvoiceFooterSection = ({
               </>
             )}
           </div>
+
+          <div className="p-2 flex justify-between">
+            <span className="text-sm">Received</span>
+            <input
+              type="number"
+              max={invoiceTotals?.totalAmount}
+              min={0}
+              value={data?.receivedAmount ?? ""}
+              onChange={(e) => {
+                const value = Number(e.target.value);
+                if (value > invoiceTotals?.totalAmount) return;
+                setData((prev) => ({
+                  ...prev,
+                  receivedAmount: value,
+                }));
+              }}
+              className="input input-xs w-1/4"
+            />
+          </div>
         </div>
 
         {/* balance amount */}
         {(title === "Sales Invoice" || title === "Sales Return") && (
           <div className="p-2">
-            <div className="flex justify-end p-2 pr-5 space-x-2">
+            {/* <div className="flex justify-end p-2 pr-5 space-x-2">
               <span className="text-xs">Mark as fully paid</span>
               <input
                 type="checkbox"
                 className="checkbox checkbox-sm"
-                onChange={(e) => setMarkedAsPaid(e.target.checked)}
+                onChange={(e) => {
+                  setMarkedAsPaid(e.target.checked);
+                  setData((prev) => ({
+                    ...prev,
+                    fullyPaid: e.target.checked,
+                  }));
+                }}
               />
-            </div>
+            </div> */}
             <div className="text-xs text-[var(--badge)] flex justify-between items-center">
               <span>Balance Amount</span>
               <span className="mr-4">

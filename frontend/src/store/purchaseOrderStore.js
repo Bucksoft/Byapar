@@ -10,6 +10,9 @@ export const usePurchaseOrderStore = create(
       setPurchaseOrders: (data) => set({ purchaseOrders: data }),
       totalPurchaseOrders: 0,
       setTotalPurchaseOrders: (data) => set({ totalPurchaseOrders: data }),
+      latestPurchaseOrderNumber: 0,
+      setLatestPurchaseOrderNumber: (data) =>
+        set({ latestPurchaseOrderNumber: data }),
     }),
     {
       name: "purchaseOrder",

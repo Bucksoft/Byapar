@@ -55,6 +55,14 @@ const debitNoteSchema = new mongoose.Schema(
       enum: ["paid", "unpaid", "draft", "partially paid", "cancelled"],
       default: "unpaid",
     },
+    fullyPaid: {
+      type: Boolean,
+      default: false,
+    },
+    roundedOff: {
+      type: Boolean,
+      default: false,
+    },
   },
   {
     strict: false,

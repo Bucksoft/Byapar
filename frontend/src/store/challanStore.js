@@ -10,6 +10,8 @@ export const useChallanStore = create(
       setDeliveryChallans: (data) => set({ deliveryChallans: data }),
       totalDeliveryChallans: 0,
       setTotalDeliveryChallans: (data) => set({ totalDeliveryChallans: data }),
+      latestDeliveryChallanNumber: 0,
+      setLatestDeliveryChallanNumber: (data) => set({ latestDeliveryChallanNumber: data }),
     }),
     {
       name: "deliveryChallan",

@@ -62,6 +62,7 @@ const BusinessForm = ({ businessToBeUpdated }) => {
     notes: "",
     termsAndCondition: "",
     bankAccounts: [],
+    previousInvNumber: "",
   });
 
   // QUERY TO FETCH ALL THE BANK ACCOUNTS
@@ -98,6 +99,7 @@ const BusinessForm = ({ businessToBeUpdated }) => {
         notes: businessToBeUpdated.notes || "",
         termsAndCondition: businessToBeUpdated.termsAndCondition || "",
         bankAccounts: [],
+        previousInvNumber: businessToBeUpdated.previousInvNumber || "",
       });
     }
     if (
@@ -1010,6 +1012,23 @@ const BusinessForm = ({ businessToBeUpdated }) => {
               placeholder="T&C"
             ></textarea>
           </div>
+
+          <div className="flex flex-col items-start gap-1 mt-5">
+            <label htmlFor="Invoice_number" className="text-xs text-gray-600">
+              Previous Invoice Number
+            </label>
+            <input
+              value={data.previousInvNumber}
+              onChange={(e) =>
+                setData((prev) => ({
+                  ...prev,
+                  previousInvNumber: e.target.value,
+                }))
+              }
+              type="text"
+              className="input input-sm w-full"
+            />
+          </div>
         </motion.div>
 
         {/* COVER LETTER */}
@@ -1151,7 +1170,7 @@ const BusinessForm = ({ businessToBeUpdated }) => {
         <div className="modal-box">
           <form method="dialog">
             {/* if there is a button in form, it will close the modal */}
-            <button className="btn rounded-xl rounded-xl btn-sm btn-circle btn-ghost absolute right-2 top-4">
+            <button className="btn rounded-xl  btn-sm btn-circle btn-ghost absolute right-2 top-4">
               ✕
             </button>
           </form>

@@ -143,6 +143,12 @@ export const dashboardFields = [
       //   label: "Purchase Orders",
       //   link: "purchase-order",
       // },
+      {
+        id: 6,
+        icon: <FaWallet size={16} />,
+        label: "Expenses",
+        link: "expenses",
+      },
     ],
   },
   {
@@ -153,15 +159,6 @@ export const dashboardFields = [
       </>
     ),
     label: "Reports",
-  },
-  {
-    id: 7,
-    icon: (
-      <>
-        <MdAddBusiness size={16} />
-      </>
-    ),
-    label: "My Businesses",
   },
 ];
 
@@ -184,12 +181,6 @@ export const dashboardAccountingFields = [
   //   label: "Automated Bills",
   //   link: "bills",
   // },
-  {
-    id: 4,
-    icon: <FaWallet size={16} />,
-    label: "Expenses",
-    link: "expenses",
-  },
   // {
   //   id: 5,
   //   icon: <BsFillLaptopFill />,
@@ -199,72 +190,82 @@ export const dashboardAccountingFields = [
 ];
 
 export const settingLinks = [
+  {
+    id: 1,
+    icon: (
+      <>
+        <MdAddBusiness size={16} />
+      </>
+    ),
+    label: "My Businesses",
+    link: "my-businesses",
+  },
+  {
+    id: 2,
+    icon: <BsWhatsapp size={16} />,
+    label: "Connect Whatsapp",
+    link: "whatsapp",
+  },
   // {
-  //   id: 1,
+  //   id: 3,
   //   icon: <RiAccountCircleFill size={16} />,
   //   label: "Account",
   //   link: "account",
   // },
   // {
-  //   id: 2,
+  //   id: 4,
   //   icon: <BiSolidBriefcaseAlt2 size={16} />,
   //   label: "Manage Business",
   //   link: "business",
   // },
   {
-    id: 3,
+    id: 5,
     icon: <IoColorPaletteSharp size={16} />,
     label: "Invoice Settings",
     link: "invoice",
   },
   // {
-  //   id: 4,
+  //   id: 6,
   //   icon: <BiSolidPrinter size={16} />,
   //   label: "Print Settings",
   //   link: "print",
   // },
   // {
-  //   id: 5,
+  //   id: 7,
   //   icon: <BsPersonFillGear size={16} />,
   //   label: "Manage Users",
   //   link: "users",
   // },
   // {
-  //   id: 6,
+  //   id: 8,
   //   icon: <RiAlarmFill size={16} />,
   //   label: "Reminders",
   //   link: "reminders",
   // },
   // {
-  //   id: 7,
+  //   id: 9,
   //   icon: <HiDocumentCurrencyRupee size={16} />,
   //   label: "CA Reports Sharing",
   //   link: "ca-reports",
   // },
   // {
-  //   id: 8,
+  //   id:10,
   //   icon: <HiCurrencyRupee size={16} />,
   //   label: "Pricing",
   //   link: "pricing",
   // },
   // {
-  //   id: 9,
+  //   id: 11,
   //   icon: <IoIosGift size={16} />,
   //   label: "Refer & Earn",
   //   link: "refer-and-earn",
   // },
   // {
-  //   id: 10,
+  //   id: 12,
   //   icon: <FaClipboardQuestion size={16} />,
   //   label: "Help And Support",
   //   link: "help-and-support",
   // },
-  {
-    id: 11,
-    icon: <BsWhatsapp size={16} />,
-    label: "Connect Whatsapp",
-    link: "whatsapp",
-  },
 ];
 
 export const businessTools = [

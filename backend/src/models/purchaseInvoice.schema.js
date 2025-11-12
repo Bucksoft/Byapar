@@ -51,6 +51,14 @@ const purchaseInvoiceSchema = new mongoose.Schema(
       type: String,
       default: "purchase invoice",
     },
+    fullyPaid: {
+      type: Boolean,
+      default: false,
+    },
+    roundedOff: {
+      type: Boolean,
+      default: false,
+    },
   },
   {
     strict: false,

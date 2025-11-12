@@ -10,6 +10,8 @@ export const useCreditNoteStore = create(
       setCreditNote: (data) => set({ creditNote: data }),
       totalCreditNotes: 0,
       setTotalCreditNotes: (data) => set({ totalCreditNotes: data }),
+      latestCreditNoteNumber: 0,
+      setLatestCreditNoteNumber: (data) => set({ latestCreditNoteNumber: data }),
     }),
     {
       name: "creditNote",

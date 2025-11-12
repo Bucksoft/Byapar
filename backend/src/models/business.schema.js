@@ -82,6 +82,10 @@ const businessSchema = new mongoose.Schema({
     enum: ["active", "inactive"],
     default: "inactive",
   },
+  previousInvNumber: {
+    type: Number,
+    default: 0,
+  },
 });
 
 export const Business = mongoose.model("Business", businessSchema);

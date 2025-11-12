@@ -53,6 +53,14 @@ const purchaseOrderSchema = new mongoose.Schema(
       type: String,
       default: "purchase order",
     },
+    fullyPaid: {
+      type: Boolean,
+      default: false,
+    },
+    roundedOff: {
+      type: Boolean,
+      default: false,
+    },
   },
   {
     strict: false,

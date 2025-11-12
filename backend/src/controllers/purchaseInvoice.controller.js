@@ -55,7 +55,6 @@ export async function createPurchaseInvoice(req, res) {
       salesInvoiceNumber,
     }).session(session);
 
-    // 🧾 Update stock for each item
     for (const purchaseItem of items) {
       const item = await Item.findById(purchaseItem?._id).session(session);
       if (!item) {

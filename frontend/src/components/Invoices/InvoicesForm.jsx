@@ -24,6 +24,7 @@ import { useDebitNoteStore } from "../../store/debitNoteStore";
 import { usePartyStore } from "../../store/partyStore";
 import SalesInvoiceItemTableTesting from "./InvoiceItemTableTesting";
 import { getTotalTaxRate } from "../../../helpers/getGSTTaxRate";
+import { getNextInvoiceNumber } from "../../../helpers/nextInvNumber";
 
 const InvoicesForm = ({
   title,
@@ -35,20 +36,36 @@ const InvoicesForm = ({
   const { business } = useBusinessStore();
   const { parties } = usePartyStore();
   const { latestInvoiceNumber } = useInvoiceStore();
-  const { totalQuotations } = useQuotationStore();
-  const { totalSalesReturn } = useSalesReturnStore();
-  const { totalCreditNotes } = useCreditNoteStore();
-  const { totalDeliveryChallans } = useChallanStore();
-  const { totalProformaInvoices } = useProformaInvoiceStore();
-  const { totalPurchaseInvoices } = usePurchaseInvoiceStore();
-  const { totalPurchaseOrders } = usePurchaseOrderStore();
-  const { totalDebitNotes } = useDebitNoteStore();
+  const { latestQuotationNumber } = useQuotationStore();
+  const { latestSalesReturnNumber } = useSalesReturnStore();
+  const { latestCreditNoteNumber } = useCreditNoteStore();
+  const { latestChallanNumber } = useChallanStore();
+  const { latestProformaNumber } = useProformaInvoiceStore();
+  const { latestPurchaseInvoiceNumber } = usePurchaseInvoiceStore();
+  const { latestPurchaseOrderNumber } = usePurchaseOrderStore();
+  const { latestDebitNoteNumber } = useDebitNoteStore();
 
   const [quantities, setQuantities] = useState({});
   const navigate = useNavigate();
   const [addedItems, setAddedItems] = useState([]);
 
   const invoiceNoRef = useRef();
+
+  const nextNumber = getNextInvoiceNumber({
+    type: title,
+    business,
+    latestNumbers: {
+      latestInvoiceNumber,
+      latestQuotationNumber,
+      latestSalesReturnNumber,
+      latestCreditNoteNumber,
+      latestChallanNumber,
+      latestProformaNumber,
+      latestPurchaseInvoiceNumber,
+      latestPurchaseOrderNumber,
+      latestDebitNoteNumber,
+    },
+  });
 
   // INVOICE DATA TO SEND
   const invoiceData = {
@@ -57,27 +74,7 @@ const InvoicesForm = ({
     validFor: 0,
     validityDate: new Date(Date.now()),
     salesInvoiceDate: new Date(Date.now()),
-    salesInvoiceNumber:
-      title === "Sales Invoice"
-        ? latestInvoiceNumber + 1
-        : title === "Quotation"
-        ? totalQuotations + 1
-        : title === "Sales Return"
-        ? totalSalesReturn + 1
-        : title === "Credit Note"
-        ? totalCreditNotes + 1
-        : title === "Delivery Challan"
-        ? totalDeliveryChallans + 1
-        : title === "Proforma Invoice"
-        ? totalProformaInvoices + 1
-        : title === "Purchase Invoice"
-        ? totalPurchaseInvoices + 1
-        : title === "Purchase Order"
-        ? totalPurchaseOrders + 1
-        : title === "Debit Note"
-        ? totalDebitNotes + 1
-        : 1,
-
+    salesInvoiceNumber: nextNumber,
     partyName: party?.partyName || "",
     partyId: "",
     items: [],
@@ -104,6 +101,9 @@ const InvoicesForm = ({
     additionalDiscountAmount: 0,
     additionalDiscountType: "after tax",
     additionalDiscountPercent: 0,
+    fullyPaid: false,
+    roundedOff: false,
+    receivedAmount: 0,
   };
 
   const [data, setData] = useState(invoiceData);
@@ -360,6 +360,7 @@ const InvoicesForm = ({
     data?.additionalDiscountPercent,
     data?.additionalDiscountType,
     data?.additionalCharges,
+    data?.receivedAmount,
   ]);
 
   useEffect(() => {
@@ -370,7 +371,7 @@ const InvoicesForm = ({
       taxableAmount: invoiceTotals.totalTaxableValue,
       cgst: invoiceTotals.totalCGST,
       sgst: invoiceTotals.totalSGST,
-      balanceAmount: invoiceTotals.totalAmount,
+      balanceAmount: invoiceTotals.totalAmount - data?.receivedAmount,
       totalAmount: invoiceTotals.totalAmount,
       additionalChargeAmount: invoiceTotals.additionalCharge,
       additionalChargeTax: data?.additionalChargeGST || "",

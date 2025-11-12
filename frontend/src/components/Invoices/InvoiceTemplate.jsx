@@ -7,6 +7,7 @@ import { useQuery } from "@tanstack/react-query";
 import { axiosInstance } from "../../config/axios";
 import { LuIndianRupee } from "react-icons/lu";
 import { Mail } from "lucide-react";
+import { getTotalTaxRate } from "../../../helpers/getGSTTaxRate";
 
 const InvoiceTemplate = ({
   type,
@@ -621,9 +622,9 @@ const InvoiceTemplate = ({
 
                 <th style={{ padding: "8px", textAlign: "left" }}>Qty.</th>
                 <th style={{ padding: "8px", textAlign: "left" }}>Rate</th>
-                <th style={{ padding: "8px", textAlign: "left" }}>
+                {/* <th style={{ padding: "8px", textAlign: "left" }}>
                   Taxable Amount
-                </th>
+                </th> */}
                 <th style={{ padding: "8px", textAlign: "left" }}>Tax</th>
                 {hasDiscount && (
                   <th style={{ padding: "8px", textAlign: "left" }}>
@@ -670,7 +671,7 @@ const InvoiceTemplate = ({
                   </td>
 
                   {/* Taxable Value */}
-                  <td style={{ padding: "6px" }}>
+                  {/* <td style={{ padding: "6px" }}>
                     <div style={{ display: "flex", alignItems: "center" }}>
                       <LiaRupeeSignSolid />
                       {Number(
@@ -682,7 +683,7 @@ const InvoiceTemplate = ({
                         maximumFractionDigits: 2,
                       })}
                     </div>
-                  </td>
+                  </td> */}
 
                   {/* Tax */}
                   <td style={{ padding: "6px" }}>
@@ -703,7 +704,7 @@ const InvoiceTemplate = ({
                         <LiaRupeeSignSolid />
                         {Number(
                           item?.gstAmount ||
-                            (item?.salesPrice * (item?.gstTaxRate || 0)) / 100
+                            (item?.salesPrice * (getTotalTaxRate(item?.gstTaxRate) || 0)) / 100
                         ).toLocaleString("en-IN", {
                           minimumFractionDigits: 2,
                           maximumFractionDigits: 2,
@@ -770,7 +771,7 @@ const InvoiceTemplate = ({
                 <td style={{ padding: "6px" }}>Subtotal</td>
                 <td></td>
                 <td style={{ padding: "6px" }}>{subtotalQuantity}</td>
-                <td></td>
+                {/* <td></td> */}
 
                 {/* Taxable */}
                 <td style={{ padding: "6px" }}>
@@ -1158,12 +1159,15 @@ const InvoiceTemplate = ({
                 <p>Total Amount</p>
                 <span style={{ display: "flex", alignItems: "center" }}>
                   <LiaRupeeSignSolid />
-                  {Number(invoice?.totalAmount).toLocaleString("en-IN", {
-                    minimumFractionDigits: 2,
-                    maximumFractionDigits: 2,
-                  })}
+                  {invoice?.roundedOff
+                    ? Math.round(invoice?.totalAmount)
+                    : Number(invoice?.totalAmount).toLocaleString("en-IN", {
+                        minimumFractionDigits: 2,
+                        maximumFractionDigits: 2,
+                      })}
                 </span>
               </div>
+
               <div
                 style={{
                   height: "1px",
@@ -1171,6 +1175,23 @@ const InvoiceTemplate = ({
                   backgroundColor: color,
                 }}
               />
+              {/* RECEIVED AMOUNT */}
+              <div className="flex items-center justify-between">
+                <span>Received Amount</span>
+                <p className="flex items-center">
+                  {" "}
+                  <LuIndianRupee /> {invoice?.receivedAmount}
+                </p>
+              </div>
+
+              {/* BALANCE AMOUNT */}
+              <div className="flex items-center justify-between">
+                <span>Balance Amount</span>
+                <p className="flex items-center">
+                  {" "}
+                  <LuIndianRupee /> {invoice?.balanceAmount}
+                </p>
+              </div>
 
               <div
                 style={{

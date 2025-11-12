@@ -8,6 +8,9 @@ export const usePaymentOutStore = create(
       setPaymentOuts: (data) => set({ paymentOuts: data }),
       paymentOut: null,
       setPaymentOuts: (data) => set({ paymentOut: data }),
+      latestPaymentOutNumber: 0,
+      setLatestPaymentOutNumber: (data) =>
+        set({ latestPaymentOutNumber: data }),
     }),
     {
       name: "paymentOut",

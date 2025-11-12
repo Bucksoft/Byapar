@@ -11,7 +11,6 @@ export async function createParty(req, res) {
 
   try {
     const data = req.body;
-    console.log("DATA", data);
 
     if (!data || Object.keys(data).length === 0) {
       return res.status(400).json({
@@ -155,7 +154,7 @@ export async function getAllParties(req, res) {
       clientId: req.user?.id,
     });
 
-    console.log(allFilteredParties);
+    console.log("ALL PARTIES ", allFilteredParties);
 
     allFilteredParties.forEach((party) => {
       const balance = party?.openingBalance || 0;
@@ -165,11 +164,11 @@ export async function getAllParties(req, res) {
         toPay += Math.abs(balance);
     });
 
-    allFilteredParties.forEach((party) => {
-      const balance = party?.currentBalance || 0;
-      if (balance > 0) toCollect += balance;
-      else if (balance < 0) toPay += Math.abs(balance);
-    });
+    // allFilteredParties.forEach((party) => {
+    //   const balance = party?.currentBalance || 0;
+    //   if (balance > 0) toCollect += balance;
+    //   else if (balance < 0) toPay += Math.abs(balance);
+    // });
 
     return res.status(200).json({
       success: true,
@@ -497,17 +496,17 @@ export async function allParties(req, res) {
 
     parties.forEach((party) => {
       if (party.openingBalanceStatus === "To Collect") {
-        toCollect += party.openingBalance || 0;
+        toCollect += party.currentBalance || 0;
       } else if (party.openingBalanceStatus === "To Pay") {
-        toPay += party.openingBalance || 0;
+        toPay += party.currentBalance || 0;
       }
     });
 
-    parties.forEach((party) => {
-      const balance = party?.currentBalance || 0;
-      if (balance > 0) toCollect += balance;
-      else if (balance < 0) toPay += Math.abs(balance);
-    });
+    // parties.forEach((party) => {
+    //   const balance = party?.currentBalance || 0;
+    //   if (balance > 0) toCollect += balance;
+    //   else if (balance < 0) toPay += Math.abs(balance);
+    // });
 
     return res
       .status(200)

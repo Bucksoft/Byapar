@@ -10,6 +10,8 @@ export const useDebitNoteStore = create(
       setDebitNote: (data) => set({ debitNote: data }),
       totalDebitNotes: 0,
       setTotalDebitNotes: (data) => set({ totalDebitNotes: data }),
+      latestDebitNoteNumber: 0,
+      setLatestDebitNoteNumber: (data) => set({ latestDebitNoteNumber: data }),
     }),
     {
       name: "debitNote",
