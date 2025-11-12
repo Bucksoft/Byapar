@@ -79,10 +79,9 @@ function App() {
   return (
     <>
       <Routes>
-
         {/* PUBLIC ROUTES */}
         <Route path="/" element={<HomePage />} />
-        <Route path="/login" element={<LoginP age />} />
+        <Route path="/login" element={<LoginPage />} />
         <Route path="/masterloginforbyapar" element={<MasterLogin />} />
         <Route path="/preview-excel/:id" element={<PreviewExcel />} />
 
