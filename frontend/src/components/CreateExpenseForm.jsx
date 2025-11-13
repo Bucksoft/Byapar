@@ -98,7 +98,6 @@ const CreateExpenseForm = ({ setOpenCreateExpense, latestExpenseNumber }) => {
         throw new Error("Please select an expense category");
       }
 
-      console.log("Final updated items", data);
       const res = await axiosInstance.post(
         `/expense/?businessId=${business?._id}`,
         data

@@ -181,12 +181,12 @@ export const dashboardAccountingFields = [
   //   label: "Automated Bills",
   //   link: "bills",
   // },
-  // {
-  //   id: 5,
-  //   icon: <BsFillLaptopFill />,
-  //   label: "POS Billing",
-  //   link: "pos",
-  // },
+  {
+    id: 5,
+    icon: <BsFillLaptopFill />,
+    label: "POS Billing",
+    link: "pos",
+  },
 ];
 
 export const settingLinks = [

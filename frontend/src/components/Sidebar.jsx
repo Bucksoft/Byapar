@@ -256,7 +256,7 @@ const Sidebar = () => {
             </motion.div>
           </div>
 
-          <div className="hidden py-2 border-b border-cyan-950">
+          <div className=" py-2 border-b border-cyan-950">
             <label className="pl-4 font-semibold text-xs text-[var(--primary-btn)]">
               ACCOUNTING SOLUTIONS
             </label>

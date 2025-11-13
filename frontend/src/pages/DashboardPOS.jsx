@@ -1,17 +1,36 @@
-import {
-  IndianRupee,
-  Plus,
-  Search,
-  Settings,
-  SquarePen,
-  X,
-} from "lucide-react";
+import { IndianRupee, Plus, Search, Settings, X } from "lucide-react";
 import { motion } from "framer-motion";
+import POSTotalSidebar from "../components/POS/POSTotalSidebar";
+import { useState } from "react";
 
 const DashboardPOS = () => {
+  // DATA OBJECT TO SEND AT THE BACKEND
+  const [data, setData] = useState({
+    items: [],
+    discountPercent: 0,
+    discountAmount: 0,
+    discountType: "after_tax",
+    additionalCharges: [
+      {
+        charge: "",
+        amount: 0,
+      },
+    ],
+    totalAdditionalCharges: 0,
+    customerDetails: {
+      mobile: "",
+      customerName: "",
+    },
+    subTotal: 0,
+    tax: 0,
+    totalAmount: 0,
+    receivedAmount: 0,
+    paymentMode: "cash",
+  });
+
   return (
     <main className="h-full overflow-y-scroll p-2">
-      <section className="h-full w-full bg-white rounded-lg p-1">
+      <section className="w-full border-r h-full border-zinc-200 px-2 py-5 flex flex-col">
         {/* POS Navigation */}
         <motion.header
           initial={{
@@ -84,12 +103,12 @@ const DashboardPOS = () => {
               }}
               className="grid grid-cols-5 gap-5 "
             >
-              <button className="btn btn-sm ">
+              <button className="btn btn-sm rounded-xl btn-neutral">
                 <Plus size={15} /> New Item
               </button>
               <button className="btn btn-sm rounded-xl">Change price</button>
               <button className="btn btn-sm rounded-xl">Change quantity</button>
-              <button className="btn btn-sm text-error bg-error/10 rounded-xl">
+              <button className="btn btn-sm btn-error btn-soft rounded-xl">
                 Delete Item
               </button>
             </motion.div>
@@ -112,7 +131,7 @@ const DashboardPOS = () => {
               <input
                 type="search"
                 placeholder="Search by Item name/Item code"
-                className="my-3 p-1 border rounded-md border-zinc-400  px-8 w-full"
+                className="my-3 p-1 border rounded-md border-zinc-200 px-8 w-full"
               />
               <Search
                 className="absolute top-5 left-2 text-zinc-500"
@@ -134,7 +153,7 @@ const DashboardPOS = () => {
                 ease: "easeInOut",
                 duration: 0.3,
               }}
-              className="overflow-x-auto mt-5 rounded-box border border-base-content/5 bg-base-100"
+              className="flex-1 overflow-auto mt-5 rounded-box border border-base-content/5 bg-base-100"
             >
               <table className="table table-zebra">
                 {/* head */}
@@ -153,119 +172,13 @@ const DashboardPOS = () => {
                     </th>
                   </tr>
                 </thead>
-                <tbody>
-                  {/* row 1 */}
-                  <tr>
-                    <th>1</th>
-                    <td>Cy Ganderton</td>
-                    <td>Quality Control Specialist</td>
-                    <td>Blue</td>
-                  </tr>
-                  {/* row 2 */}
-                  <tr>
-                    <th>2</th>
-                    <td>Hart Hagerty</td>
-                    <td>Desktop Support Technician</td>
-                    <td>Purple</td>
-                  </tr>
-                  {/* row 3 */}
-                  <tr>
-                    <th>3</th>
-                    <td>Brice Swyre</td>
-                    <td>Tax Accountant</td>
-                    <td>Red</td>
-                  </tr>
-                </tbody>
+                <tbody>{/* ITEM LIST IS RENDERED HERE */}</tbody>
               </table>
             </motion.div>
           </section>
 
           {/* Right section */}
-          <motion.section
-            initial={{
-              translateX: 100,
-              opacity: 0,
-            }}
-            animate={{
-              translateX: 0,
-              opacity: 1,
-            }}
-            transition={{
-              ease: "easeInOut",
-              duration: 0.3,
-            }}
-            className="p-4"
-          >
-            <div className="grid grid-cols-2 text-xs gap-3">
-              <button className="btn btn-sm rounded-xl">Add Discount</button>
-              <button className="btn btn-sm text-nowrap rounded-xl">
-                Add Additional Charge
-              </button>
-            </div>
-
-            <div className="border mt-4 rounded-md border-zinc-200">
-              <h2 className="p-2 border-b border-zinc-200 bg-zinc-200 text-sm font-medium">
-                Bill Details
-              </h2>
-              <div className="p-2 border-b border-zinc-200">
-                <p className="flex items-center justify-between">
-                  Sub Total
-                  <span className="flex items-center">
-                    <IndianRupee size={13} />0
-                  </span>{" "}
-                </p>
-                <p className="flex items-center justify-between mt-2">
-                  Tax
-                  <span className="flex items-center">
-                    <IndianRupee size={13} />0
-                  </span>{" "}
-                </p>
-              </div>
-              <h2 className="p-2 border-b text- flex items-center justify-between border-zinc-200 bg-zinc-200  font-medium">
-                Total Amount
-                <span className="flex items-center">
-                  <IndianRupee size={13} />0
-                </span>
-              </h2>
-            </div>
-
-            <div className="border mt-4 rounded-md border-zinc-200">
-              <h2 className="p-2 border-b border-zinc-200 bg-zinc-200 text-sm font-medium">
-                Received Amount
-              </h2>
-              <div className="p-2 border-b border-zinc-200">
-                <p className="flex items-center justify-between">
-                  <span className="flex items-center w-full">
-                    <IndianRupee size={13} />0
-                  </span>{" "}
-                  <select defaultValue="Cash" className="select select-sm">
-                    <option disabled={true}>Cash</option>
-                  </select>
-                </p>
-              </div>
-            </div>
-
-            <div className="border mt-4 rounded-md border-zinc-200">
-              <h2 className="p-2 border-b border-zinc-200 bg-zinc-200 text-sm font-medium">
-                Customer Details
-              </h2>
-              <div className="p-2 border-b border-zinc-200 text-xs">
-                <p className="flex items-center justify-between">
-                  <span className="flex items-center w-full">Cash Sale</span>{" "}
-                  <SquarePen size={13} />
-                </p>
-              </div>
-            </div>
-
-            <div className="flex items-center gap-1 p-4">
-              <button className="btn rounded-xl btn-sm btn-soft w-1/2 bg-[var(--primary-btn)]/20">
-                Save & Print
-              </button>
-              <button className="btn rounded-xl btn-sm w-1/2 bg-[var(--primary-btn)]">
-                Save Bill
-              </button>
-            </div>
-          </motion.section>
+          <POSTotalSidebar data={data} setData={setData} />
         </div>
       </section>
     </main>
