@@ -41,7 +41,7 @@ const InvoiceTemplate = ({
   });
 
   useEffect(() => {
-    if (type === "Sales Invoice" && bankAccounts) {
+    if ((type === "Sales Invoice" || type === "Quotation") && bankAccounts) {
       setBankAccount(bankAccounts);
     } else if (type === "Purchase Invoice" && supplierBankAccount) {
       setBankAccount(supplierBankAccount);
@@ -159,7 +159,8 @@ const InvoiceTemplate = ({
               width: "50%",
             }}
           >
-            {type === "Sales Invoice" && business?.logo !== "null" ? (
+            {type === "Sales Invoice" ||
+            (type === "Quotation" && business?.logo !== "null") ? (
               <div
                 style={{
                   width: "2.5rem",
@@ -168,7 +169,7 @@ const InvoiceTemplate = ({
                   display: "flex",
                   alignItems: "center",
                   justifyContent: "center",
-                  backgroundColor: "#fecaca",
+                  // backgroundColor: "#fecaca",
                   overflow: "hidden",
                 }}
               >
@@ -190,7 +191,7 @@ const InvoiceTemplate = ({
             )}
 
             <h2 style={{ fontWeight: 600, fontSize: "20px" }}>
-              {type === "Sales Invoice"
+              {type === "Sales Invoice" || type === "Quotation"
                 ? business?.businessName
                 : invoice?.partyName}
             </h2>
@@ -704,7 +705,9 @@ const InvoiceTemplate = ({
                         <LiaRupeeSignSolid />
                         {Number(
                           item?.gstAmount ||
-                            (item?.salesPrice * (getTotalTaxRate(item?.gstTaxRate) || 0)) / 100
+                            (item?.salesPrice *
+                              (getTotalTaxRate(item?.gstTaxRate) || 0)) /
+                              100
                         ).toLocaleString("en-IN", {
                           minimumFractionDigits: 2,
                           maximumFractionDigits: 2,
@@ -1212,7 +1215,6 @@ const InvoiceTemplate = ({
                       .toUpperCase()}{" "}
                 </span>
               </div>
-              
             </div>
           </section>
 
@@ -1227,11 +1229,29 @@ const InvoiceTemplate = ({
           >
             {/* TERMS AND CONDITION BLOCK */}
             <div style={{ marginTop: "12px" }}>
-              {type === "Sales Invoice" &&
-                invoice?.termsAndCondition &&
-                business?.termsAndCondition && (
-                  <div>
-                    <h4 style={{ fontWeight: 600 }}>Terms & Condition</h4>
+              {type === "Sales Invoice" ||
+                (type === "Quotation" &&
+                  invoice?.termsAndCondition &&
+                  business?.termsAndCondition && (
+                    <div>
+                      <h4 style={{ fontWeight: 600 }}>Terms & Condition</h4>
+                      <p
+                        style={{
+                          whiteSpace: "pre-line",
+                          color: "#52525c",
+                          fontStyle: "italic",
+                        }}
+                      >
+                        {invoice?.termsAndCondition ||
+                          business?.termsAndCondition}
+                      </p>
+                    </div>
+                  ))}
+
+              {type === "Sales Invoice" ||
+                (type === "Quotation" && business?.notes && (
+                  <div style={{ marginTop: "16px" }}>
+                    <h4 style={{ fontWeight: 600 }}>Notes</h4>
                     <p
                       style={{
                         whiteSpace: "pre-line",
@@ -1239,31 +1259,16 @@ const InvoiceTemplate = ({
                         fontStyle: "italic",
                       }}
                     >
-                      {invoice?.termsAndCondition ||
-                        business?.termsAndCondition}
+                      {invoice?.notes || business?.notes}
                     </p>
                   </div>
-                )}
-
-              {type === "Sales Invoice" && business?.notes && (
-                <div style={{ marginTop: "16px" }}>
-                  <h4 style={{ fontWeight: 600 }}>Notes</h4>
-                  <p
-                    style={{
-                      whiteSpace: "pre-line",
-                      color: "#52525c",
-                      fontStyle: "italic",
-                    }}
-                  >
-                    {invoice?.notes || business?.notes}
-                  </p>
-                </div>
-              )}
+                ))}
             </div>
 
             {/* SIGNATURE BLOCK */}
             <div style={{ marginTop: "50px", marginLeft: "200px" }}>
-              {type === "Sales Invoice" && business?.signature !== "null" ? (
+              {type === "Sales Invoice" ||
+              (type === "Quotation" && business?.signature !== "null") ? (
                 <img
                   src={business?.signature}
                   alt="signature"

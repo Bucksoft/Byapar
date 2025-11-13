@@ -123,9 +123,9 @@ const PaymentInForm = () => {
       const pending = Math.max(invoice.totalAmount - alreadySettled, 0);
 
       if (pending <= 0) {
-        newSettled[invoice._id] = totalAmount;
+        newSettled[invoice._id] = invoice.totalAmount;
         newChecked[invoice._id] = true;
-        return; 
+        return;
       }
 
       if (remainingPayment > 0 && pending > 0) {

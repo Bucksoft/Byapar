@@ -35,7 +35,12 @@ const salesInvoiceSchema = new mongoose.Schema(
       default: "0",
     },
     totalAmount: { type: Number, required: true },
-    balanceAmount: { type: Number, required: true },
+    balanceAmount: {
+      type: Number,
+      default: function () {
+        return this.totalAmount;
+      },
+    },
 
     partyId: { type: mongoose.Schema.Types.ObjectId, ref: "Party" },
 
@@ -62,7 +67,12 @@ const salesInvoiceSchema = new mongoose.Schema(
     additionalDiscountPercent: { type: Number, default: 0 },
 
     settledAmount: { type: Number, default: 0 },
-    pendingAmount: { type: Number },
+    pendingAmount: {
+      type: Number,
+      default: function () {
+        return this.totalAmount;
+      },
+    },
 
     businessId: {
       type: mongoose.Schema.Types.ObjectId,
@@ -105,6 +115,18 @@ const salesInvoiceSchema = new mongoose.Schema(
     timestamps: true,
   }
 );
+
+salesInvoiceSchema.pre("save", function (next) {
+  this.pendingAmount = Math.max(this.totalAmount - this.settledAmount, 0);
+  this.balanceAmount = this.pendingAmount;
+  this.fullyPaid = this.pendingAmount === 0;
+  this.status = this.fullyPaid
+    ? "paid"
+    : this.settledAmount > 0
+    ? "partially paid"
+    : "unpaid";
+  next();
+});
 
 const SalesInvoice = mongoose.model("SalesInvoice", salesInvoiceSchema);
 export default SalesInvoice;

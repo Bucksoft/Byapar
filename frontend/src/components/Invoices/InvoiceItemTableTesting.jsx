@@ -26,6 +26,7 @@ const SalesInvoiceItemTableTesting = ({
   const [quantities, setQuantities] = useState({});
   const [basePrices, setBasePrices] = useState({});
   const [manualBasePriceRaw, setManualBasePriceRaw] = useState({});
+  const [openCounters, setOpenCounters] = useState({});
 
   // FETCH ITEMS
   const { data: items = [] } = useQuery({
@@ -391,20 +392,16 @@ const SalesInvoiceItemTableTesting = ({
           {/* Quantity */}
           <span className="border-t border-l p-2 border-[var(--primary-border)]">
             <input
-              type="text"
+              type="number"
               min={1}
               value={quantities[item._id] || item?.quantity || 1}
               onChange={(e) => {
                 let newQty = Number(e.target.value);
-
-                // Clamp to minimum 1
                 if (isNaN(newQty) || newQty < 1) newQty = 1;
-
                 setQuantities((prev) => ({
                   ...prev,
                   [item._id]: newQty,
                 }));
-
                 setData((prev) => ({
                   ...prev,
                   items: prev.items.map((i) =>
@@ -649,6 +646,7 @@ const SalesInvoiceItemTableTesting = ({
                         />
                       </div>
                     </dialog>
+
                     {/* MODAL TO CREATE AN ITEM ENDS ---------------------------------------- */}
                   </div>
                 </div>
@@ -702,12 +700,10 @@ const SalesInvoiceItemTableTesting = ({
                             <td>{Math.max(item?.currentStock ?? 0, 0)}</td>
 
                             {/*  THIS IS WHERE THE ITEMS QUANTITY GETS UPDATED------------------------------------------------------------------- */}
-                            <td>
-                              {showCounterId === item?._id ? (
-                                <div className="flex items-center justify-center space-x-2">
-                                  {/* Counter Box */}
-                                  <div className="flex rounded-md  items-center bg-white  shadow-sm overflow-hidden">
-                                    {/* Minus Button */}
+                            <td className="w-44">
+                              {openCounters[item._id] ? (
+                                <div className="flex items-center justify-center space-x-1">
+                                  <div className="flex rounded-2xl p-1 items-center bg-white shadow-md overflow-hidden">
                                     <button
                                       onClick={() =>
                                         handleQuantityChange(
@@ -715,28 +711,25 @@ const SalesInvoiceItemTableTesting = ({
                                           "decrement"
                                         )
                                       }
-                                      className="px-1 rounded-xl py-0 bg-[var(--primary-btn)] hover:bg-[var(--primary-btn)]/90 transition-colors text-white"
+                                      className="px-1 rounded-xl py-1 bg-[var(--primary-btn)] text-white"
                                     >
                                       <HiMiniMinusSmall className="w-4 h-4" />
                                     </button>
 
-                                    {/* Input */}
                                     <input
                                       type="number"
                                       min={0}
                                       value={quantities[item._id] || 1}
                                       onChange={(e) =>
                                         handleQuantityChange(
-                                          item?._id,
+                                          item._id,
                                           "manual",
                                           e.target.value
                                         )
                                       }
-                                      placeholder="0"
-                                      className="w-10 text-center text-xs font-medium outline-none "
+                                      className="w-10 text-center text-xs font-medium outline-none"
                                     />
 
-                                    {/* Plus Button */}
                                     <button
                                       onClick={() =>
                                         handleQuantityChange(
@@ -744,22 +737,20 @@ const SalesInvoiceItemTableTesting = ({
                                           "increment"
                                         )
                                       }
-                                      className="px-1 rounded-xl py-0 bg-[var(--primary-btn)] hover:bg-[var(--primary-btn)]/90 transition-colors text-white"
+                                      className="px-1 rounded-xl py-1 bg-[var(--primary-btn)] text-white"
                                     >
                                       <HiOutlinePlus className="w-4 h-4" />
                                     </button>
                                   </div>
 
-                                  {/* Remove Icon */}
                                   <button
-                                    onClick={() => {
-                                      setShowCounterId(false);
-                                      setQuantities((prev) => {
+                                    onClick={() =>
+                                      setOpenCounters((prev) => {
                                         const updated = { ...prev };
-                                        delete updated[item._id]; // remove quantity entry
+                                        delete updated[item._id];
                                         return updated;
-                                      });
-                                    }}
+                                      })
+                                    }
                                     className="p-2 rounded-full hover:bg-red-100 transition-colors"
                                   >
                                     <BsTrash3
@@ -771,7 +762,10 @@ const SalesInvoiceItemTableTesting = ({
                               ) : (
                                 <button
                                   onClick={() => {
-                                    setShowCounterId(item?._id);
+                                    setOpenCounters((prev) => ({
+                                      ...prev,
+                                      [item._id]: true,
+                                    }));
                                     setQuantities((prev) => ({
                                       ...prev,
                                       [item._id]: prev[item._id] ?? 1,

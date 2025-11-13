@@ -107,12 +107,12 @@ const DashboardMyBusinesses = () => {
                     boxShadow:
                       "rgba(0, 0, 0, 0.16) 0px 3px 6px, rgba(0, 0, 0, 0.23) 0px 3px 6px",
                   }}
-                  className="card w-96 bg-gradient-to-b from-white to-gray-100  rounded-4xl card-md border-l-2 border-l-info"
+                  className="card w-96 bg-gradient-to-b rounded-2xl card-md overflow-hidden"
                 >
-                  <div className="card-body">
-                    <div className="flex items-start gap-3">
+                  <div className="overflow-hidden">
+                    <div className="flex items-start gap-3 bg-[#030F21] p-4 text-white ">
                       {/* Business Logo */}
-                      <div className="w-12 h-12 rounded-2xl flex items-center justify-center bg-red-200 overflow-hidden">
+                      <div className="w-12 h-12 rounded-2xl flex items-center justify-center  overflow-hidden">
                         {business?.logo !== "null" ? (
                           <img
                             src={business.logo}
@@ -131,154 +131,156 @@ const DashboardMyBusinesses = () => {
 
                       <div className="leading-4 flex-1">
                         <h2 className="card-title">{business?.businessName}</h2>
-                        <small className="text-zinc-500">
+                        <small className="text-zinc-100">
                           {business?.businessRegType}
                         </small>
                       </div>
 
-                      <div className="badge badge-soft badge-xs badge-warning">
+                      <div className="rounded-full px-2 py-1 text-xs bg-white/10">
                         {business?.businessType}
                       </div>
                     </div>
 
-                    {/* Displaying city and state */}
-                    <p className="flex items-center gap-1 mt-2 text-zinc-700 text-xs">
-                      <IoLocationSharp />
-                      {business?.city}, {business?.state}
-                    </p>
-
-                    {/* Business Details */}
-                    <h3 className="text-zinc-700 font-semibold mt-3">
-                      Business Details :
-                    </h3>
-                    <div className="grid grid-cols-2 gap-2 min-h-[120px]">
-                      <p className="text-xs mt-1 p-2 bg-white border border-zinc-200 rounded-lg inset-shadow-2xs shadow-lg hover:scale-105 transition-all break-all whitespace-normal">
-                        <span className="text-zinc-500 font-medium">
-                          Company email
-                        </span>
-                        <br />
-                        {business?.companyEmail}
+                    <div className="p-4">
+                      {/* Displaying city and state */}
+                      <p className="flex items-center gap-1 mt-2 text-zinc-700 text-sm">
+                        <IoLocationSharp className="text-[#4A7DF0]" />
+                        {business?.city}, {business?.state}
                       </p>
 
-                      <p className="text-xs mt-1 p-2 bg-white border border-zinc-200 rounded-lg inset-shadow-2xs shadow-lg hover:scale-105 transition-all">
-                        <span className="text-zinc-500 font-medium">
-                          Company Phone number
-                        </span>
-                        <br /> {business?.companyPhoneNo}
-                      </p>
+                      {/* Business Details */}
+                      <h3 className="text-zinc-700 font-semibold mt-3">
+                        Business Details
+                      </h3>
 
-                      {/* GST number */}
-                      <p className="text-xs mt-1 p-2 bg-white border border-zinc-200 rounded-lg inset-shadow-2xs shadow-lg hover:scale-105 transition-all">
-                        {business?.gstNumber ? (
-                          <>
-                            <span className="text-zinc-500 font-medium">
-                              GST number
-                            </span>
-                            <br /> {business?.gstNumber}
-                          </>
-                        ) : (
-                          <span className="text-zinc-400 italic">
-                            GST number not available
+                      <div className="grid grid-cols-2 gap-2 min-h-[120px]">
+                        <p className="text-xs mt-1 p-2 bg-white border border-zinc-100 rounded-lg inset-shadow-2xs  hover:scale-105 transition-all break-all whitespace-normal">
+                          <span className="text-zinc-500 font-medium">
+                            Company email
                           </span>
-                        )}
-                      </p>
+                          <br />
+                          {business?.companyEmail}
+                        </p>
 
-                      {/* PAN number */}
-                      <p className="text-xs mt-1 p-2 bg-white border border-zinc-200 rounded-lg inset-shadow-2xs shadow-lg hover:scale-105 transition-all">
-                        {business?.panNumber ? (
-                          <>
-                            <span className="text-zinc-500 font-medium">
-                              PAN number
-                            </span>
-                            <br /> {business?.panNumber}
-                          </>
-                        ) : (
-                          <span className="text-zinc-400 italic">
-                            PAN number not available
+                        <p className="text-xs mt-1 p-2 bg-white border border-zinc-100 rounded-lg inset-shadow-2xs  hover:scale-105 transition-all">
+                          <span className="text-zinc-500 font-medium">
+                            Company Phone number
                           </span>
-                        )}
-                      </p>
-                    </div>
+                          <br /> {business?.companyPhoneNo}
+                        </p>
 
-                    {/* Actions */}
-                    <div className="justify-end card-actions mt-5">
-                      <div className="inline-flex rounded-lg overflow-hidden shadow ">
-                        {/* Edit Button */}
-                        <button
-                          onClick={() =>
-                            navigate("/dashboard/business", {
-                              state: { businessId: business?._id },
-                            })
-                          }
-                          className="flex items-center gap-1 px-3 py-1 bg-emerald-100 text-emerald-700 hover:bg-emerald-200 transition-colors text-xs font-medium"
-                        >
-                          <PenSquare size={15} /> Edit
-                        </button>
-
-                        {/* Delete Button */}
-                        <button
-                          onClick={() =>
-                            document.getElementById("my_modal_2").showModal()
-                          }
-                          className="flex items-center gap-1 px-3 py-1 bg-red-100 text-red-700 hover:bg-red-200 transition-colors text-xs font-medium border-l border-zinc-200"
-                        >
-                          <BsTrash3 size={15} /> Delete
-                        </button>
-
-                        {/* Activate / Active Button */}
-                        <button
-                          onClick={() => {
-                            setActiveBusinessId(business?._id);
-                            mutation.mutate({
-                              id: business?._id,
-                              status: "active",
-                            });
-                          }}
-                          disabled={mutation?.isPending}
-                          className={`flex items-center gap-1 px-3 py-1 text-xs font-medium border-l border-zinc-200 transition-colors ${
-                            currentlyActiveBusiness?._id === business?._id
-                              ? "bg-blue-500 text-white hover:bg-blue-600"
-                              : "bg-blue-100 text-blue-700 hover:bg-blue-200"
-                          }`}
-                        >
-                          {mutation?.isPending &&
-                          business?._id === activeBusinessId ? (
-                            <CustomLoader text={""} />
-                          ) : (
+                        {/* GST number */}
+                        <p className="text-xs mt-1 p-2 bg-white border border-zinc-100 rounded-lg inset-shadow-2xs  hover:scale-105 transition-all">
+                          {business?.gstNumber ? (
                             <>
-                              <IoMdCheckmarkCircleOutline size={15} />
-                              {currentlyActiveBusiness?._id === business?._id
-                                ? "Active"
-                                : "Mark Active"}
+                              <span className="text-zinc-500 font-medium">
+                                GST number
+                              </span>
+                              <br /> {business?.gstNumber}
                             </>
+                          ) : (
+                            <span className="text-zinc-400 italic">
+                              GST number not available
+                            </span>
                           )}
-                        </button>
+                        </p>
+
+                        {/* PAN number */}
+                        <p className="text-xs mt-1 p-2 bg-white border border-zinc-100 rounded-lg inset-shadow-2xs  hover:scale-105 transition-all">
+                          {business?.panNumber ? (
+                            <>
+                              <span className="text-zinc-500 font-medium">
+                                PAN number
+                              </span>
+                              <br /> {business?.panNumber}
+                            </>
+                          ) : (
+                            <span className="text-zinc-400 italic">
+                              PAN number not available
+                            </span>
+                          )}
+                        </p>
                       </div>
 
-                      <dialog id="my_modal_2" className="modal">
-                        <div className="modal-box">
-                          <h3 className="font-bold text-lg">
-                            Confirm Deletion
-                          </h3>
-                          <p className="py-4 text-sm">
-                            Are you sure you want to delete the selected
-                            item(s)? This action cannot be undone.
-                          </p>
-                          <div className="flex w-full">
-                            <button
-                              onClick={() =>
-                                deleteMutation.mutate(business?._id)
-                              }
-                              className="btn rounded-xl btn-sm btn-ghost  ml-auto text-[var(--error-text-color)]"
-                            >
-                              Delete
-                            </button>
-                          </div>
+                      {/* Actions */}
+                      <div className="justify-end card-actions mt-5">
+                        <div className="inline-flex rounded-lg overflow-hidden shadow ">
+                          {/* Edit Button */}
+                          <button
+                            onClick={() =>
+                              navigate("/dashboard/business", {
+                                state: { businessId: business?._id },
+                              })
+                            }
+                            className="flex items-center gap-1 px-3 py-1 bg-[#DFECFF] text-blue-500 hover:bg-blue-50 transition-colors text-xs font-medium"
+                          >
+                            <PenSquare size={15} /> Edit
+                          </button>
+
+                          {/* Delete Button */}
+                          <button
+                            onClick={() =>
+                              document.getElementById("my_modal_2").showModal()
+                            }
+                            className="flex items-center gap-1 px-3 py-1 bg-[#FBF1F1] text-red-500 hover:bg-red-100 transition-colors text-xs font-medium border-l border-zinc-200"
+                          >
+                            <BsTrash3 size={15} /> Delete
+                          </button>
+
+                          {/* Activate / Active Button */}
+                          <button
+                            onClick={() => {
+                              setActiveBusinessId(business?._id);
+                              mutation.mutate({
+                                id: business?._id,
+                                status: "active",
+                              });
+                            }}
+                            disabled={mutation?.isPending}
+                            className={`flex items-center gap-1 px-3 py-1 text-xs font-medium border-l border-zinc-200 transition-colors ${
+                              currentlyActiveBusiness?._id === business?._id &&
+                              "bg-[#EDF5F0] text-green-500 hover:bg-green-50"
+                            }`}
+                          >
+                            {mutation?.isPending &&
+                            business?._id === activeBusinessId ? (
+                              <CustomLoader text={""} />
+                            ) : (
+                              <>
+                                <IoMdCheckmarkCircleOutline size={15} />
+                                {currentlyActiveBusiness?._id === business?._id
+                                  ? "Active"
+                                  : "Mark Active"}
+                              </>
+                            )}
+                          </button>
                         </div>
-                        <form method="dialog" className="modal-backdrop">
-                          <button>close</button>
-                        </form>
-                      </dialog>
+
+                        <dialog id="my_modal_2" className="modal">
+                          <div className="modal-box">
+                            <h3 className="font-bold text-lg">
+                              Confirm Deletion
+                            </h3>
+                            <p className="py-4 text-sm">
+                              Are you sure you want to delete the selected
+                              item(s)? This action cannot be undone.
+                            </p>
+                            <div className="flex w-full">
+                              <button
+                                onClick={() =>
+                                  deleteMutation.mutate(business?._id)
+                                }
+                                className="btn rounded-xl btn-sm btn-ghost  ml-auto text-[var(--error-text-color)]"
+                              >
+                                Delete
+                              </button>
+                            </div>
+                          </div>
+                          <form method="dialog" className="modal-backdrop">
+                            <button>close</button>
+                          </form>
+                        </dialog>
+                      </div>
                     </div>
                   </div>
                 </div>

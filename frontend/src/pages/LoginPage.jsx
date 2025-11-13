@@ -8,6 +8,7 @@ import { axiosInstance } from "../config/axios";
 import OtpInputForm from "../components/OtpInputForm";
 import { motion } from "framer-motion";
 import CustomLoader from "../components/Loader";
+import ByaparLogo from "../assets/ByaparSetu_Logo_White.png";
 
 const LoginPage = () => {
   const [email, setEmail] = useState("");
@@ -65,15 +66,16 @@ const LoginPage = () => {
         <div
           className="relative z-10 border border-zinc-200 bg-white/30 backdrop-blur-2xl 
     rounded-2xl w-[90%] sm:w-[80%] md:w-[70%] lg:w-[60%] xl:w-[50%] 
-    grid grid-cols-1 md:grid-cols-2 items-center p-4 sm:p-6 md:p-8"
+    grid grid-cols-1 md:grid-cols-2 items-start p-4 sm:p-6 md:p-8"
           style={{
             boxShadow:
               "rgba(60, 64, 67, 0.3) 0px 1px 2px 0px, rgba(60, 64, 67, 0.15) 0px 1px 3px 1px",
           }}
         >
           {/* Left Section */}
-          <section className="flex flex-col justify-center w-full px-3 sm:px-6 md:px-8">
-            <h1 className="font-semibold text-2xl sm:text-3xl md:text-4xl mt-4 flex items-center justify-between">
+          <section className="flex flex-col justify-center w-full px-3 sm:px-6 md:px-8 mt-10">
+            <img src={ByaparLogo} alt="" width={120} />
+            <h1 className="font-semibold text-xl sm:text-2xl md:text-3xl mt-4 flex items-center justify-between">
               Login / Register
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -139,13 +141,20 @@ const LoginPage = () => {
                 <>
                   <svg
                     xmlns="http://www.w3.org/2000/svg"
-                    width="16"
-                    height="16"
+                    width="20"
+                    height="20"
                     viewBox="0 0 24 24"
-                    fill="currentColor"
-                    className="mr-2"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    class="icon icon-tabler icons-tabler-outline icon-tabler-lock"
                   >
-                    <path d="M14.52 2a3.88 3.88 0 0 1 2.742 1.136l3.602 3.602a3.877 3.877 0 0 1 0 5.483l-2.643 2.643a3.88 3.88 0 0 1 -4.941 .452l-.105 -.078l-5.882 5.883a3 3 0 0 1 -1.68 .843h-1.172a2 2 0 0 1 -2 -2v-1.172a3 3 0 0 1 .879 -2.121l.414 -.414a1 1 0 0 1 .707 -.293h1v-1a1 1 0 0 1 .883 -.993h1v-1a1 1 0 0 1 .293 -.707l1.469 -1.469a3.9 3.9 0 0 1 -.678 -1.963a3.88 3.88 0 0 1 1.136 -2.742l2.643 -2.643a3.88 3.88 0 0 1 2.741 -1.136z" />
+                    <path stroke="none" d="M0 0h24v24H0z" fill="none" />
+                    <path d="M5 13a2 2 0 0 1 2 -2h10a2 2 0 0 1 2 2v6a2 2 0 0 1 -2 2h-10a2 2 0 0 1 -2 -2v-6z" />
+                    <path d="M11 16a1 1 0 1 0 2 0a1 1 0 0 0 -2 0" />
+                    <path d="M8 11v-4a4 4 0 1 1 8 0v4" />
                   </svg>
                   Get OTP
                 </>
@@ -153,19 +162,19 @@ const LoginPage = () => {
             </button>
 
             {/* Divider */}
-            <div className="flex items-center gap-3 text-xs text-zinc-500 my-6 w-full">
+            {/* <div className="flex items-center gap-3 text-xs text-zinc-500 my-6 w-full">
               <span className="h-px bg-zinc-300 w-full" />
               <p className="text-nowrap">or continue</p>
               <span className="h-px bg-zinc-300 w-full" />
-            </div>
+            </div> */}
 
             {/* Google Login */}
-            <button
+            {/* <button
               onClick={handleGoogleLogin}
               className="btn w-full btn-md sm:btn-lg btn-neutral rounded-2xl shadow-md hover:bg-black/80"
             >
               <FcGoogle size={20} /> Log In with Google
-            </button>
+            </button> */}
           </section>
 
           {/* Right Section (Hidden on small screens) */}

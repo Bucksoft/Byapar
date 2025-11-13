@@ -167,7 +167,7 @@ const DashboardQuotationPage = () => {
                     <th className="w-60">Date</th>
                     <th className="w-60">Quotation Number</th>
                     <th className="w-60">Party Name</th>
-                    <th className="w-60">Due In</th>
+                    <th className="w-60">Expires In</th>
                     <th className="w-60">Amount</th>
                     <th className="w-60">Status</th>
                   </tr>

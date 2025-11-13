@@ -142,6 +142,7 @@ const SalesInvoice = () => {
               {invoice?.status}
             </div>
           </div>
+          
           <div className="flex items-center gap-3">
             {/* <button className="btn btn-sm">
               <GiProfit />

@@ -18,7 +18,6 @@ export async function createPaymentIn(req, res) {
       paymentInNumber,
       settledInvoices,
     } = req.body;
-    console.log(partyId);
     const party = await Party.findOne({
       _id: new mongoose.Types.ObjectId(partyId),
       businessId: req.params?.id,
@@ -36,6 +35,7 @@ export async function createPaymentIn(req, res) {
     }).session(session);
 
     const invoiceIds = Object.keys(settledInvoices || {});
+
     const invoices = await SalesInvoice.find({
       partyId: party._id,
       businessId: req.params?.id,
@@ -77,8 +77,18 @@ export async function createPaymentIn(req, res) {
       const appliedSettlement = Math.min(settleAmount, pending);
 
       invoice.settledAmount = currentSettled + appliedSettlement;
+      invoice.receivedAmount = currentSettled + appliedSettlement;
+      invoice.balanceAmount = invoice.pendingAmount;
       invoice.pendingAmount = invoice.totalAmount - invoice.settledAmount;
       invoice.status = invoice.pendingAmount <= 0 ? "paid" : "partially paid";
+
+      if (invoice.pendingAmount <= 0) {
+        invoice.status = "paid";
+        invoice.fullyPaid = true;
+      } else {
+        invoice.status = "partially paid";
+        invoice.fullyPaid = false;
+      }
 
       await invoice.save({ session });
 
@@ -88,7 +98,11 @@ export async function createPaymentIn(req, res) {
         settledAmount: invoice.settledAmount,
         pendingAmount: invoice.pendingAmount,
         status:
-          appliedSettlement < settleAmount ? "Partially Settled" : "Settled",
+          invoice.pendingAmount <= 0
+            ? "Settled"
+            : appliedSettlement < settleAmount
+            ? "Partially Settled"
+            : "Settled",
       });
     }
 
@@ -112,7 +126,10 @@ export async function createPaymentIn(req, res) {
       { session }
     );
 
-    party.currentBalance = (party.currentBalance || 0) - paymentAmount;
+    party.currentBalance = Math.max(
+      (party.currentBalance || 0) - paymentAmount,
+      0
+    );
     party.totalCredits = (party.totalCredits || 0) + paymentAmount;
 
     await party.save({ session });
@@ -157,8 +174,6 @@ export async function getAllPaymentInDetails(req, res) {
       businessId: req.params?.id,
       clientId: req.user?.id,
     });
-
-    console.log(paymentIns);
 
     const totalPaymentAmount = paymentIns.reduce(
       (acc, current) => acc + current.paymentAmount,

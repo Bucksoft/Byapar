@@ -289,6 +289,7 @@ const DashboardSalesPage = () => {
                   <th>Party Name</th>
                   <th>Due In</th>
                   <th>Amount</th>
+                  <th>Paid</th>
                   <th>Status</th>
                   <th>Action</th>
                 </tr>
@@ -352,17 +353,14 @@ const DashboardSalesPage = () => {
                           <LiaRupeeSignSolid />
                           {Number(invoice?.totalAmount).toLocaleString("en-IN")}
                         </div>
-
-                        {/* {invoice?.pendingAmount &&
-                          invoice.pendingAmount > 0 && (
-                            <small className="flex items-center text-error">
-                              <LiaRupeeSignSolid />{" "}
-                              {Number(invoice?.pendingAmount).toLocaleString(
-                                "en-IN"
-                              )}{" "}
-                              unpaid
-                            </small>
-                          )} */}
+                      </td>
+                      <td>
+                        <div className="flex items-center">
+                          <LiaRupeeSignSolid />
+                          {Number(invoice?.settledAmount).toLocaleString(
+                            "en-IN"
+                          )}
+                        </div>
                       </td>
                       <td>
                         <p

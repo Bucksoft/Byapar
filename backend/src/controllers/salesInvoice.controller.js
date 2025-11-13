@@ -117,33 +117,37 @@ export async function createSalesInvoice(req, res) {
       data.additionalDiscountAmount = additionalDiscountAmount;
     }
 
+    const receivedAmount = Number(data?.receivedAmount || 0);
+    const totalAmount = Number(data?.totalAmount || 0);
+    const settledAmount = receivedAmount;
+    const pendingAmount = totalAmount - settledAmount;
+    const balanceAmount = pendingAmount;
+
+    let status = "unpaid";
+    if (settledAmount >= totalAmount) status = "paid";
+    else if (settledAmount > 0) status = "partially paid";
+
     const salesInvoice = await SalesInvoice.create({
       partyId: party?._id,
       businessId: req.params?.id,
       clientId: req.user?.id,
-      status:
-        data?.receivedAmount > 0
-          ? "partially paid"
-          : data?.receivedAmount === data?.totalAmount
-          ? "paid"
-          : "unpaid",
-      type: "sales invoice",
-      pendingAmount: data?.totalAmount - data?.receivedAmount,
-      settledAmount: data?.receivedAmount,
-      balanceAmount: data?.totalAmount - data?.receivedAmount,
       salesInvoiceNumber: existingInvoice
         ? existingInvoice.salesInvoiceNumber + 1
         : data?.salesInvoiceNumber,
+      type: "sales invoice",
+      status,
+      totalAmount,
+      settledAmount,
+      pendingAmount,
+      balanceAmount,
       ...data,
     });
 
-    party.currentBalance =
-      (party.currentBalance || 0) + salesInvoice.balanceAmount;
-    // party.totalSales = (party.totalSales || 0) + salesInvoice.balanceAmount;
-    party.totalDebits = (party.totalDebits || 0) + salesInvoice.balanceAmount;
-    party.totalInvoices =
-      (party.totalInvoices || 0) + salesInvoice.balanceAmount;
-    party.totalCredits = (party.totalCredits || 0) - salesInvoice.balanceAmount;
+    party.currentBalance = (party.currentBalance || 0) + pendingAmount;
+    party.totalDebits = (party.totalDebits || 0) + totalAmount;
+    party.totalCredits = (party.totalCredits || 0) + settledAmount;
+    party.totalInvoices = (party.totalInvoices || 0) + 1;
+
     await party.save();
 
     if (!salesInvoice) {

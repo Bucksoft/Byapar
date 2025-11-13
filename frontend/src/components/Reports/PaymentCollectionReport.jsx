@@ -13,7 +13,7 @@ import { useBusinessStore } from "../../store/businessStore";
 import { axiosInstance } from "../../config/axios";
 import CustomLoader from "../Loader";
 import not_found from "../../assets/not-found.png";
-import { handlePrint } from "../../../helpers/print";
+import { handlePaymentPrint, handlePrint } from "../../../helpers/print";
 import { queryClient } from "../../main";
 import toast from "react-hot-toast";
 import { useNavigate } from "react-router-dom";
@@ -507,7 +507,7 @@ const PaymentCollectionReport = () => {
               )}
             </button>
             <button
-              onClick={() => handlePrint(printRef)}
+              onClick={() => handlePaymentPrint(printRef)}
               className="btn rounded-xl btn-sm bg-[var(--primary-btn)] shadow"
             >
               Print

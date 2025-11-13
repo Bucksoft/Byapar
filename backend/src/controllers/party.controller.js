@@ -224,6 +224,11 @@ export async function updatePartyDetails(req, res) {
     const businessId = new mongoose.Types.ObjectId(req.params.id);
     const data = req.body;
 
+    const existingParty = await Party.findById(id);
+    if (!existingParty) {
+      return res.status(404).json({ success: false, msg: "Party not found" });
+    }
+
     const {
       bankAccountNumber,
       IFSCCode,
@@ -270,8 +275,19 @@ export async function updatePartyDetails(req, res) {
       }
     }
 
+    let updateData = { ...data };
+
+    const oldOpening = existingParty.openingBalance || 0;
+    const oldCurrent = existingParty.currentBalance || 0;
+
+    if (oldCurrent === 0) {
+      updateData.currentBalance = data.openingBalance;
+    }
+
     // FIND THE PARTY AND UPDATE ITS FIELDS
-    const updatedParty = await Party.findByIdAndUpdate(id, data, { new: true });
+    const updatedParty = await Party.findByIdAndUpdate(id, updateData, {
+      new: true,
+    });
 
     if (!updatedParty) {
       return res
