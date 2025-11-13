@@ -1212,6 +1212,7 @@ const InvoiceTemplate = ({
                       .toUpperCase()}{" "}
                 </span>
               </div>
+              
             </div>
           </section>
 

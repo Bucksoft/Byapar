@@ -24,7 +24,7 @@ router.route("/verify-otp").post(verifyOTP);
 
 router.route("/").get(googleOAuthRedirection);
 router.route("/me").get(isAuth, getUserCredential);
-router.route("/callback").get(loginViaGoogleCallback);
+router.route("/google/callback").get(loginViaGoogleCallback);
 
 router.route("/logout").post(isAuth, logoutUser);
 router.route("/").patch(isAuth, updateUserAccount);

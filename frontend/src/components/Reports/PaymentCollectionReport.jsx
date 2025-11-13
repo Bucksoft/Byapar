@@ -123,6 +123,15 @@ const PaymentCollectionReport = () => {
     }
   }, [sortType]);
 
+  // TOTAL COLLECTION AMOUNT BASED ON DATE RANGE
+  const totalCollection = useMemo(() => {
+    if (!searchedInvoices?.length) return 0;
+    return searchedInvoices?.reduce(
+      (acc, curr) => acc + curr?.paymentAmount,
+      0
+    );
+  }, [searchedInvoices]);
+
   return (
     <main className="w-full py-3 my-3  overflow-hidden">
       {/* TOP HEADER SECTION WITH CUSTOM DATE RANGE */}
@@ -169,7 +178,7 @@ const PaymentCollectionReport = () => {
           <span className="text-sm text-zinc-500">Total Collection</span>
           <p className="flex items-center gap-1">
             <LuIndianRupee size={12} />
-            {invoices?.totalPaymentAmount.toLocaleString("en-IN") || 0}
+            {totalCollection.toLocaleString("en-IN") || 0}
           </p>
         </div>
       </div>
@@ -425,12 +434,15 @@ const PaymentCollectionReport = () => {
                           >
                             <li
                               onClick={() =>
-                                navigate(`/parties/create-payment-in`, {
-                                  state: {
-                                    invoiceId: invoice?._id,
-                                    partyName: invoice?.partyName,
-                                  },
-                                })
+                                navigate(
+                                  `/dashboard/parties/create-payment-in`,
+                                  {
+                                    state: {
+                                      invoiceId: invoice?._id,
+                                      partyName: invoice?.partyName,
+                                    },
+                                  }
+                                )
                               }
                             >
                               <a>View/Edit</a>

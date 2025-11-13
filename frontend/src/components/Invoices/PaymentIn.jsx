@@ -2,6 +2,7 @@ import { FaIndianRupeeSign } from "react-icons/fa6";
 import converter from "number-to-words";
 import { useBusinessStore } from "../../store/businessStore";
 import { LuIndianRupee } from "react-icons/lu";
+import { toWords } from "../../../helpers/wordsToCurrency";
 
 const PaymentInTemplate = ({ data, id, printRef }) => {
   const total =
@@ -11,17 +12,13 @@ const PaymentInTemplate = ({ data, id, printRef }) => {
   const { business } = useBusinessStore();
 
   return (
-    <main
-      id={id}
-      style={{ width: "100%",  }}
-      ref={printRef}
-    >
+    <main id={id} style={{ width: "100%" }} ref={printRef}>
       <div style={{ display: "flex", justifyContent: "space-between" }}>
         <div
           style={{
             display: "flex",
             flexDirection: "column",
-            marginBottom:"20px"
+            marginBottom: "20px",
           }}
         >
           <img
@@ -37,7 +34,7 @@ const PaymentInTemplate = ({ data, id, printRef }) => {
           <span
             style={{
               color: "#71717b",
-              fontSize:"14px"
+              fontSize: "14px",
             }}
           >
             {business?.billingAddress}
@@ -45,7 +42,7 @@ const PaymentInTemplate = ({ data, id, printRef }) => {
           <span
             style={{
               color: "#71717b",
-              fontSize:"14px"
+              fontSize: "14px",
             }}
           >
             {business?.companyEmail}
@@ -53,7 +50,7 @@ const PaymentInTemplate = ({ data, id, printRef }) => {
           <span
             style={{
               color: "#71717b",
-              fontSize:"14px"
+              fontSize: "14px",
             }}
           >
             {business?.companyPhoneNo}
@@ -61,7 +58,7 @@ const PaymentInTemplate = ({ data, id, printRef }) => {
           <span
             style={{
               color: "#71717b",
-              fontSize:"14px"
+              fontSize: "14px",
             }}
           >
             {business?.gstNumber}
@@ -304,8 +301,14 @@ const PaymentInTemplate = ({ data, id, printRef }) => {
             </p>
             <span style={{ fontSize: "14px" }}>Amount Paid In Word</span>
             <p style={{ fontWeight: 600, fontSize: "14px" }}>
-              {converter.toWords(Number(total || 0)).toUpperCase()}{" "}
-              <span style={{ textTransform: "uppercase" }}>Rupees</span>
+              {total &&
+                toWords
+                  ?.convert(total)
+                  ?.toLocaleString("en-IN", {
+                    minimumFractionDigits: 2,
+                    maximumFractionDigits: 2,
+                  })
+                  .toUpperCase()}{" "}
             </p>
           </div>
           <div

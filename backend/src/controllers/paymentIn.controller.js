@@ -158,6 +158,8 @@ export async function getAllPaymentInDetails(req, res) {
       clientId: req.user?.id,
     });
 
+    console.log(paymentIns);
+
     const totalPaymentAmount = paymentIns.reduce(
       (acc, current) => acc + current.paymentAmount,
       0

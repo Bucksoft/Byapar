@@ -12,7 +12,7 @@ import { useState } from "react";
 import PaymentInTemplate from "../components/Invoices/PaymentIn";
 import { downloadPDF } from "../../helpers/downloadPdf";
 import { useRef } from "react";
-import { handlePrint } from "../../helpers/print";
+import { handlePaymentPrint, handlePrint } from "../../helpers/print";
 
 const DashboardPaymentInDetails = () => {
   const { id } = useParams();
@@ -122,6 +122,7 @@ const DashboardPaymentInDetails = () => {
 
         {/* MENUS */}
         <section className="flex items-center gap-2 mt-7 w-3/4 ">
+          {/* DOWNLOAD PDF */}
           {PaymentIn?.paymentIn?.status !== "cancelled" && (
             <button
               className="btn btn-sm rounded-xl"
@@ -134,14 +135,16 @@ const DashboardPaymentInDetails = () => {
             </button>
           )}
 
+          {/* PRINT BUTTON */}
           {PaymentIn?.paymentIn?.status !== "cancelled" && (
             <button
-              onClick={() => handlePrint(printRef)}
+              onClick={() => handlePaymentPrint(printRef)}
               className="btn btn-sm btn-dash rounded-xl"
             >
               <Printer size={15} /> Print
             </button>
           )}
+
           {PaymentIn?.paymentIn?.status !== "cancelled" && (
             <select onChange={handleShare} className="select select-sm w-1/6">
               <option className="hidden">Share</option>

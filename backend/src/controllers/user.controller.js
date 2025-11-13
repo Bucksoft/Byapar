@@ -5,6 +5,13 @@ import { OTP } from "../models/otp.schema.js";
 import jwt from "jsonwebtoken";
 import { UserCredential } from "../models/user.schema.js";
 import axios from "axios";
+import dotenv from "dotenv";
+dotenv.config();
+
+const GOOGLE_CLIENT_ID = process.env.GOOGLE_CLIENT_ID;
+const GOOGLE_CLIENT_SECRET = process.env.GOOGLE_CLIENT_SECRET;
+const FRONTEND_URI = process.env.FRONTEND_URI;
+const BACKEND_URI = process.env.BACKEND_URI;
 
 // login user via email and OTP
 export async function login(req, res) {
@@ -42,7 +49,7 @@ export async function login(req, res) {
     });
 
     // send OTP via email
-    // await sendOTPviaMail(email, otp);
+    await sendOTPviaMail(email, otp);
 
     console.log("Generated OTP:", otp);
 
@@ -147,20 +154,11 @@ export async function verifyOTP(req, res) {
 }
 
 // google authentication ********************************************************************
-
 export async function googleOAuthRedirection(req, res) {
   try {
-    const googleAuthURL =
-      "https://accounts.google.com/o/oauth2/v2/auth?" +
-      new URLSearchParams({
-        client_id: process.env.GOOGLE_CLIENT_ID,
-        redirect_uri: `https://backend.byaparsetu.com/auth/google/callback`,
-        response_type: "code",
-        scope: "profile email",
-        access_type: "offline",
-        prompt: "consent",
-      });
-    res.redirect(googleAuthURL);
+    const redirectUrl = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${GOOGLE_CLIENT_ID}&redirect_uri=${BACKEND_URI}/api/v1/user/google/callback&response_type=code&scope=openid%20email%20profile`;
+
+    res.redirect(redirectUrl);
   } catch (error) {
     console.log("ERROR", error);
     return res
@@ -172,27 +170,22 @@ export async function googleOAuthRedirection(req, res) {
 export async function loginViaGoogleCallback(req, res) {
   try {
     const code = req.query.code;
-    const tokenRes = await axios.post(
-      "https://oauth2.googleapis.com/token",
-      null,
-      {
-        params: {
-          code,
-          client_id: process.env.GOOGLE_CLIENT_ID,
-          client_secret: process.env.GOOGLE_CLIENT_SECRET,
-          redirect_uri: `https://backend.byaparsetu.com/auth/google/callback`,
-          grant_type: "authorization_code",
-        },
-        headers: { "Content-Type": "application/x-www-form-urlencoded" },
-      }
-    );
-    const token = tokenRes.data.access_token;
+    if (!code) return res.status(400).send("Missing code parameter");
+
+    const tokenRes = await axios.post("https://oauth2.googleapis.com/token", {
+      code,
+      client_id: GOOGLE_CLIENT_ID,
+      client_secret: GOOGLE_CLIENT_SECRET,
+      redirect_uri: `https://backend.byaparsetu.com/api/v1/user/google/callback`,
+      grant_type: "authorization_code",
+    });
+
+    const { id_token, access_token } = tokenRes.data;
+
     const userRes = await axios.get(
-      "https://www.googleapis.com/oauth2/v2/userinfo",
-      {
-        headers: { Authorization: `Bearer ${token}` },
-      }
+      `https://www.googleapis.com/oauth2/v2/userinfo?access_token=${access_token}`
     );
+    const userData = userRes.data;
 
     // save user in DB
     let user = await UserCredential.findOne({ email: userRes.data.email });
@@ -236,10 +229,10 @@ export async function loginViaGoogleCallback(req, res) {
       maxAge: 7 * 24 * 60 * 60 * 1000,
     });
 
-    res.redirect(`${process.env.FRONTEND_URI}/dashboard`);
+    res.redirect(`${FRONTEND_URI}/dashboard`);
   } catch (error) {
     console.log("ERROR IN AUTHENTICATING USER VIA GOOGLE CALLBACK : ", error);
-    return res.status(500).json({ msg: "Authentication failed" });
+    return res.status(500).json({ msg: "Authentication failed", error });
   }
 }
 

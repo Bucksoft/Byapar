@@ -154,8 +154,6 @@ export async function getAllParties(req, res) {
       clientId: req.user?.id,
     });
 
-    console.log("ALL PARTIES ", allFilteredParties);
-
     allFilteredParties.forEach((party) => {
       const balance = party?.openingBalance || 0;
       if (party.openingBalanceStatus === "To Collect")
