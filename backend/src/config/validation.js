@@ -302,7 +302,7 @@ export const paymentInSchema = z.object({
 
 export const itemSchema = z.object({
   itemType: z.enum(["product", "service"]).default("product"),
-
+  isPOSItem: z.boolean().default(false).optional(),
   category: z.string().optional(),
 
   // only required field

@@ -20,7 +20,12 @@ import { useBusinessStore } from "../../store/businessStore";
 import DashboardItemsSACCodePage from "./DashboardItemsSACCodePage";
 import { useRef } from "react";
 
-const DashboardItemsSidebar = ({ modalId, itemIdToEdit, isOpen }) => {
+const DashboardItemsSidebar = ({
+  modalId,
+  itemIdToEdit,
+  isOpen,
+  isPOSItem,
+}) => {
   const navigate = useNavigate();
   const [itemToBeEdited, setItemToBeEdited] = useState();
   const { state } = useLocation();
@@ -35,7 +40,7 @@ const DashboardItemsSidebar = ({ modalId, itemIdToEdit, isOpen }) => {
     setItemToBeEdited(matchingItems[0]);
   }, [itemIdToEdit, items]);
 
-  const initialFormState = {
+  const getInitialFormState = (isPOSItem, business) => ({
     itemType: "product",
     itemName: "",
     salesPrice: 0,
@@ -52,18 +57,30 @@ const DashboardItemsSidebar = ({ modalId, itemIdToEdit, isOpen }) => {
     purchasePriceType: "with tax",
     itemCode: "",
     HSNCode: "",
-    asOfDate: new Date(Date.now()),
+    asOfDate: new Date(),
     description: "",
     godown: "",
     businessId: business?._id,
     fileURLs: [""],
-  };
-  const [data, setData] = useState(initialFormState);
+    isPOSItem: isPOSItem,
+    mrp: 0,
+  });
+
+  const [data, setData] = useState(() =>
+    getInitialFormState(isPOSItem, business)
+  );
+
+  useEffect(() => {
+    setData((prev) => ({
+      ...prev,
+      isPOSItem: isPOSItem ? true : false,
+    }));
+  }, [isPOSItem]);
 
   useEffect(() => {
     if (itemToBeEdited) {
       setData({
-        ...initialFormState,
+        ...getInitialFormState(isPOSItem, business),
         ...itemToBeEdited,
       });
     }
@@ -72,6 +89,15 @@ const DashboardItemsSidebar = ({ modalId, itemIdToEdit, isOpen }) => {
   const handleSidebar = (title) => {
     setCurrentField(title);
   };
+
+  useEffect(() => {
+    if (isPOSItem) {
+      setData({
+        ...data,
+        isPOSItem: true,
+      });
+    }
+  }, [isPOSItem]);
 
   const itemMutation = useMutation({
     mutationFn: async (data) => {
@@ -106,13 +132,13 @@ const DashboardItemsSidebar = ({ modalId, itemIdToEdit, isOpen }) => {
     onSuccess: (data) => {
       toast.success(data.msg);
       setItem(data);
-      setData(initialFormState);
+      setData(getInitialFormState(isPOSItem, business));
       setItemNameError("");
       if (!itemIdToEdit) {
         document.getElementById(modalId)?.close();
       }
       setCurrentField("Basic Details");
-      queryClient.invalidateQueries({ queryKey: ["items"] });
+      queryClient.invalidateQueries({ queryKey: ["items", business?._id] });
       if (isOpen) {
         document.getElementById(modalId)?.close();
       } else {

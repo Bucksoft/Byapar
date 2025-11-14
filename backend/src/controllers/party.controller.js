@@ -499,7 +499,10 @@ export async function allParties(req, res) {
         .status(400)
         .json({ success: false, msg: "Please provide the business id" });
     }
-    const totalParties = await Party.countDocuments({ businessId: businessId });
+    // const totalParties = await Party.countDocuments({
+    //   businessId: businessId,
+    //   clientId: req.user.id,
+    // });
     let toCollect = 0;
     let toPay = 0;
 
@@ -524,7 +527,7 @@ export async function allParties(req, res) {
 
     return res
       .status(200)
-      .json({ totalParties, toCollect, toPay, data: parties });
+      .json({ totalParties: parties.length, toCollect, toPay, data: parties });
   } catch (error) {
     console.log(error);
     return res

@@ -103,8 +103,8 @@ const DashboardItemsPage = () => {
   // SEARCH ITEMS
   const searchedItems = useMemo(() => {
     if (!items?.length) return [];
-
-    return items.filter((item) =>
+    const nonPOSItems = items.filter((item) => item?.isPOSItem === false);
+    return nonPOSItems.filter((item) =>
       item?.itemName.toLowerCase().includes(searchQuery?.toLowerCase())
     );
   }, [items, searchQuery]);

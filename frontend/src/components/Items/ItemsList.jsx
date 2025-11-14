@@ -11,9 +11,11 @@ import { GrFormSubtract } from "react-icons/gr";
 import { FiPackage } from "react-icons/fi";
 import { AiOutlineProduct } from "react-icons/ai";
 import { toTitleCase } from "../../../helpers/titleCaseString";
+import { useBusinessStore } from "../../store/businessStore";
 
 const ItemsList = ({ showLowStock, items }) => {
   const [selectedItems, setSelectedItems] = useState([]);
+  const { business } = useBusinessStore();
   const [choice, setChoice] = useState("add");
   const [stockUpdationDate, setStockUpdationDate] = useState(
     new Date().toISOString().split("T")[0]
@@ -65,7 +67,10 @@ const ItemsList = ({ showLowStock, items }) => {
   // adjusting stock mutation
   const stockMutation = useMutation({
     mutationFn: async (data) => {
-      const res = await axiosInstance.patch("/item/stock", { data });
+      const res = await axiosInstance.patch(
+        `/item/stock/?businessId=${business?._id}`,
+        { data }
+      );
       return res.data;
     },
     onSuccess: (data) => {

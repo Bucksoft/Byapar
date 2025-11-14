@@ -50,6 +50,7 @@ const DashboardPartiesPage = () => {
       const res = await axiosInstance.get(
         `/parties/all-parties/${business?._id}`
       );
+      console.log("RES", res);
       return res.data;
     },
 
@@ -202,7 +203,7 @@ const DashboardPartiesPage = () => {
                   </>
                 )}
                 {details?.label === "All Parties" && (
-                  <span>{totalParties || 0}</span>
+                  <span>{data?.data?.length || 0}</span>
                 )}
               </span>
             </motion.div>

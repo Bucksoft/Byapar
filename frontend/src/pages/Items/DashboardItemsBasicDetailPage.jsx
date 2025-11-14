@@ -169,7 +169,7 @@ const DashboardItemsBasicDetailPage = ({
                   salesPriceType: e.target.value.toLowerCase(),
                 }))
               }
-              className="select select-sm w-3/8 text-info select-ghost"
+              className="select select-sm w-3/8 text-info select-ghost "
             >
               <option value={"with tax"}>With Tax</option>
               <option value={"without tax"}>Without Tax</option>

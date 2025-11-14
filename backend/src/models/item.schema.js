@@ -120,6 +120,15 @@ const itemSchema = new mongoose.Schema(
       type: Date,
       default: Date.now,
     },
+    isPOSItem: {
+      type: Boolean,
+      default: false,
+    },
+    mrp: {
+      type: Number,
+      min: [0, "MRP cannot be negative"],
+      default: 0,
+    },
   },
   { timestamps: true }
 );

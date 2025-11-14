@@ -195,7 +195,10 @@ export async function updateItem(req, res) {
 export async function updateStock(req, res) {
   try {
     const data = req.body?.data;
-    const item = await Item.findOne({ itemName: data?.activeItem?.name });
+    const item = await Item.findOne({
+      itemName: data?.activeItem?.name,
+      businessId: req.params?.id,
+    });
     if (!item) {
       return res.status(400).json({ success: false, msg: "Item not found" });
     }

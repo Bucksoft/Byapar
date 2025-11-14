@@ -11,20 +11,35 @@ const DiscountModal = ({ data, setData }) => {
           <div className="py-4">
             <input
               type="radio"
-              name="radio-9"
+              name="discount-type"
               className="radio radio-info mr-2 radio-sm"
               id="before_tax"
+              checked={data.discountType === "before_tax"}
+              onChange={() =>
+                setData((prev) => ({
+                  ...prev,
+                  discountType: "before_tax",
+                }))
+              }
             />
             <label htmlFor="before_tax" className="text-zinc-600 text-sm">
               Before Tax
             </label>
           </div>
-          <div>
+
+          <div className="py-4">
             <input
               type="radio"
-              name="radio-9"
+              name="discount-type"
               className="radio radio-info mr-2 radio-sm"
               id="after_tax"
+              checked={data.discountType === "after_tax"}
+              onChange={() =>
+                setData((prev) => ({
+                  ...prev,
+                  discountType: "after_tax",
+                }))
+              }
             />
             <label htmlFor="after_tax" className="text-zinc-600 text-sm">
               After Tax
@@ -33,12 +48,26 @@ const DiscountModal = ({ data, setData }) => {
         </div>
 
         {/* DISCOUNT PERCENT */}
+        {/* DISCOUNT PERCENTAGE */}
         <div className="mt-5 flex flex-col space-y-1">
-          <label htmlFor="percent" className="text-sm text-zinc-600">
-            Discount percentage
+          <label htmlFor="discountPercent" className="text-sm text-zinc-600">
+            Discount Percentage
           </label>
+
           <input
             type="number"
+            value={data.discountPercent}
+            onChange={(e) => {
+              const percent = Number(e.target.value) || 0;
+
+              const discountAmount = (data.subTotal * percent) / 100;
+
+              setData((prev) => ({
+                ...prev,
+                discountPercent: percent,
+                discountAmount: Number(discountAmount.toFixed(2)),
+              }));
+            }}
             id="percent"
             className="input w-full input-sm"
             placeholder="0"
@@ -47,12 +76,14 @@ const DiscountModal = ({ data, setData }) => {
 
         {/* DISCOUNT AMOUNT */}
         <div className="mt-5 flex flex-col space-y-1">
-          <label htmlFor="percent" className="text-sm text-zinc-600">
+          <label htmlFor="discountAmount" className="text-sm text-zinc-600">
             Discount Amount
           </label>
+
           <input
             type="number"
-            id="percent"
+            value={data.discountAmount.toFixed(2)}
+            readOnly
             className="input w-full input-sm"
             placeholder="0"
           />
@@ -62,7 +93,10 @@ const DiscountModal = ({ data, setData }) => {
           <form method="dialog">
             <button className="btn btn-sm rounded-xl">Close</button>
           </form>
-          <button className="btn bg-[var(--primary-btn)] btn-sm rounded-xl">
+          <button
+            onClick={() => document.getElementById("discount_modal").close()}
+            className="btn bg-[var(--primary-btn)] btn-sm rounded-xl"
+          >
             Done
           </button>
         </div>
