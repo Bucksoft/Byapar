@@ -84,6 +84,7 @@ function App() {
         <Route path="/login" element={<LoginPage />} />
         <Route path="/masterloginforbyapar" element={<MasterLogin />} />
         <Route path="/preview-excel/:id" element={<PreviewExcel />} />
+        <Route path="/pos" element={<DashboardPOS />} />
 
         {/* PROTECTED ROUTES */}
         <Route element={<ProtectedRoute />}>
@@ -312,7 +313,7 @@ function App() {
               element={<DashboardEInvoicing />}
             />
             <Route path="/dashboard/expenses" element={<DashboardExpenses />} />
-            <Route path="/dashboard/pos" element={<DashboardPOS />} />
+
             <Route
               path="/dashboard/cashandbank"
               element={<DashboardCashAndBank />}

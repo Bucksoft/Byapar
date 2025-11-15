@@ -8,7 +8,7 @@ import {
   User,
   X,
 } from "lucide-react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useLocation, useNavigate, useParams } from "react-router-dom";
 import InvoiceTemplate from "./InvoiceTemplate";
 import { useMutation, useQuery } from "@tanstack/react-query";
 import { axiosInstance } from "../../config/axios";
@@ -42,11 +42,25 @@ const SalesInvoice = () => {
   const [isSending, setIsSending] = useState(false);
   const [checkingConn, setCheckingConn] = useState(true);
 
+  const location = useLocation();
+  const searchParams = new URLSearchParams(location.search);
+  const isPosFromParams = searchParams.get("isPos") === "true";
+
   // THIS IS THE QUERY TO GET THE INVOICE BASED ON ID
   const { isLoading, data: invoice } = useQuery({
+    queryKey: ["invoice", id],
+
     queryFn: async () => {
-      const res = await axiosInstance.get(`/sales-invoice/invoice/${id}`);
-      return res.data?.invoice;
+      const endpoint = isPosFromParams
+        ? `/pos/invoice/${id}`
+        : `/sales-invoice/invoice/${id}`;
+      const res = await axiosInstance.get(endpoint);
+      console.log(res);
+      if (res.data?.invoice) {
+        return res.data?.invoice;
+      } else {
+        return res.data?.pos;
+      }
     },
   });
 
@@ -113,9 +127,7 @@ const SalesInvoice = () => {
     }, 5000);
 
     return () => clearInterval(interval);
-  }, []); 
-
-  
+  }, []);
 
   // set the number by default if party's number is available
   useEffect(() => {
@@ -142,7 +154,7 @@ const SalesInvoice = () => {
               {invoice?.status}
             </div>
           </div>
-          
+
           <div className="flex items-center gap-3">
             {/* <button className="btn btn-sm">
               <GiProfit />
@@ -544,7 +556,7 @@ const SalesInvoice = () => {
               <InvoiceTemplate
                 color={currentTheme?.selectedColor || "#E56E2A"}
                 invoice={invoice}
-                type={"Sales Invoice"}
+                type={`${isPosFromParams ? "POS" : "Sales Invoice"}`}
                 printRef={printRef}
                 setInvoiceIdToDownload={setInvoiceIdToDownload}
               />

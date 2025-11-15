@@ -1,4 +1,12 @@
-import { IndianRupee, Plus, Search, Settings, Trash, X } from "lucide-react";
+import {
+  ArrowLeft,
+  IndianRupee,
+  Plus,
+  Search,
+  Settings,
+  Trash,
+  X,
+} from "lucide-react";
 import { motion } from "framer-motion";
 import POSTotalSidebar from "../components/POS/POSTotalSidebar";
 import { useEffect, useState } from "react";
@@ -9,9 +17,11 @@ import { useQuery } from "@tanstack/react-query";
 import { axiosInstance } from "../config/axios";
 import { useBusinessStore } from "../store/businessStore";
 import { getTotalTaxRate } from "../../helpers/getGSTTaxRate";
+import { useNavigate } from "react-router-dom";
 
 const DashboardPOS = () => {
   const [searchQuery, setSearchQuery] = useState("");
+  const navigate = useNavigate();
   const { data: itemsList } = useQuery({
     queryKey: ["posItems"],
     queryFn: async () => {
@@ -106,10 +116,6 @@ const DashboardPOS = () => {
         computedDiscount = ((subtotal + totalTax) * discountPercent) / 100;
       }
     }
-    // if (discountAmount > 0) {
-    //   computedDiscount = Number(discountAmount);
-    // }
-
     const basePlusTax = subtotal + totalTax;
     const totalBeforeAdditional = basePlusTax - computedDiscount;
 
@@ -171,12 +177,42 @@ const DashboardPOS = () => {
           }}
           className="p-2 flex items-center justify-between bg-zinc-100 border-b border-zinc-200"
         >
+          <button
+            className="btn btn-sm rounded-xl"
+            onClick={() => document.getElementById("exit_modal").showModal()}
+          >
+            <ArrowLeft size={16} />
+            Exit POS
+          </button>
           <p>POS Billing</p>
-          <button className="btn btn-sm rounded-xl">
+          {/* <button className="btn btn-sm rounded-xl">
             <Settings size={16} />
             Settings
-          </button>
+          </button> */}
         </motion.header>
+
+        <dialog id="exit_modal" className="modal">
+          <div className="modal-box">
+            <h3 className="font-bold text-lg text-center">
+              Are you sure you want to leave this page?
+            </h3>
+            <p className="text-center text-zinc-500">
+              All unsaved changes will be lost!
+            </p>
+            <div className="modal-action w-full grid grid-cols-2">
+              <form method="dialog">
+                {/* if there is a button in form, it will close the modal */}
+                <button className="btn btn-sm w-full">Stay</button>
+              </form>
+              <button
+                onClick={() => navigate("/dashboard")}
+                className="btn btn-sm btn-info"
+              >
+                Leave
+              </button>
+            </div>
+          </div>
+        </dialog>
 
         {/* POS Subheading */}
         <motion.div
@@ -266,12 +302,19 @@ const DashboardPOS = () => {
                 duration: 0.5,
               }}
               className="relative"
-              onClick={() => setShowItemsList((prev) => !prev)}
+              onBlur={() => setShowItemsList(false)}
+              // onClick={() => setShowItemsList((prev) => !prev)}
             >
               <input
                 type="search"
                 value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
+                onChange={(e) => {
+                  e.stopPropagation();
+                  setSearchQuery(e.target.value);
+                  setShowItemsList(() =>
+                    searchQuery.length > 0 ? true : false
+                  );
+                }}
                 placeholder="Search by Item name"
                 className="my-3 p-1 border rounded-md border-zinc-200 px-8 w-full"
               />
@@ -295,7 +338,6 @@ const DashboardPOS = () => {
                   <tbody>
                     {itemsList?.length &&
                       itemsList
-                        ?.filter((item) => item.isPOSItem)
                         ?.filter((item) =>
                           item.itemName
                             .toLowerCase()
@@ -303,7 +345,7 @@ const DashboardPOS = () => {
                         )
                         .map((item, index) => (
                           <tr
-                            onClick={() =>
+                            onMouseDown={() =>
                               setData((prev) => {
                                 const existingItem = prev.items.find(
                                   (i) => i._id === item._id

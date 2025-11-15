@@ -518,7 +518,9 @@ const SalesInvoiceFooterSection = ({
           </div>
 
           <div className="p-2 flex justify-between">
-            <span className="text-sm">Received</span>
+            <span className="text-sm">
+              {title === "Sales Return" ? "Amount Paid" : "Received"}
+            </span>
             <input
               type="number"
               max={invoiceTotals?.totalAmount}

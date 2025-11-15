@@ -41,7 +41,13 @@ const InvoiceTemplate = ({
   });
 
   useEffect(() => {
-    if ((type === "Sales Invoice" || type === "Quotation") && bankAccounts) {
+    if (
+      (type === "Sales Invoice" ||
+        type === "Quotation" ||
+        type === "POS" ||
+        type === "Sales Return") &&
+      bankAccounts
+    ) {
       setBankAccount(bankAccounts);
     } else if (type === "Purchase Invoice" && supplierBankAccount) {
       setBankAccount(supplierBankAccount);
@@ -90,13 +96,16 @@ const InvoiceTemplate = ({
     return acc + price * quantity;
   }, 0);
 
-  const subtotalTax = items.reduce((acc, item) => {
-    const tax =
-      Number(item?.gstAmount) ||
-      (Number(item?.salesPrice) * Number(item?.gstTaxRate || 0)) / 100 ||
-      0;
-    return acc + tax;
-  }, 0);
+  const subtotalTax =
+    type === "Sales Invoice" || type === "Sales Return"
+      ? items.reduce((acc, item) => {
+          const tax =
+            Number(item?.gstAmount) ||
+            (Number(item?.salesPrice) * Number(item?.gstTaxRate || 0)) / 100 ||
+            0;
+          return acc + tax;
+        }, 0)
+      : invoice?.tax;
 
   const subtotalDiscount = hasDiscount
     ? items.reduce((acc, item) => acc + (Number(item?.discountAmount) || 0), 0)
@@ -112,6 +121,8 @@ const InvoiceTemplate = ({
 
     return acc + (isNaN(total) ? 0 : total);
   }, 0);
+
+  console.log(invoice);
 
   return (
     <main
@@ -160,6 +171,7 @@ const InvoiceTemplate = ({
             }}
           >
             {type === "Sales Invoice" ||
+            type === "POS" ||
             (type === "Quotation" && business?.logo !== "null") ? (
               <div
                 style={{
@@ -191,7 +203,9 @@ const InvoiceTemplate = ({
             )}
 
             <h2 style={{ fontWeight: 600, fontSize: "20px" }}>
-              {type === "Sales Invoice" || type === "Quotation"
+              {type === "Sales Invoice" ||
+              type === "Quotation" ||
+              type === "POS"
                 ? business?.businessName
                 : invoice?.partyName}
             </h2>
@@ -201,7 +215,9 @@ const InvoiceTemplate = ({
                 color: "#52525b", // text-gray-600
               }}
             >
-              {type === "Sales Invoice"
+              {type === "Sales Invoice" ||
+              type === "Quotation" ||
+              type === "POS"
                 ? business?.billingAddress
                 : invoice?.partyId?.billingAddress}
             </p>
@@ -335,6 +351,8 @@ const InvoiceTemplate = ({
                   ? "Debit Note No."
                   : type === "Purchase Return"
                   ? "Purchase Return No."
+                  : type === "POS"
+                  ? "Invoice No."
                   : ""}
               </p>
               <span>
@@ -358,6 +376,8 @@ const InvoiceTemplate = ({
                   ? invoice?.debitNoteNumber
                   : type === "Purchase Return"
                   ? invoice?.purchaseReturnNumber
+                  : type === "POS"
+                  ? invoice?.posNumber
                   : ""}
               </span>
             </div>
@@ -393,13 +413,16 @@ const InvoiceTemplate = ({
                   ? "Debit Note Date"
                   : type === "Purchase Return"
                   ? "Purchase Return Date"
+                  : type === "POS"
+                  ? "Invoice Date"
                   : ""}
               </p>
               <span>
                 {type === "Sales Return"
                   ? invoice?.salesReturnDate?.split("T")[0]
                   : type === "Sales Invoice"
-                  ? invoice?.salesInvoiceDate?.split("T")[0]
+                  ? invoice?.salesInvoiceDate?.split("T")[0] ||
+                    invoice?.posDate?.split("T")[0]
                   : type === "Quotation"
                   ? invoice?.quotationDate?.split("T")[0]
                   : type === "Delivery Challan"
@@ -416,6 +439,8 @@ const InvoiceTemplate = ({
                   ? invoice?.debitNoteDate?.split("T")[0]
                   : type === "Purchase Return"
                   ? invoice?.purchaseReturnDate?.split("T")[0]
+                  : type === "POS"
+                  ? invoice?.posDate?.split("T")[0]
                   : ""}
               </span>
             </div>
@@ -439,7 +464,9 @@ const InvoiceTemplate = ({
                   ? ""
                   : type === "Debit Note"
                   ? ""
-                  : "Due Date"}
+                  : type === "POS"
+                  ? ""
+                  : ""}
               </p>
               <span>
                 {type === "Sales Return"
@@ -532,6 +559,8 @@ const InvoiceTemplate = ({
             <p style={{ fontWeight: "bold" }}>
               {type === "Purchase Invoice"
                 ? business?.businessName
+                : type === "POS"
+                ? invoice?.customerDetails?.customerName
                 : invoice?.partyId?.partyName}
             </p>
             <p style={{ fontSize: "14px", color: "#3f3f46" }}>
@@ -548,6 +577,8 @@ const InvoiceTemplate = ({
                     </span>
                   </p>
                 )
+              : type === "POS"
+              ? invoice?.customerDetails?.mobile
               : invoice?.partyId?.mobileNumber?.length > 0 && (
                   <p style={{ fontWeight: 600 }}>
                     Mobile{" "}
@@ -703,15 +734,19 @@ const InvoiceTemplate = ({
                         }}
                       >
                         <LiaRupeeSignSolid />
-                        {Number(
-                          item?.gstAmount ||
-                            (item?.salesPrice *
-                              (getTotalTaxRate(item?.gstTaxRate) || 0)) /
-                              100
-                        ).toLocaleString("en-IN", {
-                          minimumFractionDigits: 2,
-                          maximumFractionDigits: 2,
-                        })}
+                        {type === "Sales Invoice" || type === "Sales Return"
+                          ? Number(
+                              item?.gstAmount ||
+                                (item?.salesPrice *
+                                  (getTotalTaxRate(item?.gstTaxRate) || 0)) /
+                                  100
+                            ).toLocaleString("en-IN", {
+                              minimumFractionDigits: 2,
+                              maximumFractionDigits: 2,
+                            })
+                          : type === "POS"
+                          ? Number(item?.taxAmount).toFixed(2)
+                          : 0}
                       </div>
                       {item?.gstTaxRate && (
                         <div style={{ marginLeft: "4px", color: "#52525c" }}>
@@ -780,7 +815,7 @@ const InvoiceTemplate = ({
                 <td style={{ padding: "6px" }}>
                   <div style={{ display: "flex", alignItems: "center" }}>
                     <LiaRupeeSignSolid />
-                    {subtotalTaxable.toLocaleString("en-IN", {
+                    {subtotalTaxable?.toLocaleString("en-IN", {
                       minimumFractionDigits: 2,
                       maximumFractionDigits: 2,
                     })}
@@ -791,7 +826,7 @@ const InvoiceTemplate = ({
                 <td style={{ padding: "6px" }}>
                   <div style={{ display: "flex", alignItems: "center" }}>
                     <LiaRupeeSignSolid />
-                    {subtotalTax.toLocaleString("en-IN", {
+                    {subtotalTax?.toLocaleString("en-IN", {
                       minimumFractionDigits: 2,
                       maximumFractionDigits: 2,
                     })}
@@ -1021,12 +1056,15 @@ const InvoiceTemplate = ({
                 <p>CGST </p>
                 <span style={{ display: "flex", alignItems: "center" }}>
                   <LiaRupeeSignSolid />
-                  {typeof invoice?.cgst === "number" && !isNaN(invoice?.sgst)
-                    ? invoice.sgst.toLocaleString("en-IN", {
+                  {type === "Sales Invoice" || type === "Sales Return" ? (
+                    typeof invoice?.cgst === "number" &&
+                    !isNaN(invoice?.sgst) ? (
+                      invoice.sgst.toLocaleString("en-IN", {
                         minimumFractionDigits: 2,
                         maximumFractionDigits: 2,
                       })
-                    : (
+                    ) : (
+                      (
                         invoice?.items?.reduce((acc, item) => {
                           const gstRate = Number(item?.gstTaxRate) || 0;
                           const gstAmount =
@@ -1038,7 +1076,13 @@ const InvoiceTemplate = ({
                       ).toLocaleString("en-IN", {
                         minimumFractionDigits: 2,
                         maximumFractionDigits: 2,
-                      })}
+                      })
+                    )
+                  ) : type === "POS" ? (
+                    <>{Number(invoice?.tax / 2).toFixed(2)}</>
+                  ) : (
+                    0
+                  )}
                 </span>
               </div>
 
@@ -1047,12 +1091,15 @@ const InvoiceTemplate = ({
                 <p>SGST</p>
                 <span style={{ display: "flex", alignItems: "center" }}>
                   <LiaRupeeSignSolid />
-                  {typeof invoice?.sgst === "number" && !isNaN(invoice?.sgst)
-                    ? invoice.sgst.toLocaleString("en-IN", {
+                  {type === "Sales Invoice" || type === "Sales Return" ? (
+                    typeof invoice?.sgst === "number" &&
+                    !isNaN(invoice?.sgst) ? (
+                      invoice.sgst.toLocaleString("en-IN", {
                         minimumFractionDigits: 2,
                         maximumFractionDigits: 2,
                       })
-                    : (
+                    ) : (
+                      (
                         invoice?.items?.reduce((acc, item) => {
                           const gstRate = Number(item?.gstTaxRate) || 0;
                           const gstAmount =
@@ -1064,7 +1111,13 @@ const InvoiceTemplate = ({
                       ).toLocaleString("en-IN", {
                         minimumFractionDigits: 2,
                         maximumFractionDigits: 2,
-                      })}
+                      })
+                    )
+                  ) : type === "POS" ? (
+                    <>{Number(invoice?.tax / 2).toFixed(2)}</>
+                  ) : (
+                    0
+                  )}
                 </span>
               </div>
 
@@ -1086,7 +1139,7 @@ const InvoiceTemplate = ({
                   <div
                     style={{ display: "flex", justifyContent: "space-between" }}
                   >
-                    <p>{charge?.reason}</p>
+                    <p>{charge?.reason || charge.charge}</p>
                     <span style={{ display: "flex", alignItems: "center" }}>
                       {charge?.amount > 0 && (
                         <>
@@ -1112,16 +1165,37 @@ const InvoiceTemplate = ({
               )}
 
               {/* ADDITIONAL DISCOUNT AMOUNT */}
-              {invoice?.additionalDiscountAmount > 0 && (
-                <div
-                  style={{ display: "flex", justifyContent: "space-between" }}
-                >
-                  <p>Discount Amount</p>
-                  <span style={{ display: "flex", alignItems: "center" }}>
-                    <LiaRupeeSignSolid />
-                    {Number(invoice?.additionalDiscountAmount).toFixed(2)}
-                  </span>
-                </div>
+              {type === "Sales Invoice" ? (
+                invoice?.additionalDiscountAmount > 0 && (
+                  <div
+                    style={{ display: "flex", justifyContent: "space-between" }}
+                  >
+                    <p>Discount Amount</p>
+                    <span style={{ display: "flex", alignItems: "center" }}>
+                      <LiaRupeeSignSolid />
+                      {Number(invoice?.additionalDiscountAmount).toFixed(2)}
+                    </span>
+                  </div>
+                )
+              ) : type === "POS" ? (
+                <>
+                  {invoice?.discountAmount > 0 && (
+                    <div
+                      style={{
+                        display: "flex",
+                        justifyContent: "space-between",
+                      }}
+                    >
+                      <p>Discount Amount</p>
+                      <span style={{ display: "flex", alignItems: "center" }}>
+                        <LiaRupeeSignSolid />
+                        {Number(invoice?.discountAmount).toFixed(2)}
+                      </span>
+                    </div>
+                  )}
+                </>
+              ) : (
+                <></>
               )}
 
               {/* DISCOUNT */}
@@ -1180,10 +1254,22 @@ const InvoiceTemplate = ({
               />
               {/* RECEIVED AMOUNT */}
               <div className="flex items-center justify-between">
-                <span>Received Amount</span>
+                <span>
+                  {type === "Sales Return" ? "Paid Amount" : "Received Amount"}
+                </span>
                 <p className="flex items-center">
                   {" "}
-                  <LuIndianRupee /> {invoice?.receivedAmount}
+                  {type === "Sales Return" ? (
+                    <>
+                      <LuIndianRupee />
+                      {invoice?.amountPaid}
+                    </>
+                  ) : (
+                    <>
+                      <LuIndianRupee />
+                      {invoice?.receivedAmount}
+                    </>
+                  )}
                 </p>
               </div>
 
@@ -1230,6 +1316,7 @@ const InvoiceTemplate = ({
             {/* TERMS AND CONDITION BLOCK */}
             <div style={{ marginTop: "12px" }}>
               {type === "Sales Invoice" ||
+                type === "POS" ||
                 (type === "Quotation" &&
                   invoice?.termsAndCondition &&
                   business?.termsAndCondition && (
@@ -1249,6 +1336,7 @@ const InvoiceTemplate = ({
                   ))}
 
               {type === "Sales Invoice" ||
+                type === "POS" ||
                 (type === "Quotation" && business?.notes && (
                   <div style={{ marginTop: "16px" }}>
                     <h4 style={{ fontWeight: 600 }}>Notes</h4>
@@ -1268,6 +1356,7 @@ const InvoiceTemplate = ({
             {/* SIGNATURE BLOCK */}
             <div style={{ marginTop: "50px", marginLeft: "200px" }}>
               {type === "Sales Invoice" ||
+              type === "POS" ||
               (type === "Quotation" && business?.signature !== "null") ? (
                 <img
                   src={business?.signature}

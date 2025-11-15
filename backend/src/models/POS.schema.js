@@ -17,6 +17,14 @@ const posSchema = new mongoose.Schema(
         required: true,
       },
     ],
+    posNumber: {
+      type: Number,
+      default: 0,
+    },
+    posDate: {
+      type: Date,
+      default: Date.now,
+    },
     discountPercent: {
       type: Number,
       default: 0,
@@ -81,6 +89,27 @@ const posSchema = new mongoose.Schema(
     paymentDate: {
       type: Date,
       default: Date.now,
+    },
+    type: {
+      type: String,
+      default: "pos invoice",
+    },
+    status: {
+      type: String,
+      enum: [
+        "paid",
+        "unpaid",
+        "draft",
+        "partially paid",
+        "cancelled",
+        "draft",
+        "open",
+        "accepted",
+        "rejected",
+        "converted",
+        "expired",
+      ],
+      default: "paid",
     },
   },
   { timestamps: true }

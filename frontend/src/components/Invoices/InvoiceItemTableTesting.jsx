@@ -394,14 +394,19 @@ const SalesInvoiceItemTableTesting = ({
             <input
               type="number"
               min={1}
+              max={title === "Sales Return" ? item.quantity : 1}
               value={quantities[item._id] || item?.quantity || 1}
               onChange={(e) => {
                 let newQty = Number(e.target.value);
+
                 if (isNaN(newQty) || newQty < 1) newQty = 1;
+                if (newQty > item.quantity) newQty = item.quantity;
+
                 setQuantities((prev) => ({
                   ...prev,
                   [item._id]: newQty,
                 }));
+
                 setData((prev) => ({
                   ...prev,
                   items: prev.items.map((i) =>

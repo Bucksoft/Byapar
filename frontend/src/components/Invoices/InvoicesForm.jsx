@@ -140,6 +140,8 @@ const InvoicesForm = ({
       let endpoint = "";
       let method = isEditing ? "patch" : "post";
 
+      
+
       switch (title) {
         case "Quotation":
           endpoint = `/quotation/${business?._id}`;

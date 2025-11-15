@@ -6,7 +6,7 @@ import { useMemo, useState } from "react";
 import { LuIndianRupee } from "react-icons/lu";
 import { downloadPDF } from "../../../helpers/downloadPdf";
 import CustomLoader from "../Loader";
-import { handlePrint } from "../../../helpers/print";
+import { handlePaymentPrint, handlePrint } from "../../../helpers/print";
 import { useRef } from "react";
 import { toTitleCase } from "../../../helpers/titleCaseString";
 
@@ -46,14 +46,14 @@ const PartyLedgerStatement = ({
         if (!invoicePartyId || invoicePartyId !== party._id) return;
 
         allEntries.push({
-          date: invoice?.salesInvoiceDate || new Date(),
-          voucher: invoice?.type || "Sales Invoice",
-          srNo: invoice?.salesInvoiceNumber ?? "-",
+          date: invoice.salesInvoiceDate,
+          voucher: "Sales Invoice",
+          srNo: invoice.salesInvoiceNumber,
+          debit: Number(invoice.totalAmount) || 0,
           credit: 0,
-          debit: Number(invoice?.totalAmount) || 0,
+          status: invoice.status,
           tdsDeductedByParty: Number(invoice?.tdsDeductedByParty) || 0,
           tdsDeductedBySelf: Number(invoice?.tdsDeductedBySelf) || 0,
-          status: invoice?.status,
         });
       });
 
@@ -254,7 +254,7 @@ const PartyLedgerStatement = ({
 
         {/* PRINTER */}
         <button
-          onClick={() => handlePrint(printRef)}
+          onClick={() => handlePaymentPrint(printRef)}
           className="btn btn-sm ml-2 w-1/8 rounded-xl"
         >
           <Printer size={14} /> Print

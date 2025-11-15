@@ -66,6 +66,19 @@ const DashboardSalesPage = () => {
     retry: 1,
   });
 
+  // FETCH ALL POS INVOICES
+  const { data: posInvoices } = useQuery({
+    queryKey: ["pos-invoices", business?._id],
+    queryFn: async () => {
+      if (!business) return [];
+      const res = await axiosInstance.get(`/pos/?businessId=${business._id}`);
+      return res.data;
+    },
+    enabled: !!business,
+    keepPreviousData: true,
+    retry: 1,
+  });
+
   useEffect(() => {
     if (isSuccess && invoices) {
       setInvoices(invoices?.invoices || []);
@@ -126,22 +139,30 @@ const DashboardSalesPage = () => {
 
   // SEARCH INVOICES
   const searchedInvoices = useMemo(() => {
-    if (!invoices?.invoices?.length) return [];
+    const all = [...(invoices?.invoices || []), ...(posInvoices?.pos || [])];
 
-    return invoices?.invoices?.filter((item) => {
+    if (!all.length) return [];
+
+    const filtered = all.filter((item) => {
+      const q = searchQuery?.toLowerCase();
+
       const invoiceMatch = item?.salesInvoiceNumber
         ?.toString()
         ?.toLowerCase()
-        .includes(searchQuery?.toLowerCase());
+        .includes(q);
 
-      const partyMatch = item?.partyName
-        ?.toString()
-        ?.toLowerCase()
-        .includes(searchQuery?.toLowerCase());
-
-      return invoiceMatch || partyMatch;
+      const posMatch = item?.posNumber?.toString()?.toLowerCase().includes(q);
+      const partyMatch = item?.partyName?.toString()?.toLowerCase().includes(q);
+      return invoiceMatch || posMatch || partyMatch;
     });
-  }, [invoices, searchQuery]);
+
+    return filtered.sort((a, b) => {
+      const numA = a.salesInvoiceNumber ?? a.posNumber ?? 0;
+      const numB = b.salesInvoiceNumber ?? b.posNumber ?? 0;
+
+      return numB - numA; // descending
+    });
+  }, [invoices, posInvoices, searchQuery]);
 
   const paginatedInvoices = useMemo(() => {
     const startIndex = (currentPage - 1) * itemsPerPage;
@@ -181,6 +202,11 @@ const DashboardSalesPage = () => {
     e.target.value = null;
   };
 
+  const toNumber = (value) => {
+    if (!value) return 0;
+    return Number(String(value).replace(/,/g, "")) || 0;
+  };
+
   return (
     <main className="h-screen overflow-y-scroll p-2 ">
       <div className="h-full w-full mb-3 flex flex-col bg-gradient-to-b from-white to-transparent rounded-lg p-3 ">
@@ -203,7 +229,10 @@ const DashboardSalesPage = () => {
             </div>
             <span className="font-medium text-2xl flex items-center gap-2">
               <FaIndianRupeeSign size={15} />
-              {invoices?.totalSales || 0}
+              {(
+                toNumber(invoices?.totalSales) +
+                toNumber(posInvoices?.totalSales)
+              ).toLocaleString("en-IN")}
             </span>
           </div>
 
@@ -217,7 +246,9 @@ const DashboardSalesPage = () => {
             </p>
             <span className="font-medium text-2xl flex items-center gap-2">
               <FaIndianRupeeSign size={15} />
-              {invoices?.totalPaid || 0}
+              {(
+                toNumber(invoices?.totalPaid) + toNumber(posInvoices?.totalPaid)
+              ).toLocaleString("en-IN")}
             </span>
           </div>
 
@@ -231,7 +262,10 @@ const DashboardSalesPage = () => {
             </p>
             <span className="font-medium text-2xl flex items-center gap-2">
               <FaIndianRupeeSign size={15} />
-              {invoices?.totalUnpaid || 0}
+              {(
+                toNumber(invoices?.totalUnpaid) +
+                toNumber(posInvoices?.totalUnpaid)
+              ).toLocaleString("en-IN")}
             </span>
           </div>
         </motion.div>
@@ -336,17 +370,27 @@ const DashboardSalesPage = () => {
                     <tr
                       key={invoice?._id}
                       onClick={() =>
-                        navigate(`/dashboard/sales-invoice/${invoice?._id}`)
+                        navigate(
+                          `/dashboard/sales-invoice/${invoice?._id}?isPos=${
+                            invoice?.type === "pos invoice" && true
+                          }`
+                        )
                       }
                       className="cursor-pointer hover:bg-zinc-50"
                     >
                       <td>
                         {invoice?.salesInvoiceDate
                           ? invoice?.salesInvoiceDate.split("T")[0]
-                          : "-"}
+                          : invoice?.posDate?.split("T")[0] || "-"}
                       </td>
-                      <td>{invoice?.salesInvoiceNumber}</td>
-                      <td>{invoice?.partyId?.partyName || "-"}</td>
+                      <td>
+                        {invoice?.salesInvoiceNumber || invoice?.posNumber}
+                      </td>
+                      <td>
+                        {invoice?.partyId?.partyName ||
+                          invoice?.customerDetails?.customerName ||
+                          "-"}
+                      </td>
                       <td>{invoice?.dueDate?.split("T")[0] || "-"}</td>
                       <td className="">
                         <div className="flex items-center">
@@ -357,9 +401,9 @@ const DashboardSalesPage = () => {
                       <td>
                         <div className="flex items-center">
                           <LiaRupeeSignSolid />
-                          {Number(invoice?.settledAmount).toLocaleString(
-                            "en-IN"
-                          )}
+                          {Number(
+                            invoice?.settledAmount || invoice?.receivedAmount
+                          ).toLocaleString("en-IN")}
                         </div>
                       </td>
                       <td>

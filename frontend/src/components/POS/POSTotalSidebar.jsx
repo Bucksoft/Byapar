@@ -13,6 +13,10 @@ const POSTotalSidebar = ({ data, setData }) => {
 
   const mutation = useMutation({
     mutationFn: async () => {
+      if (data?.items?.length === 0) {
+        throw new Error("Please add at least 1 item");
+      }
+
       return await axiosInstance.post(
         `/pos/?businessId=${business?._id}`,
         data
@@ -20,6 +24,33 @@ const POSTotalSidebar = ({ data, setData }) => {
     },
     onSuccess: () => {
       toast.success("Created successfully");
+      setData({
+        items: [],
+        discountPercent: 0,
+        discountAmount: 0,
+        discountType: "after_tax",
+        computedDiscount: 0,
+        additionalCharges: [
+          {
+            charge: "",
+            amount: 0,
+          },
+        ],
+        totalAdditionalCharges: 0,
+        customerDetails: {
+          mobile: "",
+          customerName: "",
+        },
+        subTotal: 0,
+        tax: 0,
+        totalAmount: 0,
+        receivedAmount: 0,
+        paymentMode: "cash",
+      });
+    },
+
+    onError: (err) => {
+      toast.error(err.message);
     },
   });
 

@@ -271,7 +271,7 @@ const Sidebar = () => {
                 <div key={field.id} variants={dashboardLinksItems}>
                   <NavLink
                     end
-                    to={field.link}
+                    to={field.link === "pos" ? `/${field.link}` : field.link}
                     className={({ isActive }) =>
                       ` group px-4 my-1 flex items-center gap-5 text-xs py-2 cursor-pointer transition-all ease-in-out duration-150 
                   ${

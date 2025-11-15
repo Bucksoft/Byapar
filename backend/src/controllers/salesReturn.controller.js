@@ -29,7 +29,6 @@ export async function createSalesReturn(req, res) {
       salesReturnNumber: validatedResult.data?.salesInvoiceNumber,
       businessId: req?.params?.id,
     });
-    
 
     let itemsToProcess = [];
 
@@ -99,6 +98,12 @@ export async function createSalesReturn(req, res) {
       ...cleanData
     } = data;
 
+    const totalAmount = Number(req.body?.totalAmount || 0);
+    const amountPaid = Number(req.body?.receivedAmount || 0);
+    const balanceAmount = totalAmount - amountPaid;
+    const pendingAmount = totalAmount - amountPaid;
+    const settledAmount = amountPaid;
+
     const salesReturnPayload = {
       partyId: party._id,
       salesReturnNumber:
@@ -106,6 +111,10 @@ export async function createSalesReturn(req, res) {
         validatedResult.data?.salesInvoiceNumber,
       businessId: req.params?.id,
       clientId: req.user?.id,
+      amountPaid,
+      balanceAmount,
+      pendingAmount,
+      settledAmount,
       ...cleanData,
     };
 

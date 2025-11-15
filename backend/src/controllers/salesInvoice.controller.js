@@ -2,6 +2,7 @@ import { salesInvoiceSchema } from "../config/validation.js";
 import SalesInvoice from "../models/salesInvoiceSchema.js";
 import Party from "../models/party.schema.js";
 import { Item } from "../models/item.schema.js";
+import { PaymentIn } from "../models/paymentIn.schema.js";
 import mongoose from "mongoose";
 import { parseDate } from "../../src/utils/date.js";
 import { getFinancialYearRange } from "../utils/financialYear.js";
@@ -147,6 +148,40 @@ export async function createSalesInvoice(req, res) {
     party.totalDebits = (party.totalDebits || 0) + totalAmount;
     party.totalCredits = (party.totalCredits || 0) + settledAmount;
     party.totalInvoices = (party.totalInvoices || 0) + 1;
+
+    // if there is a received amount then we need to add a record in the payment in as well
+    // fetch the latest payment in of the business.
+    const latestPaymentIn = await PaymentIn.find({
+      businessId: req.params?.id,
+      clientId: req.user?.id,
+    })
+      .sort({ paymentInNumber: -1 })
+      .limit(1);
+
+    const paymentInNumber =
+      latestPaymentIn.length > 0
+        ? Number(latestPaymentIn[0].paymentInNumber) + 1
+        : 1;
+
+    if (receivedAmount > 0) {
+      await PaymentIn.create({
+        paymentInNumber,
+        businessId: req.params?.id,
+        partyId: party?._id,
+        clientId: req.user?.id,
+        paymentAmount: receivedAmount,
+        paymentDate: new Date().toISOString().split("T")[0],
+        partyName: party?.partyName,
+        notes: "",
+        type: "payment in",
+        status: "active",
+        settledInvoices: [
+          {
+            [salesInvoice?._id]: receivedAmount,
+          },
+        ],
+      });
+    }
 
     await party.save();
 

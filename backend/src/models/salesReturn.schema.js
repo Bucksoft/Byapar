@@ -27,7 +27,6 @@ const salesReturnSchema = new mongoose.Schema(
     cgst: String,
     totalAmount: { type: Number, required: true },
     balanceAmount: { type: Number, required: true },
-
     partyId: { type: mongoose.Schema.Types.ObjectId, ref: "Party" },
     notes: { type: String, default: "" },
     termsAndCondition: { type: String, default: "" },
@@ -76,6 +75,11 @@ const salesReturnSchema = new mongoose.Schema(
       type: Boolean,
       default: false,
     },
+    amountPaid: {
+      type: Number,
+      default: 0,
+    },
+
   },
   {
     strict: false,
